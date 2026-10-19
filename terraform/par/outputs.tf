@@ -1,3 +1,8 @@
+output "cluster_name" {
+  description = "Prefix of every resource name on this site, used by the leftover sweep."
+  value       = var.cluster_name
+}
+
 output "control_plane_public_ip" {
   description = "Public address of the control plane. SSH and kubectl from a laptop arrive here."
   value       = scaleway_instance_ip.control_plane.address

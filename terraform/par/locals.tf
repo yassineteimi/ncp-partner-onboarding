@@ -1,5 +1,8 @@
 locals {
-  tags = ["gpu-fleet-poc", var.cluster_name]
+  tags = ["ncp-partner-onboarding", var.cluster_name]
+
+  # The site this Terraform root builds. Nodes carry it as eu1.io/site.
+  site = "par"
 
   # Every zonal resource of the GPU node (its IP, server, private NIC and
   # security group) lives here. Nothing of the control plane does.

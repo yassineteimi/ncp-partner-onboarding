@@ -39,7 +39,7 @@ variable "gpu_zone" {
 variable "cluster_name" {
   description = "Prefix applied to every resource name and used as the Kubernetes cluster name."
   type        = string
-  default     = "gpu-fleet"
+  default     = "eu1-par"
 }
 
 ########################################
@@ -132,8 +132,9 @@ variable "node_ip_mode" {
 variable "control_plane_type" {
   description = <<-EOT
     Commercial type of the persistent control plane node. PLAY2-MICRO is 4 vCPU
-    and 8 GB, which holds etcd, the control plane, ArgoCD and kube-prometheus-stack.
-    Verify the SKU is offered in your zone before the first apply:
+    and 8 GB at 0.055 euros an hour (Scaleway API, 2026-10-19), which holds etcd,
+    the control plane, ArgoCD, kube-prometheus-stack and the Garage store. The
+    use case workloads go to the CPU worker. Check the zone offers it with:
     scw instance server-type list zone=fr-par-2
   EOT
   type        = string
@@ -147,9 +148,12 @@ variable "control_plane_root_volume_size_gb" {
 }
 
 variable "control_plane_image" {
-  description = "Scaleway image label for the control plane node."
+  description = <<-EOT
+    Scaleway image label for the control plane node. Ubuntu 24.04, the same
+    release kapsule_noble gives the GPU node, so the site runs one release.
+  EOT
   type        = string
-  default     = "ubuntu_jammy"
+  default     = "ubuntu_noble"
 }
 
 ########################################
@@ -228,15 +232,15 @@ variable "kubernetes_minor" {
 
 variable "kubernetes_package_version" {
   description = <<-EOT
-    Exact Debian package version for kubelet, kubeadm and kubectl, for example
-    1.36.4-1.1. Leave empty to take the newest patch in kubernetes_minor. After
-    the first apply, read the installed version off a node and set it here so the
-    cluster rebuilds bit for bit:
+    Exact Debian package version for kubelet, kubeadm and kubectl. Both sites
+    pin the same one. 1.36.5-1.1 was the newest patch in the v1.36 repository on
+    2026-10-19. Empty takes whatever is newest in kubernetes_minor, which makes
+    a rebuild merely similar rather than identical. Check what a node got with:
 
       ssh root@<control plane> 'dpkg-query -W -f=$${Version} kubeadm'
   EOT
   type        = string
-  default     = ""
+  default     = "1.36.5-1.1"
 }
 
 variable "pod_subnet" {

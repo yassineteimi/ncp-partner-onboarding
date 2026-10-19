@@ -50,7 +50,7 @@ hostnamectl set-hostname ${node_name}
 sed -i '/127.0.1.1/d' /etc/hosts
 echo "${node_ip} ${node_name}" >> /etc/hosts
 
-mkdir -p /var/lib/gpu-fleet
+mkdir -p /var/lib/eu1
 
 ########################################
 # Private network interface
@@ -82,14 +82,14 @@ has_address() {
 
 write_netplan() {
   local iface="$1" body="$2"
-  cat > /etc/netplan/60-gpu-fleet-private.yaml <<EOF
+  cat > /etc/netplan/60-eu1-private.yaml <<EOF
 network:
   version: 2
   ethernets:
     $iface:
 $body
 EOF
-  chmod 600 /etc/netplan/60-gpu-fleet-private.yaml
+  chmod 600 /etc/netplan/60-eu1-private.yaml
   netplan apply
 }
 
@@ -271,7 +271,7 @@ systemctl enable kubelet
   echo "kubeadm=$(kubeadm version -o short)"
   echo "kubelet_package=$(dpkg-query -W -f='$${Version}' kubelet)"
   echo "bootstrapped_at=$(date -Is)"
-} > /var/lib/gpu-fleet/bootstrap-facts.txt
+} > /var/lib/eu1/bootstrap-facts.txt
 
 log "common bootstrap complete"
-cat /var/lib/gpu-fleet/bootstrap-facts.txt
+cat /var/lib/eu1/bootstrap-facts.txt

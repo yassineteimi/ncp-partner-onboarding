@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
-# Start a working session: create the GPU node, join it to the existing cluster,
-# and wait for the GPU to become a schedulable resource.
+# Start a GPU window on site par: create the L4 node, join it to the existing
+# cluster, and wait for the GPU to become a schedulable resource.
 #
 # The join token is never stored anywhere. It is created on the control plane at
 # the moment it is needed, with a short lifetime, and the CA is verified through
@@ -9,14 +9,16 @@
 # Git and --discovery-token-unsafe-skip-ca-verification is not used.
 #
 
-source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/../lib.sh"
+use_site par
 
 require_tools terraform kubectl ssh ssh-keygen
 load_env
+require_scaleway_env
 require_kubeconfig
 
 CP_PUBLIC_IP="$(tf_output control_plane_public_ip)"
-[ -n "$CP_PUBLIC_IP" ] || die "no control plane in the Terraform state. Run scripts/cluster-up.sh first."
+[ -n "$CP_PUBLIC_IP" ] || die "no control plane in the Terraform state. Run make par-cluster first."
 
 if [ "$(tf_output gpu_node_enabled)" = "true" ]; then
   warn "gpu_node_enabled is already true. Converging rather than creating."
@@ -32,25 +34,33 @@ fi
 ########################################
 
 SESSION_START="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+timeline_start "$ARTIFACTS/gpu-bringup-$(date -u +%Y%m%dT%H%M%SZ).txt"
+mark apply_started
 
 cat > "$GPU_TFVARS" <<EOF
-# Written by scripts/gpu-up.sh at $SESSION_START. Gitignored.
-# scripts/gpu-down.sh sets this back to false.
+# Written by scripts/par/gpu-up.sh at $SESSION_START. Gitignored.
+# scripts/par/gpu-down.sh sets this back to false.
 gpu_node_enabled = true
 EOF
 
 log "terraform apply, creating the GPU node"
 apply_gpu_only
+mark instance_created
 
 GPU_PUBLIC_IP="$(tf_output gpu_node_public_ip)"
 GPU_NODE_NAME="$(tf_output gpu_node_name)"
 [ -n "$GPU_PUBLIC_IP" ] || die "terraform produced no GPU node address"
+
+# The cost record opens now, from the moment the apply started, so a bring-up
+# that fails half way still shows up in make cost.
+session_open "$GPU_NODE_NAME" "$(tf_output gpu_node_type)" "$PAR_GPU_HOURLY_EUR" EUR "$SESSION_START"
 
 log "GPU node is $GPU_NODE_NAME at $GPU_PUBLIC_IP"
 
 forget_host "$GPU_PUBLIC_IP"
 wait_for_ssh "$GPU_PUBLIC_IP" 600
 wait_for_bootstrap "$GPU_PUBLIC_IP" 1800
+mark bootstrap_complete
 
 ########################################
 # Join
@@ -71,8 +81,9 @@ node_ssh "$GPU_PUBLIC_IP" \
 
 log "waiting for $GPU_NODE_NAME to report Ready"
 kubectl_cp wait --for=condition=Ready "node/$GPU_NODE_NAME" --timeout=600s
+mark node_ready
 
-kubectl_cp label node "$GPU_NODE_NAME" gpu-fleet.io/role=gpu --overwrite
+kubectl_cp label node "$GPU_NODE_NAME" eu1.io/site=par eu1.io/pool=gpu --overwrite
 
 ########################################
 # Wait for the GPU Operator to do its job
@@ -95,19 +106,10 @@ while [ "$(date +%s)" -lt "$GPU_DEADLINE" ]; do
   sleep 15
 done
 
-########################################
-# Cost record
-########################################
-
-GPU_NODE_TYPE="$(tf_output gpu_node_type)"
-
-if [ ! -f "$SESSION_LOG" ]; then
-  echo "started_at,ended_at,node_name,node_type" > "$SESSION_LOG"
-fi
-echo "$SESSION_START,,$GPU_NODE_NAME,$GPU_NODE_TYPE" >> "$SESSION_LOG"
-
 if [ -n "$GPU_COUNT" ] && [ "$GPU_COUNT" != "0" ]; then
+  mark gpu_allocatable
   log "node is advertising nvidia.com/gpu: $GPU_COUNT"
+  log "bring-up timeline saved to ${TIMELINE#"$REPO_ROOT"/}"
 else
   warn "the node is Ready but is not advertising nvidia.com/gpu yet."
   warn "That is expected until the GPU Operator has been synced by ArgoCD. Check:"
@@ -120,6 +122,6 @@ cat <<EOF
 
 GPU node up since $SESSION_START. It is billing from now until you run:
 
-  make down
+  make par-gpu-down
 
 EOF

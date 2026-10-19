@@ -11,7 +11,8 @@
 # is GNU and macOS wants -D.
 #
 
-source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/../lib.sh"
+use_site "${SITE:-par}"
 
 require_tools kubectl
 require_kubeconfig
@@ -48,7 +49,7 @@ if [ -n "$password" ]; then
 else
   warn "argocd-initial-admin-secret is not there."
   warn "Either the admin password was already changed, or ArgoCD is not installed."
-  warn "Run ./scripts/bootstrap-argocd.sh, or reset the password as described in the runbook."
+  warn "Run make $SITE-argocd, or reset the password as shown above."
 fi
 
 cat <<EOF

@@ -4,7 +4,9 @@
 # environment, so source the gitignored .env first:
 #
 #   set -a && source .env && set +a
-#   cd terraform && terraform init && terraform apply
+#   cd terraform/par && terraform init && terraform apply
+#
+# The scripts in scripts/par/ do this for you; prefer make par-cluster.
 
 ########################################
 # Placement
@@ -19,7 +21,7 @@ zone   = "fr-par-2"
 # has no L4 free; the Private Network is regional. Leave empty to follow zone.
 # gpu_zone = "fr-par-1"
 
-cluster_name = "gpu-fleet"
+cluster_name = "eu1-par"
 
 ########################################
 # Access
@@ -86,7 +88,7 @@ kubernetes_minor = "1.36"
 #
 #   ssh root@<control plane> "dpkg-query -W -f='\${Version}' kubeadm"
 #
-# or read /var/lib/gpu-fleet/bootstrap-facts.txt, which every node writes.
-kubernetes_package_version = "1.36.4-1.1"
+# or read /var/lib/eu1/bootstrap-facts.txt, which every node writes.
+kubernetes_package_version = "1.36.5-1.1"
 
 flannel_version = "v0.28.9"

@@ -1,23 +1,25 @@
 #!/usr/bin/env bash
 #
-# Create the persistent half of the cluster: the private network and the control
+# Create the persistent half of site par: the private network and the control
 # plane node. Idempotent. Run it once at the start of the project and again any
 # time the control plane has been destroyed.
 #
-# The GPU node is deliberately not touched here. It is created by gpu-up.sh at
-# the start of a working session and destroyed by gpu-down.sh at the end, so
-# that an L4 is never billing while nobody is looking at it.
+# The CPU worker and the L4 are not touched here. They have their own up and
+# down scripts, so that nothing bigger than the control plane bills while
+# nobody needs it.
 #
 
-source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/../lib.sh"
+use_site par
 
 require_tools terraform kubectl ssh ssh-keygen
 load_env
+require_scaleway_env
 
 log "terraform init"
 tf init -input=false
 
-log "terraform apply, control plane only"
+log "terraform apply, control plane and network"
 tf apply -input=false -auto-approve
 
 CP_PUBLIC_IP="$(tf_output control_plane_public_ip)"
@@ -53,20 +55,31 @@ chmod 600 "$KUBECONFIG_PATH"
 log "waiting for the control plane to report Ready"
 kubectl_cp wait --for=condition=Ready "node/$CP_NODE_NAME" --timeout=300s
 
+########################################
+# Evidence: what actually landed on the node, read off the node.
+########################################
+
+umask 022
+mkdir -p "$ARTIFACTS"
+FACTS="$ARTIFACTS/control-plane-facts.txt"
+{
+  echo "# $CP_NODE_NAME, captured $(date -u +%Y-%m-%dT%H:%M:%SZ) by scripts/par/cluster-up.sh"
+  node_ssh "$CP_PUBLIC_IP" cat /var/lib/eu1/bootstrap-facts.txt
+  echo
+  kubectl_cp get nodes -o wide
+} > "$FACTS"
+log "node facts saved to ${FACTS#"$REPO_ROOT"/}"
+
 kubectl_cp get nodes -o wide
 
 cat <<EOF
 
-Cluster is up. Point kubectl at it with:
+Site par is up. Point kubectl at it with:
 
   export KUBECONFIG=$KUBECONFIG_PATH
 
-Next, install ArgoCD and hand it this repository:
+Next, install ArgoCD and hand it gitops/sites/par/root.yaml:
 
-  ./scripts/bootstrap-argocd.sh
-
-Then, when you are ready to spend money on a GPU:
-
-  make up
+  make par-argocd
 
 EOF

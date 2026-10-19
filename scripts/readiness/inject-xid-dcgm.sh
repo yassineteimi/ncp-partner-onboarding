@@ -16,7 +16,8 @@
 # node-problem-detector reads.
 #
 
-source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/../lib.sh"
+use_site par
 
 require_tools kubectl
 require_kubeconfig
@@ -26,8 +27,9 @@ POD="$(kubectl_cp -n gpu-operator get pods -l app=nvidia-dcgm -o jsonpath='{.ite
 [ -n "$POD" ] || die "no standalone DCGM pod (app=nvidia-dcgm) in gpu-operator. Is the GPU node up?"
 
 warn "SIMULATED: injecting XID $XID into DCGM's cache on $POD. The GPU is fine."
+mkdir -p "$REPO_ROOT/docs/artifacts/readiness"
 kubectl_cp -n gpu-operator exec "$POD" -- dcgmi test --inject --gpuid 0 -f 230 -v "$XID" \
-  | tee "$REPO_ROOT/docs/artifacts/session-b-xid-injection.txt"
+  | tee "$REPO_ROOT/docs/artifacts/readiness/xid-dcgm-injection.txt"
 echo "xid_injected=$(date -u +%Y-%m-%dT%H:%M:%SZ) xid=$XID simulated=true" \
-  | tee -a "$REPO_ROOT/docs/artifacts/session-b-load-timeline.txt"
+  | tee -a "$REPO_ROOT/docs/artifacts/readiness/xid-timeline.txt"
 log "GPUXidCritical should fire on the next rule evaluation if the exporter counted it"

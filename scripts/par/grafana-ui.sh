@@ -5,7 +5,8 @@
 # rather than hand over a command that pipes it through base64 -d.
 #
 
-source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/../lib.sh"
+use_site "${SITE:-par}"
 
 require_tools kubectl
 require_kubeconfig
@@ -22,10 +23,9 @@ cat <<TXT
 
   user:      ${user:-admin}
   password:  $pass
-  URL:       http://localhost:$PORT/d/gpu-fleet
+  URL:       http://localhost:$PORT
 
-The GPU fleet dashboard is provisioned from Git. Changes made in the UI are not
-kept. Ctrl-C to stop the port-forward.
+Dashboards are provisioned from Git. Changes made in the UI are not kept. Ctrl-C to stop the port-forward.
 
 TXT
 

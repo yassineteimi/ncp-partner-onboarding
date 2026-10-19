@@ -9,14 +9,16 @@
 # list is not the same as the list for ordinary instances. The marketplace API is
 # the only authority on it, so ask it rather than guess.
 #
-# Usage: make gpu-images                   zone and type from Terraform
-#        scripts/gpu-images.sh ZONE TYPE    anything else, e.g. pl-waw-2 L4-1-24G
+# Usage: make par-images                   zone and type from Terraform
+#        scripts/par/gpu-images.sh ZONE TYPE    anything else, e.g. pl-waw-2 L4-1-24G
 #
 
-source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/../lib.sh"
+use_site par
 
 require_tools curl jq terraform
 load_env
+require_scaleway_env
 
 ZONE="${1:-$(tf_output gpu_zone)}"
 ZONE="${ZONE:-fr-par-2}"

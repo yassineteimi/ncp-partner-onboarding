@@ -20,7 +20,7 @@
 # after this script has finished.
 #
 set -euo pipefail
-exec > >(tee -a /var/log/gpu-fleet-bootstrap.log) 2>&1
+exec > >(tee -a /var/log/eu1-bootstrap.log) 2>&1
 
 log() { echo "[bootstrap $(date -Is)] $*"; }
 
@@ -33,7 +33,7 @@ log() { echo "[bootstrap $(date -Is)] $*"; }
 # the bootstrap diagnosable rather than mysterious.
 ########################################
 
-mkdir -p /var/lib/gpu-fleet
+mkdir -p /var/lib/eu1
 {
   echo "== os"
   . /etc/os-release && echo "$PRETTY_NAME"
@@ -50,10 +50,10 @@ mkdir -p /var/lib/gpu-fleet
     | grep -E 'kubelet|containerd|docker|nvidia' || echo "none of interest"
   echo "== kernel modules"
   lsmod | grep -E '^(nvidia|nouveau)' || echo "no nvidia or nouveau module loaded"
-} > /var/lib/gpu-fleet/image-inventory.txt 2>&1 || true
+} > /var/lib/eu1/image-inventory.txt 2>&1 || true
 
 log "image inventory, before any change:"
-cat /var/lib/gpu-fleet/image-inventory.txt
+cat /var/lib/eu1/image-inventory.txt
 
 ########################################
 # Assert the image is driverless, before spending time on anything else
@@ -94,5 +94,5 @@ lspci -nn | grep -i nvidia || log "no NVIDIA PCI device reported by lspci"
 kubeadm config images pull --kubernetes-version "$(kubeadm version -o short)" \
   --cri-socket unix:///run/containerd/containerd.sock || true
 
-touch /var/lib/gpu-fleet/bootstrap-complete
+touch /var/lib/eu1/bootstrap-complete
 log "GPU node bootstrap complete, waiting to be joined"

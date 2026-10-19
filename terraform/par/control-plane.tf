@@ -1,10 +1,10 @@
 ########################################
 # Control plane node
 #
-# Persistent. It holds etcd, the control plane, ArgoCD and, from Session B,
-# kube-prometheus-stack. It outlives the GPU node on purpose: the goodput and
-# burn-in work in Session D compares metrics across sessions a week apart, and a
-# Prometheus that resets every time the GPU node is destroyed cannot answer that.
+# Persistent. It holds etcd, the control plane, ArgoCD, kube-prometheus-stack and
+# the Garage store. It outlives the CPU worker and the L4 on purpose: metrics and
+# objects written in one window, including the ones fin ships before it is
+# destroyed, have to be there in the next.
 ########################################
 
 resource "scaleway_instance_ip" "control_plane" {
@@ -36,6 +36,7 @@ resource "scaleway_instance_server" "control_plane" {
         private_nic_required = !local.public_mode
       }))
 
+      site            = local.site
       node_name       = local.control_plane_name
       node_ip         = local.control_plane_node_ip
       private_ip      = var.control_plane_private_ip

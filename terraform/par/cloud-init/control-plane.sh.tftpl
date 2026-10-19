@@ -4,7 +4,7 @@
 # Output lands in /var/log/cloud-init-output.log and in the file below.
 #
 set -euo pipefail
-exec > >(tee -a /var/log/gpu-fleet-bootstrap.log) 2>&1
+exec > >(tee -a /var/log/eu1-bootstrap.log) 2>&1
 
 log() { echo "[bootstrap $(date -Is)] $*"; }
 
@@ -82,7 +82,7 @@ install -o root -g root -m 0600 /etc/kubernetes/admin.conf /root/.kube/config
 # container in ${flannel_version}.
 ########################################
 
-FLANNEL_MANIFEST=/var/lib/gpu-fleet/kube-flannel.yml
+FLANNEL_MANIFEST=/var/lib/eu1/kube-flannel.yml
 retry curl -fsSL -o "$FLANNEL_MANIFEST" \
   "https://github.com/flannel-io/flannel/releases/download/${flannel_version}/kube-flannel.yml"
 sed -i "s#10.244.0.0/16#${pod_subnet}#g" "$FLANNEL_MANIFEST"
@@ -100,13 +100,17 @@ kubectl -n kube-flannel rollout status daemonset/kube-flannel-ds --timeout=180s 
 # at the end of every session. Prometheus history surviving between sessions is
 # the entire reason this node persists, so the control plane taint comes off.
 # It is a deliberate single node compromise, not an oversight.
+#
+# The use case lanes keep their workloads off it with a nodeSelector on
+# eu1.io/pool, so when the CPU worker is powered off their pods wait Pending
+# instead of landing here.
 ########################################
 
 kubectl taint nodes ${node_name} node-role.kubernetes.io/control-plane- || true
-kubectl label node ${node_name} gpu-fleet.io/role=control-plane --overwrite || true
+kubectl label node ${node_name} eu1.io/site=${site} eu1.io/pool=control --overwrite || true
 
 kubectl wait --for=condition=Ready "node/${node_name}" --timeout=300s || true
 kubectl get nodes -o wide || true
 
-touch /var/lib/gpu-fleet/bootstrap-complete
+touch /var/lib/eu1/bootstrap-complete
 log "control plane bootstrap complete"
