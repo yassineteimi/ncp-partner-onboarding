@@ -383,3 +383,31 @@ scaleway_sweep() {
     log "  curl -X DELETE -H \"X-Auth-Token: \$SCW_SECRET_KEY\" $api/block/v1alpha1/zones/<zone>/volumes/<id>"
   fi
 }
+
+########################################
+# Verda API, for site fin
+#
+# OAuth client credentials from .env. The token only ever lives in a shell
+# variable, and the secret goes to curl on stdin, not on its command line,
+# where any other process could read it.
+########################################
+
+VERDA_API="${VERDA_API:-https://api.verda.com/v1}"
+
+require_verda_env() {
+  : "${VERDA_CLIENT_ID:?VERDA_CLIENT_ID is not set in .env}"
+  : "${VERDA_CLIENT_SECRET:?VERDA_CLIENT_SECRET is not set in .env}"
+}
+
+verda_login() {
+  VERDA_TOKEN="$(jq -n --arg id "$VERDA_CLIENT_ID" --arg secret "$VERDA_CLIENT_SECRET" \
+      '{grant_type: "client_credentials", client_id: $id, client_secret: $secret}' \
+    | curl -fsS -X POST "$VERDA_API/oauth2/token" -H 'Content-Type: application/json' --data @- \
+    | jq -r '.access_token // empty')"
+  [ -n "$VERDA_TOKEN" ] || die "Verda login failed. Check VERDA_CLIENT_ID and VERDA_CLIENT_SECRET in .env."
+}
+
+#   verda_get <path relative to /v1, with its query string>
+verda_get() {
+  curl -fsS -H "Authorization: Bearer $VERDA_TOKEN" "$VERDA_API/$1"
+}
