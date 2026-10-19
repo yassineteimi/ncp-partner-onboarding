@@ -1,0 +1,50 @@
+# Site par after make par-argocd, captured 2026-10-19T21:59:53Z
+# git main at f57c1d3
+
+## ArgoCD Applications
+NAME                     WAVE     SYNC     HEALTH    REVISION
+checkpoint-store         5        Synced   Healthy   f57c1d33752ca21bf7466aa4592bc55f8c9837c5
+gpu-operator             1        Synced   Healthy   <none>
+kube-prometheus-stack    0        Synced   Healthy   <none>
+local-path-provisioner   -1       Synced   Healthy   <none>
+node-feature-discovery   0        Synced   Healthy   <none>
+root                     <none>   Synced   Healthy   f57c1d33752ca21bf7466aa4592bc55f8c9837c5
+tenants                  4        Synced   Healthy   f57c1d33752ca21bf7466aa4592bc55f8c9837c5
+
+## Nodes
+NAME            STATUS   ROLES           AGE     VERSION   INTERNAL-IP    EXTERNAL-IP   OS-IMAGE             KERNEL-VERSION              CONTAINER-RUNTIME    SITE   POOL
+eu1-par-cp-01   Ready    control-plane   4m21s   v1.36.5   172.16.32.10   <none>        Ubuntu 24.04.5 LTS   6.8.0-142-generic (amd64)   containerd://2.3.6   par    control
+
+## Pods
+NAMESPACE                NAME                                                        STATUS      NODE
+argocd                   argocd-application-controller-0                             Running     eu1-par-cp-01
+argocd                   argocd-applicationset-controller-5899cbd7-77gjh             Running     eu1-par-cp-01
+argocd                   argocd-redis-c4fdd947-jgshp                                 Running     eu1-par-cp-01
+argocd                   argocd-repo-server-67db9f49bd-9lcg2                         Running     eu1-par-cp-01
+argocd                   argocd-server-795bb669dc-vfpzq                              Running     eu1-par-cp-01
+checkpoint-store         garage-0                                                    Running     eu1-par-cp-01
+checkpoint-store         garage-bootstrap-l5m27                                      Succeeded   eu1-par-cp-01
+gpu-operator             gpu-operator-8469d9bdd-xpjsg                                Running     eu1-par-cp-01
+kube-flannel             kube-flannel-ds-k72kr                                       Running     eu1-par-cp-01
+kube-system              coredns-589f44dc88-4z2pp                                    Running     eu1-par-cp-01
+kube-system              coredns-589f44dc88-96nj4                                    Running     eu1-par-cp-01
+kube-system              etcd-eu1-par-cp-01                                          Running     eu1-par-cp-01
+kube-system              kube-apiserver-eu1-par-cp-01                                Running     eu1-par-cp-01
+kube-system              kube-controller-manager-eu1-par-cp-01                       Running     eu1-par-cp-01
+kube-system              kube-proxy-kzgrk                                            Running     eu1-par-cp-01
+kube-system              kube-scheduler-eu1-par-cp-01                                Running     eu1-par-cp-01
+local-path-storage       local-path-provisioner-84c5dd95f5-6zddn                     Running     eu1-par-cp-01
+monitoring               alertmanager-kube-prometheus-stack-alertmanager-0           Running     eu1-par-cp-01
+monitoring               kube-prometheus-stack-grafana-86887dcd65-62z7q              Running     eu1-par-cp-01
+monitoring               kube-prometheus-stack-kube-state-metrics-84f8496f5c-qbp26   Running     eu1-par-cp-01
+monitoring               kube-prometheus-stack-operator-5b5dcc8f66-rvhrz             Running     eu1-par-cp-01
+monitoring               kube-prometheus-stack-prometheus-node-exporter-d2lhm        Running     eu1-par-cp-01
+monitoring               prometheus-kube-prometheus-stack-prometheus-0               Running     eu1-par-cp-01
+node-feature-discovery   node-feature-discovery-gc-7774bfb87f-786lb                  Running     eu1-par-cp-01
+node-feature-discovery   node-feature-discovery-master-7d4f8679f8-skwb2              Running     eu1-par-cp-01
+node-feature-discovery   node-feature-discovery-worker-qfwtk                         Running     eu1-par-cp-01
+
+## Use case 3 measures NVSentinel alone: Part 1's remediation path must not exist here
+namespaces named gpu-remediator: 0
+node-problem-detector workloads: 0
+GPUUnhealthy-style node conditions: 0

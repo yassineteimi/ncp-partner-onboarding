@@ -1,0 +1,12 @@
+# eu1-par-cp-01, captured 2026-10-19T21:56:04Z by scripts/par/cluster-up.sh
+node_name=eu1-par-cp-01
+node_ip=172.16.32.10
+os=Ubuntu 24.04.5 LTS
+kernel=6.8.0-142-generic
+containerd=containerd containerd v2.3.6 ee2735368117d2eb259779949d5e75cdafec9761
+kubeadm=v1.36.5
+kubelet_package=1.36.5-1.1
+bootstrapped_at=2026-10-19T21:55:19+00:00
+
+NAME            STATUS   ROLES           AGE   VERSION   INTERNAL-IP    EXTERNAL-IP   OS-IMAGE             KERNEL-VERSION              CONTAINER-RUNTIME
+eu1-par-cp-01   Ready    control-plane   32s   v1.36.5   172.16.32.10   <none>        Ubuntu 24.04.5 LTS   6.8.0-142-generic (amd64)   containerd://2.3.6
