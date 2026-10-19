@@ -1,0 +1,5 @@
+# EU1: a GPU cloud partner from handover to first workloads
+
+Part 2 of my GPU fleet work. A fictional European GPU cloud partner, EU1, goes from hardware handover to its first production workloads on NVIDIA's open stack: a known-good stack per hardware class (AICR), a readiness gate before promotion (NVCRE), fault to return to service (NVSentinel), fair share, gang scheduling and MIG (KAI Scheduler), Slurm on the same platform (Slinky), one metrics view across sites (Thanos) and VMs next to containers (KubeVirt). It runs on two sites and two providers, an L4 pool on Scaleway in Paris and an H200 pool on Verda in Finland, both upstream Kubernetes 1.36 driven by ArgoCD from this repository. Every technology choice has a short decision record with the alternatives I considered. Part 1, Day 2 operations on a single L4, is [nvidia-gpu-fleet-poc](https://github.com/yassineteimi/nvidia-gpu-fleet-poc).
+
+Start with [the story](docs/story.md). Work in progress: nothing here is described as working until it has run, and planned work is labelled as planned.

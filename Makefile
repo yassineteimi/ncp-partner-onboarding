@@ -1,0 +1,75 @@
+SHELL := /bin/bash
+VENV  := .venv
+
+.PHONY: help par-cluster par-argocd par-gpu-up par-gpu-down par-images par-sweep argocd-ui grafana-ui cost lint shellcheck fmt docs docs-serve test-goodput
+
+help:
+	@grep -hE '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN{FS=":.*?## "}{printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2}'
+
+########################################
+# Site par, Scaleway fr-par
+########################################
+
+par-cluster:   ## par: create the private network and the persistent control plane
+	./scripts/par/cluster-up.sh
+
+par-argocd:    ## par: install ArgoCD and hand it gitops/sites/par/root.yaml
+	./scripts/par/argocd.sh
+
+par-gpu-up:    ## par: create the L4 node, join it, wait for nvidia.com/gpu (starts a meter)
+	./scripts/par/gpu-up.sh
+
+par-gpu-down:  ## par: drain the L4 node, remove it, destroy it, sweep for leftovers
+	./scripts/par/gpu-down.sh
+
+par-images:    ## par: list the images Scaleway will boot on the L4 type
+	./scripts/par/gpu-images.sh
+
+par-sweep:     ## par: list every eu1-par server and unattached volume in fr-par, delete nothing
+	@bash -c 'source scripts/lib.sh && use_site par && load_env && require_scaleway_env && scaleway_sweep eu1-par'
+
+########################################
+# Both sites
+########################################
+
+argocd-ui:     ## ArgoCD credentials and port-forward (SITE=par|fin, default par)
+	SITE=$(or $(SITE),par) ./scripts/par/argocd-ui.sh
+
+grafana-ui:    ## Grafana credentials and port-forward (SITE=par|fin, default par)
+	SITE=$(or $(SITE),par) ./scripts/par/grafana-ui.sh
+
+cost:          ## What every billed node session has cost so far, on both sites
+	./scripts/par/cost-report.sh
+
+########################################
+# Free checks
+########################################
+
+lint:          ## Fail if an em dash has crept into a tracked file
+	@dash=$$(printf '\xe2\x80\x94'); \
+	if git ls-files -z | xargs -0 grep -n -I "$$dash" --; then \
+	  echo "em dash found, see above"; exit 1; \
+	fi
+	@echo "no em dashes"
+
+shellcheck:    ## Static check every shell script under scripts/
+	@shellcheck --severity=warning --external-sources scripts/*.sh scripts/*/*.sh
+	@echo "shellcheck clean"
+
+fmt:           ## Check the Terraform formatting of every site
+	@terraform fmt -check -diff -recursive terraform
+
+test-goodput:  ## Unit tests for the goodput trainer loop, store and analysis
+	cd workloads/goodput && python3 -m pytest -q
+
+$(VENV)/bin/mkdocs: requirements.txt
+	python3 -m venv $(VENV) && $(VENV)/bin/pip install -q -r requirements.txt
+
+docs: $(VENV)/bin/mkdocs  ## Build the documentation site strictly
+	$(VENV)/bin/mkdocs build --strict
+
+docs-serve: $(VENV)/bin/mkdocs  ## Serve the documentation site locally
+	$(VENV)/bin/mkdocs serve
+
+# Each use case lane adds its targets in its own file, so nobody edits a shared list.
+-include mk/*.mk
