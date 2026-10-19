@@ -1,0 +1,24 @@
+# Site par: the GPU Operator owns the NVIDIA driver (ADR 0002).
+#
+# The L4 boots kapsule_noble, which carries no driver, and the operator builds
+# and loads this one. It is the driver Part 1 ran, so use case 3 compares
+# NVSentinel with Part 1's controller on the same driver. Upgrade by editing the
+# version and committing; roll back by reverting the commit.
+driver:
+  enabled: true
+  # Chart v26.7.2 default, the same as v26.7.0's. Pinned here so it stays that
+  # way across chart bumps.
+  repository: nvcr.io/nvidia
+  image: driver
+  version: "595.91.07"
+
+  # Precompiled driver packages are only built for some Ubuntu kernels.
+  # Building against the running kernel is slower on first boot and correct on
+  # every kernel, which is the right trade for a node rebuilt every window.
+  usePrecompiled: false
+
+  # The operator drains and reloads the driver itself on a version change.
+  upgradePolicy:
+    autoUpgrade: true
+    maxParallelUpgrades: 1
+    maxUnavailable: 25%

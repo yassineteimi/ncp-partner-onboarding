@@ -29,9 +29,9 @@ spec:
       helm:
         releaseName: local-path-provisioner
         valueFiles:
-          - $values/gitops/values/local-path-provisioner.yaml
+          - $values/gitops/values/base/local-path-provisioner.yaml
 
-    - repoURL: https://github.com/yassineteimi/nvidia-gpu-fleet-poc
+    - repoURL: https://github.com/yassineteimi/ncp-partner-onboarding
       targetRevision: main
       ref: values
 

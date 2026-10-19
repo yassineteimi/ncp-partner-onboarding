@@ -16,9 +16,9 @@ spec:
   project: default
 
   source:
-    repoURL: https://github.com/yassineteimi/nvidia-gpu-fleet-poc
+    repoURL: https://github.com/yassineteimi/ncp-partner-onboarding
     targetRevision: main
-    path: gitops/manifests/checkpoint-store
+    path: gitops/manifests/base/checkpoint-store
 
   destination:
     server: https://kubernetes.default.svc

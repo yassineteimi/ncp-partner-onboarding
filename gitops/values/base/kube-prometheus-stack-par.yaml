@@ -1,0 +1,6 @@
+# Site par. Every series this Prometheus sends anywhere carries the site it
+# came from, so the cross-site view (use case 6) can tell par from fin.
+prometheus:
+  prometheusSpec:
+    externalLabels:
+      site: par

@@ -1,62 +1,44 @@
-# Values for the NVIDIA GPU Operator, chart v26.7.0.
+# Values for the NVIDIA GPU Operator, chart v26.7.2, shared by both sites.
 #
-# The two version strings below are the reason this repository exists. They are
-# the driver and the container toolkit on every GPU node in the cluster. Upgrade
-# by editing them and committing. Roll back by reverting the commit. At no point
-# does anyone log in to a node and run a package manager.
+# The GPU Operator Application of each site reads, in order:
+#   1. this file
+#   2. gitops/values/base/gpu-operator-<site>.yaml, which decides who owns the
+#      driver on that site (ADR 0002): the operator on par, the provider image
+#      on fin
+#   3. gitops/values/{readiness,scheduling,platform}/gpu-operator-<site>.yaml,
+#      if the lane has written one. Missing files are ignored, so a lane can
+#      tune the operator through its own file instead of editing this one.
 #
-# They are written as literals rather than left to the chart defaults so that
-# the version in Git is the version on the node, and a chart bump cannot move
-# the driver underneath the fleet as a side effect.
+# Versions are written as literals rather than left to the chart defaults, so
+# the version in Git is the version on the node and a chart bump can't move a
+# component underneath the fleet as a side effect.
 
-# NFD is a separate Application in sync wave 0. See gitops/apps/node-feature-discovery.yaml.
+# NFD is a separate Application in sync wave 0. See gitops/apps/<site>/base/node-feature-discovery.yaml.
 nfd:
   enabled: false
-
-driver:
-  enabled: true
-  # Chart v26.7.0 default. Pinned here so it stays that way across chart bumps.
-  repository: nvcr.io/nvidia
-  image: driver
-  version: "595.91.07"
-
-  # Precompiled driver packages are still a tech preview and only for some
-  # Ubuntu kernels. Building against the running kernel is slower on first
-  # boot and correct on every kernel, which is the right trade for a node that
-  # is rebuilt every session.
-  usePrecompiled: false
-
-  # The operator drains and reloads the driver itself on a version change.
-  # One node at a time, which on a one node fleet means the whole fleet, and is
-  # exactly the blast radius worth watching when the fleet is larger.
-  upgradePolicy:
-    autoUpgrade: true
-    maxParallelUpgrades: 1
-    maxUnavailable: 25%
 
 toolkit:
   enabled: true
   repository: nvcr.io/nvidia/k8s
   image: container-toolkit
-  version: v1.20.0
+  # Chart v26.7.2 default. Part 1 ran v1.20.0 under chart v26.7.0.
+  version: v1.20.1
 
 # The device plugin is what turns a GPU into nvidia.com/gpu on the node's
-# allocatable list. Time slicing arrives here in Session D.
+# allocatable list. Time slicing or MIG configs come from the lanes' overlays.
 devicePlugin:
   enabled: true
 
 # DCGM and its exporter ship inside this chart rather than as a separate
-# deployment, which surprised me and is on the findings page.
+# deployment.
 #
 # Standalone DCGM is a decision, not the chart's default. The default is
 # dcgm.enabled: false, with the exporter running the DCGM host engine embedded.
-# An earlier version of this comment read as though true were the default, and
-# it is not. The standalone host engine is kept because Session C gates a node's
-# return to service on dcgmi diag, which needs a running host engine to talk to.
-# It is also the leading suspect for the three restarts the exporter went
-# through in Session A: an exporter pointed at a remote host engine that is not
-# ready yet has nothing to connect to. Session B checks that rather than
-# assuming it.
+# The standalone host engine is kept because dcgmi diag needs a running host
+# engine to talk to, as Part 1's return to service did, and NVSentinel's DCGM
+# health monitor is set up against it in use case 3. Its price, measured in Part 1: the
+# exporter restarts a couple of times at every node start, until the host engine
+# answers.
 dcgm:
   enabled: true
 
@@ -70,17 +52,19 @@ dcgmExporter:
   # operator). It replaces the exporter's default set entirely, so everything
   # wanted from the default set is listed again below.
   #
-  # Every line is copied verbatim from etc/default-counters.csv in dcgm-exporter
-  # 4.6.0-4.8.3, the version this chart deploys, some of them uncommented. That
-  # is deliberate: an unknown field name stops the exporter from starting, and
-  # it would stop on a node billed by the hour.
+  # Every field name below exists in etc/default-counters.csv of dcgm-exporter
+  # 4.8.4, the version chart v26.7.2 deploys (checked field by field against
+  # that tag on 2026-10-19). That is deliberate: an unknown field name stops the
+  # exporter from starting, and it would stop on a node billed by the hour.
   #
   # Added to the defaults: XID and clock event counters, ECC, power and thermal
   # violations, SM activity and DCGM health status.
   # Removed from the defaults: NVLink bandwidth and vGPU licence status. An L4
-  # has neither.
+  # has neither. A lane that wants NVLink counters on the H200 replaces this
+  # whole data block in its fin overlay, and gives the ConfigMap a new name, so
+  # the change can't hide behind an unchanged name.
   config:
-    name: gpu-fleet-dcgm-metrics
+    name: eu1-dcgm-metrics
     create: true
     data: |-
       # Utilisation
@@ -96,8 +80,10 @@ dcgmExporter:
       DCGM_FI_PROF_SM_ACTIVE, gauge, The ratio of cycles an SM has at least 1 warp assigned.
       DCGM_FI_PROF_PIPE_TENSOR_ACTIVE, gauge, Ratio of cycles the tensor (HMMA) pipe is active.
       DCGM_FI_PROF_DRAM_ACTIVE, gauge, Ratio of cycles the device memory interface is active sending or receiving data.
-      DCGM_FI_PROF_PCIE_TX_BYTES, counter, Total number of bytes transmitted through PCIe TX via NVML.
-      DCGM_FI_PROF_PCIE_RX_BYTES, counter, Total number of bytes received through PCIe RX via NVML.
+      # A rate, so a gauge. Part 1 declared these two as counters, from a
+      # commented-out line in the 4.8.3 file; 4.8.4 documents them as below.
+      DCGM_FI_PROF_PCIE_TX_BYTES, gauge, The rate of data transmitted over the PCIe bus - including both protocol headers and data payloads - in bytes per second.
+      DCGM_FI_PROF_PCIE_RX_BYTES, gauge, The rate of data received over the PCIe bus - including both protocol headers and data payloads - in bytes per second.
 
       # Memory
       DCGM_FI_DEV_FB_FREE, gauge, Framebuffer memory free (in MiB).
@@ -140,7 +126,8 @@ dcgmExporter:
 
       DCGM_FI_DRIVER_VERSION, label, Driver Version
 
-# MIG is not available on an L4, so the manager has nothing to do here.
+# Off by default. The L4 has no MIG; on fin, the scheduling lane turns it on in
+# its own overlay with a config named after what it does.
 migManager:
   enabled: false
 

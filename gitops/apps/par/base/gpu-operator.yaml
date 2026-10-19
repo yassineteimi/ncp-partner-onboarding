@@ -1,13 +1,17 @@
-# NVIDIA GPU Operator, sync wave 1.
+# NVIDIA GPU Operator on site par, sync wave 1.
 #
-# This is the Application the whole PoC is about. The NVIDIA driver and the
-# container toolkit are not installed on the node image, not installed by
-# cloud-init and not installed by hand. They are two version strings in
-# gitops/values/gpu-operator.yaml, and changing them is a commit that ArgoCD
-# rolls out.
+# On par the operator owns the driver, as in Part 1: the L4 boots without one
+# and the driver is a version string in gitops/values/base/gpu-operator-par.yaml.
 #
-# It is wave 1 because it needs the NFD labels from wave 0 to know which nodes
-# are GPU nodes.
+# Values are layered: the shared base, then this site's driver ownership, then
+# one optional overlay per lane. A lane that needs the operator configured
+# differently (MIG, time slicing, DCGM settings) writes its own overlay file
+# instead of editing the base. ignoreMissingValueFiles lets an overlay that
+# doesn't exist yet stay listed here.
+#
+# Wave 1 because it needs the NFD labels from wave 0 to know which nodes are
+# GPU nodes, and the Prometheus CRDs from kube-prometheus-stack for the DCGM
+# exporter's ServiceMonitor.
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -23,14 +27,18 @@ spec:
   sources:
     - repoURL: https://helm.ngc.nvidia.com/nvidia
       chart: gpu-operator
-      targetRevision: v26.7.0
+      targetRevision: v26.7.2
       helm:
         releaseName: gpu-operator
+        ignoreMissingValueFiles: true
         valueFiles:
-          - $values/gitops/values/gpu-operator.yaml
-          - $values/gitops/values/gpu-operator-time-slicing.yaml
+          - $values/gitops/values/base/gpu-operator.yaml
+          - $values/gitops/values/base/gpu-operator-par.yaml
+          - $values/gitops/values/readiness/gpu-operator-par.yaml
+          - $values/gitops/values/scheduling/gpu-operator-par.yaml
+          - $values/gitops/values/platform/gpu-operator-par.yaml
 
-    - repoURL: https://github.com/yassineteimi/nvidia-gpu-fleet-poc
+    - repoURL: https://github.com/yassineteimi/ncp-partner-onboarding
       targetRevision: main
       ref: values
 

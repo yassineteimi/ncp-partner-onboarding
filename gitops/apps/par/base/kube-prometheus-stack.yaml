@@ -27,10 +27,13 @@ spec:
       targetRevision: 91.4.1
       helm:
         releaseName: kube-prometheus-stack
+        ignoreMissingValueFiles: true
         valueFiles:
-          - $values/gitops/values/kube-prometheus-stack.yaml
+          - $values/gitops/values/base/kube-prometheus-stack.yaml
+          - $values/gitops/values/base/kube-prometheus-stack-par.yaml
+          - $values/gitops/values/platform/kube-prometheus-stack-par.yaml
 
-    - repoURL: https://github.com/yassineteimi/nvidia-gpu-fleet-poc
+    - repoURL: https://github.com/yassineteimi/ncp-partner-onboarding
       targetRevision: main
       ref: values
 

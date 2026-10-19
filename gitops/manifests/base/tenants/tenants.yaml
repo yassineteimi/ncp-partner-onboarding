@@ -7,14 +7,14 @@ kind: Namespace
 metadata:
   name: tenant-a
   labels:
-    gpu-fleet.io/tenant: "true"
+    eu1.io/tenant: "true"
 ---
 apiVersion: v1
 kind: Namespace
 metadata:
   name: tenant-b
   labels:
-    gpu-fleet.io/tenant: "true"
+    eu1.io/tenant: "true"
 ---
 apiVersion: v1
 kind: ResourceQuota

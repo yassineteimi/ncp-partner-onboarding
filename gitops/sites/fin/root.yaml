@@ -1,0 +1,40 @@
+# The app of apps for site fin. The only Application applied by hand, by
+# make fin-argocd. It reads gitops/apps/fin/ recursively, so adding a
+# component to the site is a file in a commit:
+#
+#   gitops/apps/fin/base/         the platform, owned by cos
+#   gitops/apps/fin/readiness/    use cases 1 to 3
+#   gitops/apps/fin/scheduling/   use cases 4 and 5
+#   gitops/apps/fin/platform/     use cases 6 and 7
+#
+# Only Application manifests belong under gitops/apps/. Plain manifests live in
+# gitops/manifests/<lane>/ and are pointed at by an Application: a
+# kustomization.yaml found by a recursive directory source is applied as if it
+# were a Kubernetes object, and the sync fails.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: root
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/yassineteimi/ncp-partner-onboarding
+    targetRevision: main
+    path: gitops/apps/fin
+    directory:
+      recurse: true
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

@@ -29,9 +29,9 @@ spec:
       helm:
         releaseName: node-feature-discovery
         valueFiles:
-          - $values/gitops/values/node-feature-discovery.yaml
+          - $values/gitops/values/base/node-feature-discovery.yaml
 
-    - repoURL: https://github.com/yassineteimi/nvidia-gpu-fleet-poc
+    - repoURL: https://github.com/yassineteimi/ncp-partner-onboarding
       targetRevision: main
       ref: values
 
