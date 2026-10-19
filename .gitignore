@@ -5,20 +5,21 @@
 kubeconfig
 kubeconfig-*
 
-# terraform
+# terraform, one root per site under terraform/<site>/
 # .terraform.lock.hcl is deliberately NOT ignored. A repository about pinning
 # versions that lets its provider float would be arguing with itself. Commit it
 # after the first terraform init.
-terraform/.terraform/
-terraform/*.tfstate
-terraform/*.tfstate.*
-terraform/*.tfvars
-!terraform/terraform.tfvars.example
-terraform/crash.log
+terraform/*/.terraform/
+terraform/*/*.tfstate
+terraform/*/*.tfstate.*
+terraform/*/*.tfvars
+!terraform/*/terraform.tfvars.example
+terraform/*/*.tfplan
+terraform/*/crash.log
 
-# session state, written by scripts/gpu-up.sh and scripts/gpu-down.sh
-.gpu-sessions.csv
-.ssh-known-hosts
+# session state, written by the up and down scripts of each site
+.sessions.csv
+.ssh-known-hosts-*
 
 # python
 .venv/
@@ -33,6 +34,5 @@ site/
 # macos
 .DS_Store
 
-# saved plans from apply_gpu_only in scripts/lib.sh
-terraform/*.tfplan
-
+# git worktrees for parallel work
+.claude/worktrees/
