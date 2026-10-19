@@ -1,0 +1,99 @@
+name: ci
+on:
+  push: { branches: [main] }
+permissions: { contents: write }
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure Git Credentials
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+      - uses: actions/setup-python@v5
+        with: { python-version: 3.x }
+      - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
+      - uses: actions/cache@v4
+        with: { key: "mkdocs-material-${{ env.cache_id }}", path: .cache, restore-keys: "mkdocs-material-" }
+      - run: pip install -r requirements.txt
+      - run: mkdocs gh-deploy --force
+
+  # The GPU alert rules and their unit tests, with the same promtool version as
+  # the Prometheus that kube-prometheus-stack 91.4.1 deploys. A separate job, so
+  # a failing rule test is visible on its own and does not hold up the site.
+  test-rules:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install promtool 3.14.0
+        run: |
+          curl -fsSL https://github.com/prometheus/prometheus/releases/download/v3.14.0/prometheus-3.14.0.linux-amd64.tar.gz \
+            | tar xz -C /tmp
+          echo "/tmp/prometheus-3.14.0.linux-amd64" >> "$GITHUB_PATH"
+      - run: ./scripts/test-rules.sh
+
+  # The remediation controller's unit tests, with the pinned dependencies.
+  test-controller:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: controllers/gpu-remediator
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -r requirements-dev.txt
+      - run: python -m pytest -q
+
+  # The node-problem-detector GPU monitor, run through node-problem-detector's
+  # own matching code at v1.36.0, whose go.mod asks for Go 1.26.5.
+  test-npd-rules:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with: { go-version: "1.26.5" }
+      - run: ./scripts/test-npd-rules.sh
+
+  # The goodput trainer's loop, store and analysis. The end to end test runs
+  # against the same Garage image and garage.toml the cluster runs, with a
+  # throwaway key, so the interrupt-and-resume path is checked against real S3.
+  test-goodput:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: workloads/goodput
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -r requirements-dev.txt
+      - name: Start Garage
+        working-directory: .
+        run: |
+          key="GK$(openssl rand -hex 16)"; secret="$(openssl rand -hex 32)"
+          echo "AWS_ACCESS_KEY_ID=$key" >> "$GITHUB_ENV"
+          echo "AWS_SECRET_ACCESS_KEY=$secret" >> "$GITHUB_ENV"
+          docker run -d --name garage -p 3900:3900 \
+            -v "$PWD/gitops/manifests/checkpoint-store/garage.toml:/etc/garage.toml:ro" \
+            -e GARAGE_RPC_SECRET="$(openssl rand -hex 32)" \
+            -e GARAGE_DEFAULT_ACCESS_KEY="$key" -e GARAGE_DEFAULT_SECRET_KEY="$secret" \
+            -e GARAGE_DEFAULT_BUCKET=checkpoints \
+            dxflrs/garage:v2.4.1@sha256:9c96caa2612d3411acc5b0e6701fb238dbfba33e533a6d7d3d811a4b12d0d020 \
+            /garage server --single-node --default-bucket
+          for _ in $(seq 30); do curl -s -o /dev/null localhost:3900 && break; sleep 1; done
+          docker logs garage 2>&1 | tail -5
+      - run: python -m pytest -q -rs
+        env: { GARAGE_E2E: "http://127.0.0.1:3900" }
+
+  # The time slicing config, parsed by the NVIDIA device plugin's own loader
+  # at v0.20.0, whose go.mod asks for Go 1.26.0.
+  test-time-slicing:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with: { go-version: "1.26.0" }
+      - run: pip install pyyaml
+      - run: ./scripts/test-time-slicing.sh
