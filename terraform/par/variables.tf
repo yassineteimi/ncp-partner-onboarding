@@ -243,6 +243,17 @@ variable "kubernetes_package_version" {
   default     = "1.36.5-1.1"
 }
 
+variable "containerd_package_version" {
+  description = <<-EOT
+    containerd.io package version from Docker's apt repository, without the
+    distribution suffix, which the bootstrap adds. 2.3.6-1 is the newest 2.3
+    release, and GPU Operator v26.7.x validates containerd 2.0 to 2.3. Empty
+    takes the newest, which was 2.4.2 on 2026-10-19.
+  EOT
+  type        = string
+  default     = "2.3.6-1"
+}
+
 variable "pod_subnet" {
   description = "Pod CIDR. 10.244.0.0/16 is what the stock Flannel manifest expects."
   type        = string

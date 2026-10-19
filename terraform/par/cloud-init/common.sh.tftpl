@@ -203,7 +203,17 @@ echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.
   > /etc/apt/sources.list.d/docker.list
 
 retry apt_get update
-retry apt_get install -y containerd.io
+
+# Pinned, like everything else. Left floating, the Docker repository moved from
+# 2.3 to 2.4 between Part 1 and Part 2, and GPU Operator v26.7.x validates
+# containerd 2.0 to 2.3 only. The suffix makes the same pin work on Ubuntu 24.04
+# (par) and 26.04 (fin), which carry separate builds of the same release.
+CONTAINERD_PKG="containerd.io"
+if [ -n "${containerd_package_version}" ]; then
+  CONTAINERD_PKG="containerd.io=${containerd_package_version}~ubuntu.$(. /etc/os-release && echo $VERSION_ID)~$UBUNTU_CODENAME"
+fi
+log "installing $CONTAINERD_PKG"
+retry apt_get install -y --allow-downgrades "$CONTAINERD_PKG"
 
 containerd config default > /etc/containerd/config.toml
 sed -i 's/SystemdCgroup = false/SystemdCgroup = true/' /etc/containerd/config.toml
