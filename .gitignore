@@ -1,0 +1,38 @@
+# secrets
+.env
+*.pem
+*.key
+kubeconfig
+kubeconfig-*
+
+# terraform
+# .terraform.lock.hcl is deliberately NOT ignored. A repository about pinning
+# versions that lets its provider float would be arguing with itself. Commit it
+# after the first terraform init.
+terraform/.terraform/
+terraform/*.tfstate
+terraform/*.tfstate.*
+terraform/*.tfvars
+!terraform/terraform.tfvars.example
+terraform/crash.log
+
+# session state, written by scripts/gpu-up.sh and scripts/gpu-down.sh
+.gpu-sessions.csv
+.ssh-known-hosts
+
+# python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# mkdocs
+site/
+.cache/
+
+# macos
+.DS_Store
+
+# saved plans from apply_gpu_only in scripts/lib.sh
+terraform/*.tfplan
+
