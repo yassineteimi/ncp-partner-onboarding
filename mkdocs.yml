@@ -1,14 +1,13 @@
-site_name: "NVIDIA GPU Fleet PoC: Day 2 operations on upstream Kubernetes"
+site_name: "EU1: a GPU cloud partner from handover to first workloads"
 site_author: Yassine TEIMI
-site_url: https://yassineteimi.github.io/nvidia-gpu-fleet-poc/
+site_url: https://yassineteimi.github.io/ncp-partner-onboarding/
 site_description: >-
-  Taking a rented NVIDIA L4 node from bare instance to a GitOps-managed, monitored
-  and self-remediating GPU platform on upstream Kubernetes. Driver lifecycle through
-  the GPU Operator, DCGM telemetry and XID alerting, automated cordon and drain on
-  GPU fault, goodput measurement and a cluster acceptance runbook.
+  Part 2 of my GPU fleet work. A fictional European GPU cloud partner, EU1, goes
+  from hardware handover to its first production workloads on NVIDIA's open
+  stack, across two sites and two providers, driven by one Git repository.
 
-repo_name: yassineteimi/nvidia-gpu-fleet-poc
-repo_url: https://github.com/yassineteimi/nvidia-gpu-fleet-poc
+repo_name: yassineteimi/ncp-partner-onboarding
+repo_url: https://github.com/yassineteimi/ncp-partner-onboarding
 
 theme:
   name: material
@@ -70,17 +69,9 @@ plugins:
 
 nav:
   - Overview: index.md
-  - "The use cases": use-cases.md
+  - "The story": story.md
   - "What is simulated": simulated.md
-  - Prerequisites: prerequisites.md
-  - Architecture: architecture.md
-  - Build:
-      - "Session A: platform and GPU lifecycle": 01-platform.md
-      - "Session B: observability and XID alerting": 02-observability.md
-      - "Session C: fault detection and remediation": 03-fault-remediation.md
-      - "Session D: goodput, burn-in and tenancy": 04-goodput-and-burn-in.md
-  - Runbook: runbook.md
-  - Artifacts: artifacts/index.md
+  - Decisions: adr/README.md
   - Findings: findings.md
 
 copyright: |
