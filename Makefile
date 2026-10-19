@@ -1,7 +1,7 @@
 SHELL := /bin/bash
 VENV  := .venv
 
-.PHONY: help par-cluster par-argocd par-cpu-up par-cpu-down par-cpu-destroy par-gpu-up par-gpu-down par-images par-sweep argocd-ui grafana-ui cost lint shellcheck fmt docs docs-serve test-goodput
+.PHONY: help par-cluster par-argocd par-cpu-up par-cpu-down par-cpu-destroy par-gpu-up par-gpu-down par-images par-sweep fin-preflight fin-availability argocd-ui grafana-ui cost lint shellcheck fmt docs docs-serve test-goodput
 
 help:
 	@grep -hE '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN{FS=":.*?## "}{printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2}'
@@ -36,6 +36,16 @@ par-images:    ## par: list the images Scaleway will boot on the L4 type
 
 par-sweep:     ## par: list every eu1-par server and unattached volume in fr-par, delete nothing
 	@bash -c 'source scripts/lib.sh && use_site par && load_env && require_scaleway_env && scaleway_sweep eu1-par'
+
+########################################
+# Site fin, Verda Finland
+########################################
+
+fin-preflight: ## fin: free go or no-go for a window: H200 orderable, balance, leftovers (HOURS=2)
+	./scripts/fin/preflight.sh
+
+fin-availability: ## fin: log once where the H200 node can be ordered, on demand and spot
+	./scripts/fin/availability.sh
 
 ########################################
 # Both sites
