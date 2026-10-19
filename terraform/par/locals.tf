@@ -16,7 +16,11 @@ locals {
     var.ssh_public_key != "" ? var.ssh_public_key : try(file(pathexpand(var.ssh_public_key_path)), "")
   )
 
+  # Every zonal resource of the CPU worker lives here.
+  cpu_zone = var.cpu_zone != "" ? var.cpu_zone : var.zone
+
   control_plane_name = "${var.cluster_name}-cp-01"
+  cpu_worker_name    = "${var.cluster_name}-cpu-01"
   gpu_node_name      = "${var.cluster_name}-gpu-01"
 
   public_mode = var.node_ip_mode == "public"
@@ -27,6 +31,7 @@ locals {
   # node exists because it is reserved as its own resource.
   control_plane_node_ip = local.public_mode ? scaleway_instance_ip.control_plane.address : var.control_plane_private_ip
   gpu_node_node_ip      = local.public_mode ? try(scaleway_instance_ip.gpu_node[0].address, "") : var.gpu_node_private_ip
+  cpu_worker_node_ip    = local.public_mode ? try(scaleway_instance_ip.cpu_worker[0].address, "") : var.cpu_worker_private_ip
 
   # Everything both nodes need before they are anything in particular: a
   # hostname, no swap, the kernel modules and sysctls the kubelet checks for,

@@ -77,3 +77,33 @@ output "ssh_gpu_node" {
   description = "Ready made SSH command for the GPU node, or null when it is not up."
   value       = var.gpu_node_enabled ? "ssh root@${scaleway_instance_ip.gpu_node[0].address}" : null
 }
+
+output "cpu_worker_enabled" {
+  description = "Whether the CPU worker exists. It bills compute only while running."
+  value       = var.cpu_worker_enabled
+}
+
+output "cpu_worker_running" {
+  description = "Whether the CPU worker is powered on."
+  value       = var.cpu_worker_enabled && var.cpu_worker_running
+}
+
+output "cpu_worker_name" {
+  description = "Kubernetes node name of the CPU worker."
+  value       = local.cpu_worker_name
+}
+
+output "cpu_worker_type" {
+  description = "Commercial type of the CPU worker, used by the session log."
+  value       = var.cpu_worker_type
+}
+
+output "cpu_worker_public_ip" {
+  description = "Public address of the CPU worker, or null when it doesn't exist."
+  value       = var.cpu_worker_enabled ? scaleway_instance_ip.cpu_worker[0].address : null
+}
+
+output "cpu_zone" {
+  description = "Zone the CPU worker runs in."
+  value       = local.cpu_zone
+}

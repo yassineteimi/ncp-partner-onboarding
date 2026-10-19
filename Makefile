@@ -1,7 +1,7 @@
 SHELL := /bin/bash
 VENV  := .venv
 
-.PHONY: help par-cluster par-argocd par-gpu-up par-gpu-down par-images par-sweep argocd-ui grafana-ui cost lint shellcheck fmt docs docs-serve test-goodput
+.PHONY: help par-cluster par-argocd par-cpu-up par-cpu-down par-cpu-destroy par-gpu-up par-gpu-down par-images par-sweep argocd-ui grafana-ui cost lint shellcheck fmt docs docs-serve test-goodput
 
 help:
 	@grep -hE '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN{FS=":.*?## "}{printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2}'
@@ -15,6 +15,15 @@ par-cluster:   ## par: create the private network and the persistent control pla
 
 par-argocd:    ## par: install ArgoCD and hand it gitops/sites/par/root.yaml
 	./scripts/par/argocd.sh
+
+par-cpu-up:    ## par: create or power on the CPU worker, wait Ready, uncordon (starts a meter)
+	./scripts/par/cpu-up.sh
+
+par-cpu-down:  ## par: drain the CPU worker and power it off; its disk stays
+	./scripts/par/cpu-down.sh
+
+par-cpu-destroy: ## par: remove the CPU worker and its disk, at the end of the project
+	./scripts/par/cpu-destroy.sh
 
 par-gpu-up:    ## par: create the L4 node, join it, wait for nvidia.com/gpu (starts a meter)
 	./scripts/par/gpu-up.sh

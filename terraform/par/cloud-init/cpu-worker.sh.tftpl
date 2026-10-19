@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+#
+# CPU worker bootstrap. Runs once, on first boot, as cloud-init user data.
+#
+# The worker runs the use case lanes' workloads that need no GPU: KAI Scheduler
+# with simulated GPUs, Slurm through Slinky, Thanos and KubeVirt. It is powered
+# off between uses rather than destroyed, so this script runs once in its life,
+# not once per session. After a power-on, the kubelet starts by itself and the
+# node comes back with its volumes.
+#
+# Like the GPU node, it does not join the cluster here. Joining needs a token,
+# and a token in Git or in Terraform state would be a token in a public
+# repository. scripts/par/cpu-up.sh asks the control plane for a fresh one
+# after this script has finished.
+#
+set -euo pipefail
+exec > >(tee -a /var/log/eu1-bootstrap.log) 2>&1
+
+log() { echo "[bootstrap $(date -Is)] $*"; }
+
+${common}
+
+########################################
+# What KubeVirt will find
+#
+# Use case 7 runs VMs with KVM if the instance exposes it and with software
+# emulation if not. Recording the answer here costs nothing and settles the
+# question before anyone plans around it.
+########################################
+
+{
+  echo "== /dev/kvm"
+  ls -l /dev/kvm 2>&1 || true
+  echo "== cpu virtualisation flags"
+  grep -o -E -m1 '\b(vmx|svm)\b' /proc/cpuinfo || echo "none"
+} > /var/lib/eu1/virtualisation.txt 2>&1 || true
+cat /var/lib/eu1/virtualisation.txt
+
+########################################
+# Ready to be joined
+#
+# Pinned to the installed kubeadm's own version. Without it kubeadm asks the
+# internet for the newest patch in the series and pulls that instead.
+########################################
+
+kubeadm config images pull --kubernetes-version "$(kubeadm version -o short)" \
+  --cri-socket unix:///run/containerd/containerd.sock || true
+
+touch /var/lib/eu1/bootstrap-complete
+log "CPU worker bootstrap complete, waiting to be joined"

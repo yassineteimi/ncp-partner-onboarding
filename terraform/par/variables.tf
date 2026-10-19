@@ -271,3 +271,72 @@ variable "flannel_version" {
   type        = string
   default     = "v0.28.9"
 }
+
+########################################
+# CPU worker
+########################################
+
+variable "cpu_worker_enabled" {
+  description = <<-EOT
+    Whether the CPU worker exists. scripts/par/cpu-up.sh sets it to true and
+    scripts/par/cpu-destroy.sh back to false, through a generated
+    cpu.auto.tfvars, like the GPU node.
+  EOT
+  type        = bool
+  default     = false
+}
+
+variable "cpu_worker_running" {
+  description = <<-EOT
+    Whether the CPU worker is powered on. scripts/par/cpu-down.sh powers it off
+    between uses: Scaleway stops billing compute for a powered-off instance and
+    keeps billing its disk and IP, so the local-path volumes of the use case
+    lanes survive at about 0.02 euros an hour instead of 0.30.
+  EOT
+  type        = bool
+  default     = true
+}
+
+variable "cpu_worker_type" {
+  description = <<-EOT
+    Commercial type of the CPU worker. POP2-8C-32G is 8 vCPU and 32 GB at 0.29
+    euros an hour in fr-par-1 and fr-par-2 (Scaleway API, 2026-10-19), sized
+    for KubeVirt, Slinky, Thanos, NVSentinel and KAI with simulated GPUs at once.
+  EOT
+  type        = string
+  default     = "POP2-8C-32G"
+}
+
+variable "cpu_zone" {
+  description = <<-EOT
+    Zone for the CPU worker only, when it differs from the control plane's.
+    Empty means the same zone. POP2 stock was "scarce" in both fr-par-1 and
+    fr-par-2 on 2026-10-19; fr-par-3 has it at 0.435 euros an hour, which needs
+    Yassine's approval before use.
+  EOT
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = var.cpu_zone == "" || startswith(var.cpu_zone, "${var.region}-")
+    error_message = "cpu_zone must be in the same region as the Private Network (var.region)."
+  }
+}
+
+variable "cpu_worker_private_ip" {
+  description = "Private IPv4 reserved in IPAM for the CPU worker. Must fall inside private_network_subnet."
+  type        = string
+  default     = "172.16.32.30"
+}
+
+variable "cpu_worker_root_volume_size_gb" {
+  description = "Root volume size for the CPU worker. The lanes' local-path volumes and VM disks live here."
+  type        = number
+  default     = 100
+}
+
+variable "cpu_worker_image" {
+  description = "Scaleway image label for the CPU worker. Ubuntu 24.04, like the rest of par."
+  type        = string
+  default     = "ubuntu_noble"
+}
