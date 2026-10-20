@@ -159,6 +159,18 @@ for dir in "${builds[@]}"; do
 done
 log "every kustomization builds"
 
+# Rule 7: every image the lane's manifests and workloads name, including
+# images passed in env values, is pinned by digest. KWOK Stage templates
+# ({{ .image }}) aren't images.
+unpinned="$(cat "$OUT"/gitops_manifests_scheduling_*.yaml "$OUT"/workloads_scheduling_*.yaml \
+  | grep -E '^\s*(- )?image: *"?[a-z0-9]|^\s*(- )?value: *"?[a-z0-9.-]+\.[a-z]{2,}/[^ ]+:[^ ]+' \
+  | grep -v -E '@sha256:|\{\{' || true)"
+if [ -n "$unpinned" ]; then
+  echo "$unpinned"
+  fail "image references without a digest"
+fi
+log "every image reference is pinned by digest"
+
 ########################################
 # 4. Workloads say what they claim
 ########################################

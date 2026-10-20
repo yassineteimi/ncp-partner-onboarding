@@ -24,6 +24,15 @@ topology:
       gpuCount: 4
       gpuMemory: 143771
 
+# The status updater passes this image in an env var (NVML_MOCK_IMAGE) for
+# pools on the nvml-mock backend. No pool here uses it, but a reference in the
+# rendered manifests is pinned like any other (rule 7): the chart's own pin is
+# a sha-* tag, which can be pushed again.
+nvmlMock:
+  image:
+    repository: ghcr.io/nvidia/nvml-mock
+    tag: sha-1706195@sha256:960a41f17d0b3d14c4c6b3d4e3ee9cc78d0dc2a9fdb86dbc822fa41f685fd82c
+
 statusUpdater:
   enabled: true
   # The real GPU Operator owns nvidia.com/gpu.* labels on par. If the status

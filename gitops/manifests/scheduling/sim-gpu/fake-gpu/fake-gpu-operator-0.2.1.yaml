@@ -421,7 +421,7 @@ spec:
             - name: DISABLE_NODE_LABELING
               value: "true"
             - name: NVML_MOCK_IMAGE
-              value: "ghcr.io/nvidia/nvml-mock:sha-1706195"
+              value: "ghcr.io/nvidia/nvml-mock:sha-1706195@sha256:960a41f17d0b3d14c4c6b3d4e3ee9cc78d0dc2a9fdb86dbc822fa41f685fd82c"
       restartPolicy: Always
       serviceAccountName: status-updater
       imagePullSecrets:
