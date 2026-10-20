@@ -1,0 +1,48 @@
+# Kubeflow Trainer 2.2.1 on par, sync wave 10, for NVCRE (use case 2).
+#
+# NVCRE runs its certification workloads as TrainJobs. `nvcrectl setup init`
+# would install this release with helm; here Argo CD does, with the same release
+# name and namespace (pkg/setup at NVCRE v0.8.0), so `nvcrectl setup status`
+# recognises it. Runs on the CPU worker.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kubeflow-trainer
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+
+  sources:
+    - repoURL: ghcr.io/kubeflow/charts
+      chart: kubeflow-trainer
+      targetRevision: 2.2.1
+      helm:
+        releaseName: kubeflow-trainer
+        valueFiles:
+          - $values/gitops/values/readiness/kubeflow-trainer-par.yaml
+
+    - repoURL: https://github.com/yassineteimi/ncp-partner-onboarding
+      targetRevision: main
+      ref: values
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kubeflow-system
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 20s
+        factor: 2
+        maxDuration: 5m

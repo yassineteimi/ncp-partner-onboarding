@@ -1,0 +1,17 @@
+# Kubeflow Trainer 2.2.1 on fin, read by gitops/apps/fin/readiness/kubeflow-trainer.yaml.
+#
+# Same as par (see kubeflow-trainer-par.yaml), except the pool: fin's only node
+# without GPUs is its control plane, eu1.io/pool=control, which is untainted.
+
+manager:
+  nodeSelector:
+    eu1.io/pool: control
+  tolerations:
+    - operator: Exists
+
+jobset:
+  controller:
+    nodeSelector:
+      eu1.io/pool: control
+    tolerations:
+      - operator: Exists
