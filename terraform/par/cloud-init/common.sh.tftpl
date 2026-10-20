@@ -48,10 +48,15 @@ log "node ${node_name} at ${node_ip}"
 
 hostnamectl set-hostname ${node_name}
 sed -i '/127.0.1.1/d' /etc/hosts
+%{ if node_ip != "" ~}
 echo "${node_ip} ${node_name}" >> /etc/hosts
+%{ endif ~}
 
 mkdir -p /var/lib/eu1
 
+# A site without a private network (fin on Verda) renders none of this, and
+# its node address is set after the node exists, when it is known.
+%{ if private_network ~}
 ########################################
 # Private network interface
 #
@@ -155,6 +160,7 @@ elif [ "${private_nic_required}" = "true" ]; then
 else
   log "private network unavailable, continuing because node_ip_mode is public"
 fi
+%{ endif ~}
 
 ########################################
 # Kubelet preconditions
@@ -263,7 +269,9 @@ fi
 
 apt-mark hold kubelet kubeadm kubectl containerd.io
 
+%{ if node_ip != "" ~}
 echo 'KUBELET_EXTRA_ARGS=--node-ip=${node_ip}' > /etc/default/kubelet
+%{ endif ~}
 systemctl enable kubelet
 
 ########################################

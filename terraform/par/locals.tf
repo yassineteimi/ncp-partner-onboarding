@@ -40,5 +40,6 @@ locals {
     kubernetes_minor           = var.kubernetes_minor
     kubernetes_package_version = var.kubernetes_package_version
     containerd_package_version = var.containerd_package_version
+    private_network            = true
   }
 }
