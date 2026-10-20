@@ -1,7 +1,7 @@
 SHELL := /bin/bash
 VENV  := .venv
 
-.PHONY: help par-cluster par-argocd par-cpu-up par-cpu-down par-cpu-destroy par-gpu-up par-gpu-down par-images par-sweep fin-preflight fin-availability argocd-ui grafana-ui cost lint shellcheck fmt docs docs-serve test-goodput
+.PHONY: help par-cluster par-argocd par-cpu-up par-cpu-down par-cpu-destroy par-gpu-up par-gpu-down par-images par-sweep fin-preflight fin-availability fin-cp-up fin-gpu-up fin-up fin-down fin-sweep argocd-ui grafana-ui cost lint shellcheck fmt docs docs-serve test-goodput
 
 help:
 	@grep -hE '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN{FS=":.*?## "}{printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2}'
@@ -46,6 +46,20 @@ fin-preflight: ## fin: free go or no-go for a window: H200 orderable, balance, l
 
 fin-availability: ## fin: log once where the H200 node can be ordered, on demand and spot
 	./scripts/fin/availability.sh
+
+fin-cp-up:     ## fin: preflight, then the control plane, kubeadm and ArgoCD (cents an hour)
+	./scripts/fin/cp-up.sh
+
+fin-gpu-up:    ## fin: preflight, then the H200 node, join, wait for its GPUs (REHEARSAL=1: CPU stand-in)
+	./scripts/fin/gpu-up.sh
+
+fin-up: fin-cp-up fin-gpu-up ## fin: the whole site from zero, timed
+
+fin-down:      ## fin: delete every instance with its OS volume, then sweep Verda
+	./scripts/fin/down.sh
+
+fin-sweep:     ## fin: list every instance, volume and trashed volume at Verda, delete nothing
+	@bash -c 'source scripts/lib.sh && use_site fin && load_env_optional && require_verda_env && verda_sweep eu1-fin'
 
 ########################################
 # Both sites

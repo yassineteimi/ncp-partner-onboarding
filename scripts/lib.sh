@@ -233,6 +233,13 @@ wait_for_bootstrap() {
 
   log "waiting for the bootstrap script on $host to finish"
   while [ "$(date +%s)" -lt "$deadline" ]; do
+    # fin's bootstrap leaves a marker when it fails, so a broken image costs a
+    # minute of GPU time rather than the whole timeout.
+    if node_ssh "$host" test -f /var/lib/eu1/bootstrap-failed >/dev/null 2>&1; then
+      warn "the bootstrap on $host failed: $(node_ssh "$host" cat /var/lib/eu1/bootstrap-failed 2>/dev/null)"
+      node_ssh "$host" tail -n 40 /var/log/eu1-bootstrap.log || true
+      die "bootstrap failed on $host"
+    fi
     if node_ssh "$host" test -f /var/lib/eu1/bootstrap-complete >/dev/null 2>&1; then
       log "bootstrap complete on $host"
       node_ssh "$host" cat /var/lib/eu1/bootstrap-facts.txt || true
@@ -410,4 +417,37 @@ verda_login() {
 #   verda_get <path relative to /v1, with its query string>
 verda_get() {
   curl -fsS -H "Authorization: Bearer $VERDA_TOKEN" "$VERDA_API/$1"
+}
+
+#   verda_put <path> <json body>
+verda_put() {
+  curl -fsS -X PUT -H "Authorization: Bearer $VERDA_TOKEN" -H 'Content-Type: application/json' \
+    "$VERDA_API/$1" --data "$2"
+}
+
+# Everything of ours still at Verda: every instance (the account holds nothing
+# else), every volume, every volume in the trash, and the SSH keys and startup
+# scripts with this site's prefix. It only reports. Deleting by a guess is
+# worse than a warning.
+verda_sweep() {
+  local prefix="$1" instances volumes trash keys scripts
+  verda_login
+  instances="$(verda_get instances | jq -r '.[] | "\(.hostname) \(.id) status=\(.status) type=\(.instance_type) os_volume=\(.os_volume_id)"')"
+  volumes="$(verda_get volumes | jq -r '.[] | "\(.name) \(.id) status=\(.status) size=\(.size)GB instance=\(.instance_id // "none")"')"
+  trash="$(verda_get volumes/trash | jq -r '.[] | "\(.name) \(.id)"')"
+  keys="$(verda_get ssh-keys | jq -r --arg p "$prefix" '.[] | select(.name | startswith($p)) | "\(.name) \(.id)"' 2>/dev/null || true)"
+  scripts="$(verda_get scripts | jq -r --arg p "$prefix" '.[] | select(.name | startswith($p)) | "\(.name) \(.id)"' 2>/dev/null || true)"
+
+  if [ -z "$instances$volumes$trash" ]; then
+    log "Verda shows no instance, no volume and nothing in the volume trash"
+  else
+    warn "still at Verda, and billing:"
+    [ -n "$instances" ] && printf '    instance %s\n' "$instances" >&2
+    [ -n "$volumes" ] && printf '    volume %s\n' "$volumes" >&2
+    [ -n "$trash" ] && printf '    volume in trash %s\n' "$trash" >&2
+    warn "check each one is ours, then delete it through the API, with its OS volume:"
+    warn "  PUT $VERDA_API/instances {\"action\":\"delete\",\"id\":[\"<id>\"],\"volume_ids\":[\"<os volume id>\"],\"delete_permanently\":true}"
+    warn "  DELETE $VERDA_API/volumes/<id>"
+  fi
+  [ -z "$keys$scripts" ] || log "free, kept or left by Terraform: ${keys:+SSH key $keys }${scripts:+startup script $scripts}"
 }

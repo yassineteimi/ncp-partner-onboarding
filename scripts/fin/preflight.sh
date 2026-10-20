@@ -13,8 +13,9 @@
 #   HOURS=1 scripts/fin/preflight.sh         a 1 hour window
 #   scripts/fin/preflight.sh --cp-only       the control plane alone (rehearsal)
 #
-# It writes everything it read to docs/artifacts/fin/preflight-<UTC>.json and
-# the choices Terraform needs to terraform/fin/preflight.auto.tfvars.
+# It writes everything it read, and what it chose, to
+# docs/artifacts/fin/preflight-<UTC>.json. scripts/fin/cp-up.sh and gpu-up.sh
+# run it and turn its choices into Terraform variables.
 #
 # Exit codes: 0 go, 2 no H200 to order, 3 balance too low, 4 leftovers.
 #
@@ -37,9 +38,11 @@ CPU_PREFERENCE="${CPU_PREFERENCE:-CPU.8V.32G CPU-TURIN.8V.32G CPU.16V.64G CPU-TU
 CP_ONLY=false
 [ "${1:-}" = "--cp-only" ] && CP_ONLY=true
 
+# NVMe OS volumes of the nodes the window creates, billed per GB and month.
+DISK_GB="${DISK_GB:-$([ "$CP_ONLY" = true ] && echo 100 || echo 300)}"
+
 STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
 OUT="$ARTIFACTS/preflight-$STAMP.json"
-TFVARS="$TF_DIR/preflight.auto.tfvars"
 
 verda_login
 balance="$(verda_get balance)"
@@ -50,6 +53,7 @@ images="$(verda_get images)"
 instances="$(verda_get instances)"
 volumes="$(verda_get volumes)"
 trash="$(verda_get volumes/trash)"
+volume_types="$(verda_get volume-types)"
 
 where() { # locations offering a type in an availability listing
   jq -r --arg t "$1" '[.[] | select(.availabilities | index($t)) | .location_code] | join(" ")' <<<"$2"
@@ -98,11 +102,12 @@ price() { # on demand or spot price of a type, per hour
 gpu_price="$(price "$GPU_TYPE" "$([ "$is_spot" = true ] && echo spot_price || echo price_per_hour)")"
 cpu_price="$([ -n "$cpu_type" ] && price "$cpu_type" price_per_hour || echo 0)"
 currency="$(jq -r '.currency' <<<"$balance")"
+disk_price="$(jq -r --argjson gb "$DISK_GB" '.[] | select(.type == "NVMe") | .price.price_per_month_per_gb * $gb / 730' <<<"$volume_types")"
 
 if [ "$CP_ONLY" = true ]; then
-  budget="$(jq -n --argjson h "$HOURS" --argjson c "${cpu_price:-0}" '$h * $c')"
+  budget="$(jq -n --argjson h "$HOURS" --argjson c "${cpu_price:-0}" --argjson d "${disk_price:-0}" '$h * ($c + $d)')"
 else
-  budget="$(jq -n --argjson h "$HOURS" --argjson g "${gpu_price:-0}" --argjson c "${cpu_price:-0}" '$h * ($g + $c)')"
+  budget="$(jq -n --argjson h "$HOURS" --argjson g "${gpu_price:-0}" --argjson c "${cpu_price:-0}" --argjson d "${disk_price:-0}" '$h * ($g + $c + $d)')"
 fi
 required="$(jq -n --argjson b "$budget" '$b * 1.5')"
 amount="$(jq -r '.amount' <<<"$balance")"
@@ -151,15 +156,19 @@ jq -n \
   --arg gpu_on_demand "$gpu_on_demand" --arg gpu_spot "$gpu_spot" --arg fallback_on_demand "$fallback_on_demand" \
   --arg cpu_type "$cpu_type" --arg gpu_price "$gpu_price" --arg cpu_price "$cpu_price" \
   --argjson hours "$HOURS" --argjson budget "$budget" --argjson required "$required" --argjson balance "$balance" \
+  --argjson disk_gb "$DISK_GB" --arg disk_price "$disk_price" \
   --arg gpu_image "$gpu_image" --arg gpu_image_name "$gpu_image_name" --arg cp_image "$cp_image" --arg driver "$driver" \
+  --arg gpu_image_type "$GPU_IMAGE_TYPE" --arg cp_image_type "$CP_IMAGE_TYPE" \
   --argjson leftovers "$leftovers" \
   '{checked_at: $checked_at, verdict: $verdict, reason: $reason, cp_only: $cp_only,
     gpu: {type: $gpu_type, location: $location, spot: $is_spot, price_per_hour: $gpu_price,
           orderable_on_demand_in: $gpu_on_demand, orderable_on_spot_in: $gpu_spot,
           fallback_2RTXPRO6000_on_demand_in: $fallback_on_demand},
     control_plane: {type: $cpu_type, price_per_hour: $cpu_price},
+    disks: {nvme_gb: $disk_gb, price_per_hour: $disk_price},
     budget: {hours: $hours, cost: $budget, required_balance: $required, balance: $balance},
-    images: {gpu: {id: $gpu_image, name: $gpu_image_name, driver: $driver}, control_plane: {id: $cp_image}},
+    images: {gpu: {type: $gpu_image_type, id: $gpu_image, name: $gpu_image_name, driver: $driver},
+             control_plane: {type: $cp_image_type, id: $cp_image}},
     leftovers: $leftovers}' > "$OUT"
 log "preflight record saved to ${OUT#"$REPO_ROOT"/}"
 
@@ -167,16 +176,6 @@ if [ "$verdict" != go ]; then
   warn "STOP: $reason"
   exit "$exit_code"
 fi
-
-mkdir -p "$TF_DIR"
-cat > "$TFVARS" <<EOF
-# Written by scripts/fin/preflight.sh at $STAMP from ${OUT#"$REPO_ROOT"/}. Gitignored.
-location          = "$location"
-gpu_is_spot       = $is_spot
-cpu_instance_type = "$cpu_type"
-gpu_image         = "$gpu_image"
-cp_image          = "$cp_image"
-EOF
 
 log "GO: $([ "$CP_ONLY" = true ] && echo "control plane only" || echo "$GPU_TYPE $([ "$is_spot" = true ] && echo on spot || echo on demand) at $gpu_price $currency/h") in $location, control plane $cpu_type at $cpu_price $currency/h"
 log "budget $budget $currency for $HOURS h; balance $amount $currency covers the 1.5x rule ($required $currency)"

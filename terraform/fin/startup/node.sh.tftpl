@@ -1,0 +1,190 @@
+#!/usr/bin/env bash
+#
+# fin node bootstrap, for both the control plane and the GPU node. Verda runs
+# it once, as root, on the instance's first boot.
+#
+# It is par's bootstrap adapted to the provider. The same shared block
+# (terraform/par/cloud-init/common.sh.tftpl) installs containerd and the
+# kubeadm toolchain at the same pinned versions. Three things differ:
+#
+#   - Verda has no cloud firewall, so nftables on the node does that job.
+#   - There is no private network between the nodes, and the public address is
+#     only known once the instance exists, so the node address, kubeadm init
+#     and kubeadm join are done afterwards by scripts/fin/cp-up.sh and
+#     gpu-up.sh, over SSH.
+#   - The GPU image ships the NVIDIA driver and the GPU Operator runs with
+#     driver.enabled=false (ADR 0002). This script checks the driver is there,
+#     the inverse of par's gate, and holds it so nothing upgrades it mid-window.
+#
+set -euo pipefail
+exec > >(tee -a /var/log/eu1-bootstrap.log) 2>&1
+
+log() { echo "[bootstrap $(date -Is)] $*"; }
+
+# A failure leaves a marker, so the up script stops waiting at once instead of
+# timing out on a node billed by the hour. ERR names the command that failed;
+# EXIT catches the explicit exit 1 paths of the shared block, which ERR doesn't.
+mkdir -p /var/lib/eu1
+trap 'echo "line $LINENO: $BASH_COMMAND" > /var/lib/eu1/bootstrap-failed' ERR
+trap 'rc=$?; [ "$rc" -eq 0 ] || [ -f /var/lib/eu1/bootstrap-failed ] || echo "exit $rc" > /var/lib/eu1/bootstrap-failed' EXIT
+
+log "role ${role} on ${cluster_name}"
+
+########################################
+# Host firewall
+#
+# On the public interface only: established traffic, ICMP, DHCP replies (not
+# tracked as established, and needed to renew the lease), SSH and the API
+# server from the admin ranges, and everything from the other node of the site,
+# whose address scripts/fin/gpu-up.sh writes to /etc/eu1/peers once it exists.
+# The forward chain drops new connections from anywhere else, so a NodePort
+# isn't reachable from the internet either. Pod traffic between the nodes
+# arrives as VXLAN from the peer, which is allowed.
+########################################
+
+mkdir -p /etc/eu1
+touch /etc/eu1/peers
+
+cat > /usr/local/sbin/eu1-firewall <<'FIREWALL'
+#!/bin/sh
+set -eu
+IF="$(ip -o route get 1.1.1.1 | sed -n 's/.* dev \([^ ]*\).*/\1/p')"
+PEERS="$(grep -Eo '^[0-9]+(\.[0-9]+){3}$' /etc/eu1/peers | paste -sd, - || true)"
+PEER_RULE=""
+[ -n "$PEERS" ] && PEER_RULE="ip saddr { $PEERS } accept"
+nft -f - <<NFT
+table inet eu1
+delete table inet eu1
+table inet eu1 {
+  chain input {
+    type filter hook input priority filter - 10; policy accept;
+    iifname != "$IF" accept
+    ct state established,related accept
+    ip protocol icmp accept
+    meta l4proto ipv6-icmp accept
+    udp sport 67 udp dport 68 accept
+    udp sport 547 udp dport 546 accept
+    tcp dport { 22, 6443 } ip saddr { ${join(", ", admin_cidrs)} } accept
+    $PEER_RULE
+    drop
+  }
+  chain forward {
+    type filter hook forward priority filter - 10; policy accept;
+    iifname != "$IF" accept
+    ct state established,related accept
+    $PEER_RULE
+    ct state new drop
+  }
+}
+NFT
+echo "eu1-firewall: public interface $IF, peers: $${PEERS:-none}"
+FIREWALL
+chmod 0755 /usr/local/sbin/eu1-firewall
+
+cat > /etc/systemd/system/eu1-firewall.service <<'UNIT'
+[Unit]
+Description=EU1 host firewall on the public interface
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/eu1-firewall
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+UNIT
+
+command -v nft >/dev/null 2>&1 || DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=300 install -y nftables
+systemctl daemon-reload
+systemctl enable --now eu1-firewall.service
+
+########################################
+# What the image shipped, before anything changes it
+########################################
+
+{
+  echo "== os"
+  . /etc/os-release && echo "$PRETTY_NAME"
+  uname -r
+  echo "== binaries"
+  for bin in nvidia-smi nvidia-ctk containerd runc docker kubelet kubeadm; do
+    printf '%-12s %s\n' "$bin" "$(command -v "$bin" || echo absent)"
+  done
+  echo "== packages"
+  dpkg-query -W -f='$${Package} $${Version}\n' 2>/dev/null \
+    | grep -E '^(nvidia|libnvidia|cuda|containerd|runc|docker|kube)' || echo "none of interest"
+  echo "== units"
+  systemctl list-unit-files --no-legend 2>/dev/null \
+    | grep -E 'nvidia|containerd|docker|kubelet|fabricmanager|persistenced' || echo "none of interest"
+  echo "== kernel modules"
+  lsmod | grep -E '^(nvidia|nouveau)' || echo "no nvidia or nouveau module loaded"
+  echo "== nvidia module on disk"
+  modinfo -F version nvidia 2>/dev/null || echo "no nvidia module for $(uname -r)"
+} > /var/lib/eu1/image-inventory.txt 2>&1 || true
+
+%{ if role == "gpu" ~}
+########################################
+# The driver the provider image ships (ADR 0002)
+#
+# required: the driver loads and nvidia-smi sees every GPU of the instance
+# type, or the bootstrap fails within a minute of boot, before a single
+# Kubernetes package is installed on a node billed at 11 dollars an hour.
+# rehearsal: a CPU instance booting the GPU image; the driver packages must be
+# there, and there is no GPU to see.
+########################################
+
+DRIVER_VERSION="$(modinfo -F version nvidia 2>/dev/null || true)"
+{
+  echo "== driver"
+  echo "driver_version=$${DRIVER_VERSION:-none}"
+  echo "driver_check=${driver_check}"
+} >> /var/lib/eu1/image-inventory.txt
+
+%{ if driver_check == "required" ~}
+nvidia-smi >> /var/lib/eu1/image-inventory.txt 2>&1
+GPUS="$(nvidia-smi --query-gpu=index --format=csv,noheader | wc -l)"
+if [ "$GPUS" -ne ${gpu_expected_count} ]; then
+  log "FATAL: nvidia-smi sees $GPUS GPUs, expected ${gpu_expected_count}"
+  false
+fi
+{
+  echo "== gpus"
+  nvidia-smi --query-gpu=index,name,pci.bus_id,memory.total,mig.mode.current,ecc.mode.current --format=csv
+  echo "== topology"
+  nvidia-smi topo -m
+  echo "== nvlink"
+  nvidia-smi nvlink -s
+  echo "== fabric manager"
+  systemctl is-active nvidia-fabricmanager 2>&1 || true
+} >> /var/lib/eu1/image-inventory.txt 2>&1 || true
+%{ else ~}
+if [ -z "$DRIVER_VERSION" ]; then
+  log "FATAL: the GPU image carries no nvidia kernel module for $(uname -r)"
+  false
+fi
+%{ endif ~}
+
+# The provider owns the driver on this site, and nothing may upgrade it under a
+# running window: an unattended upgrade of the driver packages leaves a loaded
+# module that no longer matches its user space.
+NVIDIA_PKGS="$(dpkg-query -W -f='$${Package}\n' 2>/dev/null | grep -E '^(nvidia|libnvidia|cuda-drivers)' || true)"
+[ -n "$NVIDIA_PKGS" ] && echo "$NVIDIA_PKGS" | xargs apt-mark hold
+%{ endif ~}
+
+log "image inventory, before any change:"
+cat /var/lib/eu1/image-inventory.txt
+
+${common}
+
+%{ if role == "control" ~}
+# Pinned to the installed kubeadm's own version, so kubeadm doesn't fetch the
+# newest patch of the series instead. Only the control plane runs these images;
+# the GPU node pulls what it needs when it joins.
+kubeadm config images pull --kubernetes-version "$(kubeadm version -o short)" \
+  --cri-socket unix:///run/containerd/containerd.sock || true
+%{ endif ~}
+
+touch /var/lib/eu1/bootstrap-complete
+log "bootstrap complete, waiting for scripts/fin to set the node address and run kubeadm"
