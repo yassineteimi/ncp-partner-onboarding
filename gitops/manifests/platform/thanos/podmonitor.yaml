@@ -1,0 +1,16 @@
+# par's Prometheus scrapes every Thanos component, so the evidence for use case
+# 6 (samples received per tenant, blocks uploaded, compactions, downsampling)
+# is in Prometheus and not only in logs. It selects every PodMonitor in the
+# cluster (gitops/values/base/kube-prometheus-stack.yaml), so no release label.
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: thanos
+  namespace: thanos
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/part-of: thanos
+  podMetricsEndpoints:
+    - port: http
+      interval: 30s

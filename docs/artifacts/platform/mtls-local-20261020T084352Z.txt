@@ -1,0 +1,30 @@
+# check-mtls.sh, 20261020T084352Z, laptop clock, UTC
+# thanos, version 0.42.4 (branch: HEAD, revision: 45c4f39487e1653e606307d3952a6259fb96acae)
+# prometheus, version 3.14.0 (branch: HEAD, revision: d7598b7141418fa35be2b5ec5d0fefb634199610)
+# OpenSSL 3.3.2 3 Sep 2024 (Library: OpenSSL 3.3.2 3 Sep 2024)
+==> running the Job's sign step
+created the CA
+Certificate request self-signature ok
+subject=O=EU1, CN=thanos-receive.eu1.internal
+signed thanos-receive-tls for CN=thanos-receive.eu1.internal
+Certificate request self-signature ok
+subject=O=EU1, CN=fin
+signed thanos-client-fin for CN=fin
+Certificate request self-signature ok
+subject=O=EU1, CN=fin-sim
+signed thanos-client-fin-sim for CN=fin-sim
+==> a second run creates nothing
+/var/folders/y5/hnwhhv4137q6s6p09_xk76mc0000gn/T/tmp.NNJX22Y6Tt/certs/thanos-receive-tls/tls.crt: OK
+/var/folders/y5/hnwhhv4137q6s6p09_xk76mc0000gn/T/tmp.NNJX22Y6Tt/certs/thanos-client-fin/tls.crt: OK
+/var/folders/y5/hnwhhv4137q6s6p09_xk76mc0000gn/T/tmp.NNJX22Y6Tt/certs/thanos-client-fin-sim/tls.crt: OK
+==> chain and key usages are right
+X509v3 Subject Alternative Name: 
+    DNS:thanos-receive.eu1.internal, DNS:thanos-receive.thanos.svc, DNS:thanos-receive.thanos.svc.cluster.local
+==> thanos receive --log.level=info --grpc-address=127.0.0.1:10901 --http-address=127.0.0.1:10902 --remote-write.address=127.0.0.1:19291 --remote-write.server-tls-cert=/var/folders/y5/hnwhhv4137q6s6p09_xk76mc0000gn/T/tmp.NNJX22Y6Tt/certs/thanos-receive-tls/tls.crt --remote-write.server-tls-key=/var/folders/y5/hnwhhv4137q6s6p09_xk76mc0000gn/T/tmp.NNJX22Y6Tt/certs/thanos-receive-tls/tls.key --remote-write.server-tls-client-ca=/var/folders/y5/hnwhhv4137q6s6p09_xk76mc0000gn/T/tmp.NNJX22Y6Tt/certs/thanos-receive-tls/ca.crt --receive.tenant-certificate-field=commonName --receive.local-endpoint=local-0:10901 --label=receive_replica="local-0" --tsdb.path=/var/folders/y5/hnwhhv4137q6s6p09_xk76mc0000gn/T/tmp.NNJX22Y6Tt/tsdb --tsdb.retention=3d 
+==> waiting for samples to arrive through mutual TLS
+{"status":"success","data":{"resultType":"vector","result":[{"metric":{"site":"fin","tenant_id":"fin"},"value":[1792485850.495,"1"]}],"analysis":{}}}
+==> samples arrived as tenant_id=fin with site=fin
+==> no client certificate: HTTP code '000' (000 means the TLS handshake was refused)
+==> CN=fin from another CA: HTTP code '000'
+==> the real fin certificate with a garbage body: HTTP code '400' (TLS accepted, request rejected)
+==> all mTLS checks passed

@@ -1,0 +1,166 @@
+# Mutual TLS for the remote write endpoint, generated inside the cluster the
+# first time, so no key is ever in Git. The same pattern as Garage's bootstrap
+# Job in gitops/manifests/base/checkpoint-store/.
+#
+# One CA signs a server certificate for Receive and one client certificate per
+# writing site. Receive requires a client certificate signed by this CA
+# (--remote-write.server-tls-client-ca) and takes the tenant from its common
+# name (--receive.tenant-certificate-field=commonName), so the certificate is
+# both the credential and the tenant: fin can only write as fin.
+#
+# Three steps, because no pinned image has both kubectl and openssl:
+#   read   kubectl copies whatever already exists out of the Secrets
+#   sign   openssl creates only what is missing, with the existing CA if there is one
+#   store  kubectl creates only the Secrets that do not exist yet
+# Re-running it changes nothing that exists. Adding a site is a new CN in the
+# list below and a new Job name.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: thanos-certs
+  namespace: thanos
+  annotations:
+    argocd.argoproj.io/sync-wave: "-2"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: thanos-certs
+  namespace: thanos
+  annotations:
+    argocd.argoproj.io/sync-wave: "-2"
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: thanos-certs
+  namespace: thanos
+  annotations:
+    argocd.argoproj.io/sync-wave: "-2"
+roleRef: {apiGroup: rbac.authorization.k8s.io, kind: Role, name: thanos-certs}
+subjects: [{kind: ServiceAccount, name: thanos-certs, namespace: thanos}]
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: thanos-certs
+  namespace: thanos
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  backoffLimit: 3
+  template:
+    spec:
+      serviceAccountName: thanos-certs
+      restartPolicy: Never
+      nodeSelector:
+        eu1.io/pool: cpu
+      volumes:
+        - name: work
+          emptyDir: {medium: Memory, sizeLimit: 1Mi}
+      initContainers:
+        - name: read
+          image: alpine/k8s:1.36.5@sha256:094adf64cdc4827377cdbe7ea5747472ce115f9fbc64a4e35970ec66777f9a00
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -eu
+              cd /work
+              # secret name, then the files it holds
+              dump() {
+                name="$1"; shift
+                kubectl -n thanos get secret "$name" >/dev/null 2>&1 || return 0
+                mkdir -p "$name"
+                for key in "$@"; do
+                  k=$(echo "$key" | sed 's/\./\\./g')
+                  kubectl -n thanos get secret "$name" -o jsonpath="{.data.$k}" | base64 -d > "$name/$key"
+                done
+                echo "read $name"
+              }
+              dump thanos-ca ca.crt ca.key
+              dump thanos-receive-tls tls.crt tls.key ca.crt
+              for cn in fin fin-sim; do dump "thanos-client-$cn" tls.crt tls.key ca.crt; done
+          volumeMounts: [{name: work, mountPath: /work}]
+        - name: sign
+          image: alpine/openssl:3.5.8@sha256:3f25da71f70eba788067daac3f3df03bd1de7a7c52ed89fa93b94ad2c92d986b
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -eu
+              cd /work
+              key() { openssl genpkey -algorithm EC -pkeyopt ec_paramgen_curve:P-256 -out "$1"; }
+              if [ ! -f thanos-ca/ca.key ]; then
+                mkdir -p thanos-ca
+                key thanos-ca/ca.key
+                openssl req -x509 -new -key thanos-ca/ca.key -subj "/O=EU1/CN=eu1-thanos-ca" \
+                  -days 3650 -out thanos-ca/ca.crt
+                echo "created the CA"
+              fi
+              # directory, common name, extensions
+              sign() {
+                [ -f "$1/tls.crt" ] && return 0
+                mkdir -p "$1"
+                key "$1/tls.key"
+                openssl req -new -key "$1/tls.key" -subj "/O=EU1/CN=$2" -out "$1/req.csr"
+                printf '%s\n' "$3" > "$1/ext.cnf"
+                openssl x509 -req -in "$1/req.csr" -CA thanos-ca/ca.crt -CAkey thanos-ca/ca.key \
+                  -CAcreateserial -days 825 -extfile "$1/ext.cnf" -out "$1/tls.crt"
+                cp thanos-ca/ca.crt "$1/ca.crt"
+                rm "$1/req.csr" "$1/ext.cnf"
+                echo "signed $1 for CN=$2"
+              }
+              # fin dials the CPU worker's public IP and checks this name, set as
+              # serverName in its remote write config, so no IP is in the SAN.
+              sign thanos-receive-tls thanos-receive.eu1.internal "$(printf '%s\n%s' \
+                'subjectAltName=DNS:thanos-receive.eu1.internal,DNS:thanos-receive.thanos.svc,DNS:thanos-receive.thanos.svc.cluster.local' \
+                'extendedKeyUsage=serverAuth')"
+              for cn in fin fin-sim; do
+                sign "thanos-client-$cn" "$cn" 'extendedKeyUsage=clientAuth'
+              done
+              chmod -R a+r /work
+          volumeMounts: [{name: work, mountPath: /work}]
+      containers:
+        - name: store
+          image: alpine/k8s:1.36.5@sha256:094adf64cdc4827377cdbe7ea5747472ce115f9fbc64a4e35970ec66777f9a00
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -eu
+              cd /work
+              store() {
+                name="$1"; shift
+                if kubectl -n thanos get secret "$name" >/dev/null 2>&1; then
+                  echo "$name exists, keeping it"
+                  return 0
+                fi
+                args=""
+                for key in "$@"; do args="$args --from-file=$key=$name/$key"; done
+                # shellcheck disable=SC2086
+                kubectl -n thanos create secret generic "$name" $args
+                echo "$name created"
+              }
+              store thanos-ca ca.crt ca.key
+              store thanos-receive-tls tls.crt tls.key ca.crt
+              for cn in fin fin-sim; do store "thanos-client-$cn" tls.crt tls.key ca.crt; done
+              # The simulated site (fin-sim.yaml) runs on par, so its certificate
+              # can be handed over here. The real fin gets its copy from
+              # scripts/platform/fin-remote-write-secret.sh at bring-up.
+              if kubectl -n fin-sim get secret thanos-remote-write >/dev/null 2>&1; then
+                echo "fin-sim/thanos-remote-write exists, keeping it"
+              elif kubectl -n fin-sim create secret generic thanos-remote-write \
+                  --from-file=tls.crt=thanos-client-fin-sim/tls.crt \
+                  --from-file=tls.key=thanos-client-fin-sim/tls.key \
+                  --from-file=ca.crt=thanos-client-fin-sim/ca.crt; then
+                echo "fin-sim/thanos-remote-write created"
+              else
+                echo "no fin-sim namespace to write to, skipped"
+              fi
+              echo "fingerprints:"
+              for d in thanos-receive-tls thanos-client-fin thanos-client-fin-sim; do
+                printf '%s ' "$d"; sha256sum "$d/tls.crt" | cut -c1-16
+              done
+          volumeMounts: [{name: work, mountPath: /work}]

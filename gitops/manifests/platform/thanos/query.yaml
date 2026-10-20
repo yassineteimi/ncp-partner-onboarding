@@ -1,0 +1,86 @@
+# Thanos Query: the one PromQL endpoint for both sites, and Grafana's "Thanos
+# (EU1)" data source.
+#
+# It fans out to three kinds of store:
+#   par's Prometheus, through its Thanos sidecar   par, last 15 days
+#   Receive                                        fin and fin-sim, last 3 days
+#   the store gateway, reading Garage              everything uploaded
+# and merges what they return. --endpoint is deprecated at v0.42.4, so the
+# stores come from an endpoint config file (cmd/thanos/endpointset.go).
+#
+# Deduplication: kube-prometheus-stack gives every Prometheus a
+# prometheus_replica label, and Receive adds receive_replica to its blocks.
+# Treating both as replica labels merges an HA pair of Prometheus servers into
+# one series. The simulated fin runs two replicas to show it.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: thanos-query-endpoints
+  namespace: thanos
+data:
+  endpoints.yaml: |
+    endpoints:
+      - address: dnssrv+_grpc._tcp.thanos-receive-headless.thanos.svc.cluster.local
+      - address: dnssrv+_grpc._tcp.thanos-store.thanos.svc.cluster.local
+      - address: dnssrv+_grpc._tcp.kube-prometheus-stack-thanos-discovery.monitoring.svc.cluster.local
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: thanos-query
+  namespace: thanos
+  labels: {app.kubernetes.io/name: thanos-query, app.kubernetes.io/part-of: thanos}
+spec:
+  selector: {app.kubernetes.io/name: thanos-query}
+  ports:
+    - {name: http, port: 9090, targetPort: http}
+    - {name: grpc, port: 10901, targetPort: grpc}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: thanos-query
+  namespace: thanos
+  labels: {app.kubernetes.io/name: thanos-query, app.kubernetes.io/part-of: thanos}
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app.kubernetes.io/name: thanos-query}
+  template:
+    metadata:
+      labels: {app.kubernetes.io/name: thanos-query, app.kubernetes.io/part-of: thanos}
+    spec:
+      nodeSelector:
+        eu1.io/pool: cpu
+      containers:
+        - name: thanos
+          image: quay.io/thanos/thanos:v0.42.4@sha256:b567818fe608067eb0f1d7c2c4fe361e7ad83c8a256234c97685f1d0bf670cc8
+          args:
+            - query
+            - --log.level=info
+            - --grpc-address=0.0.0.0:10901
+            - --http-address=0.0.0.0:10902
+            - --endpoint.sd-config-file=/etc/thanos/endpoints/endpoints.yaml
+            - --endpoint.sd-config-reload-interval=1m
+            - --query.replica-label=prometheus_replica
+            - --query.replica-label=receive_replica
+            # Pick 5m or 1h blocks when the step is wide enough, once the
+            # compactor has made them.
+            - --query.auto-downsampling
+          ports:
+            - {name: grpc, containerPort: 10901}
+            - {name: http, containerPort: 10902}
+          readinessProbe:
+            httpGet: {path: /-/ready, port: http}
+            periodSeconds: 5
+          livenessProbe:
+            httpGet: {path: /-/healthy, port: http}
+            periodSeconds: 30
+          resources:
+            requests: {cpu: 50m, memory: 128Mi}
+            limits: {memory: 1Gi}
+          volumeMounts:
+            - {name: endpoints, mountPath: /etc/thanos/endpoints, readOnly: true}
+      volumes:
+        - name: endpoints
+          configMap: {name: thanos-query-endpoints}

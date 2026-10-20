@@ -1,0 +1,28 @@
+# The Thanos hub on par: certificates, Receive, Query, store gateway,
+# compactor, the cross-site dashboard and the simulated fin. Deployed by
+# gitops/apps/par/platform/thanos.yaml. Every file sets its own namespace,
+# because fin-sim.yaml lives in its own.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - certs.yaml
+  - receive.yaml
+  - query.yaml
+  - store.yaml
+  - compact.yaml
+  - podmonitor.yaml
+  # SIMULATED. Removing this line is the simulated site's teardown.
+  - fin-sim.yaml
+
+# The dashboard stays a plain JSON file, as in Part 1. Grafana's sidecar looks
+# for the label in every namespace (gitops/values/base/kube-prometheus-stack.yaml).
+configMapGenerator:
+  - name: eu1-gpus-across-sites-dashboard
+    namespace: thanos
+    files:
+      - dashboards/eu1-gpus-across-sites.json
+    options:
+      disableNameSuffixHash: true
+      labels:
+        grafana_dashboard: "1"
