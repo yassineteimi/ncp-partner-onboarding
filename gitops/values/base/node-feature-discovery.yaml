@@ -45,6 +45,14 @@ worker:
     - key: nvidia.com/gpu
       operator: Exists
       effect: NoSchedule
+    # A fin GPU node joins with eu1.io/staging=pending:NoSchedule and keeps it
+    # until it passes NVCRE certification (use case 2). Its GPU Operator
+    # components need NFD's labels to start, so nfd-worker tolerates the
+    # staging taint; the readiness lane's overlay does the same for the
+    # operator.
+    - key: eu1.io/staging
+      operator: Exists
+      effect: NoSchedule
 
   config:
     core:
