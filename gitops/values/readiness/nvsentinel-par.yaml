@@ -47,11 +47,11 @@ global:
 
   # Stage 3
   faultRemediation:
-    enabled: false
+    enabled: true
   janitor:
-    enabled: false
+    enabled: true
   janitorProvider:
-    enabled: false
+    enabled: true
 
   # Off, and kept off on purpose. Post-remediation validation (lifecycle-manager)
   # would run a DCGM diagnostic before the node returns. Use case 3 measures
