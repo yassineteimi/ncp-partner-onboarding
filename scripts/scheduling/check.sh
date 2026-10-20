@@ -16,11 +16,21 @@
 #      kinds whose CRD isn't installed yet are listed and skipped)
 #
 # Renders are left in $OUT (default: a temporary directory) for inspection.
+# ARTIFACT=1 also writes the transcript to
+# docs/artifacts/scheduling/free-checks-<stamp>.txt.
 # Needs PyYAML: the repository's .venv has it (make docs creates it), and it
 # is used when present.
 #
 
 source "$(dirname "${BASH_SOURCE[0]}")/../lib.sh"
+
+if [ "${ARTIFACT:-}" = "1" ]; then
+  stamp="$(date -u +%Y%m%dT%H%M%SZ)"
+  transcript="$REPO_ROOT/docs/artifacts/scheduling/free-checks-$stamp.txt"
+  mkdir -p "$(dirname "$transcript")"
+  exec > >(perl -pe 'BEGIN { $| = 1 } s/\e\[[0-9;]*m//g' | tee "$transcript") 2>&1
+  echo "# scripts/scheduling/check.sh, $stamp, laptop clock, UTC. git $(git -C "$REPO_ROOT" rev-parse --short HEAD). DRY_RUN=${DRY_RUN:-none}"
+fi
 
 if [ -x "$REPO_ROOT/.venv/bin/python3" ]; then
   PATH="$REPO_ROOT/.venv/bin:$PATH"
