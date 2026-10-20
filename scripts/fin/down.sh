@@ -50,6 +50,18 @@ else
   done
   [ "${left:-1}" -eq 0 ] || warn "$left instance(s) still listed after 10 minutes; the sweep below shows them"
 
+  # The volumes go after the instances: in the rehearsal on 20 October they
+  # were still listed as detached 20 seconds after the instances had gone, and
+  # gone 20 seconds later. Sweeping before that reports a false leftover.
+  log "waiting for Verda to delete the OS volumes"
+  deadline=$(( $(date +%s) + 300 ))
+  while [ "$(date +%s)" -lt "$deadline" ]; do
+    left_volumes="$(verda_get volumes | jq --argjson v "$volumes" '[.[] | select(.id as $i | $v | index($i))] | length')"
+    [ "$left_volumes" -eq 0 ] && break
+    sleep 10
+  done
+  [ "${left_volumes:-1}" -eq 0 ] || warn "$left_volumes OS volume(s) still listed after 5 minutes; the sweep below shows them"
+
   for address in $(jq -r 'keys[]' <<<"$INSTANCES"); do
     tf state rm "$address" >/dev/null && log "removed $address from the Terraform state"
   done

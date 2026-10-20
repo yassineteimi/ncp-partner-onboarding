@@ -1,0 +1,7 @@
+# cp-bringup-20261020T074646Z.txt, laptop clock, UTC
+started=2026-10-20T07:46:46Z
+preflight_done=2026-10-20T07:46:50Z
+instance_running=2026-10-20T07:47:25Z
+bootstrap_complete=2026-10-20T07:49:17Z
+kubeadm_ready=2026-10-20T07:49:44Z
+argocd_installed=2026-10-20T07:50:44Z
