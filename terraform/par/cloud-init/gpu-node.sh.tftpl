@@ -76,6 +76,21 @@ fi
 
 log "no NVIDIA driver present, as intended"
 
+########################################
+# Persistent journald
+#
+# NVSentinel's syslog health monitor (use case 3) reads the journal, not
+# /dev/kmsg, and refuses to start without /var/log/journal. Ubuntu's default
+# Storage=auto keeps the journal in memory unless that directory exists, so it
+# is created and journald is told to keep the journal on disk.
+########################################
+
+mkdir -p /var/log/journal /etc/systemd/journald.conf.d
+printf '[Journal]\nStorage=persistent\n' > /etc/systemd/journald.conf.d/10-eu1-persistent.conf
+systemd-tmpfiles --create --prefix /var/log/journal
+systemctl restart systemd-journald
+log "journald is persistent: $(ls -ld /var/log/journal)"
+
 ${common}
 
 lspci -nn | grep -i nvidia || log "no NVIDIA PCI device reported by lspci"
