@@ -51,3 +51,27 @@ nvcre-promote: $(READINESS_VENV)/bin/pytest ## readiness: remove the staging tai
 	$(NVCRE_ENV) ./scripts/readiness/nvcre.sh promote
 
 .PHONY: readiness-tools readiness-prepull nvcre-stage nvcre-certify readiness-diag nvcre-promote
+
+########################################
+# Use case 3: NVSentinel against Part 1's goodput run, on par's L4
+########################################
+
+uc3-check:     ## readiness: NVSentinel ready on the L4 before any injection (labels, pods, breaker, journal)
+	./scripts/readiness/uc3.sh check
+
+uc3-watch: $(READINESS_VENV)/bin/pytest ## readiness: clock offsets, then record the outage timeline until Ctrl-C
+	./scripts/readiness/uc3.sh watch
+
+uc3-goodput:   ## readiness: start Part 1's goodput Job in tenant-a
+	./scripts/readiness/goodput.sh start
+
+uc3-inject:    ## readiness: SIMULATED XID as a kernel log line on the L4 (XID=79 by default)
+	./scripts/readiness/uc3.sh inject $(or $(XID),79)
+
+uc3-inject-dcgm: ## readiness: SIMULATED XID 79 into DCGM's cache on the L4
+	./scripts/readiness/uc3.sh inject-dcgm
+
+uc3-capture: $(READINESS_VENV)/bin/pytest ## readiness: after the Job completes, goodput, phases and NVSentinel's state
+	./scripts/readiness/uc3.sh capture
+
+.PHONY: uc3-check uc3-watch uc3-goodput uc3-inject uc3-inject-dcgm uc3-capture

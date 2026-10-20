@@ -6,7 +6,7 @@
 #   SITE=par|fin scripts/readiness/nvcre.sh prepull         pull the workload images onto the GPU node
 #   SITE=par     scripts/readiness/nvcre.sh stage           add the staging taint (fin's node joins with it)
 #   SITE=par|fin scripts/readiness/nvcre.sh certify         run workloads/readiness/certification-$SITE.yaml
-#   SITE=par|fin scripts/readiness/nvcre.sh diag            dcgmi diag -r 2 (DIAG_VIA=workloadrun, the default, or exec)
+#   SITE=par|fin scripts/readiness/nvcre.sh diag            dcgmi diag -r 2 (DIAG_LEVEL=3 for W3; DIAG_VIA=workloadrun, the default, or exec)
 #   SITE=par|fin scripts/readiness/nvcre.sh promote         promote.py, then remove the taint only on its yes
 #
 # WORKLOAD_IMAGE=<image@digest> makes certify run the NCCL tests in another
@@ -138,14 +138,20 @@ yaml.safe_dump(d, open(sys.argv[3], "w"), sort_keys=False)' "$cert" "$WORKLOAD_I
   diag)
     node="$(gpu_node)"
     ts="$(stamp)"
+    LEVEL="${DIAG_LEVEL:-2}"
+    [[ "$LEVEL" =~ ^[1-4]$ ]] || die "DIAG_LEVEL must be 1 to 4"
     file="$OUT/diag-$SITE-$ts.log"
-    echo "diag_started=$(now) node=$node via=${DIAG_VIA:-workloadrun}" | tee -a "$OUT/nvcre-$SITE-timeline.txt"
+    echo "diag_started=$(now) node=$node level=$LEVEL via=${DIAG_VIA:-workloadrun}" | tee -a "$OUT/nvcre-$SITE-timeline.txt"
     if [ "${DIAG_VIA:-workloadrun}" = workloadrun ]; then
       require_tools "$NVCRECTL"
       kubectl_cp create namespace "$RUNS_NS" --dry-run=client -o yaml | kubectl_cp apply -f - >/dev/null
       name="eu1-$SITE-diag-$(date -u +%H%M%S)"
+      # The YAML says -r 2; W3 asks for level 3 on the same objects.
+      spec="$REPO_ROOT/.cache/readiness/diag-$SITE-$ts.yaml"
+      sed "s/ -r 2 -j/ -r $LEVEL -j/" "$REPO_ROOT/workloads/readiness/diag-$SITE.yaml" > "$spec"
+      grep -q -- "-r $LEVEL -j" "$spec" || die "couldn't set the diagnostic level in $spec"
       "$NVCRECTL" workloadrun run --kubeconfig "$KUBECONFIG_PATH" -n "$RUNS_NS" --name "$name" \
-        --wait --timeout "${TIMEOUT:-10m}" "$REPO_ROOT/workloads/readiness/diag-$SITE.yaml" \
+        --wait --timeout "${TIMEOUT:-10m}" "$spec" \
         > "$OUT/diag-$SITE-$ts-report.txt" 2>&1 || warn "the WorkloadRun didn't succeed, see diag-$SITE-$ts-report.txt"
       for pod in $(kubectl_cp -n "$RUNS_NS" get pods -o name | grep "$name" || true); do
         kubectl_cp -n "$RUNS_NS" logs "$pod" --all-containers 2>&1
@@ -155,7 +161,7 @@ yaml.safe_dump(d, open(sys.argv[3], "w"), sort_keys=False)' "$cert" "$WORKLOAD_I
       pod="$(kubectl_cp -n gpu-operator get pods -l app=nvidia-dcgm --field-selector "spec.nodeName=$node" -o jsonpath='{.items[0].metadata.name}')"
       [ -n "$pod" ] || die "no nvidia-dcgm pod on $node"
       set +e
-      kubectl_cp -n gpu-operator exec "$pod" -- dcgmi diag -r 2 -j > "$file" 2>&1
+      kubectl_cp -n gpu-operator exec "$pod" -- dcgmi diag -r "$LEVEL" -j > "$file" 2>&1
       rc=$?
       set -e
       echo "dcgmi_exit=$rc" >> "$file"
