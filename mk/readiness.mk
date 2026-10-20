@@ -22,3 +22,32 @@ readiness-dryrun: readiness-render ## readiness: server-side dry run on par of e
 	./scripts/readiness/dryrun.sh $(if $(SAVE),--save)
 
 .PHONY: readiness-venv readiness-test readiness-render readiness-dryrun
+
+########################################
+# Use case 2: NVCRE certification as the promotion gate
+########################################
+
+READINESS_BIN := .cache/readiness/bin
+NVCRE_ENV := PATH="$(CURDIR)/$(READINESS_BIN):$$PATH" SITE=$(or $(SITE),par)
+
+$(READINESS_BIN)/nvcrectl:
+	./scripts/readiness/tools.sh
+
+readiness-tools: $(READINESS_BIN)/nvcrectl ## readiness: nvcrectl v0.8.0, checksum-verified, in .cache/readiness/bin
+
+readiness-prepull: ## readiness: pull the window's workload images onto the GPU node (SITE=par|fin)
+	$(NVCRE_ENV) ./scripts/readiness/nvcre.sh prepull
+
+nvcre-stage:   ## readiness: add the staging taint to the GPU node (SITE=par; fin's node joins with it)
+	$(NVCRE_ENV) ./scripts/readiness/nvcre.sh stage
+
+nvcre-certify: $(READINESS_BIN)/nvcrectl $(READINESS_VENV)/bin/pytest ## readiness: NVCRE certification of the staged node (SITE=, WORKLOAD_IMAGE= to override)
+	$(NVCRE_ENV) ./scripts/readiness/nvcre.sh certify
+
+readiness-diag: $(READINESS_BIN)/nvcrectl ## readiness: dcgmi diag -r 2 on the GPU node (SITE=, DIAG_VIA=workloadrun|exec)
+	$(NVCRE_ENV) ./scripts/readiness/nvcre.sh diag
+
+nvcre-promote: $(READINESS_VENV)/bin/pytest ## readiness: remove the staging taint only if certification and diag passed (SITE=)
+	$(NVCRE_ENV) ./scripts/readiness/nvcre.sh promote
+
+.PHONY: readiness-tools readiness-prepull nvcre-stage nvcre-certify readiness-diag nvcre-promote

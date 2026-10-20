@@ -1,0 +1,40 @@
+# The single-GPU subset of use case 2, on par's L4 in W1, run by
+#   make nvcre-stage nvcre-certify nvcre-promote SITE=par
+#
+# What it can and can't show: on one GPU an all-reduce has one rank, and bus
+# bandwidth is algbw * 2(n-1)/n = 0 for n = 1 (nccl-tests doc/PERFORMANCE.md).
+# So this run proves the gate's plumbing on cheap hardware before W2: the
+# staging taint is honoured, NVCRE injects the toleration, the results file is
+# written, the NCCL log is captured and the promotion script reads it. It
+# proves nothing about the L4. No threshold, for that reason.
+apiVersion: nvcre.nvidia.com/v1alpha1
+kind: Certification
+metadata:
+  name: eu1-par-l4
+spec:
+  target:
+    nodeSelector:
+      eu1.io/site: par
+      eu1.io/pool: gpu
+      # GPU Feature Discovery's label on an L4 (Part 1, session A). NVCRE reads
+      # the architecture from it; nvcrectl's offline render refuses to guess
+      # without it.
+      nvidia.com/gpu.product: NVIDIA-L4
+    taintSelectors:
+      - key: eu1.io/staging
+        effect: NoSchedule
+
+  # NVCRE doesn't know the L4 and falls back to 4 GPUs per node ("GPU
+  # architecture l4 has no entry in the catalog's GPU defaults", nvcrectl
+  # certification render at v0.8.0).
+  gpusPerNode: 1
+
+  env:
+    - name: NCCL_DEBUG
+      value: INFO
+    - name: NCCL_DEBUG_SUBSYS
+      value: INIT,GRAPH
+
+  categories:
+    - domain: communication
+      variant: nccl-all-reduce
