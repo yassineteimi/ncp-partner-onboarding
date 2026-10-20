@@ -1,4 +1,4 @@
-[cli] generating recipe offline — reads inputs only; does not deploy to or modify any cluster
+[cli] generating recipe offline -- reads inputs only; does not deploy to or modify any cluster
 [cli] CLI flag overriding snapshot-detected value: field=service detected=any override=bcm
 [cli] CLI flag overriding snapshot-detected value: field=accelerator detected=any override=h200
 [cli] CLI flag overriding snapshot-detected value: field=intent detected=any override=training

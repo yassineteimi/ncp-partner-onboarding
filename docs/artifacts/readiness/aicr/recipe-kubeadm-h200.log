@@ -1,2 +1,2 @@
-[cli] generating recipe offline — reads inputs only; does not deploy to or modify any cluster
+[cli] generating recipe offline -- reads inputs only; does not deploy to or modify any cluster
 [cli] command failed: error=[INVALID_REQUEST] error parsing criteria: [INVALID_REQUEST] invalid service type: kubeadm exitCode=2

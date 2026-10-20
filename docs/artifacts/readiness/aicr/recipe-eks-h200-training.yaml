@@ -137,7 +137,7 @@ componentRefs:
       # AWS EFA Health Check
       #
       # Validates that the AWS EFA K8s device plugin is running and healthy
-      # in the kube-system namespace. The DaemonSet must roll out fully —
+      # in the kube-system namespace. The DaemonSet must roll out fully --
       # numberReady == desiredNumberScheduled (with desiredNumberScheduled > 0
       # as a guard against vacuous pass on a 0-node selector). The previous
       # check gated only on numberReady > 0, which passed on partial
@@ -255,9 +255,9 @@ componentRefs:
       # Cert Manager Health Check
       #
       # Validates that cert-manager is running and healthy in the cert-manager
-      # namespace. The chart deploys three Deployments — the controller
+      # namespace. The chart deploys three Deployments -- the controller
       # (cert-manager), the CA injector (cert-manager-cainjector), and the
-      # webhook (cert-manager-webhook) — all of which must be available for
+      # webhook (cert-manager-webhook) -- all of which must be available for
       # the operator to issue / inject / validate certificates. The previous
       # check only asserted the controller; this check covers all three to
       # avoid silently passing while the webhook is down (which would block
@@ -535,7 +535,7 @@ componentRefs:
       # 2. The clusterpolicies.nvidia.com CRD is Established (apiserver will
       #    accept the singleton ClusterPolicy CR).
       # 3. The ClusterPolicy singleton named "cluster-policy" has reconciled
-      #    to status.state == "ready" — this is the deepest signal that the
+      #    to status.state == "ready" -- this is the deepest signal that the
       #    full GPU stack (driver, toolkit, cuda, plugin DaemonSets, validators)
       #    is healthy. Migrates the verifyClusterPolicyReady Go check that
       #    PR #1235 task 7 deferred for assertion-equivalence proof.
@@ -1179,7 +1179,7 @@ componentRefs:
                     # the guard above, this rejects partial failures. We assert on
                     # numberReady (always present in DaemonSetStatus) rather than
                     # numberUnavailable, which is `omitempty` and disappears from
-                    # the status when zero — making `numberUnavailable == 0`
+                    # the status when zero -- making `numberUnavailable == 0`
                     # evaluate `null == 0` (false) on a fully-healthy DaemonSet.
                     ((status.numberReady || `0`) == status.desiredNumberScheduled): true
                     # numberReady alone doesn't distinguish a node still on the
@@ -1304,13 +1304,13 @@ componentRefs:
       #
       # Value-gate awareness (#1844): this static assert cannot see the component's
       # effective Helm values, so it would fail when the whole `tuning` CR is
-      # deliberately suppressed — e.g. `--set nodewrightcustomizations:tuningEnabled=false`
+      # deliberately suppressed -- e.g. `--set nodewrightcustomizations:tuningEnabled=false`
       # on a single-package tuning manifest (tuning-gke.yaml / tuning-generic.yaml). The
       # deployment validator therefore renders the component's manifests with the
       # effective values and skips this assert when they yield no Nodewright CR (see
       # nodewrightHealthCheckSuppressed in validators/deployment/expected_resources.go).
       # The skip is fail-closed: whenever the values keep the CR, the render still lists
-      # it and this assert runs — only an intentionally-absent CR is tolerated. The
+      # it and this assert runs -- only an intentionally-absent CR is tolerated. The
       # render-aware Go readiness check (verifyNodewrightReady) enforces the same
       # status.status == "complete" signal (plus the runtime-required taint gate), so
       # nodewright readiness is never left unverified.
@@ -1334,9 +1334,9 @@ componentRefs:
               # Assert a NodeWright CR has status.status == "complete" per the
               # NodeWright CRD schema. NodeWright is cluster-scoped.
               #
-              # Deliberately name-agnostic. The manifests do not agree on a name —
+              # Deliberately name-agnostic. The manifests do not agree on a name --
               # tuning.yaml / tuning-gke.yaml / tuning-generic.yaml render "tuning"
-              # while no-op.yaml renders "no-op" — so a hardcoded name asserts a CR
+              # while no-op.yaml renders "no-op" -- so a hardcoded name asserts a CR
               # that never exists for any component wiring a differently-named
               # manifest. A nameless assert uses the executor's list-and-match path
               # (pkg/chainsaw/inprocess.go): it fails closed when the collection is
@@ -1348,7 +1348,7 @@ componentRefs:
               # from the component's rendered manifests and requires every one of
               # them to be live (not Terminating) and complete, reporting each failure
               # by name. That per-name gate is what binds readiness to the CRs the
-              # recipe declared — this assert alone would accept a stale or unrelated
+              # recipe declared -- this assert alone would accept a stale or unrelated
               # complete NodeWright.
               - assert:
                   resource:
@@ -1522,7 +1522,7 @@ componentRefs:
       #
       # Validates that the NVIDIA DRA (Dynamic Resource Allocation) GPU driver
       # is running and healthy in the nvidia-dra-driver namespace. The
-      # kubelet-plugin DaemonSet must roll out fully — numberReady ==
+      # kubelet-plugin DaemonSet must roll out fully -- numberReady ==
       # desiredNumberScheduled (with desiredNumberScheduled > 0 as a guard).
       # Previous check gated only on numberReady > 0, passing on partial
       # failures; see #1222 and recipes/checks/nfd/health-check.yaml for
@@ -1535,7 +1535,7 @@ componentRefs:
       # (<release>-kubelet-plugin). AICR's release name is
       # `nvidia-dra-driver-gpu` (matches ComponentRef Name in registry.yaml).
       # If a deployer renames the release, this assert needs updating in
-      # lockstep — see verifyDRAKubeletPluginReady commentary in
+      # lockstep -- see verifyDRAKubeletPluginReady commentary in
       # validators/deployment/expected_resources.go for why a chart-shape
       # label would be a more robust selector.
       apiVersion: chainsaw.kyverno.io/v1alpha1
@@ -1656,8 +1656,8 @@ componentRefs:
       spec:
         # 90s, deliberately below the 5m the sibling checks author. The
         # in-process executor (pkg/chainsaw/inprocess.go) supports exactly one
-        # timeout knob — this Test-level assert budget caps the WHOLE check
-        # (per-step/per-operation timeouts are not honored) — and this check is
+        # timeout knob -- this Test-level assert budget caps the WHOLE check
+        # (per-step/per-operation timeouts are not honored) -- and this check is
         # uniquely prone to a legitimately-never-true wait: on a cluster in the
         # #2175 broken state the driver-labeled DaemonSets sit at 0 desired
         # FOREVER, so a 5m budget here does not buy readiness, it buys a stall.
@@ -1695,7 +1695,7 @@ componentRefs:
               # DaemonSets sit at 0 desired pods. That state is invisible to the
               # assertions in the surrounding steps: pods that are never created
               # cannot be Pending, Failed, or CrashLooping, and the labeler
-              # Deployment itself stays available — which is how issue #2175
+              # Deployment itself stays available -- which is how issue #2175
               # shipped unnoticed.
               #
               # Assert non-omitempty status fields only. numberUnavailable is
@@ -1713,12 +1713,12 @@ componentRefs:
               # =false renders no DaemonSet), so a positive existence assert
               # would fail deployment validation for a configuration bundling
               # explicitly allows. The error ops below pass on a true 404
-              # (disabled subchart — the in-process executor fails closed on
+              # (disabled subchart -- the in-process executor fails closed on
               # transient fetch errors, so this is not an API-blip loophole)
               # while still catching both failure states when the DaemonSet IS
               # rendered: the #2175 signature (present with 0 desired) and a
               # partial rollout. Trade-off, stated plainly: a DaemonSet deleted
-              # out-of-band also passes — accepted, because the disabled-
+              # out-of-band also passes -- accepted, because the disabled-
               # subchart configuration is supported and chainsaw cannot
               # condition one resource's assert on another's values.
               - error:
@@ -1770,7 +1770,7 @@ componentRefs:
                       name: metadata-collector
                       namespace: nvsentinel
                     ((status.observedGeneration || `0`) < metadata.generation): true
-              # syslog-health-monitor-regular: same negative form — the
+              # syslog-health-monitor-regular: same negative form -- the
               # syslog-health-monitor subchart is switchable via its chart
               # condition (global.syslogHealthMonitor.enabled) exactly like
               # metadata-collector, and the driver-label gate's consumer-aware

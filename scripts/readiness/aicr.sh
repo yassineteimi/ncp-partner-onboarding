@@ -18,6 +18,14 @@ AICR="${AICR:-$REPO_ROOT/.cache/readiness/bin/aicr}"
 OUT="$REPO_ROOT/docs/artifacts/readiness/aicr"
 mkdir -p "$OUT"
 
+# AICR's CLI and its recipe comments use em dashes, which this repository's
+# lint refuses in every tracked file. Everything aicr writes here is saved with
+# "--" in their place, and nothing else changed.
+no_em_dashes() {
+  find "$OUT" -type f \( -name '*.yaml' -o -name '*.log' -o -name '*.txt' -o -name '*.md' \) \
+    -exec perl -CSD -pi -e 's/\x{2014}/--/g' {} +
+}
+
 # One query, its exit code and its output, into the summary.
 try() {
   local name="$1"
@@ -33,6 +41,7 @@ case "${1:-}" in
   recipes)
     {
       echo "# aicr recipe, $("$AICR" --version 2>&1 | head -1), $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+      echo "# Em dashes in aicr's output are written as -- (this repository's lint refuses them)."
       echo "# What resolves for the H200 training pool:"
       try eks-h200-training --service eks --accelerator h200 --os ubuntu --intent training
       try eks-h200-kubeflow --service eks --accelerator h200 --os ubuntu --intent training --platform kubeflow
@@ -48,6 +57,7 @@ case "${1:-}" in
       try generic-l4 --service generic --accelerator l4 --os ubuntu --intent inference
       try eks-l4 --service eks --accelerator l4 --os ubuntu --intent inference
     } | tee "$OUT/recipes-summary.txt"
+    no_em_dashes
     ;;
 
   bundle)

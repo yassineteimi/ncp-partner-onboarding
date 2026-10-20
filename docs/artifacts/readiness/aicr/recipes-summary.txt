@@ -1,14 +1,15 @@
-# aicr recipe, aicr version 1.1.0 (commit: 5f8423cf21daaacb1fe661d745f5f52191b55d29, date: 2026-10-19T20:23:53Z), 2026-10-20T16:08:38Z
+# aicr recipe, aicr version 1.1.0 (commit: 5f8423cf21daaacb1fe661d745f5f52191b55d29, date: 2026-10-19T20:23:53Z), 2026-10-20T23:06:22Z
+# Em dashes in aicr's output are written as -- (this repository's lint refuses them).
 # What resolves for the H200 training pool:
 eks-h200-training      exit=0  aicr recipe --service eks --accelerator h200 --os ubuntu --intent training
 eks-h200-kubeflow      exit=0  aicr recipe --service eks --accelerator h200 --os ubuntu --intent training --platform kubeflow
 k0s-h200-training      exit=0  aicr recipe --service k0s --accelerator h200 --os ubuntu --intent training
 # What we run, or the closest names to it, refused:
 kubeadm-h200           exit=2  aicr recipe --service kubeadm --accelerator h200 --os ubuntu --intent training
-    [cli] generating recipe offline — reads inputs only; does not deploy to or modify any cluster
+    [cli] generating recipe offline -- reads inputs only; does not deploy to or modify any cluster
     [cli] command failed: error=[INVALID_REQUEST] error parsing criteria: [INVALID_REQUEST] invalid service type: kubeadm exitCode=2
 generic-h200           exit=2  aicr recipe --service generic --accelerator h200 --os ubuntu --intent training
-    [cli] generating recipe offline — reads inputs only; does not deploy to or modify any cluster
+    [cli] generating recipe offline -- reads inputs only; does not deploy to or modify any cluster
     [cli] CLI flag overriding snapshot-detected value: field=service detected=any override=generic
     [cli] CLI flag overriding snapshot-detected value: field=accelerator detected=any override=h200
     [cli] CLI flag overriding snapshot-detected value: field=intent detected=any override=training
@@ -16,7 +17,7 @@ generic-h200           exit=2  aicr recipe --service generic --accelerator h200 
     [cli] building recipe from criteria: criteria=criteria(service=generic, accelerator=h200, intent=training, os=ubuntu)
     [cli] command failed: error=[INVALID_REQUEST] no recipe provides service 'generic' for criteria(service=generic, accelerator=h200, intent=training, os=ubuntu); no recipe provides intent 'training' for criteria(service=generic, accelerator=h200, intent=training, os=ubuntu); no recipe provides os 'ubuntu' for criteria(service=generic, accelerator=h200, intent=training, os=ubuntu) exitCode=2
 metal3-h200            exit=2  aicr recipe --service metal3 --accelerator h200 --os ubuntu --intent training
-    [cli] generating recipe offline — reads inputs only; does not deploy to or modify any cluster
+    [cli] generating recipe offline -- reads inputs only; does not deploy to or modify any cluster
     [cli] CLI flag overriding snapshot-detected value: field=service detected=any override=metal3
     [cli] CLI flag overriding snapshot-detected value: field=accelerator detected=any override=h200
     [cli] CLI flag overriding snapshot-detected value: field=intent detected=any override=training
@@ -24,7 +25,7 @@ metal3-h200            exit=2  aicr recipe --service metal3 --accelerator h200 -
     [cli] building recipe from criteria: criteria=criteria(service=metal3, accelerator=h200, intent=training, os=ubuntu)
     [cli] command failed: error=[INVALID_REQUEST] no recipe provides service 'metal3' for criteria(service=metal3, accelerator=h200, intent=training, os=ubuntu); no recipe provides intent 'training' for criteria(service=metal3, accelerator=h200, intent=training, os=ubuntu); no recipe provides os 'ubuntu' for criteria(service=metal3, accelerator=h200, intent=training, os=ubuntu) exitCode=2
 kind-h200              exit=2  aicr recipe --service kind --accelerator h200 --os ubuntu --intent training
-    [cli] generating recipe offline — reads inputs only; does not deploy to or modify any cluster
+    [cli] generating recipe offline -- reads inputs only; does not deploy to or modify any cluster
     [cli] CLI flag overriding snapshot-detected value: field=service detected=any override=kind
     [cli] CLI flag overriding snapshot-detected value: field=accelerator detected=any override=h200
     [cli] CLI flag overriding snapshot-detected value: field=intent detected=any override=training
@@ -32,7 +33,7 @@ kind-h200              exit=2  aicr recipe --service kind --accelerator h200 --o
     [cli] building recipe from criteria: criteria=criteria(service=kind, accelerator=h200, intent=training, os=ubuntu)
     [cli] command failed: error=[INVALID_REQUEST] no recipe provides intent 'training' for criteria(service=kind, accelerator=h200, intent=training, os=ubuntu); no recipe provides os 'ubuntu' for criteria(service=kind, accelerator=h200, intent=training, os=ubuntu) exitCode=2
 bcm-h200               exit=2  aicr recipe --service bcm --accelerator h200 --os ubuntu --intent training
-    [cli] generating recipe offline — reads inputs only; does not deploy to or modify any cluster
+    [cli] generating recipe offline -- reads inputs only; does not deploy to or modify any cluster
     [cli] CLI flag overriding snapshot-detected value: field=service detected=any override=bcm
     [cli] CLI flag overriding snapshot-detected value: field=accelerator detected=any override=h200
     [cli] CLI flag overriding snapshot-detected value: field=intent detected=any override=training
@@ -40,7 +41,7 @@ bcm-h200               exit=2  aicr recipe --service bcm --accelerator h200 --os
     [cli] building recipe from criteria: criteria=criteria(service=bcm, accelerator=h200, intent=training, os=ubuntu)
     [cli] command failed: error=[INVALID_REQUEST] no recipe provides os 'ubuntu' for criteria(service=bcm, accelerator=h200, intent=training, os=ubuntu) exitCode=2
 k0s-h200-kubeflow      exit=2  aicr recipe --service k0s --accelerator h200 --os ubuntu --intent training --platform kubeflow
-    [cli] generating recipe offline — reads inputs only; does not deploy to or modify any cluster
+    [cli] generating recipe offline -- reads inputs only; does not deploy to or modify any cluster
     [cli] CLI flag overriding snapshot-detected value: field=service detected=any override=k0s
     [cli] CLI flag overriding snapshot-detected value: field=accelerator detected=any override=h200
     [cli] CLI flag overriding snapshot-detected value: field=intent detected=any override=training
@@ -50,10 +51,10 @@ k0s-h200-kubeflow      exit=2  aicr recipe --service k0s --accelerator h200 --os
     [cli] command failed: error=[INVALID_REQUEST] no recipe provides platform 'kubeflow' for criteria(service=k0s, accelerator=h200, intent=training, os=ubuntu, platform=kubeflow) exitCode=2
 # The L4 pool:
 generic-l4             exit=2  aicr recipe --service generic --accelerator l4 --os ubuntu --intent inference
-    [cli] generating recipe offline — reads inputs only; does not deploy to or modify any cluster
+    [cli] generating recipe offline -- reads inputs only; does not deploy to or modify any cluster
     [cli] CLI flag overriding snapshot-detected value: field=service detected=any override=generic
     [cli] command failed: error=[INVALID_REQUEST] error parsing criteria: [INVALID_REQUEST] invalid accelerator type: l4 exitCode=2
 eks-l4                 exit=2  aicr recipe --service eks --accelerator l4 --os ubuntu --intent inference
-    [cli] generating recipe offline — reads inputs only; does not deploy to or modify any cluster
+    [cli] generating recipe offline -- reads inputs only; does not deploy to or modify any cluster
     [cli] CLI flag overriding snapshot-detected value: field=service detected=any override=eks
     [cli] command failed: error=[INVALID_REQUEST] error parsing criteria: [INVALID_REQUEST] invalid accelerator type: l4 exitCode=2
