@@ -73,6 +73,9 @@ IP="$(tf_output gpu_ip)"
 session_open "$NAME" "$TYPE" "$PRICE" USD "$STARTED"
 log "GPU node is $NAME at $IP, billing $PRICE USD/h"
 
+# Both fin addresses on par's metrics port, and nothing else.
+"$REPO_ROOT/scripts/par/metrics-peers.sh" "$CP_IP" "$IP" || warn "could not update par's metrics rule; use case 6 may not reach par"
+
 forget_host "$IP"
 wait_for_ssh "$IP" 600
 wait_for_bootstrap "$IP" 1500

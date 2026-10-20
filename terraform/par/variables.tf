@@ -340,3 +340,33 @@ variable "cpu_worker_image" {
   type        = string
   default     = "ubuntu_noble"
 }
+
+########################################
+# Cross-site metrics (use case 6)
+########################################
+
+variable "metrics_ingress_port" {
+  description = <<-EOT
+    NodePort of the Thanos Receive endpoint that site fin remote-writes to, on
+    the CPU worker (ws-platform, 20 October). mTLS, externalTrafficPolicy Local.
+  EOT
+  type        = number
+  default     = 30291
+}
+
+variable "fin_peer_ips" {
+  description = <<-EOT
+    Public addresses of the fin nodes, the only sources allowed to reach
+    metrics_ingress_port. Written to fin-peers.auto.tfvars by
+    scripts/par/metrics-peers.sh, which the fin up and down scripts call: the
+    addresses exist only while the fin instances do. Empty means the port is
+    closed.
+  EOT
+  type        = list(string)
+  default     = []
+
+  validation {
+    condition     = alltrue([for ip in var.fin_peer_ips : can(cidrhost("${ip}/32", 0))])
+    error_message = "fin_peer_ips must be plain IPv4 addresses."
+  }
+}

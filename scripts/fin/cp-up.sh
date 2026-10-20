@@ -57,6 +57,9 @@ IP="$(tf_output cp_ip)"
 session_open "$NAME" "$(tf_output cp_instance_type)" "$CP_PRICE" USD "$STARTED"
 log "control plane is $NAME at $IP"
 
+# par's Thanos Receive NodePort opens to this address, and only this one.
+"$REPO_ROOT/scripts/par/metrics-peers.sh" "$IP"
+
 forget_host "$IP"
 wait_for_ssh "$IP" 600
 wait_for_bootstrap "$IP" 1200
@@ -82,6 +85,28 @@ fi
 chmod 600 "$KUBECONFIG_PATH"
 umask 022
 kubectl_cp wait --for=condition=Ready "node/$NAME" --timeout=300s
+
+########################################
+# Use case 6 hook, before the root Application
+#
+# fin's Prometheus remote-writes to par over mTLS, and its client certificate
+# has to be in fin's monitoring namespace before kube-prometheus-stack syncs:
+# without it the Prometheus Operator can't render the remote-write config,
+# kube-prometheus-stack stays Degraded at wave 0, and the GPU Operator at wave
+# 1 never syncs. ws-platform owns the script; this only calls it. Missing, it
+# is skipped (fin then works without use case 6). Failing, it stops here, at
+# the control plane stage, before any GPU is ordered.
+########################################
+
+HOOK="$REPO_ROOT/scripts/platform/fin-remote-write-secret.sh"
+if [ -x "$HOOK" ]; then
+  log "running the use case 6 hook ${HOOK#"$REPO_ROOT"/}"
+  PAR_KUBECONFIG="$REPO_ROOT/kubeconfig-par" FIN_KUBECONFIG="$KUBECONFIG_PATH" "$HOOK" \
+    || die "the use case 6 hook failed. To run the window without use case 6, remove gitops/values/platform/kube-prometheus-stack-fin.yaml on main first."
+  mark platform_hook_done
+else
+  warn "no ${HOOK#"$REPO_ROOT"/}: fin comes up without the remote-write secret (use case 6 off)"
+fi
 
 bootstrap_argocd
 mark argocd_installed

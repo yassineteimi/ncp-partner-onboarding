@@ -29,9 +29,9 @@ resource "scaleway_ipam_ip" "cpu_worker" {
   }
 }
 
-# Security groups filter the public interface only. SSH from admin ranges; the
-# cross-site metrics rule is added here if use case 6 puts its endpoint on this
-# node.
+# Security groups filter the public interface only. SSH from admin ranges, and
+# the Thanos Receive NodePort from the fin nodes' addresses only, while they
+# exist.
 resource "scaleway_instance_security_group" "cpu_worker" {
   count = var.cpu_worker_enabled ? 1 : 0
   zone  = local.cpu_zone
@@ -57,6 +57,16 @@ resource "scaleway_instance_security_group" "cpu_worker" {
     content {
       action   = "accept"
       protocol = "ANY"
+      ip_range = "${inbound_rule.value}/32"
+    }
+  }
+
+  dynamic "inbound_rule" {
+    for_each = var.fin_peer_ips
+    content {
+      action   = "accept"
+      protocol = "TCP"
+      port     = var.metrics_ingress_port
       ip_range = "${inbound_rule.value}/32"
     }
   }

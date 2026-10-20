@@ -81,6 +81,9 @@ TFVARS
 log "terraform apply, removing the SSH key and startup scripts"
 guarded_apply 'verda_ssh_key|verda_startup_script' 'SSH key or startup scripts'
 
+# The fin addresses are gone, so par's metrics port closes again.
+"$REPO_ROOT/scripts/par/metrics-peers.sh" || warn "could not close par's metrics rule; run scripts/par/metrics-peers.sh"
+
 session_close "$CP_NAME"
 session_close "$GPU_NAME"
 [ -n "$CP_IP" ] && forget_host "$CP_IP"

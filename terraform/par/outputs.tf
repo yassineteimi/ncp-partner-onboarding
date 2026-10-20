@@ -107,3 +107,13 @@ output "cpu_zone" {
   description = "Zone the CPU worker runs in."
   value       = local.cpu_zone
 }
+
+output "metrics_ingress_port" {
+  description = "Thanos Receive NodePort on the CPU worker, open only to fin_peer_ips."
+  value       = var.metrics_ingress_port
+}
+
+output "fin_peer_ips" {
+  description = "fin addresses currently allowed on the metrics port."
+  value       = var.fin_peer_ips
+}
