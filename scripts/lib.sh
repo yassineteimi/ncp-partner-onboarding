@@ -377,8 +377,8 @@ scaleway_sweep() {
     [ -z "$servers" ] && [ -z "$volumes" ] && continue
     found=1
     log "at Scaleway in $zone:"
-    [ -n "$servers" ] && printf '    server %s\n' "$servers"
-    [ -n "$volumes" ] && printf '    UNATTACHED volume %s\n' "$volumes"
+    [ -n "$servers" ] && sed 's/^/    server /' <<<"$servers"
+    [ -n "$volumes" ] && sed 's/^/    UNATTACHED volume /' <<<"$volumes"
   done
 
   if [ "$found" -eq 0 ]; then
@@ -442,9 +442,9 @@ verda_sweep() {
     log "Verda shows no instance, no volume and nothing in the volume trash"
   else
     warn "still at Verda, and billing:"
-    [ -n "$instances" ] && printf '    instance %s\n' "$instances" >&2
-    [ -n "$volumes" ] && printf '    volume %s\n' "$volumes" >&2
-    [ -n "$trash" ] && printf '    volume in trash %s\n' "$trash" >&2
+    [ -n "$instances" ] && sed 's/^/    instance /' <<<"$instances" >&2
+    [ -n "$volumes" ] && sed 's/^/    volume /' <<<"$volumes" >&2
+    [ -n "$trash" ] && sed 's/^/    volume in trash /' <<<"$trash" >&2
     warn "check each one is ours, then delete it through the API, with its OS volume:"
     warn "  PUT $VERDA_API/instances {\"action\":\"delete\",\"id\":[\"<id>\"],\"volume_ids\":[\"<os volume id>\"],\"delete_permanently\":true}"
     warn "  DELETE $VERDA_API/volumes/<id>"
