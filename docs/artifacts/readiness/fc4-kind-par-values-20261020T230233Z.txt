@@ -1,0 +1,53 @@
+# FC4: gitops/values/readiness/nvsentinel-par.yaml in KIND, 2026-10-20T23:02:33Z
+# overrides for KIND only: --set mongodb-store.psmdb-db.replsets.rs0.volumeSpec.pvc.storageClassName=standard --set global.labeler.enabled=false --set global.syslogHealthMonitor.enabled=false --set global.metadataCollector.enabled=false --set janitor-provider.csp.provider=kind
+stage 1 installed 2026-10-20T23:04:09Z
+DEPLOYMENT                  READY   NODE-SELECTOR
+nvsentinel-psmdb-operator   1       map[eu1.io/pool:cpu]
+== stage 1: SIMULATED XID 95 into the fake DCGM at 2026-10-20T23:04:10Z
+after 45s: condition=[GpuMemWatch] unschedulable= state=
+workload: gpu-workload-659776df95-g9t2s Running nvsentinel-demo-worker; 
+RebootNodes: rebootnode.janitor.dgxc.nvidia.com/maintenance-nvsentinel-demo-worker-6ad7f23afbe154eacb8f3223 
+cleared after 86s: condition=[]
+stage 2 installed 2026-10-20T23:05:49Z
+DEPLOYMENT                  READY   NODE-SELECTOR
+fault-quarantine            1       map[eu1.io/pool:cpu]
+node-drainer                1       map[eu1.io/pool:cpu]
+nvsentinel-psmdb-operator   1       map[eu1.io/pool:cpu]
+== stage 2: SIMULATED XID 95 into the fake DCGM at 2026-10-20T23:05:49Z
+after 90s: condition=[GpuMemWatch] unschedulable=true state=drain-succeeded
+workload: gpu-workload-659776df95-zb95k Pending ; 
+RebootNodes: rebootnode.janitor.dgxc.nvidia.com/maintenance-nvsentinel-demo-worker-6ad7f23afbe154eacb8f3223 
+cleared after 141s: condition=[]
+stage 3 installed 2026-10-20T23:08:25Z
+DEPLOYMENT                  READY   NODE-SELECTOR
+fault-quarantine            1       map[eu1.io/pool:cpu]
+fault-remediation           1       map[eu1.io/pool:cpu]
+janitor                     1       map[eu1.io/pool:cpu]
+janitor-provider            1       map[eu1.io/pool:cpu]
+node-drainer                1       map[eu1.io/pool:cpu]
+nvsentinel-psmdb-operator   1       map[eu1.io/pool:cpu]
+== stage 3: SIMULATED XID 95 into the fake DCGM at 2026-10-20T23:08:25Z
+after 90s: condition=[GpuMemWatch] unschedulable=true state=remediation-succeeded
+workload: gpu-workload-659776df95-vbjt8 Pending ; 
+RebootNodes: rebootnode.janitor.dgxc.nvidia.com/maintenance-nvsentinel-demo-worker-6ad7f23afbe154eacb8f3223 rebootnode.janitor.dgxc.nvidia.com/maintenance-nvsentinel-demo-worker-6ad7f477b52507b5c78ba243 
+cleared after 141s: condition=[]
+== circuit breaker
+no circuit-breaker ConfigMap (breaker disabled)
+== MongoDB
+NAME                                             READY   STATUS      RESTARTS        AGE     IP            NODE                            NOMINATED NODE   READINESS GATES
+create-mongodb-database-2592000-c9dfbc49-lx8wz   0/1     Completed   0               8m9s    10.244.0.21   nvsentinel-demo-control-plane   <none>           <none>
+mongodb-rs0-0                                    1/1     Running     0               7m48s   10.244.0.24   nvsentinel-demo-control-plane   <none>           <none>
+#
+# Reading it:
+# - Every Deployment and the MongoDB member ran on the node labelled eu1.io/pool=cpu (KIND's
+#   control plane, untainted for this), as the par values ask. Percona MongoDB with one
+#   member came up; the circuit breaker is off.
+# - stage 1: the XID produced the GpuMemWatch condition (DCGM 4.2.0 maps XID 95 to its
+#   memory watch) and nothing else: no cordon.
+# - stage 2: cordon and eviction (state drain-succeeded, the workload Pending), no new
+#   RebootNode. When the fake host engine restarted healthy, NVSentinel uncordoned the
+#   node itself: the script's "uncordoned by hand" line never printed.
+# - stage 3: a new RebootNode (the first one listed is left over from the demo's own run),
+#   state remediation-succeeded, then the same automatic uncordon.
+# - Not covered here: the syslog monitor, the labeler and the generic reboot. W1 is their
+#   first run, on the L4. The 141 s "cleared after" includes the fake DCGM pod's restart.

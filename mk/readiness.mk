@@ -90,3 +90,8 @@ aicr-bundle: $(READINESS_BIN)/aicr ## readiness: render the reference recipe for
 
 $(READINESS_BIN)/aicr:
 	./scripts/readiness/tools.sh
+
+nvsentinel-kind: ## readiness: FC4, par's NVSentinel values in NVSentinel's KIND demo cluster, stage by stage (NVSENTINEL_SRC=checkout at v1.28.0)
+	./scripts/readiness/kind-rehearsal.sh $(NVSENTINEL_SRC)
+
+.PHONY: nvsentinel-kind
