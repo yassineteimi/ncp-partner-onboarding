@@ -5,6 +5,8 @@
 #   https://github.com/kubevirt/kubevirt/releases/download/v1.9.1/kubevirt-operator.yaml
 #   sha256 9ac45a436c49d32e6fc21d542bcb7600b970705297b9e6752f3ef9b0a1d292da
 # (the digest GitHub lists for the asset; make kubevirt-check checks it).
+# That digest covers the manifest, not the images it names by tag:
+# pin-images.yaml pins those.
 # Vendored rather than fetched at render time, so a bump is a reviewable diff
 # and ArgoCD's render doesn't depend on GitHub. KubeVirt 1.9 supports
 # Kubernetes 1.34 to 1.36 (kubevirt/sig-release, k8s-support-matrix.md).
@@ -27,6 +29,8 @@ resources:
   - ../tenant-vm
 
 patches:
+  # Every KubeVirt image by digest, the operator's and the ones it deploys.
+  - path: pin-images.yaml
   # virt-operator's Deployment requires a control-plane node in the release
   # manifest (placement.RequireControlPlanePreferNonWorker, applied with no
   # override in pkg/virt-operator/resource/generate/components/deployments.go

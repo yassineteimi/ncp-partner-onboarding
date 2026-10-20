@@ -41,6 +41,7 @@ What would change the answer:
 ## Consequences
 
 - One more operator on each cluster that has VM tenants. Here it runs on the CPU worker. The release manifest pins virt-operator to control-plane nodes, so a patch moves it, and the KubeVirt resource places virt-api and virt-controller.
+- Every KubeVirt image is pinned by digest, and a bump has to update all of them. The release manifest names images by tag only. A digest on virt-operator's own image doesn't reach the components it deploys: it builds each one as `<registry>/<name>:<KUBEVIRT_VERSION>`, unless that component's `*_IMAGE` env var gives a full reference. So `pin-images.yaml` sets all eleven digests: the operator, virt-api, virt-controller, virt-handler, virt-launcher, the export proxy and server, the synchronization controller, libguestfs, pr-helper and sidecar-shim. `make kubevirt-check` fails on any reference left on a bare tag. One limit remains: the two virt-template components have no pin. They only deploy with the `Template` feature gate, which is off, and `quay.io/kubevirt` has no v1.9.1 tag for them. Turning that gate on means pinning them first.
 - A VM's cost counts against its tenant's ResourceQuota through its `virt-launcher` pod, which requests the guest's memory plus an overhead. The first boot will measure that overhead, and the use case 7 page will report it (planned).
 - With one CPU worker there's nowhere to live-migrate to, so the VM sets `evictionStrategy: None` and stops when the worker is drained. A real VM pool needs at least two nodes, and RWX storage or migratable disks, before it can promise anything across maintenance.
 - **What this PoC can't show:**
@@ -53,5 +54,6 @@ What would change the answer:
 - `/dev/kvm` and AMD SVM on the CPU worker: [cpu-worker-facts.txt](../artifacts/par/cpu-worker-facts.txt), captured 2026-10-20 by `scripts/par/cpu-up.sh`.
 - KubeVirt 1.9 supports Kubernetes 1.34 to 1.36 (kubevirt/sig-release, `releases/k8s-support-matrix.md`).
 - Placement: `pkg/virt-operator/resource/placement/placement.go` and `pkg/virt-operator/resource/generate/components/deployments.go` at KubeVirt v1.9.1.
+- Image references: `getConfig` and `getTag` in `pkg/virt-operator/util/config.go`, and the `*_IMAGE` fallbacks in `components/deployments.go` and `components/daemonsets.go`, at v1.9.1. Digests come from quay.io's registry API for tag v1.9.1, checked against its tag API on 2026-10-20.
 - GPU Operator v26.7.2 chart values (`sandboxWorkloads`, `vfioManager`, `sandboxDevicePlugin`) and its 26.7 KubeVirt page. KubeVirt's live migration guide and the `VGPULiveMigration` gate in `pkg/virt-config/featuregate/active.go` at v1.9.1.
 - Planned: the first boot on the CPU worker (`make kubevirt-capture`): boot time from KubeVirt's phase timestamps, the guest's own `systemd-detect-virt`, the launcher overhead against the quota, and the VM running next to the L4's GPU pods during W1.

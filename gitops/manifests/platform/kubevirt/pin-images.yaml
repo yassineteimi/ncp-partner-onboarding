@@ -1,0 +1,53 @@
+# Every KubeVirt v1.9.1 image by digest. The release manifest names them by
+# tag only, and its sha256 (see kustomization.yaml) covers the manifest, not
+# the images.
+#
+# A digest on virt-operator's own image doesn't carry through. The operator
+# builds each component's image as <registry>/<name>:<KUBEVIRT_VERSION>,
+# unless that component's *_IMAGE env var gives a full reference, which it
+# then uses unchanged (getConfig and getTag in pkg/virt-operator/util/config.go,
+# NewHandlerDaemonSet and NewControllerDeployment in
+# pkg/virt-operator/resource/generate/components at v1.9.1). So each one is
+# set here: virt-launcher too, which virt-controller starts for every VM.
+#
+# Not set: VIRT_TEMPLATE_APISERVER_IMAGE and VIRT_TEMPLATE_CONTROLLER_IMAGE.
+# Their components only deploy with the Template feature gate, which is off
+# (kubevirt.yaml), and quay.io/kubevirt has no v1.9.1 tag for them.
+#
+# Index digests from quay.io's registry API for tag v1.9.1, checked against
+# its tag API, 2026-10-20 (all pushed 12 October). make kubevirt-check fails
+# if a reference here or in the rendered Deployment is a bare tag.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: virt-operator
+  namespace: kubevirt
+spec:
+  template:
+    spec:
+      containers:
+        - name: virt-operator
+          image: quay.io/kubevirt/virt-operator@sha256:a8adf7b772e9ce0bf7e2ce889910fc41ebadf552c9dbe843e9b86641e34f5df9
+          env:
+            - name: VIRT_OPERATOR_IMAGE
+              value: quay.io/kubevirt/virt-operator@sha256:a8adf7b772e9ce0bf7e2ce889910fc41ebadf552c9dbe843e9b86641e34f5df9
+            - name: VIRT_API_IMAGE
+              value: quay.io/kubevirt/virt-api@sha256:d341c751dbe632d183989cce78203a888293e0e2a32719f32461bd6273322485
+            - name: VIRT_CONTROLLER_IMAGE
+              value: quay.io/kubevirt/virt-controller@sha256:75c94c787eec15458729848e00fe0b421ca8998c6219de8c2d3cae72ff0bd287
+            - name: VIRT_HANDLER_IMAGE
+              value: quay.io/kubevirt/virt-handler@sha256:c23b635ea4aff7f0779c6c061c431da0469c7796255e6de90a5970236b5ea61b
+            - name: VIRT_LAUNCHER_IMAGE
+              value: quay.io/kubevirt/virt-launcher@sha256:53e6d12197761cda653201f82e295ac6098d689a58bc2c68df0970c248d61fa6
+            - name: VIRT_EXPORTPROXY_IMAGE
+              value: quay.io/kubevirt/virt-exportproxy@sha256:fe9a0a297e7b407c3a322c6f5fccba5313c668907c30cb0b80b8c51bcdea640a
+            - name: VIRT_EXPORTSERVER_IMAGE
+              value: quay.io/kubevirt/virt-exportserver@sha256:76c01dca74921eb5fd74d00b82e77a60d58e8213c72d84cc66a3bc92679690b8
+            - name: VIRT_SYNCHRONIZATIONCONTROLLER_IMAGE
+              value: quay.io/kubevirt/virt-synchronization-controller@sha256:5f3da789a7b7a4febb1ece9f4a085ceb73aabcd468af84563ea7b6809341eb10
+            - name: GS_IMAGE
+              value: quay.io/kubevirt/libguestfs-tools@sha256:08df144de2a77ad8259f93df3dca7e13e73669651ce8fbe63f58c23e4fdd6427
+            - name: PR_HELPER_IMAGE
+              value: quay.io/kubevirt/pr-helper@sha256:c7724681efa3297091d0ce0edf4fda52c062455fb83b76484499a46ae261f61d
+            - name: SIDECAR_SHIM_IMAGE
+              value: quay.io/kubevirt/sidecar-shim@sha256:d48c6af64305c28de7e9a5509a11737b115cc0193f57f2a0f42faff85bebe5cd
