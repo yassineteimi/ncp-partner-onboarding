@@ -1,0 +1,61 @@
+# run-ai/fake-gpu-operator 0.2.1, simulated GPUs for use case 4 on par only.
+# SIMULATED: listed in docs/simulated.md.
+#
+# Not synced as a Helm chart. scripts/scheduling/render-sim-gpu.sh renders it
+# with these values into gitops/manifests/scheduling/sim-gpu/fake-gpu/, where a
+# kustomization adds what the chart can't: a nodeSelector for the CPU worker
+# and images pinned by digest.
+#
+# Only the KWOK path is kept. The status updater writes a topology ConfigMap per
+# KWOK node, and the KWOK GPU device plugin patches nvidia.com/gpu into that
+# Node's status (internal/kwok-gpu-device-plugin/handlers/configmap/handler.go).
+# Nothing here runs on, or labels, a real node.
+
+topology:
+  nodePoolLabelKey: run.ai/simulated-gpu-node-pool
+  migStrategy: none
+  # The chart's flat pool format. The status updater converts it to the fake
+  # backend with these values as overrides and no named profile
+  # (internal/common/topology/normalize.go at v0.2.1).
+  nodePools:
+    # Shaped like fin's H200s, four to a node. The scheduler only counts them.
+    sim-h200:
+      gpuProduct: NVIDIA-H200-SIMULATED
+      gpuCount: 4
+      gpuMemory: 143771
+
+statusUpdater:
+  enabled: true
+  # The real GPU Operator owns nvidia.com/gpu.* labels on par. If the status
+  # updater wrote gpu.deploy.* on the KWOK nodes, the operator would strip them
+  # again (controllers/nodelabeling_controller.go at v26.7.2), so they would
+  # flap forever. Capacity doesn't depend on those labels.
+  disableNodeLabeling: true
+
+kwokGpuDevicePlugin:
+  enabled: true
+
+# Everything below would either run on real nodes or isn't needed for KWOK:
+# the device plugin and status exporter DaemonSets select real GPU nodes by
+# label, and the exporter would add fake DCGM series next to the L4's.
+devicePlugin:
+  enabled: false
+statusExporter:
+  enabled: false
+migFaker:
+  enabled: false
+kwokDraPlugin:
+  enabled: false
+draPlugin:
+  enabled: false
+
+# The real GPU Operator on par owns RuntimeClass nvidia and the ClusterPolicy
+# CRD. The render script also passes --skip-crds.
+runtimeClass:
+  enabled: false
+
+# Seven ConfigMaps of named GPU profiles (A100 to GB300), about 3000 lines. The
+# sim-h200 pool above states its product, count and memory itself, so none is
+# read.
+builtinProfiles:
+  enabled: false

@@ -1,0 +1,47 @@
+# run-ai/fake-gpu-operator 0.2.1, KWOK path only, rendered by
+# scripts/scheduling/render-sim-gpu.sh from
+# gitops/values/scheduling/fake-gpu-operator.yaml.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: fake-gpu
+resources:
+  - namespace.yaml
+  - fake-gpu-operator-0.2.1.yaml
+
+# Rule 7: by digest. The chart pulls :0.2.1 with pullPolicy Always.
+images:
+  - name: ghcr.io/run-ai/fake-gpu-operator/status-updater
+    newTag: 0.2.1@sha256:1095ef89150ec6b10661778028cc004e39172be8bae28116123941241e57a7b6
+  - name: ghcr.io/run-ai/fake-gpu-operator/kwok-gpu-device-plugin
+    newTag: 0.2.1@sha256:96b85a6ab122881d576048a0160f6d92109aecdf2e51c7dd1aae270d385c2858
+  - name: ghcr.io/run-ai/fake-gpu-operator/topology-server
+    newTag: 0.2.1@sha256:811e39799aaa01c48d02520fab05da4a91a591a751b1fad89df756b7be666a45
+
+patches:
+  # The chart renders a "gpu-operator" Deployment with 0 replicas when its
+  # GPU Operator subchart is off, a stand-in for Run:ai integrations. par
+  # runs the real GPU Operator in its own namespace; a second object by that
+  # name would only confuse whoever reads the cluster.
+  - target:
+      kind: Deployment
+      name: gpu-operator
+    patch: |-
+      $patch: delete
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: gpu-operator
+  # On the CPU worker, pulled once by digest, and without the chart's
+  # gcr-secret pull secret, which nothing here creates.
+  - target:
+      kind: Deployment
+    patch: |-
+      - op: add
+        path: /spec/template/spec/nodeSelector
+        value:
+          eu1.io/pool: cpu
+      - op: replace
+        path: /spec/template/spec/containers/0/imagePullPolicy
+        value: IfNotPresent
+      - op: remove
+        path: /spec/template/spec/imagePullSecrets
