@@ -1,0 +1,66 @@
+# NVIDIA GPU Operator on site fin, sync wave 1.
+#
+# On fin the provider image owns the driver (ADR 0002): the H200 node boots
+# Verda's Ubuntu 26.04 image with the NVIDIA driver preinstalled, and the
+# operator runs with driver.enabled=false, adding the container toolkit, the
+# device plugin, DCGM and the MIG manager around it. GPU Operator v26.7.x lists
+# Ubuntu 26.04 with Kubernetes 1.33 to 1.37; with a host driver its validator
+# runs chroot /host nvidia-smi (cmd/nvidia-validator/main.go at v26.7.2).
+#
+# Values are layered as on par: the shared base, this site's driver ownership,
+# then one optional overlay per lane, ignored while it doesn't exist.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: gpu-operator
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+
+  sources:
+    - repoURL: https://helm.ngc.nvidia.com/nvidia
+      chart: gpu-operator
+      targetRevision: v26.7.2
+      helm:
+        releaseName: gpu-operator
+        ignoreMissingValueFiles: true
+        valueFiles:
+          - $values/gitops/values/base/gpu-operator.yaml
+          - $values/gitops/values/base/gpu-operator-fin.yaml
+          - $values/gitops/values/readiness/gpu-operator-fin.yaml
+          - $values/gitops/values/scheduling/gpu-operator-fin.yaml
+          - $values/gitops/values/platform/gpu-operator-fin.yaml
+
+    - repoURL: https://github.com/yassineteimi/ncp-partner-onboarding
+      targetRevision: main
+      ref: values
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: gpu-operator
+
+  # The operator's own controllers write status and defaults back into the
+  # ClusterPolicy, which Argo CD would otherwise report as permanent drift.
+  ignoreDifferences:
+    - group: nvidia.com
+      kind: ClusterPolicy
+      jsonPointers:
+        - /status
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 20s
+        factor: 2
+        maxDuration: 5m

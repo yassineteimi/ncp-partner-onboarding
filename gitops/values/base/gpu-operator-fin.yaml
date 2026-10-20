@@ -1,0 +1,7 @@
+# Site fin: the provider image owns the NVIDIA driver (ADR 0002).
+#
+# Verda's 26.04.cuda13.4 image ships the driver, and the node's bootstrap
+# checks it loads and sees both GPUs, then holds its packages so nothing
+# upgrades it during a window. The operator must not install a second one.
+driver:
+  enabled: false

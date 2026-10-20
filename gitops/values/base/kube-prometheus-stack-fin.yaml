@@ -1,0 +1,23 @@
+# Site fin. A light Prometheus: the site lives for a window, its long-term
+# view is on the par hub (use case 6), and Grafana and Alertmanager live there
+# too. NVCRE needs the Prometheus Operator CRDs, which this chart installs.
+prometheus:
+  prometheusSpec:
+    externalLabels:
+      site: fin
+    retention: 2d
+    retentionSize: 8GB
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: local-path
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 10Gi
+
+grafana:
+  enabled: false
+
+alertmanager:
+  enabled: false
