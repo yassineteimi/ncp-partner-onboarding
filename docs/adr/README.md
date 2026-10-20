@@ -12,5 +12,5 @@ One page per real choice, with at least two genuine alternatives. Written for an
 | 0006 | Batch scheduling for many tenants: KAI vs Kueue vs Volcano | ws-scheduling | proposed |
 | 0007 | HPC tenants: Slurm on Kubernetes (Slinky) vs a separate Slurm cluster | ws-scheduling | proposed |
 | 0008 | GPU sharing per tenant class: MIG vs time slicing vs whole GPUs | ws-scheduling | proposed |
-| 0009 | Metrics across sites: Thanos Receive vs sidecar vs Mimir vs VictoriaMetrics | ws-platform | proposed |
+| [0009](0009-metrics-across-sites.md) | Metrics across sites: Thanos Receive for fin, a sidecar for par (vs Mimir, VictoriaMetrics) | ws-platform | proposed |
 | 0010 | VM tenants: KubeVirt on the same cluster vs a separate IaaS; KVM vs emulation | ws-platform | proposed |

@@ -71,7 +71,9 @@ nav:
   - Overview: index.md
   - "The story": story.md
   - "What is simulated": simulated.md
-  - Decisions: adr/README.md
+  - Decisions:
+      - "All decisions": adr/README.md
+      - "0009: Metrics across sites": adr/0009-metrics-across-sites.md
   - Findings: findings.md
 
 copyright: |
