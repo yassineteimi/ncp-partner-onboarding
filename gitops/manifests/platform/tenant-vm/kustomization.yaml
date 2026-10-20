@@ -1,0 +1,8 @@
+# EU1's VM tenant, use case 7. Included by ../kubevirt/kustomization.yaml, so
+# it syncs after KubeVirt reports Available.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - tenant.yaml
+  - vm.yaml

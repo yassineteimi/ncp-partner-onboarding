@@ -1,0 +1,97 @@
+# EU1's first VM tenant: a workload that can't move to containers yet, on the
+# same cluster as the GPU pods (use case 7, ADR 0010).
+#
+# Ubuntu 24.04 from the containerdisks project, pinned by digest: the disk is
+# an image layer, so the VM starts from the same bits every time and keeps
+# nothing across restarts, which is what a demo tenant needs. A real tenant
+# would boot from a DataVolume on a PVC (KubeVirt's CDI), not installed here.
+#
+# cloud-init writes a small page of facts about the guest (hypervisor as the
+# guest sees it, kernel, CPU, boot time) and serves it on port 80, so "is it
+# running on KVM" is answered from inside the guest, through a Service.
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: web-01
+  namespace: tenant-vm
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+    # The CRD is created by the KubeVirt operator during this same sync.
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  runStrategy: Always
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: web-01
+        app.kubernetes.io/part-of: tenant-vm
+    spec:
+      nodeSelector:
+        eu1.io/pool: cpu
+      # One CPU worker: nowhere to live-migrate to. With None, draining the
+      # worker (make par-cpu-down) stops the VM instead of waiting for a
+      # migration that can't happen.
+      evictionStrategy: None
+      terminationGracePeriodSeconds: 30
+      domain:
+        cpu:
+          cores: 1
+        memory:
+          guest: 2Gi
+        resources:
+          requests:
+            cpu: "1"
+        devices:
+          disks:
+            - name: rootdisk
+              disk: {bus: virtio}
+            - name: cloudinit
+              disk: {bus: virtio}
+          interfaces:
+            - name: default
+              masquerade: {}
+              ports:
+                - {name: http, port: 80}
+      networks:
+        - name: default
+          pod: {}
+      volumes:
+        - name: rootdisk
+          containerDisk:
+            image: quay.io/containerdisks/ubuntu:24.04@sha256:ea164c514b308286bdc179b403298efd2d8ae549af518a82a029e1bbb027f3a4
+        - name: cloudinit
+          cloudInitNoCloud:
+            userData: |
+              #cloud-config
+              write_files:
+                - path: /usr/local/bin/vm-facts
+                  permissions: "0755"
+                  content: |
+                    #!/bin/sh
+                    mkdir -p /srv/www
+                    {
+                      echo "hostname: $(hostname)"
+                      echo "hypervisor seen by the guest: $(systemd-detect-virt)"
+                      echo "kernel: $(uname -r)"
+                      echo "cpu:$(grep -m1 'model name' /proc/cpuinfo | cut -d: -f2)"
+                      echo "vcpus: $(nproc)"
+                      echo "memory: $(free -m | awk '/Mem:/ {print $2}') MiB"
+                      echo "boot: $(systemd-analyze 2>&1 | head -n1)"
+                      echo "written: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+                    } > /srv/www/index.txt
+                - path: /etc/systemd/system/vm-web.service
+                  content: |
+                    [Unit]
+                    Description=Facts about this VM over HTTP
+                    After=network-online.target
+                    [Service]
+                    ExecStartPre=/usr/local/bin/vm-facts
+                    ExecStart=/usr/bin/python3 -m http.server 80 --directory /srv/www
+                    Restart=always
+                    [Install]
+                    WantedBy=multi-user.target
+              runcmd:
+                - systemctl daemon-reload
+                - systemctl enable --now vm-web.service
+                # Again once boot has finished, so systemd-analyze has a number.
+                - systemd-run --on-active=90 /usr/local/bin/vm-facts

@@ -1,0 +1,51 @@
+# KubeVirt v1.9.1 and its first tenant, use case 7. Deployed by
+# gitops/apps/par/platform/kubevirt.yaml.
+#
+# upstream/kubevirt-operator-v1.9.1.yaml is the release asset, unchanged:
+#   https://github.com/kubevirt/kubevirt/releases/download/v1.9.1/kubevirt-operator.yaml
+#   sha256 9ac45a436c49d32e6fc21d542bcb7600b970705297b9e6752f3ef9b0a1d292da
+# (the digest GitHub lists for the asset; make kubevirt-check checks it).
+# Vendored rather than fetched at render time, so a bump is a reviewable diff
+# and ArgoCD's render doesn't depend on GitHub. KubeVirt 1.9 supports
+# Kubernetes 1.34 to 1.36 (kubevirt/sig-release, k8s-support-matrix.md).
+#
+# Sync waves inside this Application:
+#   0  the operator, its CRD and its namespace
+#   1  the KubeVirt resource, which makes the operator deploy everything else
+#   2  a Job that waits for KubeVirt to report Available. ArgoCD v3.5.3 ships
+#      health checks for VirtualMachine and VirtualMachineInstance but not
+#      for KubeVirt itself, so without it wave 3 would race the CRDs the
+#      operator creates
+#   3  the tenant: namespace, quota, VM, Service (../tenant-vm)
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - upstream/kubevirt-operator-v1.9.1.yaml
+  - kubevirt.yaml
+  - wait-available.yaml
+  - ../tenant-vm
+
+patches:
+  # virt-operator's Deployment requires a control-plane node in the release
+  # manifest (placement.RequireControlPlanePreferNonWorker, applied with no
+  # override in pkg/virt-operator/resource/generate/components/deployments.go
+  # at v1.9.1). par's control plane is 4 vCPU and 8 GB and already carries
+  # etcd, ArgoCD and monitoring, and every lane workload here runs on the CPU
+  # worker, so the operator goes there too, as one replica: there is one node
+  # to run it on.
+  - target:
+      group: apps
+      version: v1
+      kind: Deployment
+      name: virt-operator
+      namespace: kubevirt
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1
+      - op: remove
+        path: /spec/template/spec/affinity/nodeAffinity
+      - op: add
+        path: /spec/template/spec/nodeSelector/eu1.io~1pool
+        value: cpu
