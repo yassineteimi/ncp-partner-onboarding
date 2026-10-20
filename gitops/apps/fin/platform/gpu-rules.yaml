@@ -1,0 +1,35 @@
+# Recording rules for use case 6 (series per GPU), sync wave 10. The same
+# rules run on par, from gitops/apps/par/platform/gpu-rules.yaml, so both sites
+# count their GPUs the same way, and the H200 count travels to par with the
+# rest of fin's data.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: gpu-rules
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/yassineteimi/ncp-partner-onboarding
+    targetRevision: main
+    path: gitops/manifests/platform/gpu-rules
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    retry:
+      limit: 5
+      backoff:
+        duration: 20s
+        factor: 2
+        maxDuration: 5m

@@ -1,0 +1,131 @@
+{
+  "uid": "eu1-gpus-across-sites",
+  "title": "EU1 GPUs across sites",
+  "description": "Every GPU of both EU1 sites through Thanos Query. Use case 6. site=fin-sim is simulated.",
+  "tags": ["eu1", "gpu", "thanos"],
+  "timezone": "utc",
+  "editable": false,
+  "schemaVersion": 41,
+  "time": {"from": "now-6h", "to": "now"},
+  "refresh": "30s",
+  "templating": {
+    "list": [
+      {
+        "name": "site",
+        "label": "Site",
+        "type": "query",
+        "datasource": {"type": "prometheus", "uid": "thanos-eu1"},
+        "query": {"query": "label_values(up, site)", "refId": "site"},
+        "definition": "label_values(up, site)",
+        "includeAll": true,
+        "multi": true,
+        "current": {"text": "All", "value": "$__all"},
+        "refresh": 2
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "timeseries",
+      "title": "GPU utilisation, every GPU of every site",
+      "description": "DCGM_FI_DEV_GPU_UTIL, one line per GPU. Aggregated by GPU, not by exporter pod, so a restart of the exporter doesn't draw a second line. Query tested in gitops/manifests/platform/gpu-rules/tests/.",
+      "gridPos": {"h": 10, "w": 24, "x": 0, "y": 0},
+      "datasource": {"type": "prometheus", "uid": "thanos-eu1"},
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "max by (site, modelName, Hostname, gpu) (DCGM_FI_DEV_GPU_UTIL{site=~\"$site\"})",
+          "legendFormat": "{{site}} {{modelName}} {{Hostname}} gpu{{gpu}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {"unit": "percent", "min": 0, "max": 100},
+        "overrides": []
+      },
+      "options": {"legend": {"displayMode": "table", "placement": "right", "calcs": ["lastNotNull", "max"]}}
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "Power draw",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 10},
+      "datasource": {"type": "prometheus", "uid": "thanos-eu1"},
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "max by (site, modelName, Hostname, gpu) (DCGM_FI_DEV_POWER_USAGE{site=~\"$site\"})",
+          "legendFormat": "{{site}} {{modelName}} gpu{{gpu}}"
+        }
+      ],
+      "fieldConfig": {"defaults": {"unit": "watt"}, "overrides": []}
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "Framebuffer used",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 10},
+      "datasource": {"type": "prometheus", "uid": "thanos-eu1"},
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "max by (site, modelName, Hostname, gpu) (DCGM_FI_DEV_FB_USED{site=~\"$site\"})",
+          "legendFormat": "{{site}} {{modelName}} gpu{{gpu}}"
+        }
+      ],
+      "fieldConfig": {"defaults": {"unit": "mbytes"}, "overrides": []}
+    },
+    {
+      "id": 4,
+      "type": "table",
+      "title": "DCGM series per GPU",
+      "description": "From the recording rule gpu:dcgm_series:count, evaluated on each site. MIG instances count against their GPU.",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 18},
+      "datasource": {"type": "prometheus", "uid": "thanos-eu1"},
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "max by (site, modelName, Hostname, gpu) (gpu:dcgm_series:count{site=~\"$site\"})",
+          "instant": true,
+          "format": "table"
+        }
+      ],
+      "transformations": [{"id": "organize", "options": {"excludeByName": {"Time": true}}}]
+    },
+    {
+      "id": 5,
+      "type": "barchart",
+      "title": "Which DCGM metrics carry the most series",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 18},
+      "datasource": {"type": "prometheus", "uid": "thanos-eu1"},
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "topk(10, max by (metric) (gpu:dcgm_series_by_metric:count{site=~\"$site\"}))",
+          "instant": true,
+          "format": "table",
+          "legendFormat": "{{metric}}"
+        }
+      ],
+      "options": {"orientation": "horizontal", "xField": "metric"}
+    },
+    {
+      "id": 6,
+      "type": "table",
+      "title": "Sites seen in this time range",
+      "description": "Last time each site sent anything. A site that has been deleted stays in this table with its last timestamp: its data is served from Receive, then from Garage.",
+      "gridPos": {"h": 7, "w": 24, "x": 0, "y": 26},
+      "datasource": {"type": "prometheus", "uid": "thanos-eu1"},
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "max by (site) (max_over_time(timestamp(up{site=~\"$site\"})[$__range:5m])) * 1000",
+          "instant": true,
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {"defaults": {"unit": "dateTimeAsIso"}, "overrides": []},
+      "transformations": [{"id": "organize", "options": {"excludeByName": {"Time": true}, "renameByName": {"Value": "last sample"}}}]
+    }
+  ]
+}

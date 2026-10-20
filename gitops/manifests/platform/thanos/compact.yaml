@@ -1,0 +1,77 @@
+# Thanos compactor: merges the 2 h blocks in Garage into larger ones,
+# downsamples them, and applies retention. Exactly one may run per bucket.
+#
+# Downsampling is on, which is the default. At v0.42.4 a block is downsampled to
+# 5 minutes once it spans more than 40 hours, and to 1 hour beyond 10 days
+# (pkg/compact/downsample/downsample.go L48-49). A 2 hour GPU window never gets
+# there on its own; par's continuous uploads do, after about two days.
+#
+# Retention per resolution. Raw data is kept as long as par's Prometheus keeps
+# it locally. Downsampled data is small and is kept longer. The compactor
+# refuses raw retention under 40 h with downsampling on (compact.go L415).
+apiVersion: v1
+kind: Service
+metadata:
+  name: thanos-compact
+  namespace: thanos
+  labels: {app.kubernetes.io/name: thanos-compact, app.kubernetes.io/part-of: thanos}
+spec:
+  selector: {app.kubernetes.io/name: thanos-compact}
+  ports:
+    - {name: http, port: 10902, targetPort: http}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: thanos-compact
+  namespace: thanos
+  labels: {app.kubernetes.io/name: thanos-compact, app.kubernetes.io/part-of: thanos}
+spec:
+  serviceName: thanos-compact
+  replicas: 1
+  selector:
+    matchLabels: {app.kubernetes.io/name: thanos-compact}
+  template:
+    metadata:
+      labels: {app.kubernetes.io/name: thanos-compact, app.kubernetes.io/part-of: thanos}
+    spec:
+      nodeSelector:
+        eu1.io/pool: cpu
+      containers:
+        - name: thanos
+          image: quay.io/thanos/thanos:v0.42.4@sha256:b567818fe608067eb0f1d7c2c4fe361e7ad83c8a256234c97685f1d0bf670cc8
+          args:
+            - compact
+            - --log.level=info
+            - --http-address=0.0.0.0:10902
+            - --data-dir=/var/thanos/compact
+            - --objstore.config-file=/etc/thanos/objstore/objstore.yml
+            - --wait
+            - --wait-interval=5m
+            - --retention.resolution-raw=15d
+            - --retention.resolution-5m=90d
+            - --retention.resolution-1h=365d
+            # A block marked for deletion stays this long so a store gateway
+            # that has not resynced yet can still read it. 48 h by default.
+            - --delete-delay=6h
+            - --compact.concurrency=1
+          ports:
+            - {name: http, containerPort: 10902}
+          readinessProbe:
+            httpGet: {path: /-/ready, port: http}
+            periodSeconds: 10
+          livenessProbe:
+            httpGet: {path: /-/healthy, port: http}
+            periodSeconds: 30
+          resources:
+            requests: {cpu: 50m, memory: 256Mi}
+            limits: {memory: 1Gi}
+          volumeMounts:
+            - {name: data, mountPath: /var/thanos/compact}
+            - {name: objstore, mountPath: /etc/thanos/objstore, readOnly: true}
+      volumes:
+        # Scratch space for the blocks being compacted, nothing to keep.
+        - name: data
+          emptyDir: {sizeLimit: 5Gi}
+        - name: objstore
+          secret: {secretName: thanos-objstore}

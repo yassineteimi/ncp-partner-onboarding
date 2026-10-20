@@ -1,0 +1,36 @@
+# Recording rules for use case 6: how many series one GPU costs, per site.
+#
+# Evaluated by each site's own Prometheus, par and fin, and shipped with the
+# rest of its data, so the count for an H200 survives fin's teardown like
+# everything else. The site label is added on the way out (external labels),
+# not here.
+#
+# Every rule here has a promtool unit test in tests/. `spec:` must stay the last
+# top-level key: scripts/platform/test-rules.sh lifts everything under it into a
+# plain rules file for promtool.
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: gpu-cardinality
+  namespace: monitoring
+spec:
+  groups:
+    - name: gpu-cardinality
+      interval: 1m
+      rules:
+        # Series per physical GPU, all DCGM metrics together. MIG instances
+        # carry their parent's gpu and UUID, so they count against the GPU
+        # they live on, which is the number capacity planning needs.
+        - record: gpu:dcgm_series:count
+          expr: |
+            count by (Hostname, gpu, UUID, modelName) ({__name__=~"DCGM_.+"})
+
+        # The same, split by metric, to see which ones multiply: the XID
+        # counter (one series per code), clock events (one per reason), and
+        # anything per MIG instance. The metric name is copied into a label
+        # because a recording rule replaces __name__.
+        - record: gpu:dcgm_series_by_metric:count
+          expr: |
+            count by (Hostname, gpu, modelName, metric) (
+              label_replace({__name__=~"DCGM_.+"}, "metric", "$1", "__name__", "(.+)")
+            )

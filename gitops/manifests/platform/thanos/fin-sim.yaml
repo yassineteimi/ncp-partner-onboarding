@@ -1,0 +1,132 @@
+# SIMULATED. A stand-in for site fin, running on par, labelled
+# site=fin-sim and simulated=true on every series it sends. Listed in
+# docs/simulated.md.
+#
+# It exists to run the whole cross-site pipeline before anyone pays for an
+# H200: mutual TLS, a tenant taken from the certificate, Receive, upload to
+# Garage, the store gateway, the compactor, and deduplication of an HA pair.
+# Its remote write block is written the way fin's is, through the same
+# Prometheus Operator, so a mistake there shows up here first. What it can't
+# test is the public path, the security group and NodePort 30291: it writes to
+# Receive's Service inside the cluster.
+#
+# Its "teardown" is a commit that removes this file. The proof is that its
+# series are still in Grafana afterwards.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: fin-sim
+  labels:
+    eu1.io/simulated: "true"
+  annotations:
+    argocd.argoproj.io/sync-wave: "-3"
+---
+# Lets the certificate Job (certs.yaml) hand fin-sim its client certificate.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: thanos-certs
+  namespace: fin-sim
+  annotations:
+    argocd.argoproj.io/sync-wave: "-2"
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: thanos-certs
+  namespace: fin-sim
+  annotations:
+    argocd.argoproj.io/sync-wave: "-2"
+roleRef: {apiGroup: rbac.authorization.k8s.io, kind: Role, name: thanos-certs}
+subjects: [{kind: ServiceAccount, name: thanos-certs, namespace: thanos}]
+---
+# Service discovery for its own namespace only.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: prometheus-fin-sim
+  namespace: fin-sim
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: prometheus-fin-sim
+  namespace: fin-sim
+rules:
+  - apiGroups: [""]
+    resources: ["services", "endpoints", "pods"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["discovery.k8s.io"]
+    resources: ["endpointslices"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: prometheus-fin-sim
+  namespace: fin-sim
+roleRef: {apiGroup: rbac.authorization.k8s.io, kind: Role, name: prometheus-fin-sim}
+subjects: [{kind: ServiceAccount, name: prometheus-fin-sim, namespace: fin-sim}]
+---
+apiVersion: monitoring.coreos.com/v1
+kind: Prometheus
+metadata:
+  name: fin-sim
+  namespace: fin-sim
+  annotations:
+    # After the certificate Job, which writes the Secret this reads.
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  image: quay.io/prometheus/prometheus:v3.14.0-distroless@sha256:50c707e96da5ade383cb1707790576480485e93de06aa60ad8802cb5f744bd0a
+  version: v3.14.0
+  # Two replicas, so Query's deduplication has an HA pair to merge. Each gets
+  # its own prometheus_replica label from the operator.
+  replicas: 2
+  serviceAccountName: prometheus-fin-sim
+  nodeSelector:
+    eu1.io/pool: cpu
+  externalLabels:
+    site: fin-sim
+    simulated: "true"
+  # Its own pods only. Without a selector it would scrape nothing at all.
+  serviceMonitorSelector:
+    matchLabels:
+      eu1.io/scraped-by: fin-sim
+  serviceMonitorNamespaceSelector:
+    matchLabels:
+      kubernetes.io/metadata.name: fin-sim
+  # No volume: like fin, its local data goes when it goes.
+  retention: 1d
+  resources:
+    requests: {cpu: 20m, memory: 128Mi}
+    limits: {memory: 512Mi}
+  remoteWrite:
+    - name: par-thanos
+      url: https://thanos-receive.thanos.svc:19291/api/v1/receive
+      tlsConfig:
+        # The name fin checks too, whatever address it dials.
+        serverName: thanos-receive.eu1.internal
+        ca:
+          secret: {name: thanos-remote-write, key: ca.crt}
+        cert:
+          secret: {name: thanos-remote-write, key: tls.crt}
+        keySecret: {name: thanos-remote-write, key: tls.key}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: fin-sim-self
+  namespace: fin-sim
+  labels:
+    eu1.io/scraped-by: fin-sim
+spec:
+  selector:
+    matchLabels:
+      operated-prometheus: "true"
+  endpoints:
+    - port: web
+      interval: 30s

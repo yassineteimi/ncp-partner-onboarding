@@ -1,0 +1,61 @@
+# Platform lane overlay for kube-prometheus-stack 91.4.1 on par, read after
+# gitops/values/base/kube-prometheus-stack{,-par}.yaml. Use case 6.
+#
+# par is the permanent site, so its Prometheus keeps working as it did in
+# Part 1 (local alerting, 15 days on its own disk) and gains a Thanos sidecar:
+#   - Thanos Query reads par's recent data through the sidecar's gRPC API;
+#   - the sidecar uploads every 2 hour block to Garage, for long-term storage
+#     and so the compactor has something long enough to downsample.
+# No remote write from par: it would make par's Prometheus depend on the CPU
+# worker, which is powered off most of the time (ADR 0009).
+
+prometheus:
+  prometheusSpec:
+    thanos:
+      image: quay.io/thanos/thanos:v0.42.4@sha256:b567818fe608067eb0f1d7c2c4fe361e7ad83c8a256234c97685f1d0bf670cc8
+      version: v0.42.4
+      # Secret monitoring/thanos-objstore, written by the base platform's
+      # Garage Job (gitops/manifests/base/checkpoint-store/thanos-bucket.yaml).
+      #
+      # The chart only accepts it as existingSecret and renders name and key,
+      # nothing else (templates/prometheus/prometheus.yaml at 91.4.1), so it
+      # can't be marked optional. The Prometheus pod therefore needs this
+      # Secret to start, and ArgoCD's health check for the Prometheus resource
+      # waits for the pod. On a par rebuilt from nothing, the Secret has to
+      # exist before this chart's wave 0, not after Garage's wave 5. Raised
+      # with cos; the running par already has it.
+      objectStorageConfig:
+        existingSecret:
+          name: thanos-objstore
+          key: objstore.yml
+      resources:
+        requests: {cpu: 20m, memory: 64Mi}
+        limits: {memory: 256Mi}
+
+  # The sidecar's gRPC port, for Thanos Query's dnssrv lookup:
+  # kube-prometheus-stack-thanos-discovery.monitoring.svc.
+  thanosService:
+    enabled: true
+  # And its metrics, thanos_shipper_uploads_total among them.
+  thanosServiceMonitor:
+    enabled: true
+
+########################################
+# Grafana
+#
+# Thanos Query as a second data source, beside the chart's local Prometheus
+# one, which stays the default so Part 1's dashboards don't change. The
+# cross-site dashboard asks for this one by uid.
+########################################
+
+grafana:
+  additionalDataSources:
+    - name: Thanos (EU1)
+      uid: thanos-eu1
+      type: prometheus
+      access: proxy
+      url: http://thanos-query.thanos.svc:9090
+      editable: false
+      jsonData:
+        prometheusType: Thanos
+        timeInterval: 30s

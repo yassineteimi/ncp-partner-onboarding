@@ -1,0 +1,39 @@
+# Platform lane overlay for kube-prometheus-stack 91.4.1 on fin, read after
+# gitops/values/base/kube-prometheus-stack{,-fin}.yaml. Use case 6.
+#
+# fin exists only during a GPU window and opens no port to par, so its
+# Prometheus pushes: every sample goes to Thanos Receive on par within seconds,
+# and fin's data outlives the site (ADR 0009).
+#
+# The endpoint is NodePort 30291 on par's CPU worker, whose flexible IP
+# survives power-off. The Scaleway security group opens it to fin's node
+# addresses only, while fin exists (scripts/par/metrics-peers.sh, cos).
+#
+# BRING-UP ORDER MATTERS. The Secret below must exist before ArgoCD syncs this
+# chart: without it the Prometheus Operator can't render the remote write
+# configuration, kube-prometheus-stack stays unhealthy at wave 0, and the GPU
+# Operator at wave 1 never syncs. scripts/fin/cp-up.sh creates it before it
+# installs ArgoCD, with scripts/platform/fin-remote-write-secret.sh.
+# If that fails during a window, the abort is to delete this file on main.
+
+prometheus:
+  prometheusSpec:
+    remoteWrite:
+      - name: par-thanos
+        url: https://51.159.176.50:30291/api/v1/receive
+        tlsConfig:
+          # Receive's certificate names no IP. fin checks this name instead,
+          # signed by the CA that only par's cluster holds the key for.
+          serverName: thanos-receive.eu1.internal
+          ca:
+            secret: {name: thanos-remote-write, key: ca.crt}
+          # The client certificate is the credential and, through its common
+          # name "fin", the tenant (--receive.tenant-certificate-field).
+          cert:
+            secret: {name: thanos-remote-write, key: tls.crt}
+          keySecret: {name: thanos-remote-write, key: tls.key}
+        # A few thousand series from two GPUs. The defaults would do; these
+        # keep the backlog bounded if par is unreachable for a while.
+        queueConfig:
+          maxShards: 10
+          batchSendDeadline: 5s

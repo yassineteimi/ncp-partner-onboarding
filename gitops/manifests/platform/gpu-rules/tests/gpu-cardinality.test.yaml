@@ -1,0 +1,135 @@
+# promtool unit tests for gitops/manifests/platform/gpu-rules/gpu-cardinality.yaml,
+# and for the queries of the "EU1 GPUs across sites" dashboard.
+#
+# Run with: make thanos-test-rules
+#
+# Part 1's dashboard had the same bug as its alert, and only the alert had
+# tests. So the panel queries are tested here too, against series shaped like
+# what dcgm-exporter 4.8.4 emits, with the site label Thanos adds.
+
+rule_files:
+  - gpu-cardinality.rules.yaml
+
+evaluation_interval: 1m
+
+tests:
+  ##########################################################################
+  # Series per GPU.
+  ##########################################################################
+  - name: an L4 with two XID codes costs one series per metric plus one per extra code
+    interval: 1m
+    input_series:
+      - series: 'DCGM_FI_DEV_GPU_UTIL{Hostname="eu1-par-gpu-01", gpu="0", UUID="GPU-l4", modelName="NVIDIA L4", pod="nvidia-dcgm-exporter-a"}'
+        values: '50x5'
+      - series: 'DCGM_FI_DEV_POWER_USAGE{Hostname="eu1-par-gpu-01", gpu="0", UUID="GPU-l4", modelName="NVIDIA L4", pod="nvidia-dcgm-exporter-a"}'
+        values: '70x5'
+      - series: 'DCGM_EXP_XID_ERRORS_TOTAL{Hostname="eu1-par-gpu-01", gpu="0", UUID="GPU-l4", modelName="NVIDIA L4", pod="nvidia-dcgm-exporter-a", xid="13"}'
+        values: '1x5'
+      - series: 'DCGM_EXP_XID_ERRORS_TOTAL{Hostname="eu1-par-gpu-01", gpu="0", UUID="GPU-l4", modelName="NVIDIA L4", pod="nvidia-dcgm-exporter-a", xid="79"}'
+        values: '1x5'
+      # Not DCGM: must not be counted.
+      - series: 'up{job="node-exporter", instance="eu1-par-gpu-01"}'
+        values: '1x5'
+    promql_expr_test:
+      - expr: gpu:dcgm_series:count
+        eval_time: 2m
+        exp_samples:
+          - labels: 'gpu:dcgm_series:count{Hostname="eu1-par-gpu-01", gpu="0", UUID="GPU-l4", modelName="NVIDIA L4"}'
+            value: 4
+      - expr: gpu:dcgm_series_by_metric:count{metric="DCGM_EXP_XID_ERRORS_TOTAL"}
+        eval_time: 2m
+        exp_samples:
+          - labels: 'gpu:dcgm_series_by_metric:count{Hostname="eu1-par-gpu-01", gpu="0", modelName="NVIDIA L4", metric="DCGM_EXP_XID_ERRORS_TOTAL"}'
+            value: 2
+
+  - name: MIG instances count against the physical GPU they live on
+    interval: 1m
+    input_series:
+      # GPU 0 split into two MIG instances: profiling metrics are per instance.
+      - series: 'DCGM_FI_PROF_SM_ACTIVE{Hostname="eu1-fin-gpu-01", gpu="0", UUID="GPU-h200-0", modelName="NVIDIA H200", GPU_I_ID="1", GPU_I_PROFILE="3g.71gb"}'
+        values: '0.5x5'
+      - series: 'DCGM_FI_PROF_SM_ACTIVE{Hostname="eu1-fin-gpu-01", gpu="0", UUID="GPU-h200-0", modelName="NVIDIA H200", GPU_I_ID="2", GPU_I_PROFILE="3g.71gb"}'
+        values: '0.4x5'
+      - series: 'DCGM_FI_DEV_GPU_TEMP{Hostname="eu1-fin-gpu-01", gpu="0", UUID="GPU-h200-0", modelName="NVIDIA H200"}'
+        values: '40x5'
+      # GPU 1 whole.
+      - series: 'DCGM_FI_PROF_SM_ACTIVE{Hostname="eu1-fin-gpu-01", gpu="1", UUID="GPU-h200-1", modelName="NVIDIA H200"}'
+        values: '0.9x5'
+      - series: 'DCGM_FI_DEV_GPU_TEMP{Hostname="eu1-fin-gpu-01", gpu="1", UUID="GPU-h200-1", modelName="NVIDIA H200"}'
+        values: '45x5'
+    promql_expr_test:
+      - expr: gpu:dcgm_series:count
+        eval_time: 2m
+        exp_samples:
+          - labels: 'gpu:dcgm_series:count{Hostname="eu1-fin-gpu-01", gpu="0", UUID="GPU-h200-0", modelName="NVIDIA H200"}'
+            value: 3
+          - labels: 'gpu:dcgm_series:count{Hostname="eu1-fin-gpu-01", gpu="1", UUID="GPU-h200-1", modelName="NVIDIA H200"}'
+            value: 2
+
+  - name: an exporter restart doubles the series while both pods are scraped
+    # This is churn, not a bug in the rule: while the old pod is still scraped
+    # next to the new one, both sets of series exist, until the old target goes
+    # and Prometheus marks its series stale. Every new pod name is a new set of
+    # series in the TSDB. It is also why the dashboard aggregates by GPU, not
+    # by pod.
+    interval: 1m
+    input_series:
+      - series: 'DCGM_FI_DEV_GPU_UTIL{Hostname="eu1-par-gpu-01", gpu="0", UUID="GPU-l4", modelName="NVIDIA L4", pod="nvidia-dcgm-exporter-a"}'
+        values: '50 50 50 stale'
+      - series: 'DCGM_FI_DEV_GPU_UTIL{Hostname="eu1-par-gpu-01", gpu="0", UUID="GPU-l4", modelName="NVIDIA L4", pod="nvidia-dcgm-exporter-b"}'
+        values: '_ _ 60 60 60 60'
+    promql_expr_test:
+      - expr: gpu:dcgm_series:count
+        eval_time: 2m
+        exp_samples:
+          - labels: 'gpu:dcgm_series:count{Hostname="eu1-par-gpu-01", gpu="0", UUID="GPU-l4", modelName="NVIDIA L4"}'
+            value: 2
+      - expr: gpu:dcgm_series:count
+        eval_time: 4m
+        exp_samples:
+          - labels: 'gpu:dcgm_series:count{Hostname="eu1-par-gpu-01", gpu="0", UUID="GPU-l4", modelName="NVIDIA L4"}'
+            value: 1
+
+  ##########################################################################
+  # Dashboard queries, as Thanos Query sees them: site comes from the
+  # sending Prometheus's external labels.
+  ##########################################################################
+  - name: the utilisation panel shows one line per GPU per site, through an exporter restart
+    interval: 1m
+    input_series:
+      - series: 'DCGM_FI_DEV_GPU_UTIL{site="par", Hostname="eu1-par-gpu-01", gpu="0", UUID="GPU-l4", modelName="NVIDIA L4", pod="nvidia-dcgm-exporter-a"}'
+        values: '50 50 50'
+      - series: 'DCGM_FI_DEV_GPU_UTIL{site="par", Hostname="eu1-par-gpu-01", gpu="0", UUID="GPU-l4", modelName="NVIDIA L4", pod="nvidia-dcgm-exporter-b"}'
+        values: '_ _ 60'
+      - series: 'DCGM_FI_DEV_GPU_UTIL{site="fin", Hostname="eu1-fin-gpu-01", gpu="0", UUID="GPU-h200-0", modelName="NVIDIA H200", pod="nvidia-dcgm-exporter-x"}'
+        values: '90 90 90'
+      - series: 'DCGM_FI_DEV_GPU_UTIL{site="fin", Hostname="eu1-fin-gpu-01", gpu="1", UUID="GPU-h200-1", modelName="NVIDIA H200", pod="nvidia-dcgm-exporter-x"}'
+        values: '80 80 80'
+    promql_expr_test:
+      - expr: max by (site, modelName, Hostname, gpu) (DCGM_FI_DEV_GPU_UTIL{site=~"par|fin"})
+        eval_time: 2m
+        exp_samples:
+          - labels: '{site="par", modelName="NVIDIA L4", Hostname="eu1-par-gpu-01", gpu="0"}'
+            value: 60
+          - labels: '{site="fin", modelName="NVIDIA H200", Hostname="eu1-fin-gpu-01", gpu="0"}'
+            value: 90
+          - labels: '{site="fin", modelName="NVIDIA H200", Hostname="eu1-fin-gpu-01", gpu="1"}'
+            value: 80
+
+  - name: the series-per-GPU panel reads the recorded count, per site
+    interval: 1m
+    input_series:
+      - series: 'gpu:dcgm_series:count{site="par", Hostname="eu1-par-gpu-01", gpu="0", UUID="GPU-l4", modelName="NVIDIA L4"}'
+        values: '33x3'
+      - series: 'gpu:dcgm_series:count{site="fin", Hostname="eu1-fin-gpu-01", gpu="0", UUID="GPU-h200-0", modelName="NVIDIA H200"}'
+        values: '35x3'
+      - series: 'gpu:dcgm_series:count{site="fin", Hostname="eu1-fin-gpu-01", gpu="1", UUID="GPU-h200-1", modelName="NVIDIA H200"}'
+        values: '35x3'
+    promql_expr_test:
+      - expr: max by (site, modelName) (gpu:dcgm_series:count)
+        eval_time: 2m
+        exp_samples:
+          - labels: '{site="par", modelName="NVIDIA L4"}'
+            value: 33
+          - labels: '{site="fin", modelName="NVIDIA H200"}'
+            value: 35

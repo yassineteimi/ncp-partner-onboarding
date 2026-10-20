@@ -1,0 +1,43 @@
+# The Thanos hub, use case 6, sync wave 10 like every lane Application.
+#
+# Runs on par's CPU worker (eu1.io/pool: cpu), so with the worker powered off
+# its pods wait Pending and this Application reads Progressing or Degraded.
+# Nothing in a later wave depends on it.
+#
+# The thanos namespace belongs to the base platform (cos), which creates it in
+# the checkpoint-store Application together with the thanos-objstore Secret
+# this reads. CreateNamespace only matters on a cluster built in another
+# order; no Namespace object is managed here.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: thanos
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/yassineteimi/ncp-partner-onboarding
+    targetRevision: main
+    path: gitops/manifests/platform/thanos
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: thanos
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 20s
+        factor: 2
+        maxDuration: 5m
