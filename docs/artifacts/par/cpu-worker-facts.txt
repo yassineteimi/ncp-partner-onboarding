@@ -1,0 +1,13 @@
+# eu1-par-cpu-01, captured 2026-10-20T07:36:21Z by scripts/par/cpu-up.sh
+node_name=eu1-par-cpu-01
+node_ip=172.16.32.30
+os=Ubuntu 24.04.5 LTS
+kernel=6.8.0-142-generic
+containerd=containerd containerd v2.3.6 ee2735368117d2eb259779949d5e75cdafec9761
+kubeadm=v1.36.5
+kubelet_package=1.36.5-1.1
+bootstrapped_at=2026-10-20T07:35:57+00:00
+== /dev/kvm
+crw-rw---- 1 root kvm 10, 232 Oct 20 07:34 /dev/kvm
+== cpu virtualisation flags
+svm
