@@ -18,7 +18,7 @@ sched-sim-demo: ## UC4: par, simulated GPUs: burst, reclaim, gang all-or-nothing
 sched-gang: ## UC4: two-pod KAI gang with an all-reduce, SITE=par (gloo, CPU worker) or SITE=fin (NCCL, W2 step 4)
 	./scripts/scheduling/gang.sh $(or $(SITE),par)
 
-sched-mig: ## UC4: fin, W2 step 5: MIG h200-split, then a tenant per slice (aborts after 10 min, never reboots)
+sched-mig: ## UC4: fin, W2 step 5: waits for cos's MIG label (LABEL=1: sets it), then a tenant per slice (aborts after 10 min, never reboots)
 	./scripts/scheduling/mig.sh
 
 sched-mig-check: ## UC4: parse fin's MIG config with mig-parted's own loader, on par's CPU worker

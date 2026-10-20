@@ -4,8 +4,11 @@
 #
 #   1. checks no pod holds a GPU on the H200 node (mig-manager refuses, or
 #      waits, while a GPU is in use)
-#   2. labels the node nvidia.com/mig.config=h200-split; the GPU Operator's MIG
-#      manager splits GPU0 into two 3g.71gb instances and leaves GPU1 whole
+#   2. waits for the node label nvidia.com/mig.config=h200-split, which cos
+#      sets in W2 (a node label is cluster-scoped, so it's cos's line in the
+#      run sheet); LABEL=1 makes the script set it itself, outside W2. The GPU
+#      Operator's MIG manager then splits GPU0 into two 3g.71gb instances and
+#      leaves GPU1 whole
 #   3. waits for nvidia.com/mig.config.state=success (MIG_TIMEOUT, 10 min) and
 #      for the device plugin to advertise nvidia.com/mig-3g.71gb: 2
 #   4. starts workloads/scheduling/mig/tenants.yaml: team-a and team-b on one
@@ -74,10 +77,19 @@ if [ -n "$busy" ]; then
 fi
 echo "(none)"
 
-section "Label $node nvidia.com/mig.config=$MIG_CONFIG"
-labelled="$(date -u +%H:%M:%SZ)"
-kubectl_cp label node "$node" "nvidia.com/mig.config=$MIG_CONFIG" --overwrite
-echo "labelled at $labelled"
+mig_config_is() { [ "$(node_label nvidia.com/mig.config)" = "$MIG_CONFIG" ]; }
+if [ "${LABEL:-0}" = "1" ]; then
+  section "Label $node nvidia.com/mig.config=$MIG_CONFIG"
+  kubectl_cp label node "$node" "nvidia.com/mig.config=$MIG_CONFIG" --overwrite
+else
+  section "Waiting for cos to label $node nvidia.com/mig.config=$MIG_CONFIG"
+  echo "cos runs: kubectl label node $node nvidia.com/mig.config=$MIG_CONFIG --overwrite"
+  if ! wait_for "node labelled $MIG_CONFIG" 300 mig_config_is; then
+    echo "not labelled in 5 min; nothing changed on the node"
+    exit 1
+  fi
+fi
+echo "label nvidia.com/mig.config=$(node_label nvidia.com/mig.config) seen at $(date -u +%H:%M:%SZ)"
 
 section "Wait for the MIG manager (time box ${MIG_TIMEOUT}s)"
 # Watch the state change, printing each transition. The node already reads
