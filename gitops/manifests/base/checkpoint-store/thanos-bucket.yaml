@@ -1,0 +1,155 @@
+# A second bucket in the same Garage, for Thanos (use case 6), with its own key
+# that can read and write that bucket and nothing else.
+#
+# Garage's single-node mode only makes the default key and bucket at start, so
+# this Job adds the rest through Garage's own CLI, run inside the Garage pod:
+# `garage bucket create`, `garage key import` and `garage bucket allow`, whose
+# options were read in src/garage/cli/structs.rs at v2.4.1. The key's
+# credentials are generated here, in the cluster, the first time, and kept in
+# the garage-thanos Secret, so they are never in Git and a re-run imports
+# nothing new. Each step checks first, so the Job is safe to run on every sync.
+#
+# It hands the credentials to Thanos as Secret thanos-objstore, key
+# objstore.yml, in the Thanos object store format, in the namespaces where
+# Thanos (thanos) and Prometheus's sidecar (monitoring) read it.
+#
+# The thanos namespace belongs to this file. Thanos's own Applications create
+# their resources in it without managing the Namespace object.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: thanos
+  annotations:
+    argocd.argoproj.io/sync-wave: "-3"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: garage-thanos
+  namespace: checkpoint-store
+  annotations:
+    argocd.argoproj.io/sync-wave: "-2"
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["pods/exec"]
+    verbs: ["create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: garage-thanos
+  namespace: checkpoint-store
+  annotations:
+    argocd.argoproj.io/sync-wave: "-2"
+roleRef: {apiGroup: rbac.authorization.k8s.io, kind: Role, name: garage-thanos}
+subjects: [{kind: ServiceAccount, name: garage-bootstrap, namespace: checkpoint-store}]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: thanos-objstore-writer
+  namespace: thanos
+  annotations:
+    argocd.argoproj.io/sync-wave: "-2"
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    resourceNames: ["thanos-objstore"]
+    verbs: ["get", "patch"]
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: thanos-objstore-writer
+  namespace: thanos
+  annotations:
+    argocd.argoproj.io/sync-wave: "-2"
+roleRef: {apiGroup: rbac.authorization.k8s.io, kind: Role, name: thanos-objstore-writer}
+subjects: [{kind: ServiceAccount, name: garage-bootstrap, namespace: checkpoint-store}]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: thanos-objstore-writer
+  namespace: monitoring
+  annotations:
+    argocd.argoproj.io/sync-wave: "-2"
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    resourceNames: ["thanos-objstore"]
+    verbs: ["get", "patch"]
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: thanos-objstore-writer
+  namespace: monitoring
+  annotations:
+    argocd.argoproj.io/sync-wave: "-2"
+roleRef: {apiGroup: rbac.authorization.k8s.io, kind: Role, name: thanos-objstore-writer}
+subjects: [{kind: ServiceAccount, name: garage-bootstrap, namespace: checkpoint-store}]
+---
+# A Sync hook rather than a plain Job: it runs again on every sync, which is
+# harmless because every step checks first, and a change to it never meets the
+# immutable pod template of an existing Job. Wave 1 puts it after Garage's
+# StatefulSet (wave 0) in this Application.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: garage-thanos
+  namespace: checkpoint-store
+  annotations:
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  backoffLimit: 3
+  template:
+    spec:
+      serviceAccountName: garage-bootstrap
+      restartPolicy: Never
+      nodeSelector:
+        node-role.kubernetes.io/control-plane: ""
+      containers:
+        - name: thanos-bucket
+          image: alpine/k8s:1.36.5@sha256:094adf64cdc4827377cdbe7ea5747472ce115f9fbc64a4e35970ec66777f9a00
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -eu
+              hex() { head -c "$1" /dev/urandom | od -An -tx1 | tr -d ' \n'; }
+              ns=checkpoint-store
+              if kubectl -n "$ns" get secret garage-thanos >/dev/null 2>&1; then
+                echo "garage-thanos exists, keeping it"
+              else
+                kubectl -n "$ns" create secret generic garage-thanos \
+                  --from-literal=access-key-id="GK$(hex 16)" \
+                  --from-literal=secret-access-key="$(hex 32)"
+                echo "garage-thanos created"
+              fi
+              get() { kubectl -n "$ns" get secret garage-thanos -o jsonpath="{.data.$1}" | base64 -d; }
+              ak="$(get access-key-id)"; sk="$(get secret-access-key)"
+
+              kubectl -n "$ns" wait --for=condition=Ready pod/garage-0 --timeout=300s
+              g() { kubectl -n "$ns" exec garage-0 -c garage -- /garage "$@"; }
+              if g bucket info thanos >/dev/null 2>&1; then echo "bucket thanos exists"; else g bucket create thanos; fi
+              if g key info "$ak" >/dev/null 2>&1; then echo "key exists"; else g key import --yes -n thanos "$ak" "$sk"; fi
+              g bucket allow --read --write thanos --key "$ak"
+
+              objstore="$(printf 'type: S3\nconfig:\n  bucket: thanos\n  endpoint: garage.checkpoint-store.svc:3900\n  region: garage\n  insecure: true\n  access_key: %s\n  secret_key: %s\n' "$ak" "$sk")"
+              for target in thanos monitoring; do
+                kubectl -n "$target" create secret generic thanos-objstore \
+                  --from-literal=objstore.yml="$objstore" \
+                  --dry-run=client -o yaml | kubectl apply -f -
+                echo "thanos-objstore applied in $target"
+              done

@@ -6,6 +6,7 @@ resources:
   - namespace.yaml
   - bootstrap.yaml
   - garage.yaml
+  - thanos-bucket.yaml
 configMapGenerator:
   - name: garage-config
     namespace: checkpoint-store
