@@ -451,3 +451,44 @@ verda_sweep() {
   fi
   [ -z "$keys$scripts" ] || log "free, kept or left by Terraform: ${keys:+SSH key $keys }${scripts:+startup script $scripts}"
 }
+
+########################################
+# kubeadm join with a JoinConfiguration
+#
+# `kubeadm token create --print-join-command` prints flags; a taint at join
+# time needs a JoinConfiguration instead (nodeRegistration.taints), so the
+# endpoint, token and CA hash are read out of the printed command.
+########################################
+
+#   join_parts "<kubeadm join ...>"  ->  "<endpoint> <token> <ca hash>"
+join_parts() {
+  awk '{ for (i = 1; i <= NF; i++) {
+      if ($i == "join") e = $(i + 1)
+      if ($i == "--token") t = $(i + 1)
+      if ($i == "--discovery-token-ca-cert-hash") h = $(i + 1)
+    } } END { print e, t, h }' <<<"$1"
+}
+
+#   join_configuration <endpoint> <token> <ca hash> <node name> <node ip>
+# A worker that joins tainted eu1.io/staging=pending:NoSchedule (use case 2).
+join_configuration() {
+  cat <<YAML
+apiVersion: kubeadm.k8s.io/v1beta4
+kind: JoinConfiguration
+discovery:
+  bootstrapToken:
+    apiServerEndpoint: "$1"
+    token: "$2"
+    caCertHashes: ["$3"]
+nodeRegistration:
+  name: $4
+  criSocket: unix:///run/containerd/containerd.sock
+  kubeletExtraArgs:
+    - name: node-ip
+      value: "$5"
+  taints:
+    - key: eu1.io/staging
+      value: pending
+      effect: NoSchedule
+YAML
+}

@@ -101,11 +101,23 @@ case "$JOIN_COMMAND" in
   *) die "the control plane did not return a usable join command" ;;
 esac
 
-log "joining $NAME, advertising $NODE_IP"
-node_ssh "$IP" "$JOIN_COMMAND --node-name $NAME --cri-socket unix:///run/containerd/containerd.sock"
+# The node joins in staging (use case 2): eu1.io/staging=pending:NoSchedule
+# keeps every pod off it except those that tolerate the taint (the GPU
+# Operator, NFD, NVCRE's certification jobs) until the readiness lane's
+# promotion gate removes it. A JoinConfiguration carries the taint, so it is on
+# the node from its first second rather than added after the scheduler could
+# already use it. The file holds a 30 minute bootstrap token and is deleted
+# right after the join.
+read -r ENDPOINT TOKEN CA_HASH <<<"$(join_parts "$JOIN_COMMAND")"
+[ -n "$ENDPOINT" ] && [ -n "$TOKEN" ] && [ -n "$CA_HASH" ] || die "could not parse the join command"
+
+log "joining $NAME in staging, advertising $NODE_IP"
+join_configuration "$ENDPOINT" "$TOKEN" "$CA_HASH" "$NAME" "$NODE_IP" \
+  | node_ssh "$IP" 'umask 077 && cat > /etc/kubernetes/kubeadm-join.yaml && kubeadm join --config /etc/kubernetes/kubeadm-join.yaml; rc=$?; rm -f /etc/kubernetes/kubeadm-join.yaml; exit $rc'
 kubectl_cp wait --for=condition=Ready "node/$NAME" --timeout=600s
 mark node_ready
 kubectl_cp label node "$NAME" eu1.io/site=fin eu1.io/pool=gpu --overwrite
+log "taints on $NAME: $(kubectl_cp get node "$NAME" -o jsonpath='{range .spec.taints[*]}{.key}={.value}:{.effect} {end}')"
 
 ########################################
 # The GPU Operator, with the provider's driver, advertises the GPUs
