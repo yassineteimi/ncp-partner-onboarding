@@ -1,0 +1,7 @@
+[cli] generating recipe offline — reads inputs only; does not deploy to or modify any cluster
+[cli] CLI flag overriding snapshot-detected value: field=service detected=any override=k0s
+[cli] CLI flag overriding snapshot-detected value: field=accelerator detected=any override=h200
+[cli] CLI flag overriding snapshot-detected value: field=intent detected=any override=training
+[cli] CLI flag overriding snapshot-detected value: field=os detected=any override=ubuntu
+[cli] building recipe from criteria: criteria=criteria(service=k0s, accelerator=h200, intent=training, os=ubuntu)
+[cli] recipe generation completed: output=/Users/yassineteimi/Desktop/ncp-partner-onboarding/.claude/worktrees/ws-readiness/docs/artifacts/readiness/aicr/recipe-k0s-h200-training.yaml components=12 componentNames=cert-manager, dra-node-labeler, gpu-operator, k8s-ephemeral-storage-metrics, kai-scheduler, kube-prometheus-stack, nfd, nodewright-operator, nvidia-dra-driver-gpu, nvsentinel, prometheus-adapter, prometheus-operator-crds overlays=6

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# The lane's CLIs at their pinned versions, in .cache/readiness/bin, each
+# The lane's CLIs at their pinned versions (nvcrectl, aicr), in .cache/readiness/bin, each
 # checked against the checksums file of its own GitHub release.
 #
 #   scripts/readiness/tools.sh
@@ -14,6 +14,7 @@ source "$(dirname "${BASH_SOURCE[0]}")/../lib.sh"
 require_tools gh shasum
 
 NVCRE_VERSION=v0.8.0
+AICR_VERSION=v1.1.0
 BIN="$REPO_ROOT/.cache/readiness/bin"
 mkdir -p "$BIN"
 
@@ -33,3 +34,12 @@ gh release download "$NVCRE_VERSION" -R NVIDIA/cluster-readiness-engine \
   || die "nvcrectl-$platform doesn't match the release's checksums.txt"
 install -m 0755 "$work/nvcrectl-$platform" "$BIN/nvcrectl"
 log "$("$BIN/nvcrectl" --version) in ${BIN#"$REPO_ROOT"/}"
+
+# AICR names its archives os_arch with an underscore and the version without v.
+tarball="aicr_${AICR_VERSION#v}_${platform/-/_}.tar.gz"
+gh release download "$AICR_VERSION" -R NVIDIA/aicr -p "$tarball" -p aicr_checksums.txt -D "$work"
+(cd "$work" && grep " $tarball\$" aicr_checksums.txt | shasum -a 256 -c -) \
+  || die "$tarball doesn't match the release's aicr_checksums.txt"
+tar -xzf "$work/$tarball" -C "$work" aicr
+install -m 0755 "$work/aicr" "$BIN/aicr"
+log "aicr $("$BIN/aicr" --version 2>&1 | head -1) in ${BIN#"$REPO_ROOT"/}"

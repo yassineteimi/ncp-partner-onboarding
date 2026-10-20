@@ -33,7 +33,7 @@ NVCRE_ENV := PATH="$(CURDIR)/$(READINESS_BIN):$$PATH" SITE=$(or $(SITE),par)
 $(READINESS_BIN)/nvcrectl:
 	./scripts/readiness/tools.sh
 
-readiness-tools: $(READINESS_BIN)/nvcrectl ## readiness: nvcrectl v0.8.0, checksum-verified, in .cache/readiness/bin
+readiness-tools: $(READINESS_BIN)/nvcrectl ## readiness: nvcrectl v0.8.0 and aicr v1.1.0, checksum-verified, in .cache/readiness/bin
 
 readiness-prepull: ## readiness: pull the window's workload images onto the GPU node (SITE=par|fin)
 	$(NVCRE_ENV) ./scripts/readiness/nvcre.sh prepull
@@ -75,3 +75,18 @@ uc3-capture: $(READINESS_VENV)/bin/pytest ## readiness: after the Job completes,
 	./scripts/readiness/uc3.sh capture
 
 .PHONY: uc3-check uc3-watch uc3-goodput uc3-inject uc3-inject-dcgm uc3-capture
+
+########################################
+# Use case 1: AICR as the known-good reference for the H200 pool
+########################################
+
+aicr-recipe: $(READINESS_BIN)/aicr ## readiness: AICR v1.1.0 recipes for the H200 pool, and its refusals for what we run
+	./scripts/readiness/aicr.sh recipes
+
+aicr-bundle: $(READINESS_BIN)/aicr ## readiness: render the reference recipe for Argo CD (kept as evidence, never synced)
+	./scripts/readiness/aicr.sh bundle
+
+.PHONY: aicr-recipe aicr-bundle
+
+$(READINESS_BIN)/aicr:
+	./scripts/readiness/tools.sh

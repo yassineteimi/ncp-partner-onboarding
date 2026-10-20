@@ -1,0 +1,21 @@
+# FC11: NCCL test images against fin's driver 580.178.04, read from nvcr.io on 20 October 2026
+#
+# Image config (env), amd64 manifest of each tag:
+26.01-py3 sha256:38ed2ecb2c16d10677006d73fb0a150855d6ec81db8fc66e800b5ae92741007e 9.11GB CUDA 13.1.1.006 driver 590.48.01 NCCL 2.29.stable.20260109
+25.12-py3 sha256:1dc787f5c6264fcc1c99809f99b84823e73ed4588d5a581b94290fc2a8fecff8 9.07GB CUDA 13.1.0.036 driver 590.44.01 NCCL 2.28.9+cuda13.0
+25.11-py3 sha256:417cbf33f87b5378849df37983552cd1f8bc8b62fe1ceabe004de816a55dff21 9.21GB CUDA 13.0.2.006 driver 580.95.05 NCCL 2.28.8
+25.10-py3 sha256:42263b2424fc237b34c4fc4a91c30d603c57eed36e37d31ff6d9a4f1f801edee 8.77GB CUDA 13.0.2.006 driver 580.95.05 NCCL 2.27.7
+25.09-py3 sha256:f3b4a33fd60d5e0358287bb44d57e91eda45e8f1681fef1bfd6c969371417130 8.57GB CUDA 13.0.1.012 driver 580.82.07 NCCL 2.27.7
+25.08-py3 sha256:ace9a848c0ae543317e3c4763b6b4248961c47902625abfe3c77a0fb931c50fb 11.04GB CUDA 13.0.0.044 driver 580.65.06 NCCL 2.27.7
+#
+# 26.01-py3 is the image NVCRE v0.8.0's NCCL categories use. Built for driver 590.48.01,
+# above fin's 580.178.04: on the H200 it can only run through CUDA forward compatibility
+# (/usr/local/cuda/compat is in the image). par's 595.91.07 is above 590 and runs it natively.
+#
+# 25.11-py3 is the newest tag built for a 580 driver. Its amd64 layers, streamed and listed
+# without keeping them (9.17 GB), hold what the catalog's command line calls:
+#   layer 30  usr/local/bin/all_reduce_perf_mpi   5134320 bytes
+#   layer 6   usr/local/mpi -> /opt/hpcx/ompi     (symlink)
+#   layer 6   opt/hpcx/ompi/bin/mpirun -> orterun (link)
+# So /usr/local/mpi/bin/mpirun and /usr/local/bin/all_reduce_perf_mpi resolve in it.
+# Read, not run: nothing here has executed on a GPU.

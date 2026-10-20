@@ -1,0 +1,7 @@
+[cli] generating recipe offline — reads inputs only; does not deploy to or modify any cluster
+[cli] CLI flag overriding snapshot-detected value: field=service detected=any override=metal3
+[cli] CLI flag overriding snapshot-detected value: field=accelerator detected=any override=h200
+[cli] CLI flag overriding snapshot-detected value: field=intent detected=any override=training
+[cli] CLI flag overriding snapshot-detected value: field=os detected=any override=ubuntu
+[cli] building recipe from criteria: criteria=criteria(service=metal3, accelerator=h200, intent=training, os=ubuntu)
+[cli] command failed: error=[INVALID_REQUEST] no recipe provides service 'metal3' for criteria(service=metal3, accelerator=h200, intent=training, os=ubuntu); no recipe provides intent 'training' for criteria(service=metal3, accelerator=h200, intent=training, os=ubuntu); no recipe provides os 'ubuntu' for criteria(service=metal3, accelerator=h200, intent=training, os=ubuntu) exitCode=2
