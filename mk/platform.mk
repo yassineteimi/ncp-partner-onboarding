@@ -18,3 +18,7 @@ thanos-fin-secret: ## UC6: copy fin's remote write client certificate from par t
 .PHONY: thanos-check-mtls
 thanos-check-mtls: ## UC6: local end to end of fin's write path: certificates, mutual TLS, tenant from the certificate (ARTIFACT=1 saves it)
 	./scripts/platform/check-mtls.sh
+
+.PHONY: thanos-capture
+thanos-capture: ## UC6: evidence through par's API, MODE=hub|fin|after|bucket, into docs/artifacts/platform/
+	./scripts/platform/capture-thanos.sh $(or $(MODE),hub)
