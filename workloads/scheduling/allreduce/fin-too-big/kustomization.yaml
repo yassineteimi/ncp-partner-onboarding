@@ -1,0 +1,42 @@
+# W2 step 4, second half: a three-pod gang on a node with two GPUs. It must stay
+# Pending with no pod bound, rather than start two pods that wait forever for
+# a third, which is what the default scheduler would do.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../fin
+nameSuffix: "-3"
+patches:
+  - target:
+      kind: Job
+    patch: |-
+      - op: replace
+        path: /metadata/annotations/kai.scheduler~1batch-min-member
+        value: "3"
+      - op: replace
+        path: /spec/completions
+        value: 3
+      - op: replace
+        path: /spec/parallelism
+        value: 3
+      - op: replace
+        path: /spec/activeDeadlineSeconds
+        value: 300
+      - op: replace
+        path: /spec/template/spec/subdomain
+        value: allreduce-gang-3
+      - op: replace
+        path: /spec/template/metadata/labels/app
+        value: allreduce-gang-3
+      - op: replace
+        path: /spec/template/spec/containers/0/env/1/value
+        value: "3"
+      - op: replace
+        path: /spec/template/spec/containers/0/env/2/value
+        value: allreduce-gang-3-0.allreduce-gang-3
+  - target:
+      kind: Service
+    patch: |-
+      - op: replace
+        path: /spec/selector/app
+        value: allreduce-gang-3

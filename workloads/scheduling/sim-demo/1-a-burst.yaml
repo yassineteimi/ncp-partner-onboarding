@@ -1,0 +1,48 @@
+# par demo, step 1 of 3 (scripts/scheduling/sim-demo.sh). SIMULATED GPUs.
+#
+# team-a asks for 8 single-GPU pods while team-b is idle. Its quota is 4, its
+# limit none, so KAI binds all 8: 4 in quota and 4 borrowed from team-b.
+# Not a gang: each pod schedules on its own.
+#
+# All three demo Jobs run on the KWOK nodes. The pods show Running but run no
+# container, so the image is a pinned pause image that is never pulled. KWOK's
+# pod-complete stage is removed (render-sim-gpu.sh), so they stay Running, like
+# training pods, until the demo deletes them.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: a-burst
+  namespace: team-a
+  labels:
+    kai.scheduler/queue: team-a
+    eu1.io/simulated: "true"
+spec:
+  completions: 8
+  parallelism: 8
+  template:
+    metadata:
+      labels:
+        kai.scheduler/queue: team-a
+        eu1.io/simulated: "true"
+    spec:
+      schedulerName: kai-scheduler
+      priorityClassName: train
+      restartPolicy: Never
+      nodeSelector:
+        eu1.io/pool: sim-gpu
+      tolerations:
+        - key: kwok.x-k8s.io/node
+          operator: Exists
+          effect: NoSchedule
+        - key: eu1.io/simulated
+          operator: Exists
+          effect: NoExecute
+      containers:
+        - name: train
+          image: registry.k8s.io/pause:3.10@sha256:ee6521f290b2168b6e0935a181d4cff9be1ac3f505666ef0e3c98fae8199917a
+          resources:
+            requests:
+              cpu: "4"
+              memory: 32Gi
+            limits:
+              nvidia.com/gpu: 1

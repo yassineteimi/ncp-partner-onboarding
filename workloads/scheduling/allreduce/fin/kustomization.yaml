@@ -1,0 +1,15 @@
+# W2 step 4 on fin: the gang on the H200 node, one GPU per pod, NCCL.
+# No toleration for eu1.io/staging: it runs after promotion (Yassine, 20 Oct).
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../base
+patches:
+  - target:
+      kind: Job
+      name: allreduce-gang
+    patch: |-
+      - op: add
+        path: /spec/template/spec/nodeSelector
+        value:
+          eu1.io/pool: gpu

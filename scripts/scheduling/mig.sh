@@ -1,0 +1,150 @@
+#!/usr/bin/env bash
+#
+# W2 step 5 on fin: MIG on the H200s, then one tenant per slice (use case 4).
+#
+#   1. checks no pod holds a GPU on the H200 node (mig-manager refuses, or
+#      waits, while a GPU is in use)
+#   2. labels the node nvidia.com/mig.config=h200-split; the GPU Operator's MIG
+#      manager splits GPU0 into two 3g.71gb instances and leaves GPU1 whole
+#   3. waits for nvidia.com/mig.config.state=success (MIG_TIMEOUT, 10 min) and
+#      for the device plugin to advertise nvidia.com/mig-3g.71gb: 2
+#   4. starts workloads/scheduling/mig/tenants.yaml: team-a and team-b on one
+#      slice each, team-a on the whole GPU1, and captures what each pod sees
+#
+# Abort rule from the W2 run sheet: state not success in 10 min, or failed
+# (for example mig-parted's nvidia-smi -r reset path failing in the VM). Then
+# the script captures the MIG manager's logs and the GPUs' MIG state, and
+# exits non-zero; the node is never rebooted (WITH_REBOOT=false in
+# gitops/values/scheduling/gpu-operator-fin.yaml). The MIG layout is left as
+# is: the node is deleted at teardown.
+#
+# Writes docs/artifacts/scheduling/mig-fin-<stamp>.txt. KEEP=1 leaves the
+# tenant pods running.
+#
+
+source "$(dirname "${BASH_SOURCE[0]}")/../lib.sh"
+use_site fin
+require_kubeconfig
+require_tools kubectl perl
+source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
+
+MIG_TIMEOUT="${MIG_TIMEOUT:-600}"
+MIG_CONFIG=h200-split
+TENANTS="$REPO_ROOT/workloads/scheduling/mig/tenants.yaml"
+
+node="$(kubectl_cp get nodes -l eu1.io/pool=gpu -o jsonpath='{.items[0].metadata.name}')"
+[ -n "$node" ] || die "no node with eu1.io/pool=gpu on fin"
+
+node_label() {
+  kubectl_cp get node "$node" -o jsonpath="{.metadata.labels.${1//./\\.}}"
+}
+mig_state_is() { [ "$(node_label nvidia.com/mig.config.state)" = "$1" ]; }
+mig_allocatable_is() {
+  [ "$(kubectl_cp get node "$node" -o jsonpath='{.status.allocatable.nvidia\.com/mig-3g\.71gb}')" = "$1" ]
+}
+mig_manager_pod() {
+  kubectl_cp -n gpu-operator get pods -l app=nvidia-mig-manager \
+    --field-selector "spec.nodeName=$node" -o name | head -n1
+}
+show_node() {
+  kubectl_cp get node "$node" -o jsonpath='{"mig.capable="}{.metadata.labels.nvidia\.com/mig\.capable}{"  mig.config="}{.metadata.labels.nvidia\.com/mig\.config}{"  mig.config.state="}{.metadata.labels.nvidia\.com/mig\.config\.state}{"  mig.strategy="}{.metadata.labels.nvidia\.com/mig\.strategy}{"\n"}'
+  kubectl_cp get node "$node" -o jsonpath='{.status.allocatable}' | tr ',' '\n' | grep -E 'nvidia.com' || true
+  echo
+}
+capture_mig_manager() {
+  local pod
+  pod="$(mig_manager_pod)"
+  echo "### MIG manager ($pod) logs"
+  [ -n "$pod" ] && kubectl_cp -n gpu-operator logs "$pod" --tail=200 || echo "(no MIG manager pod on $node)"
+  echo "### MIG layout the node reports (nvidia-mig-parted export)"
+  [ -n "$pod" ] && kubectl_cp -n gpu-operator exec "$pod" -- nvidia-mig-parted export 2>&1 || true
+}
+
+start_capture mig
+
+section "Before: $node"
+show_node
+echo "### pods on $node asking for a GPU (must be none)"
+busy="$(kubectl_cp get pods -A --field-selector "spec.nodeName=$node,status.phase=Running" \
+  -o jsonpath='{range .items[*]}{.metadata.namespace}/{.metadata.name} {.spec.containers[*].resources.limits}{"\n"}{end}' \
+  | grep 'nvidia.com/' || true)"
+if [ -n "$busy" ]; then
+  echo "$busy"
+  die "pods still hold GPUs on $node; delete them (NVCRE, the gang) before MIG"
+fi
+echo "(none)"
+
+section "Label $node nvidia.com/mig.config=$MIG_CONFIG"
+labelled="$(date -u +%H:%M:%SZ)"
+kubectl_cp label node "$node" "nvidia.com/mig.config=$MIG_CONFIG" --overwrite
+echo "labelled at $labelled"
+
+section "Wait for the MIG manager (time box ${MIG_TIMEOUT}s)"
+# Watch the state change, printing each transition. The node already reads
+# success from all-disabled, so success only counts once the MIG manager has
+# set pending for the new config (reconfigure.go:158 at v0.15.1). If the
+# config was already applied it goes straight to success with no pending
+# (reconfigure.go:144); after 60 s of success the allocatable check below
+# decides.
+last=""
+saw_pending=""
+start="$(date +%s)"
+while :; do
+  state="$(node_label nvidia.com/mig.config.state)"
+  elapsed=$(($(date +%s) - start))
+  if [ "$state" != "$last" ]; then
+    echo "$(date -u +%H:%M:%SZ) +${elapsed}s mig.config.state=${state:-<none>}"
+    last="$state"
+  fi
+  case "$state" in
+    pending | rebooting) saw_pending=1 ;;
+    failed) break ;;
+    success)
+      if [ -n "$saw_pending" ] || [ "$elapsed" -ge 60 ]; then break; fi
+      ;;
+  esac
+  [ "$elapsed" -ge "$MIG_TIMEOUT" ] && break
+  sleep 5
+done
+
+if ! mig_state_is success; then
+  section "ABORT: MIG not applied (state=${last:-<none>})"
+  capture_mig_manager
+  show_node
+  echo "Cut per the run sheet; recorded as a finding. No reboot."
+  exit 1
+fi
+
+section "Device plugin advertises the slices"
+if ! wait_for "nvidia.com/mig-3g.71gb: 2 allocatable" 180 mig_allocatable_is 2; then
+  show_node
+  capture_mig_manager
+  echo "MIG applied but the slices are not advertised; cut."
+  exit 1
+fi
+show_node
+capture_mig_manager
+
+section "Tenants on their slices"
+kubectl_cp apply -f "$TENANTS"
+pod_running() { [ "$(kubectl_cp -n "$1" get pod "$2" -o jsonpath='{.status.phase}' 2>/dev/null)" = Running ]; }
+for pod in team-a/mig-a team-b/mig-b team-a/whole-a; do
+  ns="${pod%/*}" name="${pod#*/}"
+  wait_for "$pod running" 300 pod_running "$ns" "$name" || true
+done
+sleep 20
+kubectl_cp get pods -A -l app=mig-tenant -o wide
+for pod in team-a/mig-a team-b/mig-b team-a/whole-a; do
+  ns="${pod%/*}" name="${pod#*/}"
+  echo "### $pod: $(kubectl_cp -n "$ns" get pod "$name" -o jsonpath='{.spec.containers[0].resources.limits}')"
+  kubectl_cp -n "$ns" logs "$name" 2>&1 || true
+done
+kai_state team-a team-b
+
+if [ "${KEEP:-}" != "1" ]; then
+  section "Cleanup (MIG layout kept until teardown)"
+  kubectl_cp delete -f "$TENANTS" --ignore-not-found --wait=false
+fi
+
+section "Result"
+echo "MIG $MIG_CONFIG applied on $node; tenants placed by KAI"

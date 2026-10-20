@@ -1,0 +1,98 @@
+# W2 step 5 on fin, after nvidia.com/mig.config=h200-split reports success:
+# GPU0 is two 3g.71gb MIG instances, GPU1 is whole.
+#
+# One pod per team on its own slice, plus a whole-GPU pod for team-a on GPU1,
+# all placed by KAI through the teams' queues. Each prints the device it was
+# given (nvidia-smi -L shows the MIG UUID) and the memory CUDA sees, which on a
+# 3g.71gb slice is about 71 GB, not the H200's 141. Two tenants on one GPU, each
+# with its own memory, compute and fault domain: what Part 1's time slicing on
+# the L4 couldn't give.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mig-a
+  namespace: team-a
+  labels:
+    kai.scheduler/queue: team-a
+    app: mig-tenant
+spec:
+  schedulerName: kai-scheduler
+  priorityClassName: train
+  restartPolicy: Never
+  nodeSelector:
+    eu1.io/pool: gpu
+  containers:
+    - name: probe
+      image: pytorch/pytorch:2.11.0-cuda12.8-cudnn9-runtime@sha256:eee11b3b3872a8c838e35ef48f08b2d5def2080902c7f666831310ca1a0ef2be
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          nvidia-smi -L
+          python -c 'import torch; f, t = torch.cuda.mem_get_info(); print("cuda device:", torch.cuda.get_device_name(0), "total GiB:", round(t / 2**30, 1))'
+          sleep 900
+      env:
+        - name: NVIDIA_DRIVER_CAPABILITIES
+          value: compute,utility
+      resources:
+        limits:
+          nvidia.com/mig-3g.71gb: 1
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mig-b
+  namespace: team-b
+  labels:
+    kai.scheduler/queue: team-b
+    app: mig-tenant
+spec:
+  schedulerName: kai-scheduler
+  priorityClassName: train
+  restartPolicy: Never
+  nodeSelector:
+    eu1.io/pool: gpu
+  containers:
+    - name: probe
+      image: pytorch/pytorch:2.11.0-cuda12.8-cudnn9-runtime@sha256:eee11b3b3872a8c838e35ef48f08b2d5def2080902c7f666831310ca1a0ef2be
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          nvidia-smi -L
+          python -c 'import torch; f, t = torch.cuda.mem_get_info(); print("cuda device:", torch.cuda.get_device_name(0), "total GiB:", round(t / 2**30, 1))'
+          sleep 900
+      env:
+        - name: NVIDIA_DRIVER_CAPABILITIES
+          value: compute,utility
+      resources:
+        limits:
+          nvidia.com/mig-3g.71gb: 1
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: whole-a
+  namespace: team-a
+  labels:
+    kai.scheduler/queue: team-a
+    app: mig-tenant
+spec:
+  schedulerName: kai-scheduler
+  priorityClassName: train
+  restartPolicy: Never
+  nodeSelector:
+    eu1.io/pool: gpu
+  containers:
+    - name: probe
+      image: pytorch/pytorch:2.11.0-cuda12.8-cudnn9-runtime@sha256:eee11b3b3872a8c838e35ef48f08b2d5def2080902c7f666831310ca1a0ef2be
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          nvidia-smi -L
+          python -c 'import torch; f, t = torch.cuda.mem_get_info(); print("cuda device:", torch.cuda.get_device_name(0), "total GiB:", round(t / 2**30, 1))'
+          sleep 900
+      env:
+        - name: NVIDIA_DRIVER_CAPABILITIES
+          value: compute,utility
+      resources:
+        limits:
+          nvidia.com/gpu: 1
