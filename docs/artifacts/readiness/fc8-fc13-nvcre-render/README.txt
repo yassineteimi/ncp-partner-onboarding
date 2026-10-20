@@ -10,7 +10,8 @@
 # certification-fin: two Workflows (nccl-all-reduce, nccl-loopback-nvswitch);
 #   nvidia.com/gpu "2" per worker; NCCL_DEBUG=INFO and NCCL_DEBUG_SUBSYS=INIT,GRAPH
 #   passed to mpirun with -x; a toleration for eu1.io/staging:NoSchedule; the
-#   threshold busBandwidthGBps "value >= 64.0"; image nvcr.io/nvidia/pytorch:26.01-py3.
+#   threshold busBandwidthGBps "value >= 64.0"; image nvcr.io/nvidia/pytorch:26.01-py3
+#   pinned by digest (sha256:38ed2ecb...007e), as the DCGM 4.6.1 image is (sha256:48464e50...d7f2).
 #   The MPI workers install openssh-server with apt-get if the image has no
 #   /usr/sbin/sshd, which needs package mirror egress from the node.
 # certification-par: one Workflow, nvidia.com/gpu "1". nvcrectl warns:

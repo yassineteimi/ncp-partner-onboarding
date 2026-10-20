@@ -23,6 +23,13 @@ spec:
       - key: eu1.io/staging
         effect: NoSchedule
 
+  # The catalog's NCCL image, nvcr.io/nvidia/pytorch:26.01-py3, pinned by the
+  # index digest nvcr.io served on 20 October: the catalog names it by tag. It
+  # is built for driver 590.48.01 (CUDA 13.1.1), above fin's 580.178.04, so it
+  # runs there through CUDA forward compatibility. WORKLOAD_IMAGE overrides
+  # this at run time if that fails (see scripts/readiness/nvcre.sh).
+  image: nvcr.io/nvidia/pytorch:26.01-py3@sha256:38ed2ecb2c16d10677006d73fb0a150855d6ec81db8fc66e800b5ae92741007e
+
   # NVCRE assumes 8 GPUs per node for an H200 and would find no node able to
   # supply them (pkg/catalog/entries/_lib/gpu-defaults.yaml at v0.8.0). This
   # Verda type is a 2-GPU slice of an HGX board.

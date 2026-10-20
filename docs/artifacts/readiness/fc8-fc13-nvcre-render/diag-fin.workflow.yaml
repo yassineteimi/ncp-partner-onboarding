@@ -52,7 +52,7 @@ spec:
                         value: "0"
                       - name: NCCL_SOCKET_IFNAME
                         value: eth0
-                      image: nvcr.io/nvidia/cloud-native/dcgm:4.6.1-1-ubuntu24.04
+                      image: nvcr.io/nvidia/cloud-native/dcgm:4.6.1-1-ubuntu24.04@sha256:48464e50aa76671f5b204264cb4999739591112bf74330a727523f5655c6d7f2
                       name: node
                       resources:
                         limits:
@@ -111,7 +111,7 @@ spec:
             command:
             - /bin/bash
             - /config/diag.sh
-            image: nvcr.io/nvidia/cloud-native/dcgm:4.6.1-1-ubuntu24.04
+            image: nvcr.io/nvidia/cloud-native/dcgm:4.6.1-1-ubuntu24.04@sha256:48464e50aa76671f5b204264cb4999739591112bf74330a727523f5655c6d7f2
             numNodes: 1
             numProcPerNode: 2
   orchestration:

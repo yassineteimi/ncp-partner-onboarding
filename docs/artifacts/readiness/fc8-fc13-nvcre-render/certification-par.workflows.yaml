@@ -49,7 +49,7 @@ spec:
                       command:
                       - sh
                       - -c
-                      image: nvcr.io/nvidia/pytorch:26.01-py3
+                      image: nvcr.io/nvidia/pytorch:26.01-py3@sha256:38ed2ecb2c16d10677006d73fb0a150855d6ec81db8fc66e800b5ae92741007e
                       name: node
                       readinessProbe:
                         exec:
@@ -91,7 +91,7 @@ spec:
                 template:
                   spec:
                     containers:
-                    - image: nvcr.io/nvidia/pytorch:26.01-py3
+                    - image: nvcr.io/nvidia/pytorch:26.01-py3@sha256:38ed2ecb2c16d10677006d73fb0a150855d6ec81db8fc66e800b5ae92741007e
                       name: node
                       resources:
                         limits:
@@ -113,7 +113,7 @@ spec:
                       command:
                       - sh
                       - -c
-                      image: nvcr.io/nvidia/pytorch:26.01-py3
+                      image: nvcr.io/nvidia/pytorch:26.01-py3@sha256:38ed2ecb2c16d10677006d73fb0a150855d6ec81db8fc66e800b5ae92741007e
                       name: fix-ssh-permissions
                       volumeMounts:
                       - mountPath: /tmp/mpi-ssh-raw
@@ -193,7 +193,7 @@ spec:
             - timeout
             - "3600"
             - /usr/local/mpi/bin/mpirun
-            image: nvcr.io/nvidia/pytorch:26.01-py3
+            image: nvcr.io/nvidia/pytorch:26.01-py3@sha256:38ed2ecb2c16d10677006d73fb0a150855d6ec81db8fc66e800b5ae92741007e
             numNodes: 1
             numProcPerNode: 1
   orchestration:
