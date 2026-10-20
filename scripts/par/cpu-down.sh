@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 #
 # Power the par CPU worker off between uses. Drain it first, so the lanes'
-# pods stop cleanly and wait Pending for its return, then power it off.
+# pods stop cleanly and wait Pending for its return, remove its Node object,
+# then power it off.
 # Scaleway stops billing compute for a powered-off instance and keeps billing
 # its disk and IP, about 0.02 euros an hour.
 #
@@ -29,6 +30,14 @@ if [ -f "$KUBECONFIG_PATH" ] && kubectl_cp get node "$NAME" >/dev/null 2>&1; the
   # is still running when it gives up stops with the power.
   kubectl_cp drain "$NAME" --ignore-daemonsets --delete-emptydir-data --force --timeout=300s \
     || warn "drain did not finish cleanly, powering off anyway"
+
+  # A powered-off node left in the cluster keeps every DaemonSet at one pod
+  # short (flannel, kube-proxy, node-exporter), which holds the Applications
+  # that own them at Progressing until it returns. So the Node object goes.
+  # On power-on the kubelet still has its credentials on disk and registers
+  # the node again; cpu-up.sh puts its labels back.
+  log "deleting the node object; the kubelet registers it again on power-on"
+  kubectl_cp delete node "$NAME" --wait=false || warn "delete node failed, continuing"
 fi
 
 cat > "$CPU_TFVARS" <<TFVARS

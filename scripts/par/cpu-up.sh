@@ -21,6 +21,7 @@ CPU_TFVARS="$TF_DIR/cpu.auto.tfvars"
 CP_PUBLIC_IP="$(tf_output control_plane_public_ip)"
 [ -n "$CP_PUBLIC_IP" ] || die "no control plane in the Terraform state. Run make par-cluster first."
 
+EXISTED="$(tf_output cpu_worker_enabled)"
 STARTED="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 timeline_start "$ARTIFACTS/cpu-up-$(date -u +%Y%m%dT%H%M%SZ).txt"
 mark apply_started
@@ -42,14 +43,23 @@ IP="$(tf_output cpu_worker_public_ip)"
 
 session_open "$NAME" "$(tf_output cpu_worker_type)" "$PAR_CPU_HOURLY_EUR" EUR "$STARTED"
 
-if kubectl_cp get node "$NAME" >/dev/null 2>&1; then
-  log "$NAME is already a member of the cluster: waiting for it to come back Ready"
+# A new instance may get an address an older one had; a powered-on one keeps
+# its address and its host key.
+[ "$EXISTED" = "true" ] || forget_host "$IP"
+wait_for_ssh "$IP" 600
+
+if node_ssh "$IP" test -f /etc/kubernetes/kubelet.conf >/dev/null 2>&1; then
+  # Powered back on. cpu-down.sh deleted the Node object; the kubelet still
+  # has its credentials and registers the node again by itself.
+  log "$NAME was a member before its power-off: waiting for the kubelet to register it again"
+  deadline=$(( $(date +%s) + 600 ))
+  until kubectl_cp get node "$NAME" >/dev/null 2>&1; do
+    [ "$(date +%s)" -lt "$deadline" ] || die "$NAME did not register within 10 minutes"
+    sleep 5
+  done
   kubectl_cp wait --for=condition=Ready "node/$NAME" --timeout=600s
   mark node_ready
-  kubectl_cp uncordon "$NAME"
 else
-  forget_host "$IP"
-  wait_for_ssh "$IP" 600
   wait_for_bootstrap "$IP" 1800
   mark bootstrap_complete
 
@@ -64,7 +74,6 @@ else
   node_ssh "$IP" "$JOIN_COMMAND --node-name $NAME --cri-socket unix:///run/containerd/containerd.sock"
   kubectl_cp wait --for=condition=Ready "node/$NAME" --timeout=600s
   mark node_ready
-  kubectl_cp label node "$NAME" eu1.io/site=par eu1.io/pool=cpu --overwrite
 
   mkdir -p "$ARTIFACTS"
   {
@@ -73,6 +82,11 @@ else
   } > "$ARTIFACTS/cpu-worker-facts.txt"
   log "node facts, including whether /dev/kvm exists, saved to ${ARTIFACTS#"$REPO_ROOT"/}/cpu-worker-facts.txt"
 fi
+
+# Labels set with kubectl don't survive the Node object, so they are applied
+# on every power-on, and the node is schedulable again.
+kubectl_cp label node "$NAME" eu1.io/site=par eu1.io/pool=cpu --overwrite
+kubectl_cp uncordon "$NAME"
 
 kubectl_cp get nodes -o wide
 
