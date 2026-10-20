@@ -134,3 +134,91 @@ def test_unreadable_results_is_an_input_error(tmp_path):
 def test_bus_bandwidth_takes_the_highest_row():
     assert promote.bus_bandwidth(PASSED["categories"][0]) == 361.2
     assert promote.bus_bandwidth({"bandwidth": []}) is None
+
+
+# The cause on the last line decides what happens next in W2 (cos's run sheet):
+# hardware cuts the later steps, tooling allows a recorded override, unclear
+# goes to Yassine.
+
+def last_line(capsys):
+    return capsys.readouterr().out.strip().splitlines()[-1]
+
+
+def test_threshold_violation_is_hardware(tmp_path, capsys):
+    def slow(r):
+        r.update(result="FAILED")
+        r["categories"][0].update(status="Failed", failureReason="ThresholdViolation: busBandwidthGBps 41.2")
+        r["failedNodeDetails"] = [{"name": NODE, "reason": "ThresholdViolation", "message": "busBW 41.2 < 64"}]
+    assert run(tmp_path, broken(slow)) == 1
+    out = capsys.readouterr().out
+    assert f"FAIL [hardware] {NODE} failed, ThresholdViolation: busBW 41.2 < 64" in out
+    assert out.strip().endswith("cause=hardware")
+
+
+def test_launch_failure_is_tooling(tmp_path, capsys):
+    # The image can't start on driver 580: the run fails and nothing reaches NCCL.
+    def launch(r):
+        r.update(result="FAILED")
+        for c in r["categories"]:
+            c.update(status="Failed", failureReason="WorkloadFailed: CUDA driver version is insufficient",
+                     bandwidth=[])
+        r["failedNodeDetails"] = [{"name": NODE, "reason": "WorkloadFailed"}]
+    assert run(tmp_path, broken(launch), nccl="mpirun: exit 1\n") == 1
+    out = capsys.readouterr().out
+    assert "CUDA driver version is insufficient" in out
+    assert "FAIL [tooling] NCCL channels over NVLink: 0 lines" in out
+    assert out.strip().endswith("cause=tooling")
+
+
+def test_timeout_is_tooling(tmp_path, capsys):
+    assert run(tmp_path, broken(lambda r: r.update(result="RUNNING"))) == 1
+    assert last_line(capsys) == f"REFUSE {NODE} cause=tooling"
+
+
+def test_diag_fault_is_hardware(tmp_path, capsys):
+    diag = '{"name": "memory", "status": "Fail", "info": "DBE"}\ndcgmi_exit=226\ndiag_result=FAIL\n'
+    assert run(tmp_path, PASSED, diag=diag) == 1
+    out = capsys.readouterr().out
+    assert '"status": "Fail"' in out
+    assert out.strip().endswith("cause=hardware")
+
+
+def test_diag_that_never_answered_is_tooling(tmp_path, capsys):
+    assert run(tmp_path, PASSED, diag="Error: unable to connect to host engine\n") == 1
+    out = capsys.readouterr().out
+    assert "unable to connect to host engine" in out
+    assert out.strip().endswith("cause=tooling")
+
+
+NET_CHANNEL = "Channel 02/0 : 0[0] -> 1[1] via NET/Socket/0\n"
+
+
+def test_traffic_over_the_network_with_a_clean_diag_is_unclear(tmp_path, capsys):
+    # Inside one node this is as likely P2P disabled, the VM's topology or no
+    # fabric manager in the guest as a broken link: Yassine decides.
+    assert run(tmp_path, PASSED, nccl=NCCL_NVLINK + NET_CHANNEL) == 1
+    assert last_line(capsys) == f"REFUSE {NODE} cause=unclear"
+
+
+def test_traffic_over_the_network_with_a_failed_diag_is_hardware(tmp_path, capsys):
+    diag = '{"name": "nvlink", "status": "Fail"}\ndiag_result=FAIL\n'
+    assert run(tmp_path, PASSED, diag=diag, nccl=NCCL_NVLINK + NET_CHANNEL) == 1
+    assert last_line(capsys) == f"REFUSE {NODE} cause=hardware"
+
+
+def test_no_nvlink_after_a_successful_run_is_unclear(tmp_path, capsys):
+    assert run(tmp_path, PASSED, nccl="NCCL INFO comm 0x1 rank 0 nranks 2\n") == 1
+    assert last_line(capsys) == f"REFUSE {NODE} cause=unclear"
+
+
+def test_hardware_and_tooling_together_is_unclear(tmp_path, capsys):
+    assert run(tmp_path, broken(lambda r: r.update(result="INCOMPLETE")),
+               diag="dcgmi_exit=226\ndiag_result=FAIL\n") == 1
+    assert last_line(capsys) == f"REFUSE {NODE} cause=unclear"
+
+
+def test_unreadable_inputs_say_tooling(tmp_path, capsys):
+    (tmp_path / "results.json").write_text("{not json")
+    assert promote.main(["--node", NODE, "--results", str(tmp_path / "results.json"),
+                         "--require", *REQUIRED]) == 2
+    assert last_line(capsys) == f"REFUSE {NODE} cause=tooling"

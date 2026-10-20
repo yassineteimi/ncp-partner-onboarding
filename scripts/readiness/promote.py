@@ -11,6 +11,14 @@ scripts/readiness/nvcre.sh removes the taint on exit 0 and leaves it otherwise.
 
 Exit codes: 0 promote, 1 refuse, 2 the inputs couldn't be read.
 
+Every failed check says whether it points at the hardware or at the tooling,
+and the last line gives the cause of a refusal, for the W2 rule: hardware
+(a node failure NVCRE detected, a threshold violated, a diagnostic test
+failed) cuts the later steps; tooling (the run didn't finish, a launch
+failed, the diagnostic never answered) allows a recorded override; NCCL off
+NVLink inside the node with a clean diagnostic, or hardware and tooling at
+once, is unclear and goes to Yassine.
+
 Refused when any of these holds:
   - result is anything but PASSED (INCOMPLETE means some target node went
     untested; RUNNING means the run isn't over)
@@ -29,6 +37,7 @@ import sys
 from pathlib import Path
 
 GBPS = re.compile(r"([0-9.]+)\s*GB/s")
+HARDWARE_REASONS = ("HardwareFailureDetected", "ThresholdViolation")
 
 
 def bus_bandwidth(category):
@@ -38,56 +47,83 @@ def bus_bandwidth(category):
     return max(values) if values else None
 
 
+def finding(passed, text, cause=None):
+    """One check: whether it passed and, for a failure, hardware or tooling."""
+    return passed, (None if passed else cause), text
+
+
 def check_results(results, node, required):
     out = []
-    ok = True
+    details = [d for d in results.get("failedNodeDetails") or [] if d.get("name") == node]
+    hardware = [d for d in details if d.get("reason") in HARDWARE_REASONS]
 
-    def verdict(passed, text):
-        nonlocal ok
-        ok &= passed
-        out.append(f"{'PASS' if passed else 'FAIL'} {text}")
-
-    verdict(results.get("result") == "PASSED", f"certification result is {results.get('result')!r}")
+    result = results.get("result")
+    out.append(finding(result == "PASSED", f"certification result is {result!r}",
+                       "hardware" if hardware else "tooling"))
     excluded = results.get("excludedNodes") or []
-    verdict(node not in excluded,
-            f"{node} not excluded" + (f" (excluded: {results.get('exclusionReason')})" if node in excluded else ""))
-    failed = set(results.get("failedNodes") or []) | {
-        d.get("name") for d in results.get("failedNodeDetails") or []}
-    verdict(node not in failed, f"{node} not among failed nodes {sorted(failed - {None}) or '[]'}")
+    out.append(finding(node not in excluded, f"{node} not excluded" + (
+        f" (excluded: {results.get('exclusionReason')})" if node in excluded else ""), "tooling"))
+    for d in details:
+        cause = "hardware" if d.get("reason") in HARDWARE_REASONS else "tooling"
+        message = f": {d['message']}" if d.get("message") else ""
+        out.append(finding(False, f"{node} failed, {d.get('reason')}{message}", cause))
+    if node in (results.get("failedNodes") or []) and not details:
+        out.append(finding(False, f"{node} is among failed nodes, with no detail", "tooling"))
     tested = {n.get("name") for n in results.get("nodeResults") or []}
     if tested:
-        verdict(node in tested, f"{node} is in the run's node results")
+        out.append(finding(node in tested, f"{node} is in the run's node results", "tooling"))
 
     categories = {f"{c.get('domain')}/{c.get('variant')}": c for c in results.get("categories") or []}
     for name in required:
         c = categories.get(name)
         if c is None:
-            verdict(False, f"{name} missing from the results")
+            out.append(finding(False, f"{name} missing from the results", "tooling"))
             continue
         bw = bus_bandwidth(c)
         detail = f", max busBW {bw:.2f} GB/s" if bw is not None else ""
-        reason = f" ({c.get('failureReason')})" if c.get("failureReason") else ""
-        verdict(c.get("status") == "Succeeded", f"{name} {c.get('status')}{detail}{reason}")
+        reason = c.get("failureReason") or ""
+        cause = "hardware" if any(r in reason for r in ("Threshold", "HardwareFailure")) else "tooling"
+        out.append(finding(c.get("status") == "Succeeded",
+                           f"{name} {c.get('status')}{detail}" + (f": {reason}" if reason else ""), cause))
         provisional = [r.get("size") for r in c.get("bandwidth") or [] if r.get("provisional")]
         if provisional:
-            verdict(False, f"{name} has provisional bandwidth rows {provisional}")
-    return ok, out
+            out.append(finding(False, f"{name} has provisional bandwidth rows {provisional}", "tooling"))
+    return out
 
 
 def check_diag(text):
     if re.search(r"^diag_result=FAIL", text, re.M):
-        return False, ["FAIL dcgmi diag reported a failed test"]
+        failing = [line.strip() for line in text.splitlines() if re.search(r'"Fail', line)][:3]
+        shown = f": {' | '.join(failing)}" if failing else ""
+        return [finding(False, f"dcgmi diag reported a failed test{shown}", "hardware")]
     if re.search(r"^diag_result=PASS", text, re.M):
-        return True, ["PASS dcgmi diag passed"]
-    return False, ["FAIL no diag_result line in the diagnostic log"]
+        return [finding(True, "dcgmi diag passed")]
+    last = next((line.strip() for line in reversed(text.splitlines()) if line.strip()), "empty log")
+    return [finding(False, f"the diagnostic never gave a verdict: {last[:200]}", "tooling")]
 
 
-def check_nccl(text):
+def check_nccl(text, ran, link_fault):
+    """ran: the NCCL categories succeeded, so a missing NVLink line says
+    something about the path and not only that the test never started.
+
+    Inside one node, traffic over the network or no NVLink channel is as
+    likely a configuration or topology problem (P2P disabled, the VM's
+    topology, no fabric manager in the guest) as a broken link, so it is
+    unclear, and goes to Yassine, unless the diagnostic also failed
+    (link_fault), which makes it hardware."""
+    path = "hardware" if link_fault else "unclear"
     net = len(re.findall(r"via NET/", text))
     nvlink = len(re.findall(r"via P2P/|NVLS", text))
-    lines = [f"{'PASS' if nvlink else 'FAIL'} NCCL channels over NVLink: {nvlink} lines",
-             f"{'PASS' if not net else 'FAIL'} NCCL channels over the network: {net} lines"]
-    return bool(nvlink) and not net, lines
+    return [finding(bool(nvlink), f"NCCL channels over NVLink: {nvlink} lines", path if ran else "tooling"),
+            finding(not net, f"NCCL channels over the network: {net} lines", path)]
+
+
+def verdict(findings):
+    """None to promote, else the cause of the refusal."""
+    causes = {cause for passed, cause, _ in findings if not passed}
+    if not causes:
+        return None
+    return causes.pop() if len(causes) == 1 else "unclear"
 
 
 def main(argv=None):
@@ -104,18 +140,24 @@ def main(argv=None):
         diag = a.diag.read_text() if a.diag else None
         nccl = a.nccl_log.read_text() if a.nccl_log else None
     except (OSError, ValueError) as e:
-        print(f"ERROR cannot read the inputs: {e}")
+        print(f"ERROR [tooling] cannot read the inputs: {e}")
+        print(f"REFUSE {a.node} cause=tooling")
         return 2
 
-    ok, lines = check_results(results, a.node, a.require)
-    for given, check in ((diag, check_diag), (nccl, check_nccl)):
-        if given is not None:
-            passed, more = check(given)
-            ok &= passed
-            lines += more
-    print("\n".join(lines))
-    print(f"{'PROMOTE' if ok else 'REFUSE'} {a.node}")
-    return 0 if ok else 1
+    findings = check_results(results, a.node, a.require)
+    if diag is not None:
+        findings += check_diag(diag)
+    if nccl is not None:
+        ran = all(c.get("status") == "Succeeded" for c in results.get("categories") or []
+                  if c.get("domain") == "communication")
+        link_fault = any(not passed and cause == "hardware" and text.startswith("dcgmi diag")
+                         for passed, cause, text in findings)
+        findings += check_nccl(nccl, ran, link_fault)
+    for passed, cause, text in findings:
+        print(f"PASS {text}" if passed else f"FAIL [{cause}] {text}")
+    cause = verdict(findings)
+    print(f"PROMOTE {a.node}" if cause is None else f"REFUSE {a.node} cause={cause}")
+    return 0 if cause is None else 1
 
 
 if __name__ == "__main__":
