@@ -1,0 +1,5 @@
+# KAI on fin: on the CPU node (pool control, 8 vCPU, untainted at join) and off
+# the H200 node, whose CPUs are for the workloads KAI places there.
+global:
+  nodeSelector:
+    eu1.io/pool: control

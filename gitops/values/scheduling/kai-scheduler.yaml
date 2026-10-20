@@ -1,0 +1,32 @@
+# KAI Scheduler v0.18.6 on both sites (use case 4). Site files follow:
+# kai-scheduler-par.yaml and kai-scheduler-fin.yaml.
+#
+# The chart renders only the operator, the CRDs and the kai-config Config. The
+# operator creates the scheduler, binder, admission webhooks, pod grouper and
+# queue controller from that Config, with self-signed webhook certificates of
+# its own, so nothing here regenerates a secret on each render (Part 1 rule 5).
+# The chart's remaining lookup calls are on a Namespace, a ServiceAccount and
+# an OpenShift CRD. Offline they return nothing, so the render is stable.
+
+# GitOps mode, from docs/gitops/README.md at v0.18.6: the Config is a regular
+# chart resource that ArgoCD tracks and heals, not something a post-install hook
+# applies out of band. Its health comes from the argocd-cm check cos added from
+# the same file.
+kaiConfig:
+  render: true
+kaiConfigDeployer:
+  enabled: false
+
+# Copies Kueue Topology objects into KAI ones. There is no Kueue here, and ArgoCD
+# would run this pre-install hook Job before every sync.
+topologyMigration:
+  enabled: false
+
+# A post-delete hook Job. Pruning the Application already removes what it
+# deletes, and AICR v1.1.0 turns it off for the same reason.
+postCleanup:
+  enabled: false
+
+# The chart's crd-upgrader pre-upgrade hook has no switch. ArgoCD runs it as a
+# PreSync Job on every sync, with global.nodeSelector, so with par's CPU worker
+# off a sync of this Application waits on that Job. It needs the worker anyway.

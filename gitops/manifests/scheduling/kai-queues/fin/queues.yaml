@@ -1,0 +1,84 @@
+# KAI queues on fin: two tenants share the real 2x H200 node.
+#
+# One GPU guaranteed each (quota 1) and no cap (limit -1), so team-a's
+# two-pod gang in W2 step 4 borrows team-b's idle GPU. After MIG in step 5,
+# GPU0 becomes two 3g.71gb slices and each team runs a pod on its own slice.
+# KAI counts a MIG slice from its resource name, nvidia.com/mig-<g>g.<mem>gb
+# (pkg/scheduler/api/common_info/resources/mig.go at v0.18.6), so both slices
+# fit inside the quotas. Only GPUs count; CPU and memory are unlimited, as
+# on par.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: team-a
+  labels:
+    eu1.io/tenant: "true"
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: team-b
+  labels:
+    eu1.io/tenant: "true"
+---
+apiVersion: scheduling.run.ai/v2
+kind: Queue
+metadata:
+  name: eu1
+spec:
+  displayName: EU1 training pool (fin)
+  resources:
+    gpu:
+      quota: 2
+      limit: -1
+      overQuotaWeight: 1
+    cpu:
+      quota: -1
+      limit: -1
+      overQuotaWeight: 1
+    memory:
+      quota: -1
+      limit: -1
+      overQuotaWeight: 1
+---
+apiVersion: scheduling.run.ai/v2
+kind: Queue
+metadata:
+  name: team-a
+spec:
+  displayName: Team A
+  parentQueue: eu1
+  resources:
+    gpu:
+      quota: 1
+      limit: -1
+      overQuotaWeight: 1
+    cpu:
+      quota: -1
+      limit: -1
+      overQuotaWeight: 1
+    memory:
+      quota: -1
+      limit: -1
+      overQuotaWeight: 1
+---
+apiVersion: scheduling.run.ai/v2
+kind: Queue
+metadata:
+  name: team-b
+spec:
+  displayName: Team B
+  parentQueue: eu1
+  resources:
+    gpu:
+      quota: 1
+      limit: -1
+      overQuotaWeight: 1
+    cpu:
+      quota: -1
+      limit: -1
+      overQuotaWeight: 1
+    memory:
+      quota: -1
+      limit: -1
+      overQuotaWeight: 1
