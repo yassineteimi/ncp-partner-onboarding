@@ -54,6 +54,102 @@ configs:
       end
       return hs
 
+    # Health for KAI Scheduler's Config and SchedulingShard (use case 4),
+    # verbatim from kai-scheduler/KAI-Scheduler v0.18.6 (commit 279f61c6),
+    # docs/gitops/README.md, "ArgoCD health check"; the same file says
+    # SchedulingShard reports the same conditions, so it gets the same block.
+    # Healthy only when Deployed, Available and DependenciesFulfilled are True
+    # for the current generation; Degraded when DependenciesFulfilled is False.
+    resource.customizations.health.kai.scheduler_Config: |
+      local hs = {}
+      hs.status = "Progressing"
+      hs.message = "Waiting for the KAI operator to reconcile the resource"
+
+      if obj.status == nil or obj.status.conditions == nil then
+        return hs
+      end
+
+      local generation = obj.metadata.generation
+      local byType = {}
+      for _, condition in ipairs(obj.status.conditions) do
+        byType[condition.type] = condition
+      end
+
+      -- DependenciesFulfilled=False (reason dependencies_missing) is the only
+      -- condition that means a real, user-actionable dependency is absent, so map
+      -- it to Degraded. Deployed=False and Available=False are normal transient
+      -- states while pods roll out, so they stay Progressing.
+      local deps = byType["DependenciesFulfilled"]
+      if deps ~= nil and deps.observedGeneration == generation and deps.status == "False" then
+        hs.status = "Degraded"
+        hs.message = "DependenciesFulfilled: " .. (deps.message or deps.reason or "dependencies are missing")
+        return hs
+      end
+
+      local required = {"Deployed", "Available", "DependenciesFulfilled"}
+      for _, name in ipairs(required) do
+        local condition = byType[name]
+        if condition == nil or condition.observedGeneration ~= generation then
+          hs.status = "Progressing"
+          hs.message = name .. " has not been observed for the current generation"
+          return hs
+        end
+        if condition.status ~= "True" then
+          hs.status = "Progressing"
+          hs.message = name .. " is " .. tostring(condition.status)
+          return hs
+        end
+      end
+
+      hs.status = "Healthy"
+      hs.message = "KAI resource reconciled for the current generation"
+      return hs
+
+    resource.customizations.health.kai.scheduler_SchedulingShard: |
+      local hs = {}
+      hs.status = "Progressing"
+      hs.message = "Waiting for the KAI operator to reconcile the resource"
+
+      if obj.status == nil or obj.status.conditions == nil then
+        return hs
+      end
+
+      local generation = obj.metadata.generation
+      local byType = {}
+      for _, condition in ipairs(obj.status.conditions) do
+        byType[condition.type] = condition
+      end
+
+      -- DependenciesFulfilled=False (reason dependencies_missing) is the only
+      -- condition that means a real, user-actionable dependency is absent, so map
+      -- it to Degraded. Deployed=False and Available=False are normal transient
+      -- states while pods roll out, so they stay Progressing.
+      local deps = byType["DependenciesFulfilled"]
+      if deps ~= nil and deps.observedGeneration == generation and deps.status == "False" then
+        hs.status = "Degraded"
+        hs.message = "DependenciesFulfilled: " .. (deps.message or deps.reason or "dependencies are missing")
+        return hs
+      end
+
+      local required = {"Deployed", "Available", "DependenciesFulfilled"}
+      for _, name in ipairs(required) do
+        local condition = byType[name]
+        if condition == nil or condition.observedGeneration ~= generation then
+          hs.status = "Progressing"
+          hs.message = name .. " has not been observed for the current generation"
+          return hs
+        end
+        if condition.status ~= "True" then
+          hs.status = "Progressing"
+          hs.message = name .. " is " .. tostring(condition.status)
+          return hs
+        end
+      end
+
+      hs.status = "Healthy"
+      hs.message = "KAI resource reconciled for the current generation"
+      return hs
+
 controller:
   replicas: 1
 
