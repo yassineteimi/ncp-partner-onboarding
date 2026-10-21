@@ -23,3 +23,15 @@ Things that didn't behave the way the documentation or my first assumption said,
 ## Scaleway
 
 - **PLAY2-MICRO costs €0.055 an hour, not "about 4 cents".** Part 1's prerequisites page carried the lower figure, and my first budget for this project used it. Scaleway's API read 0.05508 in fr-par-1 and fr-par-2 on 20 October ([prices](artifacts/par/scaleway-prices-20261020.json)). With its 80 GB disk the always-on control plane comes to about €0.065 an hour, or €11 a week.
+
+## NVSentinel, NVCRE and AICR
+
+- **NVSentinel's syslog monitor never sees Part 1's simulated XID line.** It reads journald, and journald takes `NVRM:` from a userspace `/dev/kmsg` write as the syslog identifier and strips it from the message. A real driver XID, written by the kernel, isn't affected. Shown on systemd 255 (`fc2-journald-*.txt` in the readiness evidence); an `[uptime]` prefix fixes it, as NVSentinel's own acceptance tests do.
+- **Four NVSentinel v1.28.0 defaults would have stopped use case 3.** Drain mode `AllowCompletion` never evicts; the janitor's provider defaults to `kind`, which fakes the reboot; the circuit breaker trips on the first cordon in a cluster with one GPU node and then blocks the uncordon; and the chart in Git uses image tag `main`, so only the OCI chart is pinned.
+- **NVCRE v0.8.0 assumes 8 GPUs per H200 node.** It falls back to 4 for a GPU it doesn't know, like the L4, so a 2-GPU H200 node is dropped unless `gpusPerNode` is set. It ships no thresholds, so PASSED means "ran" until you add one. Its only DCGM category is level 4, about 90 minutes. The docs say the controller needs a node without GPUs; the chart doesn't enforce it.
+- **NVCRE's NCCL image is built for a newer driver than fin's.** `pytorch:26.01-py3` targets driver 590.48.01, and Verda's image ships 580.178.04, so on the H200 it can only run through CUDA forward compatibility. `pytorch:25.11-py3`, built for 580, is the fallback (`fc11-pytorch-images.txt`).
+- **AICR v1.1.0 has no recipe for the stack I run.** `kubeadm` and the L4 are rejected as invalid values; `metal3`, `generic`, `kind` and `bcm` have no H200 Ubuntu training recipe. Every recipe constrains Ubuntu to 24.04, while fin's image is 26.04. Its Kubeflow recipe pins Trainer 2.2.0 in namespace `kubeflow`, where NVCRE v0.8.0 needs 2.2.1 in `kubeflow-system`, and it pins cert-manager 1.20.2, below the 1.21 floor in NVSentinel v1.28.0's README.
+
+## Thanos
+
+- **kube-prometheus-stack 91.4.1 rewrites the Thanos sidecar's bucket config.** It keeps only `existingSecret.name` and `key` (or its own inline secret) from `prometheusSpec.thanos.objectStorageConfig` and silently drops anything else, `optional` included (`templates/prometheus/prometheus.yaml` at 91.4.1). ws-platform's first overlay rendered with no bucket at all, and only the render check caught it. Without `optional`, par's Prometheus can't start until the Secret exists, so the Secret is now written at sync wave -1 instead of with Garage at wave 5.
