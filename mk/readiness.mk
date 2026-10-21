@@ -105,3 +105,15 @@ readiness-tidy: ## readiness: before committing window evidence, write em dashes
 	./scripts/readiness/tidy-evidence.sh
 
 .PHONY: readiness-tidy
+
+aicr-snapshot: $(READINESS_BIN)/aicr ## readiness: AICR snapshot of a site (SITE=par|fin), privileged agent Job
+	SITE=$(or $(SITE),par) ./scripts/readiness/aicr.sh snapshot
+
+aicr-validate: $(READINESS_BIN)/aicr ## readiness: validate the newest snapshot against the H200 reference recipe, deployment phase (SITE=)
+	SITE=$(or $(SITE),fin) ./scripts/readiness/aicr.sh snapshot
+	SITE=$(or $(SITE),fin) ./scripts/readiness/aicr.sh validate
+
+aicr-drift: $(READINESS_BIN)/aicr ## readiness: aicr diff of the two newest snapshots of a site (SITE=)
+	SITE=$(or $(SITE),par) ./scripts/readiness/aicr.sh diff
+
+.PHONY: aicr-snapshot aicr-validate aicr-drift
