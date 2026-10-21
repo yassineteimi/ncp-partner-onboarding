@@ -31,7 +31,11 @@ split="$("$PYTHON" -I "$REPO_ROOT/scripts/readiness/dryrun_split.py" "$WORK/api-
 results=""
 failed=0
 for f in "$WORK"/par-*.yaml; do
-  if out="$(kubectl_cp apply --dry-run=server --server-side --field-manager=readiness-dryrun -n default -f "$f" 2>&1)"; then
+  # --force-conflicts: once Argo CD has deployed these objects it owns their
+  # fields, and server-side apply reports every one as a conflict with
+  # argocd-controller before checking anything else. A dry run persists
+  # nothing, so taking ownership for the check is harmless.
+  if out="$(kubectl_cp apply --dry-run=server --server-side --force-conflicts --field-manager=readiness-dryrun -n default -f "$f" 2>&1)"; then
     results+="$(basename "$f" .yaml): $(grep -c 'server dry run' <<<"$out") objects accepted"$'\n'
   else
     failed=1
