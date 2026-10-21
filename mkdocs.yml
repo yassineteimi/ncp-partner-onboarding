@@ -74,6 +74,7 @@ nav:
   - Decisions:
       - "All decisions": adr/README.md
       - "0009: Metrics across sites": adr/0009-metrics-across-sites.md
+      - "0010: VM tenants": adr/0010-vm-tenants.md
   - Findings: findings.md
 
 copyright: |
