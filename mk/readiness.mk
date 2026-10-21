@@ -100,3 +100,8 @@ fc12:          ## readiness: FC12 checks on par after a merge (LABEL=after-3|aft
 	./scripts/readiness/fc12.sh $(or $(LABEL),check)
 
 .PHONY: fc12
+
+readiness-tidy: ## readiness: before committing window evidence, write em dashes in docs/artifacts/readiness as -- (CI lint)
+	./scripts/readiness/tidy-evidence.sh
+
+.PHONY: readiness-tidy

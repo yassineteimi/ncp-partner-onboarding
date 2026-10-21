@@ -120,7 +120,7 @@ yaml.safe_dump(d, open(sys.argv[3], "w"), sort_keys=False)' "$cert" "$WORKLOAD_I
     set +e
     "$NVCRECTL" certification run --kubeconfig "$KUBECONFIG_PATH" -n "$RUNS_NS" --cert-file "$cert" \
       --name "$name" --wait --timeout "${TIMEOUT:-20m}" --results-file "$OUT/nvcre-$SITE-$ts.json" \
-      2>&1 | tee "$OUT/nvcre-$SITE-$ts-report.txt"
+      2>&1 | perl -CSD -pe 's/\x{2014}/--/g' | tee "$OUT/nvcre-$SITE-$ts-report.txt"
     rc=${PIPESTATUS[0]}
     set -e
     echo "certify_ended=$(now) name=$name exit=$rc" | tee -a "$OUT/nvcre-$SITE-timeline.txt"
