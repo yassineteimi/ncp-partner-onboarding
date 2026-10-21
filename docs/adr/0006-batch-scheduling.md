@@ -48,6 +48,6 @@ What would change the answer:
 - Free checks: [renders, digests, dry run on par](../artifacts/scheduling/free-checks-20261020T232008Z.txt); KAI's chart generates no secret at render time, and every KAI pod lands on the site's pool.
 - KAI's `SUPPORT.md` on main, read 21 October (support dates and the Kubernetes matrix for v0.16 to v0.18; the copy at v0.18.6 stops at v0.17).
 - Source at v0.18.6: `docs/queues/README.md`, `docs/batch/README.md`, `docs/gitops/README.md`, `pkg/scheduler/api/common_info/resources/mig.go`, `pkg/operator/operands/admission/resources.go`. AICR v1.1.0: `docs/user/component-version-matrix.md`, `recipes/overlays/base.yaml`. Kueue's README at v0.20.2 ("All-or-nothing with ready Pods"). Volcano's README and `docs/user-guide/how_to_use_volcano_vgpu.md` at v1.16.0.
-- Planned, not run yet:
-  - par, simulated: burst, reclaim, and a gang of 6 that binds nothing with 4 GPUs free (`make sched-sim-demo`, Wednesday's worker window)
-  - fin, real H200s: the two-pod gang with NCCL between the pods, and a gang of 3 that stays Pending on 2 GPUs (W2 step 4)
+- par, simulated, 21 October ([capture](../artifacts/scheduling/sim-demo-par-20261021T112733Z.txt)): `team-a` borrowed 4 GPUs over its quota; `team-b`'s gang of 4 made KAI evict exactly those 4 and bind all 4 gang pods 2 seconds later; a gang of 6 with 4 GPUs free bound nothing, with KAI's reason on the PodGroup.
+- par, CPU worker, 21 October ([capture](../artifacts/scheduling/gang-par-20261021T113004Z.txt)): the two-pod gang with real containers, bound in the same second, all-reduce over gloo completed.
+- Planned: fin, real H200s, the two-pod gang with NCCL between the pods, and a gang of 3 that stays Pending on 2 GPUs (W2 step 4).

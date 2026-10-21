@@ -64,7 +64,8 @@ spec:
   containers:
     - name: check
       image: $MIG_MANAGER_IMAGE
-      command: ["/busybox", "sh", "-c"]
+      # The image has no /bin/sh; busybox and its applets live in /busybox/.
+      command: ["/busybox/sh", "-c"]
       args:
         - |
           nvidia-mig-parted --version
@@ -95,5 +96,8 @@ phase="$(kubectl_cp -n "$NS" get pod mig-config-check -o jsonpath='{.status.phas
 
 section "Result"
 echo "pod phase: $phase"
+# A container that never started has no log; its termination message says why.
+kubectl_cp -n "$NS" get pod mig-config-check \
+  -o jsonpath='{.status.containerStatuses[0].state.terminated.message}{"\n"}' 2>/dev/null || true
 [ "$phase" = Succeeded ] || exit 1
 echo "fin's MIG config parses with mig-parted v0.15.1; both configs selectable"

@@ -1,0 +1,34 @@
+# mig-config on par, 20261021T113350Z, laptop clock, UTC. git a5ea577
+
+## Render fin's GPU Operator values and extract the MIG config   [11:33:50Z]
+version: v1
+mig-configs:
+  all-disabled:
+    - devices: all
+      mig-enabled: false
+  h200-split:
+    - devices: [0]
+      mig-enabled: true
+      mig-devices:
+        "3g.71gb": 2
+    - devices: [1]
+      mig-enabled: false
+
+## Run mig-parted's loader on the CPU worker   [11:33:52Z]
+configmap/mig-config-check configured
+pod/mig-config-check created
+after 6s: the check pod finished
+nvidia-mig-parted version a24171d5
+commit: a24171d5bed3ae2a907782b88f4782f6ad53d6e2
+== all-disabled
+Selected MIG configuration is valid
+== h200-split
+Selected MIG configuration is valid
+== a config that isn't in the file must fail
+time="2026-10-21T11:33:54Z" level=fatal msg="Error selecting MIG config: selected mig-config not present: does-not-exist"
+refused as expected
+
+## Result   [11:34:00Z]
+pod phase: Succeeded
+
+fin's MIG config parses with mig-parted v0.15.1; both configs selectable
