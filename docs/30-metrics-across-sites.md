@@ -3,9 +3,7 @@
 !!! abstract "The use case"
     EU1 has a permanent site, par, and a site that only exists while a GPU window is
     paid for, fin. The partner wants one place to query every GPU of both sites, and
-    fin's metrics have to stay queryable after fin is deleted. In the first interview an
-    NVIDIA architect named Thanos as how they think about observability at thousands of
-    GPUs. Here fin writes to Thanos Receive on par, par keeps its own Prometheus with a
+    fin's metrics have to stay queryable after fin is deleted. Here fin writes to Thanos Receive on par, par keeps its own Prometheus with a
     sidecar, and one Thanos Query reads both and the bucket. The design and its
     alternatives (Mimir, VictoriaMetrics) are in [ADR 0009](adr/0009-metrics-across-sites.md).
 

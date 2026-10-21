@@ -9,7 +9,7 @@ EU1 has a permanent site, par, and a site that only exists while a GPU window is
 
 Two facts narrow the choice before any product comparison: fin opens no port to par (its firewall allows SSH and the Kubernetes API from admin ranges only), and par can't query a site that no longer exists. Whatever carries fin's metrics has to push them out of fin, while the window is still running.
 
-I started from Thanos because an NVIDIA architect named it as how they think about observability at thousands of GPUs. Mimir and VictoriaMetrics answer the same question, so they're in the table too.
+Thanos was the starting point. Mimir and VictoriaMetrics answer the same question, so they're in the table too.
 
 ## Options considered
 
