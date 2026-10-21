@@ -127,6 +127,12 @@ nodesets:
     enabled: true
     replicas: 2
     oversubscribeNode: true
+    # Under the default RollingUpdate, Slinky 1.2.3 drains the Slurm node of a
+    # pod annotated nodeset.slinky.slurm.net/pod-cordon=true, then uncordons
+    # the pod in the same reconcile (upstream PR #271). Under OnDelete the
+    # cordon holds. The cost: slurmd pods take a new image only when deleted.
+    updateStrategy:
+      type: OnDelete
     partition:
       enabled: true
       configMap:

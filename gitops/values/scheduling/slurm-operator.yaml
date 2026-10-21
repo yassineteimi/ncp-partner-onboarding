@@ -23,6 +23,10 @@ operator:
     requests:
       cpu: 100m
       memory: 128Mi
+  # One replica, so there is no other instance to elect against. With it on,
+  # a lease renewal slower than 5 s made the operator exit ("leader election
+  # lost") four times in its first 22 minutes on par.
+  leaderElection: false
 
 webhook:
   image:
@@ -34,6 +38,8 @@ webhook:
     requests:
       cpu: 50m
       memory: 64Mi
+  # One replica too; same reason as the operator's.
+  leaderElection: false
 
 certManager:
   enabled: true
