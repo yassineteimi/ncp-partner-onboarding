@@ -31,6 +31,19 @@ gpu_node() {
   echo "$node"
 }
 
+# Every restarted container in the lane's namespaces, with its last exit.
+# Counts above zero before the run aren't the run's: by 21 October par's
+# controllers had restarted 8 to 10 times each, last when the API server
+# stalled at 12:07 UTC. The exit times say which restarts happened during it.
+restarts() {
+  local ns
+  for ns in nvsentinel nvcre kubeflow-system; do
+    kubectl_cp -n "$ns" get pods -o json | jq -r --arg ns "$ns" '.items[] | .metadata.name as $p
+      | .status.containerStatuses[]? | select(.restartCount > 0)
+      | "\($ns)/\($p) \(.name) restarts=\(.restartCount) last_exit=\(.lastState.terminated.finishedAt // "-") \(.lastState.terminated.reason // "")"'
+  done
+}
+
 # Offset of a machine's clock from this laptop's, in seconds: its clock read
 # over SSH, against the middle of the round trip. Printed with the round trip,
 # which bounds the error.
@@ -52,6 +65,8 @@ case "${1:-}" in
       kubectl_cp get node "$node" -o json | jq -r '.metadata.labels | to_entries[] | select(.key | test("nvsentinel")) | "\(.key)=\(.value)"'
       echo "== NVSentinel pods"
       kubectl_cp -n nvsentinel get pods -o wide
+      echo "== restarts so far (the baseline for capture)"
+      restarts
       echo "== node conditions"
       kubectl_cp get node "$node" -o json | jq -r '.status.conditions[] | "\(.type)=\(.status) \(.reason // "") \(.lastTransitionTime)"'
       echo "== circuit breaker"
@@ -107,6 +122,8 @@ case "${1:-}" in
       kubectl_cp -n nvsentinel get jobs -o wide
       echo "== NVSentinel pods"
       kubectl_cp -n nvsentinel get pods -o wide
+      echo "== restarts (compare with the uc3-check file; a last exit after the injection is the run's)"
+      restarts
     } > "$OUT/uc3-nvsentinel-state-$ts.txt" 2>&1
     log "evidence in docs/artifacts/readiness/uc3-*-$ts.*"
     ;;
