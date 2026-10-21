@@ -1,0 +1,25 @@
+# Acceptance, part 1: a CUDA kernel runs on the GPU and checks its own
+# arithmetic. Part 1's pod, unchanged except for the digest and the pool
+# selector. It asks for nvidia.com/gpu, so it can only schedule once the device
+# plugin advertises the GPU, and it can only pass once the driver the GPU
+# Operator installed is loaded and working.
+#
+# Tag vectoradd-cuda12.5.0-ubuntu22.04, from NVIDIA's gpu-operator repository
+# at v26.7.0 (Part 1). Index digest from nvcr.io's registry API, 21 October 2026,
+# with linux/amd64 in it.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: cuda-vectoradd
+  labels:
+    app.kubernetes.io/part-of: gpu-acceptance
+spec:
+  restartPolicy: Never
+  nodeSelector:
+    eu1.io/pool: gpu
+  containers:
+    - name: cuda-vectoradd
+      image: nvcr.io/nvidia/k8s/cuda-sample:vectoradd-cuda12.5.0-ubuntu22.04@sha256:7c7540bdf1f942d4fb6db97069fd6c289471b54ac29e3c7fcdf914cf77af7d41
+      resources:
+        limits:
+          nvidia.com/gpu: 1

@@ -1,7 +1,7 @@
 SHELL := /bin/bash
 VENV  := .venv
 
-.PHONY: help par-cluster par-argocd par-cpu-up par-cpu-down par-cpu-destroy par-gpu-up par-gpu-down par-images par-sweep fin-preflight fin-availability fin-cp-up fin-gpu-up fin-up fin-down fin-sweep argocd-ui grafana-ui cost lint shellcheck fmt docs docs-serve test-goodput
+.PHONY: help par-cluster par-argocd par-cpu-up par-cpu-down par-cpu-destroy par-gpu-up par-acceptance par-gpu-down par-images par-sweep fin-preflight fin-availability fin-cp-up fin-gpu-up fin-up fin-down fin-sweep argocd-ui grafana-ui cost lint shellcheck fmt docs docs-serve test-goodput
 
 help:
 	@grep -hE '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN{FS=":.*?## "}{printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2}'
@@ -27,6 +27,9 @@ par-cpu-destroy: ## par: remove the CPU worker and its disk, at the end of the p
 
 par-gpu-up:    ## par: create the L4 node, join it, wait for nvidia.com/gpu (starts a meter)
 	./scripts/par/gpu-up.sh
+
+par-acceptance: ## par: W1 step 2, cuda-vectoradd and nvidia-smi on the L4, versions on the node (free once the L4 is up)
+	./scripts/par/acceptance.sh
 
 par-gpu-down:  ## par: drain the L4 node, remove it, destroy it, sweep for leftovers
 	./scripts/par/gpu-down.sh

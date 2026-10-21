@@ -1,0 +1,24 @@
+# Acceptance, part 2: nvidia-smi from inside a container. It shows the GPU
+# model and the driver version, which must be the one pinned in Git. The
+# container ships no driver; what it reports is what the GPU Operator put on
+# the node. Part 1's pod, unchanged except for the digest and the pool selector.
+#
+# Index digest of nvcr.io/nvidia/cuda:12.6.0-base-ubuntu22.04 from nvcr.io's
+# registry API, 21 October 2026, with linux/amd64 in it.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nvidia-smi
+  labels:
+    app.kubernetes.io/part-of: gpu-acceptance
+spec:
+  restartPolicy: Never
+  nodeSelector:
+    eu1.io/pool: gpu
+  containers:
+    - name: nvidia-smi
+      image: nvcr.io/nvidia/cuda:12.6.0-base-ubuntu22.04@sha256:5dca947f477ec8ea91624447bdad7cc5f6a0dfe038ef53642c884bf5416478a6
+      command: ["nvidia-smi"]
+      resources:
+        limits:
+          nvidia.com/gpu: 1
