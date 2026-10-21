@@ -1,0 +1,15 @@
+# allreduce.py, two gloo ranks on the laptop (not a cluster), 20261020T232031Z UTC. git d3e595a.
+# Checks the script's rendezvous, correctness check and output before any pod runs it.
+# Laptop torch 2.14.1 on CPU; the pods use pytorch 2.11.0 (CUDA 12.8).
+# MAX_BYTES=8 MiB, ITERS=5. Bandwidth numbers are meaningless here.
+## rank 0
+rank 0/2 host MacBook-Pro-de-Yassine.local backend gloo device cpu torch 2.14.1 nccl None CUDA_VISIBLE_DEVICES=None
+rank 0: process group up in 0.0 s
+     1048576 B      3388.1 us  algbw     0.31 GB/s  busbw     0.31 GB/s
+     2097152 B      3516.3 us  algbw     0.60 GB/s  busbw     0.60 GB/s
+     4194304 B      6630.9 us  algbw     0.63 GB/s  busbw     0.63 GB/s
+     8388608 B     14367.4 us  algbw     0.58 GB/s  busbw     0.58 GB/s
+RESULT {"backend": "gloo", "world_size": 2, "device": "cpu", "torch": "2.14.1", "nccl": null, "iters": 5, "peak_busbw_GBps": 0.63, "results": [{"bytes": 1048576, "time_us": 3388.1, "algbw_GBps": 0.31, "busbw_GBps": 0.31}, {"bytes": 2097152, "time_us": 3516.3, "algbw_GBps": 0.6, "busbw_GBps": 0.6}, {"bytes": 4194304, "time_us": 6630.9, "algbw_GBps": 0.63, "busbw_GBps": 0.63}, {"bytes": 8388608, "time_us": 14367.4, "algbw_GBps": 0.58, "busbw_GBps": 0.58}]}
+## rank 1
+rank 1/2 host MacBook-Pro-de-Yassine.local backend gloo device cpu torch 2.14.1 nccl None CUDA_VISIBLE_DEVICES=None
+rank 1: process group up in 0.0 s

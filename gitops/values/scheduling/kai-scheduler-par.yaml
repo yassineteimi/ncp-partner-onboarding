@@ -1,0 +1,11 @@
+# KAI on par: every KAI pod on the CPU worker (CLAUDE.md, node labels), so
+# with the worker powered off they wait Pending instead of taking room on the
+# 4 vCPU control plane.
+#
+# What that costs while the worker is off: KAI's webhooks only match pods with
+# schedulerName kai-scheduler and its own objects (matchConditions in
+# pkg/operator/operands/admission/resources.go), so other lanes' pods are not
+# blocked. Queue writes and pods sent to KAI fail until the worker is back.
+global:
+  nodeSelector:
+    eu1.io/pool: cpu

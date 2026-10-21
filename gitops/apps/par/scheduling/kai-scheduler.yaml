@@ -1,0 +1,68 @@
+# KAI Scheduler v0.18.6 and its queues on par, use case 4, sync wave 10.
+#
+# Pinned to the v0.18 line, KAI's active LTS (SUPPORT.md: Sep 2026 to Sep 2027,
+# validated on Kubernetes v1.36.1). AICR v1.1.0 resolves v0.16.9, the previous
+# LTS line, now in maintenance; ADR 0006 records the difference.
+#
+# One Application for the chart and the queues, not two in successive waves:
+# Queue writes go through KAI's own admission webhook, which runs on the CPU
+# worker, so a later-wave queues Application would depend on the worker
+# (CLAUDE.md forbids that). Here the queues sync after the chart in the same
+# operation, and a refused Queue write is retried until the webhook answers.
+#
+# Everything KAI runs sits on the CPU worker. With the worker off, this
+# Application reads Progressing or Degraded, and the chart's crd-upgrader
+# PreSync Job waits Pending. Nothing in a later wave depends on it.
+#
+# The chart is OCI on ghcr.io. A repoURL without a scheme is read as OCI by
+# ArgoCD v3.5.3 (util/helm/client.go, IsHelmOciRepo), so no repository Secret.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kai-scheduler
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+
+  sources:
+    - repoURL: ghcr.io/kai-scheduler/kai-scheduler
+      chart: kai-scheduler
+      targetRevision: v0.18.6
+      helm:
+        releaseName: kai-scheduler
+        valueFiles:
+          - $values/gitops/values/scheduling/kai-scheduler.yaml
+          - $values/gitops/values/scheduling/kai-scheduler-par.yaml
+
+    - repoURL: https://github.com/yassineteimi/ncp-partner-onboarding
+      targetRevision: main
+      ref: values
+
+    - repoURL: https://github.com/yassineteimi/ncp-partner-onboarding
+      targetRevision: main
+      path: gitops/manifests/scheduling/kai-queues/par
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kai-scheduler
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+      # The Queue CRD arrives in this same sync, so the first dry run of the
+      # Queues can't find it yet.
+      - SkipDryRunOnMissingResource=true
+    retry:
+      limit: 10
+      backoff:
+        duration: 20s
+        factor: 2
+        maxDuration: 5m

@@ -1,0 +1,55 @@
+# par's simulated GPUs for use case 4, sync wave 10. SIMULATED, see
+# docs/simulated.md.
+#
+# The KWOK controller, the fake GPU operator's KWOK path, and two KWOK nodes
+# with 4 simulated H200s each: what KAI's queues, gangs and reclaim are shown
+# on without renting a GPU. The controllers run on the CPU worker. The KWOK
+# nodes themselves need nothing, but nothing updates them while the worker is
+# off, so they go NotReady and come back with it.
+#
+# Independent of kai-scheduler (same wave, no ordering between them): KAI
+# reads whatever GPUs the nodes advertise whenever they appear.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: sim-gpu
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/yassineteimi/ncp-partner-onboarding
+    targetRevision: main
+    path: gitops/manifests/scheduling/sim-gpu
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: fake-gpu
+
+  # The KWOK nodes' status belongs to the KWOK controller (heartbeats,
+  # conditions) and the KWOK device plugin (nvidia.com/gpu); Git only seeds it.
+  ignoreDifferences:
+    - group: ""
+      kind: Node
+      jsonPointers:
+        - /status
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - ServerSideApply=true
+      # KWOK's Stage CRD arrives in this same sync.
+      - SkipDryRunOnMissingResource=true
+      - RespectIgnoreDifferences=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 20s
+        factor: 2
+        maxDuration: 5m

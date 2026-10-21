@@ -1,0 +1,54 @@
+# KAI Scheduler v0.18.6 and its queues on fin, use case 4, sync wave 10.
+#
+# Same chart and values as par (see gitops/apps/par/scheduling/kai-scheduler.yaml
+# for the pin and the single-Application reasoning), with fin's queues and KAI
+# on fin's CPU node. It syncs with the base apps at fin-cp-up, before the H200
+# joins, so KAI is ready when the node is promoted.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kai-scheduler
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+
+  sources:
+    - repoURL: ghcr.io/kai-scheduler/kai-scheduler
+      chart: kai-scheduler
+      targetRevision: v0.18.6
+      helm:
+        releaseName: kai-scheduler
+        valueFiles:
+          - $values/gitops/values/scheduling/kai-scheduler.yaml
+          - $values/gitops/values/scheduling/kai-scheduler-fin.yaml
+
+    - repoURL: https://github.com/yassineteimi/ncp-partner-onboarding
+      targetRevision: main
+      ref: values
+
+    - repoURL: https://github.com/yassineteimi/ncp-partner-onboarding
+      targetRevision: main
+      path: gitops/manifests/scheduling/kai-queues/fin
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kai-scheduler
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+      - SkipDryRunOnMissingResource=true
+    retry:
+      limit: 10
+      backoff:
+        duration: 20s
+        factor: 2
+        maxDuration: 5m

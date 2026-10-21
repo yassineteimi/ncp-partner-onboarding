@@ -1,0 +1,8 @@
+# par's simulated GPUs for use case 4: the KWOK controller, the fake GPU
+# operator's KWOK path, and two KWOK nodes. SIMULATED, see docs/simulated.md.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - kwok
+  - fake-gpu
+  - nodes.yaml

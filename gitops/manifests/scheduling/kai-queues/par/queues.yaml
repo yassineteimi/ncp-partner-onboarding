@@ -1,0 +1,86 @@
+# KAI queues on par: two tenants share par's 8 simulated GPUs (two KWOK nodes,
+# four each). SIMULATED GPUs, see docs/simulated.md.
+#
+# Each team is guaranteed half (quota 4) and may borrow the rest when the other
+# team is idle (limit -1). Borrowed GPUs are over quota, and KAI takes them back
+# when the owner submits work: that reclaim is what the par demo shows. Only
+# GPUs count here. CPU and memory quotas are -1 (unlimited), because with a 0
+# quota every pod would sit over quota on CPU and could always be reclaimed.
+#
+# Part 1's tenant-a and tenant-b namespaces keep their ResourceQuota of 2
+# time-sliced L4 GPUs and stay outside KAI. These are separate namespaces.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: team-a
+  labels:
+    eu1.io/tenant: "true"
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: team-b
+  labels:
+    eu1.io/tenant: "true"
+---
+apiVersion: scheduling.run.ai/v2
+kind: Queue
+metadata:
+  name: eu1
+spec:
+  displayName: EU1 training pool (par, simulated)
+  resources:
+    gpu:
+      quota: 8
+      limit: -1
+      overQuotaWeight: 1
+    cpu:
+      quota: -1
+      limit: -1
+      overQuotaWeight: 1
+    memory:
+      quota: -1
+      limit: -1
+      overQuotaWeight: 1
+---
+apiVersion: scheduling.run.ai/v2
+kind: Queue
+metadata:
+  name: team-a
+spec:
+  displayName: Team A
+  parentQueue: eu1
+  resources:
+    gpu:
+      quota: 4
+      limit: -1
+      overQuotaWeight: 1
+    cpu:
+      quota: -1
+      limit: -1
+      overQuotaWeight: 1
+    memory:
+      quota: -1
+      limit: -1
+      overQuotaWeight: 1
+---
+apiVersion: scheduling.run.ai/v2
+kind: Queue
+metadata:
+  name: team-b
+spec:
+  displayName: Team B
+  parentQueue: eu1
+  resources:
+    gpu:
+      quota: 4
+      limit: -1
+      overQuotaWeight: 1
+    cpu:
+      quota: -1
+      limit: -1
+      overQuotaWeight: 1
+    memory:
+      quota: -1
+      limit: -1
+      overQuotaWeight: 1

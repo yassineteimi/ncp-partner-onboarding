@@ -1,0 +1,81 @@
+# A two-pod gang in team-a's queue, one GPU per pod, running an all-reduce
+# between the pods (allreduce.py). Use case 4, W2 step 4.
+#
+# The gang comes from KAI's own pod grouper: kai.scheduler/batch-min-member on
+# the Job makes the PodGroup's minMember 2 (docs/batch/README.md at v0.18.6),
+# so both pods bind together or neither does. No hand-written PodGroup.
+#
+# An Indexed Job with a subdomain gives each pod a stable name,
+# allreduce-gang-<index>.allreduce-gang, so rank 0 is the rendezvous point
+# without a launcher pod.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: allreduce-gang
+  namespace: team-a
+  labels:
+    kai.scheduler/queue: team-a
+  annotations:
+    kai.scheduler/batch-min-member: "2"
+spec:
+  completionMode: Indexed
+  completions: 2
+  parallelism: 2
+  backoffLimit: 0
+  # Long enough for a cold image pull plus the run, short enough that a hung
+  # rendezvous can't eat the window.
+  activeDeadlineSeconds: 900
+  template:
+    metadata:
+      labels:
+        app: allreduce-gang
+        kai.scheduler/queue: team-a
+    spec:
+      schedulerName: kai-scheduler
+      # Preemptible (KAI's train class, 50), so the gang may borrow team-b's
+      # idle GPU over team-a's quota.
+      priorityClassName: train
+      subdomain: allreduce-gang
+      restartPolicy: Never
+      containers:
+        - name: allreduce
+          # Part 1's trainer base: CUDA 12.8, runs natively on fin's driver 580.
+          image: pytorch/pytorch:2.11.0-cuda12.8-cudnn9-runtime@sha256:eee11b3b3872a8c838e35ef48f08b2d5def2080902c7f666831310ca1a0ef2be
+          command: ["python", "/scripts/allreduce.py"]
+          env:
+            - name: RANK
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.annotations['batch.kubernetes.io/job-completion-index']
+            - name: WORLD_SIZE
+              value: "2"
+            - name: MASTER_ADDR
+              value: allreduce-gang-0.allreduce-gang
+            - name: MASTER_PORT
+              value: "29500"
+            - name: BACKEND
+              value: nccl
+            - name: NCCL_DEBUG
+              value: INFO
+            - name: PYTHONUNBUFFERED
+              value: "1"
+          resources:
+            requests:
+              cpu: "2"
+              memory: 8Gi
+            limits:
+              memory: 16Gi
+              nvidia.com/gpu: 1
+          volumeMounts:
+            - name: scripts
+              mountPath: /scripts
+            - name: dshm
+              mountPath: /dev/shm
+      volumes:
+        - name: scripts
+          configMap:
+            name: allreduce
+        - name: dshm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 2Gi

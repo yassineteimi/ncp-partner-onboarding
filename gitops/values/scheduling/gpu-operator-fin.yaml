@@ -1,0 +1,50 @@
+# GPU Operator overlay on fin from the scheduling lane (use case 4): MIG on the
+# H200s, for W2 step 5.
+#
+# Mixed strategy: a MIG-enabled GPU advertises nvidia.com/mig-<profile>, a GPU
+# with MIG off keeps advertising nvidia.com/gpu. Before step 5 neither GPU has
+# MIG on, so the node advertises nvidia.com/gpu: 2 exactly as with the default
+# strategy, and NVCRE and the gang in step 4 see no difference.
+#
+# Not set here: daemonsets.tolerations, which the readiness overlay owns.
+mig:
+  strategy: mixed
+
+migManager:
+  enabled: true
+  env:
+    # mig-manager v0.15.1 (from this chart): if the mode change fails and
+    # WITH_REBOOT is true, it runs "chroot /host reboot". A reboot in a 2 h
+    # window means the node rejoins, fabric manager restarts and evidence is
+    # lost, so a failure must stay a failure (state=failed) that the run sheet
+    # records. False is also the binary's default; it is written down here so
+    # nobody turns it on by accident.
+    - name: WITH_REBOOT
+      value: "false"
+  config:
+    # Applied to a node only when it carries no nvidia.com/mig.config label.
+    default: all-disabled
+    create: true
+    name: mig-parted-eu1
+    data:
+      # Configs are named after what they do (Part 1 rule 6). Step 5 sets
+      # nvidia.com/mig.config=h200-split on the node (make sched-mig).
+      #
+      # h200-split: GPU0 becomes two 3g.71gb instances, one per tenant, each
+      # with its own compute and memory slices and its own fault domain; GPU1
+      # stays whole for a full-GPU job. H200 141GB profiles per NVIDIA's MIG
+      # guide: 1g.18gb x7, 1g.35gb x4, 2g.35gb x3, 3g.71gb x2, 4g.71gb x1,
+      # 7g.141gb x1. W2 step 1 captures nvidia-smi mig -lgip to confirm them.
+      config.yaml: |-
+        version: v1
+        mig-configs:
+          all-disabled:
+            - devices: all
+              mig-enabled: false
+          h200-split:
+            - devices: [0]
+              mig-enabled: true
+              mig-devices:
+                "3g.71gb": 2
+            - devices: [1]
+              mig-enabled: false

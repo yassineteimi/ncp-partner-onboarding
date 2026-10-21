@@ -1,0 +1,82 @@
+# Two simulated GPU nodes on par, 4 simulated H200s each. SIMULATED: no VM, no
+# kubelet, no GPU. The KWOK controller answers for them, and the fake GPU
+# operator's KWOK device plugin writes nvidia.com/gpu: 4 into their status.
+# Pods bound here show Running but run no container (docs/simulated.md).
+#
+# Two taints keep everything else off them:
+#   kwok.x-k8s.io/node=fake:NoSchedule  the taint the fake GPU operator's
+#       README puts on KWOK nodes
+#   eu1.io/simulated=true:NoExecute  flannel and node-exporter tolerate every
+#       NoSchedule taint, so without this they would "run" here too, and a
+#       node-exporter on a node that doesn't exist reads as a down target in
+#       ws-platform's Prometheus
+# Only the use case 4 demo workloads tolerate both.
+#
+# Status is set at creation only (the API server accepts a Node's status on
+# create). After that KWOK and the device plugin own it, and the Application
+# ignores /status on Nodes.
+apiVersion: v1
+kind: Node
+metadata:
+  name: eu1-par-sim-gpu-01
+  annotations:
+    kwok.x-k8s.io/node: fake
+  labels:
+    type: kwok
+    kubernetes.io/hostname: eu1-par-sim-gpu-01
+    kubernetes.io/os: linux
+    kubernetes.io/arch: amd64
+    eu1.io/site: par
+    eu1.io/pool: sim-gpu
+    eu1.io/simulated: "true"
+    run.ai/simulated-gpu-node-pool: sim-h200
+spec:
+  taints:
+    - key: kwok.x-k8s.io/node
+      value: fake
+      effect: NoSchedule
+    - key: eu1.io/simulated
+      value: "true"
+      effect: NoExecute
+status:
+  allocatable:
+    cpu: "64"
+    memory: 512Gi
+    pods: "110"
+  capacity:
+    cpu: "64"
+    memory: 512Gi
+    pods: "110"
+---
+apiVersion: v1
+kind: Node
+metadata:
+  name: eu1-par-sim-gpu-02
+  annotations:
+    kwok.x-k8s.io/node: fake
+  labels:
+    type: kwok
+    kubernetes.io/hostname: eu1-par-sim-gpu-02
+    kubernetes.io/os: linux
+    kubernetes.io/arch: amd64
+    eu1.io/site: par
+    eu1.io/pool: sim-gpu
+    eu1.io/simulated: "true"
+    run.ai/simulated-gpu-node-pool: sim-h200
+spec:
+  taints:
+    - key: kwok.x-k8s.io/node
+      value: fake
+      effect: NoSchedule
+    - key: eu1.io/simulated
+      value: "true"
+      effect: NoExecute
+status:
+  allocatable:
+    cpu: "64"
+    memory: 512Gi
+    pods: "110"
+  capacity:
+    cpu: "64"
+    memory: 512Gi
+    pods: "110"

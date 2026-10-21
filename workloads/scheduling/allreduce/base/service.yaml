@@ -1,0 +1,16 @@
+# Headless Service behind the Job's subdomain, so allreduce-gang-0.allreduce-gang
+# resolves. publishNotReadyAddresses: rank 1 must reach rank 0 before
+# either pod could be called ready.
+apiVersion: v1
+kind: Service
+metadata:
+  name: allreduce-gang
+  namespace: team-a
+spec:
+  clusterIP: None
+  publishNotReadyAddresses: true
+  selector:
+    app: allreduce-gang
+  ports:
+    - name: rendezvous
+      port: 29500

@@ -1,0 +1,47 @@
+# par demo, step 3 of 3. SIMULATED GPUs.
+#
+# Run after a-burst is deleted: team-b holds 4 GPUs with b-gang, 4 are free.
+# team-b then asks for a gang of 6. Only 4 GPUs are free and nothing can be
+# reclaimed, so none of the 6 pods binds and the 4 free GPUs stay free. A
+# scheduler without gangs would bind 4 pods that wait forever for 2 more,
+# holding GPUs nobody else can use.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: b-gang-too-big
+  namespace: team-b
+  labels:
+    kai.scheduler/queue: team-b
+    eu1.io/simulated: "true"
+  annotations:
+    kai.scheduler/batch-min-member: "6"
+spec:
+  completions: 6
+  parallelism: 6
+  template:
+    metadata:
+      labels:
+        kai.scheduler/queue: team-b
+        eu1.io/simulated: "true"
+    spec:
+      schedulerName: kai-scheduler
+      priorityClassName: train
+      restartPolicy: Never
+      nodeSelector:
+        eu1.io/pool: sim-gpu
+      tolerations:
+        - key: kwok.x-k8s.io/node
+          operator: Exists
+          effect: NoSchedule
+        - key: eu1.io/simulated
+          operator: Exists
+          effect: NoExecute
+      containers:
+        - name: train
+          image: registry.k8s.io/pause:3.10@sha256:ee6521f290b2168b6e0935a181d4cff9be1ac3f505666ef0e3c98fae8199917a
+          resources:
+            requests:
+              cpu: "4"
+              memory: 32Gi
+            limits:
+              nvidia.com/gpu: 1

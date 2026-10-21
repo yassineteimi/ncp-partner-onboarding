@@ -1,0 +1,45 @@
+# W2 step S0 on fin: pulls the gang's image (4.1 GB) onto the H200 node while
+# NVCRE certifies it, so steps 4 and 5 don't wait on a pull.
+#
+# It tolerates the staging taint because it runs before promotion, and it asks
+# for no GPU, so it can't touch what the certification measures. The init
+# container is the pull; the pause container keeps the pod around until
+# make sched-prepull-down deletes it.
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: prepull-trainer
+  namespace: team-a
+spec:
+  selector:
+    matchLabels:
+      app: prepull-trainer
+  template:
+    metadata:
+      labels:
+        app: prepull-trainer
+    spec:
+      nodeSelector:
+        eu1.io/pool: gpu
+      tolerations:
+        - key: eu1.io/staging
+          operator: Exists
+          effect: NoSchedule
+        - key: nvidia.com/gpu
+          operator: Exists
+          effect: NoSchedule
+      initContainers:
+        - name: pull
+          image: pytorch/pytorch:2.11.0-cuda12.8-cudnn9-runtime@sha256:eee11b3b3872a8c838e35ef48f08b2d5def2080902c7f666831310ca1a0ef2be
+          command: ["true"]
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi
+      containers:
+        - name: pause
+          image: registry.k8s.io/pause:3.10@sha256:ee6521f290b2168b6e0935a181d4cff9be1ac3f505666ef0e3c98fae8199917a
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi

@@ -1,0 +1,28 @@
+# Free check on par's CPU worker: the same gang, scheduled by KAI, with real
+# containers and the gloo backend instead of GPUs. It tests the pod grouper's
+# gang, the rendezvous through the headless Service, and allreduce.py before
+# any H200 is rented. Bandwidth numbers from it mean nothing.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../base
+patches:
+  - target:
+      kind: Job
+      name: allreduce-gang
+    patch: |-
+      - op: add
+        path: /spec/template/spec/nodeSelector
+        value:
+          eu1.io/pool: cpu
+      - op: replace
+        path: /spec/template/spec/containers/0/env/4/value
+        value: gloo
+      - op: replace
+        path: /spec/template/spec/containers/0/resources
+        value:
+          requests:
+            cpu: 500m
+            memory: 1Gi
+          limits:
+            memory: 2Gi
