@@ -104,6 +104,36 @@ deleted site have to look back, as `MODE=after` now does (`last_over_time(...[3h
 A dashboard panel showing fin after teardown needs a time range covering the window,
 not "now".
 
+## Series per GPU: the L4 on par, W1
+
+From the [W1-b capture](artifacts/platform/thanos-par-20261021T170231Z.txt) and the
+[follow-up](artifacts/platform/thanos-par-l4-growth-20261021T170350Z.txt), through
+par's Query on 21 October:
+
+| What | Measured |
+|---|---|
+| DCGM series for the L4, idle, from the recording rule | 40, from 16:58 to 17:02 UTC |
+| The same, once the goodput job loaded the GPU | 41, from about 17:02:30 UTC |
+| The series that appeared | `DCGM_EXP_CLOCK_EVENTS_TOTAL{clock_event="power_cap"}` |
+| par's Prometheus head, for scale | 105,491 series |
+
+Two things make the count move, both visible in the labels:
+
+- **One series per clock-event reason.** `gpu_idle` was there from the start.
+  `power_cap` appeared when the training job hit the L4's power limit.
+- **Pod labels on a busy GPU.** dcgm-exporter adds `exported_pod`, `exported_namespace`
+  and `exported_container` to series of a GPU a pod is using. Every new job puts its
+  own pod name on new series, so the count churns with the workload, not only with
+  the number of GPUs.
+
+So the per-GPU figure for capacity planning is the maximum over a busy window, not an
+idle reading. The recording rule is evaluated every minute and kept with the rest of
+the data, so `max_over_time(gpu:dcgm_series:count[...])` over a window gives it.
+
+While reading these labels I found the exporter names the node label `hostname`, not
+`Hostname`. This repo's rules and dashboard grouped by the wrong one, and it's
+corrected by PR #24, with a line for [findings](findings.md).
+
 ## fin's GPUs (planned, W2, 22 October)
 
 Steps 6a to 6c: the H200s' DCGM series in par's Query, DCGM series per GPU from the

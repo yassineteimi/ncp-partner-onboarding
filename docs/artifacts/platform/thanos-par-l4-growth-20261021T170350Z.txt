@@ -1,0 +1,14 @@
+# W1-b follow-up, 20261021T170350Z, laptop clock, UTC: why the L4's DCGM series per GPU went from 40 to 41
+# Read through par's Thanos Query. The MODE=par capture at 17:02:31Z read 40 from the rule and 41 counted directly.
+
+17:03:50Z
+## new or grown since 3 minutes ago
+   DCGM_EXP_CLOCK_EVENTS_TOTAL +1
+## series per GPU, one value a minute, last 15 minutes
+   16:57:50Z 40
+   16:58:50Z 40
+   16:59:50Z 40
+   17:00:50Z 40
+   17:01:50Z 40
+   17:02:50Z 41
+   17:03:50Z 41

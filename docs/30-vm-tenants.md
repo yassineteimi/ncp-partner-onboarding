@@ -8,11 +8,6 @@
     quota, next to the GPU workloads, and the guest itself says it runs on KVM.
     The choice of KubeVirt over a separate IaaS is in [ADR 0010](adr/0010-vm-tenants.md).
 
-!!! warning "One part is planned: W1, Wednesday 21 October, 19:00 Paris"
-    The VM ran on 21 October and everything below is measured, except one capture: the
-    VM running while the L4's GPU pods run, which needs the GPU window. Until then that
-    section says "planned".
-
 ## What runs where
 
 ```mermaid
@@ -87,11 +82,20 @@ guest gets:
 So a 2 GiB VM costs its tenant about 2.3 GiB: about 15% more than the guest's memory.
 A tenant sizing a quota from the guest's size alone would hit it early.
 
-## Next to the GPU workloads (planned, W1)
+## Next to the GPU workloads, W1
 
-`make kubevirt-capture` lists every pod holding a GPU at the moment it runs. On
-21 October no GPU workload was running. During W1-a it runs again with the L4 up and
-its pods scheduled, to show both kinds of tenant on one cluster at the same moment.
+`make kubevirt-capture` lists every pod holding a GPU at the moment it runs. During
+W1, at 17:01:51 UTC on 21 October and before ws-readiness injected its SIMULATED
+XID 79, [the capture](artifacts/platform/kubevirt-20261021T170151Z.txt) shows both
+kinds of tenant on one cluster:
+
+| Tenant | Pod | Node | What it holds |
+|---|---|---|---|
+| `tenant-vm` | `virt-launcher-web-01`, the VM `web-01` | `eu1-par-cpu-01` | 1 vCPU, 2 GiB, KVM, the same instance since 10:31 UTC |
+| `tenant-a` | `goodput-xq462`, a training job | `eu1-par-gpu-01` | the L4, `nvidia.com/gpu: 1` |
+
+One scheduler, one quota system and one GitOps flow placed both. The L4's reboot that
+followed, part of use case 3, didn't touch the VM, which runs on another node.
 
 ## What one CPU worker can't show
 
