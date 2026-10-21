@@ -32,6 +32,15 @@ spec:
     server: https://kubernetes.default.svc
     namespace: argocd
 
+  # ArgoCD's controller adds pre-delete and post-delete finalizers to an
+  # Application whose chart has PreDelete or PostDelete hooks (gpu-operator and
+  # NFD here). Git doesn't list them, so without this the root stays OutOfSync.
+  ignoreDifferences:
+    - group: argoproj.io
+      kind: Application
+      jqPathExpressions:
+        - '.metadata.finalizers[] | select(startswith("pre-delete-finalizer.argocd.argoproj.io") or startswith("post-delete-finalizer.argocd.argoproj.io"))'
+
   syncPolicy:
     automated:
       prune: true
