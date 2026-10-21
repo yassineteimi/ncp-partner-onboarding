@@ -35,8 +35,8 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "max by (site, modelName, Hostname, gpu) (DCGM_FI_DEV_GPU_UTIL{site=~\"$site\"})",
-          "legendFormat": "{{site}} {{modelName}} {{Hostname}} gpu{{gpu}}"
+          "expr": "max by (site, modelName, hostname, gpu) (DCGM_FI_DEV_GPU_UTIL{site=~\"$site\"})",
+          "legendFormat": "{{site}} {{modelName}} {{hostname}} gpu{{gpu}}"
         }
       ],
       "fieldConfig": {
@@ -54,7 +54,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "max by (site, modelName, Hostname, gpu) (DCGM_FI_DEV_POWER_USAGE{site=~\"$site\"})",
+          "expr": "max by (site, modelName, hostname, gpu) (DCGM_FI_DEV_POWER_USAGE{site=~\"$site\"})",
           "legendFormat": "{{site}} {{modelName}} gpu{{gpu}}"
         }
       ],
@@ -69,7 +69,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "max by (site, modelName, Hostname, gpu) (DCGM_FI_DEV_FB_USED{site=~\"$site\"})",
+          "expr": "max by (site, modelName, hostname, gpu) (DCGM_FI_DEV_FB_USED{site=~\"$site\"})",
           "legendFormat": "{{site}} {{modelName}} gpu{{gpu}}"
         }
       ],
@@ -85,7 +85,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "max by (site, modelName, Hostname, gpu) (max_over_time(gpu:dcgm_series:count{site=~\"$site\"}[$__range]))",
+          "expr": "max by (site, modelName, hostname, gpu) (max_over_time(gpu:dcgm_series:count{site=~\"$site\"}[$__range]))",
           "instant": true,
           "format": "table"
         }

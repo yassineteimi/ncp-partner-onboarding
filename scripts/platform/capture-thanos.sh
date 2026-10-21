@@ -136,9 +136,9 @@ case "$MODE" in
     q "Sites and tenants seen ($at)" "count by (site, tenant_id) ($(last up))"
     q "Last sample per site (Unix seconds)" "$stamp"
     q "GPUs per site and model ($at)" "count by (site, modelName) ($(last DCGM_FI_DEV_GPU_UTIL))"
-    q "GPU utilisation ($at)" "max by (site, modelName, Hostname, gpu) ($(last DCGM_FI_DEV_GPU_UTIL))"
-    q "GPU utilisation, max over the last 3 h" 'max by (site, modelName, Hostname, gpu) (max_over_time(DCGM_FI_DEV_GPU_UTIL[3h]))'
-    q "DCGM series per GPU (recording rule)" 'max by (site, modelName, Hostname, gpu) (max_over_time(gpu:dcgm_series:count[3h]))'
+    q "GPU utilisation ($at)" "max by (site, modelName, hostname, gpu) ($(last DCGM_FI_DEV_GPU_UTIL))"
+    q "GPU utilisation, max over the last 3 h" 'max by (site, modelName, hostname, gpu) (max_over_time(DCGM_FI_DEV_GPU_UTIL[3h]))'
+    q "DCGM series per GPU (recording rule)" 'max by (site, modelName, hostname, gpu) (max_over_time(gpu:dcgm_series:count[3h]))'
     q "DCGM series per GPU, top metrics on fin" 'topk(15, max by (metric) (max_over_time(gpu:dcgm_series_by_metric:count{site="fin"}[3h])))'
     # Each site's own Prometheus reports its head: one series per site. A
     # count over {__name__=~".+"} would make par's Prometheus, on the 4 vCPU
@@ -156,11 +156,11 @@ case "$MODE" in
     ;;
   par)
     # W1-b: the L4's DCGM cardinality, the same figures W2 takes on fin.
-    q "GPUs on par" 'count by (site, modelName, Hostname) (DCGM_FI_DEV_GPU_UTIL{site="par"})'
-    q "DCGM series per GPU (recording rule, now)" 'max by (site, modelName, Hostname, gpu) (gpu:dcgm_series:count{site="par"})'
-    q "DCGM series per GPU (recording rule, max over the last 3 h)" 'max by (site, modelName, Hostname, gpu) (max_over_time(gpu:dcgm_series:count{site="par"}[3h]))'
+    q "GPUs on par" 'count by (site, modelName, hostname) (DCGM_FI_DEV_GPU_UTIL{site="par"})'
+    q "DCGM series per GPU (recording rule, now)" 'max by (site, modelName, hostname, gpu) (gpu:dcgm_series:count{site="par"})'
+    q "DCGM series per GPU (recording rule, max over the last 3 h)" 'max by (site, modelName, hostname, gpu) (max_over_time(gpu:dcgm_series:count{site="par"}[3h]))'
     q "DCGM series per GPU, top metrics on par" 'topk(15, max by (metric) (max_over_time(gpu:dcgm_series_by_metric:count{site="par"}[3h])))'
-    q "DCGM series per GPU, counted directly (cross-check of the rule)" 'count by (Hostname, gpu) ({__name__=~"DCGM_.+", site="par"})'
+    q "DCGM series per GPU, counted directly (cross-check of the rule)" 'count by (hostname, gpu) ({__name__=~"DCGM_.+", site="par"})'
     q "Head series in par's Prometheus" 'max(prometheus_tsdb_head_series{job="kube-prometheus-stack-prometheus", site="par"})'
     tsdb_status "$KUBECONFIG_PATH" par
     ;;
