@@ -61,12 +61,29 @@ case "${1:-}" in
     ;;
 
   bundle)
+    # Rendered outside docs/ and kept as a tarball of AICR's untouched output,
+    # so its checksums.txt still matches; a listing beside it is readable on
+    # GitHub. Never synced: no Application reads docs/.
     recipe="$OUT/recipe-k0s-h200-training.yaml"
     [ -f "$recipe" ] || die "run scripts/readiness/aicr.sh recipes first"
-    rm -rf "$OUT/bundle-argocd"
-    "$AICR" bundle --recipe "$recipe" --deployer argocd --output "$OUT/bundle-argocd" \
-      --repo https://github.com/yassineteimi/ncp-partner-onboarding \
-      2>&1 | tee "$OUT/bundle-argocd.log"
+    work="$REPO_ROOT/.cache/readiness/aicr-bundle"
+    rm -rf "$work" "$OUT/bundle-argocd"
+    "$AICR" bundle --recipe "$recipe" --deployer argocd --output "$work/bundle-argocd" \
+      --repo https://github.com/yassineteimi/ncp-partner-onboarding > "$OUT/bundle-argocd.log" 2>&1
+    (cd "$work/bundle-argocd" && shasum -a 256 -c checksums.txt --quiet) \
+      || die "AICR's bundle doesn't match its own checksums.txt"
+    tar -czf "$OUT/bundle-argocd.tar.gz" -C "$work" bundle-argocd
+    {
+      echo "# aicr bundle --deployer argocd of recipe-k0s-h200-training.yaml, $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+      echo "# The bundle itself: bundle-argocd.tar.gz, AICR's output untouched (checksums.txt verified)."
+      echo "# Reference only: nothing here is synced to a cluster."
+      (cd "$work/bundle-argocd" && find . -type f | sort | sed 's#^\./#  #')
+      echo
+      echo "# bundle-info.yaml"
+      cat "$work/bundle-argocd/bundle-info.yaml"
+    } > "$OUT/bundle-argocd.txt"
+    no_em_dashes
+    log "bundle in ${OUT#"$REPO_ROOT"/}/bundle-argocd.{tar.gz,txt}"
     ;;
 
   snapshot)
