@@ -14,6 +14,8 @@ Things that didn't behave the way the documentation or my first assumption said,
 
 ## Kubernetes and ArgoCD
 
+- **ArgoCD adds finalizers to child Applications that Git doesn't have.** On v3.5.3, the controller puts pre-delete hook finalizers on the gpu-operator Application and post-delete ones on node-feature-discovery, because their charts carry those hooks. par's root app of apps then showed both children OutOfSync while every child was Synced and Healthy. The root now ignores just those finalizers ([`gitops/sites/par/root.yaml`](https://github.com/yassineteimi/ncp-partner-onboarding/blob/main/gitops/sites/par/root.yaml)).
+- **Kubeflow Trainer 2.2.1's chart renders its webhook Secrets empty.** The Trainer and JobSet controllers then write certificates into `kubeflow-trainer-webhook-cert` and `jobset-webhook-server-cert`. ArgoCD saw the filled Secrets as drift, and self-heal put the empty ones back every five minutes, so the controllers kept issuing new certificates. Both Trainer Applications now ignore `/data` on those two Secrets, with `RespectIgnoreDifferences=true`. It's the same family as Part 1's rule about charts that generate secrets.
 - **A powered-off node keeps every DaemonSet one pod short.** I power par's CPU worker off between uses so it stops billing. Left in the cluster as a NotReady node, it held flannel, kube-proxy and node-exporter at one pod of two, and that kept kube-prometheus-stack, and the root Application above it, at Progressing until the worker came back. `make par-cpu-down` now deletes the Node object after the drain. The kubelet still has its credentials on disk and registers the node again on power-on, and `make par-cpu-up` puts its labels back.
 
 ## GPU Operator and DCGM
@@ -31,6 +33,10 @@ Things that didn't behave the way the documentation or my first assumption said,
 - **NVCRE v0.8.0 assumes 8 GPUs per H200 node.** It falls back to 4 for a GPU it doesn't know, like the L4, so a 2-GPU H200 node is dropped unless `gpusPerNode` is set. It ships no thresholds, so PASSED means "ran" until you add one. Its only DCGM category is level 4, about 90 minutes. The docs say the controller needs a node without GPUs; the chart doesn't enforce it.
 - **NVCRE's NCCL image is built for a newer driver than fin's.** `pytorch:26.01-py3` targets driver 590.48.01, and Verda's image ships 580.178.04, so on the H200 it can only run through CUDA forward compatibility. `pytorch:25.11-py3`, built for 580, is the fallback (`fc11-pytorch-images.txt`).
 - **AICR v1.1.0 has no recipe for the stack I run.** `kubeadm` and the L4 are rejected as invalid values; `metal3`, `generic`, `kind` and `bcm` have no H200 Ubuntu training recipe. Every recipe constrains Ubuntu to 24.04, while fin's image is 26.04. Its Kubeflow recipe pins Trainer 2.2.0 in namespace `kubeflow`, where NVCRE v0.8.0 needs 2.2.1 in `kubeflow-system`, and it pins cert-manager 1.20.2, below the 1.21 floor in NVSentinel v1.28.0's README.
+
+## KubeVirt
+
+- **Pinning virt-operator by digest doesn't pin the virt-template components.** KubeVirt v1.9.1 deploys virt-template-apiserver and virt-template-controller by default: their `Template` gate is Beta (`pkg/virt-config/featuregate/active.go`), and Beta gates are on unless disabled (`IsEnabled` in `feature-gates.go`). The operator takes them at their own version, v0.2.3, by tag, from a manifest it embeds. Only `VIRT_TEMPLATE_APISERVER_IMAGE` and `VIRT_TEMPLATE_CONTROLLER_IMAGE` on virt-operator override that (`components/virttemplate.go`, `util/config.go`). I had accepted them as unpinned because I thought the gate was off; the first deployment on par showed them running from tags ([capture](artifacts/platform/kubevirt-20261021T103649Z.txt)). Both are now pinned by digest.
 
 ## Thanos
 
