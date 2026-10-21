@@ -10,6 +10,8 @@
 #                               DCGM series per GPU, and fin's own TSDB
 #                               status (needs FIN_KUBECONFIG)
 #   capture-thanos.sh after     after fin-down: the same queries, each series's last value within 3 h
+#   capture-thanos.sh par       during W1: the L4's DCGM series per GPU, and
+#                               par's own TSDB status
 #   capture-thanos.sh bucket    the blocks in Garage, by tenant and resolution
 #
 # Each run writes docs/artifacts/platform/thanos-<mode>-<timestamp>.txt.
@@ -21,7 +23,7 @@ source "$(dirname "${BASH_SOURCE[0]}")/../lib.sh"
 require_tools kubectl python3 curl
 
 MODE="${1:-}"
-case "$MODE" in hub | fin | after | bucket) ;; *) die "usage: $0 hub|fin|after|bucket" ;; esac
+case "$MODE" in hub | fin | after | par | bucket) ;; *) die "usage: $0 hub|fin|after|par|bucket" ;; esac
 
 use_site par
 require_kubeconfig
@@ -64,6 +66,25 @@ import json, sys
 for kind, stores in sorted(json.load(sys.stdin)["data"].items()):
     for s in stores:
         print(kind, s["name"], "labelSets:", s.get("labelSets"), "minTime:", s.get("minTime"), "maxTime:", s.get("maxTime"), "lastError:", s.get("lastError"))
+'
+}
+
+# A site's own Prometheus: head series and the top label pairs, read on that site.
+# tsdb_status <kubeconfig> <site>
+tsdb_status() {
+  echo
+  echo "## $2's own TSDB status (head series, top label pairs), read on $2"
+  kubectl --kubeconfig "$1" get --raw \
+    "/api/v1/namespaces/monitoring/services/kube-prometheus-stack-prometheus:9090/proxy/api/v1/status/tsdb?limit=15" \
+    | python3 -c '
+import json, sys
+d = json.load(sys.stdin)["data"]
+print("headStats:", d.get("headStats"))
+for k in ("seriesCountByMetricName", "labelValueCountByLabelName", "seriesCountByLabelValuePair"):
+    print()
+    print(k + ":")
+    for e in d.get(k, []):
+        print("  %s: %s" % (e["name"], e["value"]))
 '
 }
 
@@ -127,24 +148,21 @@ case "$MODE" in
     if [ "$MODE" = fin ]; then
       FIN_KUBECONFIG="${FIN_KUBECONFIG:-$REPO_ROOT/kubeconfig-fin}"
       if [ -f "$FIN_KUBECONFIG" ]; then
-        echo
-        echo "## fin's own TSDB status (head series, top label pairs), read on fin"
-        kubectl --kubeconfig "$FIN_KUBECONFIG" get --raw \
-          "/api/v1/namespaces/monitoring/services/kube-prometheus-stack-prometheus:9090/proxy/api/v1/status/tsdb?limit=15" \
-          | python3 -c '
-import json, sys
-d = json.load(sys.stdin)["data"]
-print("headStats:", d.get("headStats"))
-for k in ("seriesCountByMetricName", "labelValueCountByLabelName", "seriesCountByLabelValuePair"):
-    print()
-    print(k + ":")
-    for e in d.get(k, []):
-        print("  %s: %s" % (e["name"], e["value"]))
-'
+        tsdb_status "$FIN_KUBECONFIG" fin
       else
         warn "no fin kubeconfig at $FIN_KUBECONFIG, skipping fin's own TSDB status"
       fi
     fi
+    ;;
+  par)
+    # W1-b: the L4's DCGM cardinality, the same figures W2 takes on fin.
+    q "GPUs on par" 'count by (site, modelName, Hostname) (DCGM_FI_DEV_GPU_UTIL{site="par"})'
+    q "DCGM series per GPU (recording rule, now)" 'max by (site, modelName, Hostname, gpu) (gpu:dcgm_series:count{site="par"})'
+    q "DCGM series per GPU (recording rule, max over the last 3 h)" 'max by (site, modelName, Hostname, gpu) (max_over_time(gpu:dcgm_series:count{site="par"}[3h]))'
+    q "DCGM series per GPU, top metrics on par" 'topk(15, max by (metric) (max_over_time(gpu:dcgm_series_by_metric:count{site="par"}[3h])))'
+    q "DCGM series per GPU, counted directly (cross-check of the rule)" 'count by (Hostname, gpu) ({__name__=~"DCGM_.+", site="par"})'
+    q "Head series in par's Prometheus" 'max(prometheus_tsdb_head_series{job="kube-prometheus-stack-prometheus", site="par"})'
+    tsdb_status "$KUBECONFIG_PATH" par
     ;;
   bucket)
     bucket
