@@ -1,0 +1,153 @@
+# A small Slurm cluster through Slinky (slurm chart 1.2.3, Slurm 26.05) on
+# par's CPU worker, for use case 5: an HPC group keeps sbatch and srun on the
+# platform its Kubernetes tenants use.
+#
+# Limits stated in docs/21-hpc-slinky.md: one VM carries the whole cluster,
+# so the two Slurm nodes share it (oversubscribeNode); no accounting (it needs
+# a MariaDB); no GPUs on par. The fin stretch (Slurm with the H200s) is
+# W2 step 7, only if time remains.
+
+# The chart would create these two Secrets with randAscii, guarded by a
+# lookup of the existing Secret. ArgoCD renders offline, where lookup returns
+# nothing, so every render makes new keys for Secrets marked immutable
+# (templates/secrets/slurmkey.yaml and jwtkey.yaml at 1.2.3): Part 1 rule 5.
+# A bootstrap Job in the same Application creates them in the cluster, once
+# (gitops/manifests/scheduling/slurm-bootstrap).
+slurmKey:
+  create: false
+  secretRef:
+    name: slurm-auth-slurm
+    key: slurm.key
+jwtKey:
+  create: false
+  secretRef:
+    name: slurm-auth-jwt
+    key: jwt.key
+
+clusterName: eu1-par
+
+controller:
+  slurmctld:
+    image:
+      repository: ghcr.io/slinkyproject/slurmctld
+      digest: sha256:2ec467b75fe62221d5d042154e2610c12e0a35a0947f48c940f4a9f0b858b083 # 26.05-ubuntu26.04
+    resources:
+      requests:
+        cpu: 250m
+        memory: 512Mi
+  reconfigure:
+    image:
+      repository: ghcr.io/slinkyproject/slurmctld
+      digest: sha256:2ec467b75fe62221d5d042154e2610c12e0a35a0947f48c940f4a9f0b858b083 # 26.05-ubuntu26.04
+  logfile:
+    image:
+      repository: docker.io/library/alpine
+      digest: sha256:5291449c3df73caf6ed85e649dec1b9e818b39a5d8c871e97afc13e9cd5e8fa8 # 3.22
+  # slurmctld's save state on local-path, on the CPU worker's disk, which
+  # survives a power-off. par has no default StorageClass, so the class is
+  # named: left null, the chart asks for the default and the claim never binds.
+  persistence:
+    enabled: true
+    storageClassName: local-path
+    resources:
+      requests:
+        storage: 2Gi
+  podSpec:
+    nodeSelector:
+      eu1.io/pool: cpu
+
+restapi:
+  slurmrestd:
+    image:
+      repository: ghcr.io/slinkyproject/slurmrestd
+      digest: sha256:14fcccb88bdc0566c499fd9cfc08ad9f30636a88e91cf94c2aaf2e9cd53fa02c # 26.05-ubuntu26.04
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+  podSpec:
+    nodeSelector:
+      eu1.io/pool: cpu
+
+accounting:
+  enabled: false
+
+loginsetDefaults:
+  login:
+    image:
+      repository: ghcr.io/slinkyproject/login
+      digest: sha256:295aa62473bffa46ed5ed81d98aafd05f251d42db48e48cea96a4c219afdc454 # 26.05-ubuntu26.04
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+  initconf:
+    image:
+      repository: docker.io/library/alpine
+      digest: sha256:5291449c3df73caf6ed85e649dec1b9e818b39a5d8c871e97afc13e9cd5e8fa8 # 3.22
+  podSpec:
+    nodeSelector:
+      eu1.io/pool: cpu
+  # par has no load balancer controller; a LoadBalancer Service would stay
+  # pending and keep the Application Progressing. Users reach the login pod
+  # with kubectl exec.
+  service:
+    spec:
+      type: ClusterIP
+
+loginsets:
+  hpc:
+    enabled: true
+
+nodesetDefaults:
+  slurmd:
+    image:
+      repository: ghcr.io/slinkyproject/slurmd
+      digest: sha256:dc415d580e0c9d9b2e8c785bfe90f2541670bc9a5de255fba9117032eb247d10 # 26.05-ubuntu26.04
+    resources:
+      requests:
+        cpu: 500m
+        memory: 1Gi
+      limits:
+        cpu: "2"
+        memory: 2Gi
+  logfile:
+    image:
+      repository: docker.io/library/alpine
+      digest: sha256:5291449c3df73caf6ed85e649dec1b9e818b39a5d8c871e97afc13e9cd5e8fa8 # 3.22
+  podSpec:
+    nodeSelector:
+      eu1.io/pool: cpu
+
+nodesets:
+  # Two Slurm nodes on the one CPU worker, so srun -N2 and a drained node next
+  # to a healthy one can be shown. Slinky marks oversubscribeNode as not for
+  # production; here it stands in for a second machine.
+  cpu:
+    enabled: true
+    replicas: 2
+    oversubscribeNode: true
+    partition:
+      enabled: true
+      configMap:
+        Default: "YES"
+        MaxTime: UNLIMITED
+
+partitions:
+  all:
+    enabled: false
+
+# Health check before every job, on every Slurm node. A prolog that exits
+# non-zero makes Slurm drain the node and requeue the job, the Slurm
+# counterpart of a failed readiness gate. The marker file is the SIMULATED
+# fault the demo creates (docs/simulated.md); the other checks are real.
+prologScripts:
+  00-node-health.sh: |
+    #!/usr/bin/env bash
+    set -euo pipefail
+    fail() { echo "eu1 node health: $*" >&2; exit 1; }
+    [ ! -e /var/run/eu1-simulated-fault ] || fail "simulated fault marker present"
+    touch /tmp/.eu1-health && rm -f /tmp/.eu1-health || fail "/tmp not writable"
+    avail_kb="$(awk '/MemAvailable/ {print $2}' /proc/meminfo)"
+    [ "$avail_kb" -gt 262144 ] || fail "less than 256 MiB available"
+    exit 0

@@ -14,16 +14,14 @@ prometheus:
     thanos:
       image: quay.io/thanos/thanos:v0.42.4@sha256:b567818fe608067eb0f1d7c2c4fe361e7ad83c8a256234c97685f1d0bf670cc8
       version: v0.42.4
-      # Secret monitoring/thanos-objstore, written by the base platform's
-      # Garage Job (gitops/manifests/base/checkpoint-store/thanos-bucket.yaml).
+      # Secret monitoring/thanos-objstore, written by the base Application
+      # objstore-credentials at wave -1, before this chart's wave 0
+      # (gitops/manifests/base/objstore-credentials/).
       #
       # The chart only accepts it as existingSecret and renders name and key,
       # nothing else (templates/prometheus/prometheus.yaml at 91.4.1), so it
-      # can't be marked optional. The Prometheus pod therefore needs this
-      # Secret to start, and ArgoCD's health check for the Prometheus resource
-      # waits for the pod. On a par rebuilt from nothing, the Secret has to
-      # exist before this chart's wave 0, not after Garage's wave 5. Raised
-      # with cos; the running par already has it.
+      # can't be marked optional: the Prometheus pod needs this Secret to
+      # start, which is why it has to exist before wave 0.
       objectStorageConfig:
         existingSecret:
           name: thanos-objstore
@@ -39,6 +37,32 @@ prometheus:
   # And its metrics, thanos_shipper_uploads_total among them.
   thanosServiceMonitor:
     enabled: true
+
+########################################
+# Kubelet targets
+#
+# ws-scheduling's KWOK nodes, eu1-par-sim-gpu-01 and -02 (SIMULATED GPUs,
+# docs/simulated.md), are Node objects with no kubelet behind them. The
+# operator's kubelet Endpoints list every Node, so each KWOK node added
+# three targets that can never answer (/metrics, /metrics/cadvisor,
+# /metrics/probes), raising TargetDown and KubeletInstanceUnreachable.
+# They're dropped by node name, which the Endpoints role sets.
+#
+# Setting these lists replaces the chart's defaults, which hold only the
+# metrics_path rule (values.yaml at 91.4.1), so that rule comes first.
+########################################
+
+kubelet:
+  serviceMonitor:
+    relabelings: &kubelet-relabelings
+      - action: replace
+        sourceLabels: [__metrics_path__]
+        targetLabel: metrics_path
+      - action: drop
+        sourceLabels: [__meta_kubernetes_endpoint_node_name]
+        regex: eu1-par-sim-gpu-.*
+    cAdvisorRelabelings: *kubelet-relabelings
+    probesRelabelings: *kubelet-relabelings
 
 ########################################
 # Grafana

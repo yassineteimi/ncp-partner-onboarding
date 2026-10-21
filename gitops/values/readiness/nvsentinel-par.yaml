@@ -69,6 +69,22 @@ global:
 podMonitor:
   enabled: false
 
+# The platform connector DaemonSet tolerates every taint, so it was also bound
+# to ws-scheduling's KWOK nodes (simulated GPUs, use case 4), where no
+# container ever runs: pods shown Running that do nothing. The nodes carry
+# eu1.io/simulated=true; a real node has no such label. The NVSentinel
+# monitors don't need this: they select on nvidia.com/gpu.present, which the
+# KWOK nodes don't carry.
+platformConnector:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: eu1.io/simulated
+                operator: NotIn
+                values: ["true"]
+
 mongodb-store:
   # Percona, not the chart's default Bitnami: the Bitnami MongoDB images are
   # amd64 only (docs/configuration/mongodb-store.md at v1.28.0), so the values

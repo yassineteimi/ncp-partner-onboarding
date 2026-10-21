@@ -1,0 +1,84 @@
+# Creates the Slurm authentication Secrets inside the cluster the first time,
+# so neither key is ever in Git or on a laptop: slurm-auth-slurm (slurm.key)
+# and slurm-auth-jwt (jwt.key), 1024 printable characters each, immutable.
+#
+# Why not the slurm chart's own Secrets: it makes them with randAscii behind a
+# lookup of the existing Secret (templates/secrets/slurmkey.yaml and
+# jwtkey.yaml at 1.2.3). ArgoCD renders offline, where lookup returns nothing,
+# so each render would generate new keys for Secrets marked immutable
+# (Part 1 rule 5).
+#
+# Idempotent: an existing Secret is kept, never rotated. The Job runs at sync
+# wave -1, before the slurm chart's objects (wave 0) read the Secrets, and on
+# the control plane, like the Garage bootstrap, so it doesn't wait for the CPU
+# worker. Pattern from gitops/manifests/base/checkpoint-store/bootstrap.yaml.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: slurm-keys-bootstrap
+  namespace: slurm
+  annotations:
+    argocd.argoproj.io/sync-wave: "-2"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: slurm-keys-bootstrap
+  namespace: slurm
+  annotations:
+    argocd.argoproj.io/sync-wave: "-2"
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: slurm-keys-bootstrap
+  namespace: slurm
+  annotations:
+    argocd.argoproj.io/sync-wave: "-2"
+roleRef: {apiGroup: rbac.authorization.k8s.io, kind: Role, name: slurm-keys-bootstrap}
+subjects: [{kind: ServiceAccount, name: slurm-keys-bootstrap, namespace: slurm}]
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: slurm-keys-bootstrap
+  namespace: slurm
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  backoffLimit: 3
+  template:
+    spec:
+      serviceAccountName: slurm-keys-bootstrap
+      restartPolicy: Never
+      nodeSelector:
+        node-role.kubernetes.io/control-plane: ""
+      containers:
+        - name: bootstrap
+          image: alpine/k8s:1.36.5@sha256:094adf64cdc4827377cdbe7ea5747472ce115f9fbc64a4e35970ec66777f9a00
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -eu
+              # 768 random bytes in base64: 1024 printable characters, the
+              # length the chart's randAscii 1024 would give.
+              make_key() {
+                name="$1" key="$2"
+                if kubectl -n slurm get secret "$name" >/dev/null 2>&1; then
+                  echo "$name exists, keeping it"
+                  return
+                fi
+                head -c 768 /dev/urandom | base64 | tr -d '\n' > /tmp/key
+                { kubectl -n slurm create secret generic "$name" --from-file="$key=/tmp/key" \
+                    --dry-run=client -o yaml
+                  echo "immutable: true"
+                } | kubectl apply -f -
+                rm -f /tmp/key
+                echo "$name created ($key, immutable)"
+              }
+              make_key slurm-auth-slurm slurm.key
+              make_key slurm-auth-jwt jwt.key

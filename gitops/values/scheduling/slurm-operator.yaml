@@ -1,0 +1,39 @@
+# Slinky slurm-operator 1.2.3 on par (use case 5). AICR v1.1.0 lists Slinky
+# 1.2.0; 1.2.3 is the latest patch of the same line (30 Sep). Minimum
+# Kubernetes for 1.2 is 1.29 (README, compatibility matrix).
+#
+# The webhook's certificate comes from cert-manager, in par's base since
+# 20 Oct, so nothing here generates a CA at render time (Part 1 rule 5). Its
+# validating webhook is failurePolicy Fail but only matches Slinky's own
+# objects; the pod webhook is Ignore. A powered-off CPU worker therefore
+# blocks Slurm objects, never other lanes' pods.
+
+# The operator chart owns the CRDs, so the operator and the cluster that
+# needs them sync in one Application.
+crds:
+  enabled: true
+
+operator:
+  image:
+    repository: ghcr.io/slinkyproject/slurm-operator
+    digest: sha256:b35e76c09e587f1bc902bcff228b6c14e63ffd173afebf33e627480e67bc36ee # 1.2.3
+  nodeSelector:
+    eu1.io/pool: cpu
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+webhook:
+  image:
+    repository: ghcr.io/slinkyproject/slurm-operator-webhook
+    digest: sha256:68a4460abaa12e34d700c90ea05364c4251000cb72f2a950964bde681a8a0fc1 # 1.2.3
+  nodeSelector:
+    eu1.io/pool: cpu
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+
+certManager:
+  enabled: true
