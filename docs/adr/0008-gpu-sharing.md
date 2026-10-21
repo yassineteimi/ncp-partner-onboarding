@@ -51,6 +51,5 @@ What would change the answer:
 - Part 1 (nvidia-gpu-fleet-poc): `docs/artifacts/session-d-tenancy.txt` and `session-d-tenancy-verdict.txt` (three pods, two tenants, one L4 UUID, the quota refusal), `session-d-timeline.txt` (`xid_injected=2026-09-30T19:48:35.363Z ... xid=79 simulated=true`), `docs/04-goodput-and-burn-in.md` ("Time slicing has no isolation").
 - Free check of the MIG config: the GPU Operator v26.7.2 render for fin has `mig.strategy=mixed`, the `mig-parted-eu1` ConfigMap and `WITH_REBOOT=false` ([free checks](../artifacts/scheduling/free-checks-20261020T232008Z.txt)).
 - Source: mig-parted v0.15.1, `pkg/mig/reconfigure/reconfigure.go` (state labels, the reboot fallback) and `cmd/nvidia-mig-parted/util/device.go` (`nvidia-smi -r` on a pending mode change); KAI v0.18.6, `pkg/scheduler/api/common_info/resources/mig.go`; H200 141GB profiles from NVIDIA's MIG user guide.
-- Planned, not run yet:
-  - `make sched-mig-check`: the config through mig-parted's own loader, on par's CPU worker (Wednesday)
-  - W2 step 5 on fin: MIG applied, two tenants each seeing about 71 GB on their own instance, one whole-GPU pod beside them (`make sched-mig`)
+- `make sched-mig-check`, 21 October ([capture](../artifacts/scheduling/mig-config-par-20261021T113350Z.txt)): fin's rendered config through mig-parted v0.15.1's own loader on par's CPU worker. `h200-split` and `all-disabled` are valid, an unknown name is refused.
+- Planned: W2 step 5 on fin, MIG applied, two tenants each seeing about 71 GB on their own instance, one whole-GPU pod beside them (`make sched-mig`).
