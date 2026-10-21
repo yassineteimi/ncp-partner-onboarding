@@ -22,3 +22,14 @@ thanos-check-mtls: ## UC6: local end to end of fin's write path: certificates, m
 .PHONY: thanos-capture
 thanos-capture: ## UC6: evidence through par's API, MODE=hub|fin|after|bucket, into docs/artifacts/platform/
 	./scripts/platform/capture-thanos.sh $(or $(MODE),hub)
+
+.PHONY: thanos-backfill-sim
+thanos-backfill-sim: ## UC6, SIMULATED: upload 5 days of synthetic blocks (site=sim-backfill) so the compactor's downsampling can be seen
+	./scripts/platform/backfill-downsampling.sh
+
+.PHONY: kubevirt-check kubevirt-capture
+kubevirt-check: ## UC7: free checks: vendored manifest digest, kustomize, fields against KubeVirt's OpenAPI (DRY_RUN=server: also on par; BREAK=1: must fail)
+	./scripts/platform/check-kubevirt.sh
+
+kubevirt-capture: ## UC7: evidence through par's API: VM, boot timestamps, quota, the guest's page, GPU pods next to it
+	./scripts/platform/capture-kubevirt.sh

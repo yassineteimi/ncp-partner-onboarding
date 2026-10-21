@@ -1,0 +1,42 @@
+# The KubeVirt resource: the operator deploys virt-api, virt-controller and
+# virt-handler from it.
+#
+# KVM, not emulation. eu1-par-cpu-01 (POP2-8C-32G) exposes /dev/kvm with AMD
+# SVM (docs/artifacts/par/cpu-worker-facts.txt), so useEmulation stays false
+# and guests run with hardware virtualisation. It is set explicitly because it
+# is the decision ADR 0010 records; with emulation on, KubeVirt runs QEMU's
+# software CPU (TCG) and a guest is many times slower.
+#
+# Placement. With nodePlacement set, KubeVirt uses it instead of its default
+# "control plane required" affinity for virt-api and virt-controller
+# (InjectPlacementMetadata in pkg/virt-operator/resource/placement at
+# v1.9.1). virt-handler, a DaemonSet, decides where VMs can run: only on the
+# CPU worker here. A GPU node would join that list only for GPU passthrough,
+# which this PoC documents and does not build.
+apiVersion: kubevirt.io/v1
+kind: KubeVirt
+metadata:
+  name: kubevirt
+  namespace: kubevirt
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+    # The CRD comes with this Application, in wave 0.
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  certificateRotateStrategy: {}
+  configuration:
+    developerConfiguration:
+      useEmulation: false
+      featureGates: []
+  customizeComponents: {}
+  imagePullPolicy: IfNotPresent
+  workloadUpdateStrategy: {}
+  infra:
+    replicas: 1
+    nodePlacement:
+      nodeSelector:
+        eu1.io/pool: cpu
+  workloads:
+    nodePlacement:
+      nodeSelector:
+        eu1.io/pool: cpu

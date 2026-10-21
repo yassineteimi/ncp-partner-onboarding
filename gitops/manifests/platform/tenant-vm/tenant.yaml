@@ -1,0 +1,43 @@
+# The VM tenant's namespace, its quota and the Service in front of its VM.
+#
+# The quota counts what the VM really costs the cluster: KubeVirt runs each VM
+# in a virt-launcher pod whose requests are the guest's plus an overhead for
+# QEMU and libvirt, and that pod is what the quota sees. The capture after the
+# first boot (make kubevirt-capture) records how much the overhead was.
+# No GPUs for this tenant: GPU passthrough is documented, not built.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: tenant-vm
+  labels:
+    eu1.io/tenant: tenant-vm
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: tenant-vm
+  namespace: tenant-vm
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+spec:
+  hard:
+    requests.cpu: "2"
+    requests.memory: 4Gi
+    requests.nvidia.com/gpu: "0"
+    count/virtualmachines.kubevirt.io: "2"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-01
+  namespace: tenant-vm
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+spec:
+  # The VM's template labels are copied onto its virt-launcher pod.
+  selector:
+    app.kubernetes.io/name: web-01
+  ports:
+    - {name: http, port: 80, targetPort: 80}

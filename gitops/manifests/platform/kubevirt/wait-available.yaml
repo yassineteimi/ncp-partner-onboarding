@@ -1,0 +1,65 @@
+# Holds this Application's sync until KubeVirt reports Available, so the
+# tenant's VirtualMachine (wave 3) is applied after the operator has created
+# the VirtualMachine CRD and its webhooks. ArgoCD v3.5.3 has no health check
+# for the KubeVirt resource (resource_customizations/kubevirt.io lists only
+# VirtualMachine and VirtualMachineInstance), so it would call wave 1 healthy
+# at once.
+#
+# A Sync hook, recreated on each sync, so a later sync waits again.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kubevirt-wait
+  namespace: kubevirt
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: kubevirt-wait
+  namespace: kubevirt
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+rules:
+  - apiGroups: ["kubevirt.io"]
+    resources: ["kubevirts"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: kubevirt-wait
+  namespace: kubevirt
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+roleRef: {apiGroup: rbac.authorization.k8s.io, kind: Role, name: kubevirt-wait}
+subjects: [{kind: ServiceAccount, name: kubevirt-wait, namespace: kubevirt}]
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kubevirt-wait-available
+  namespace: kubevirt
+  annotations:
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  backoffLimit: 2
+  template:
+    spec:
+      serviceAccountName: kubevirt-wait
+      restartPolicy: Never
+      nodeSelector:
+        eu1.io/pool: cpu
+      containers:
+        - name: wait
+          image: alpine/k8s:1.36.5@sha256:094adf64cdc4827377cdbe7ea5747472ce115f9fbc64a4e35970ec66777f9a00
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -eu
+              kubectl -n kubevirt wait kubevirt/kubevirt --for=condition=Available --timeout=20m
+              kubectl -n kubevirt get kubevirt/kubevirt \
+                -o jsonpath='{.status.phase} {.status.observedKubeVirtVersion}{"\n"}'

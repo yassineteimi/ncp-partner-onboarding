@@ -1,0 +1,42 @@
+# KubeVirt v1.9.1 and the VM tenant, use case 7, sync wave 10 like every lane
+# Application. Everything runs on par's CPU worker (eu1.io/pool: cpu), which
+# exposes /dev/kvm; with the worker off this Application reads Progressing.
+# Nothing in a later wave depends on it.
+#
+# Server-side apply: the KubeVirt CRD is larger than the annotation a
+# client-side apply would store. Server-side diff: KubeVirt's webhooks fill in
+# VirtualMachine defaults, which would otherwise read as drift.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kubevirt
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
+    argocd.argoproj.io/compare-options: ServerSideDiff=true
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/yassineteimi/ncp-partner-onboarding
+    targetRevision: main
+    path: gitops/manifests/platform/kubevirt
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kubevirt
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - ServerSideApply=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 20s
+        factor: 2
+        maxDuration: 5m
