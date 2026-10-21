@@ -1,0 +1,541 @@
+# NVSentinel's state after the run, 2026-10-21T17:22:50Z
+== node
+apiVersion: v1
+kind: Node
+metadata:
+  annotations:
+    flannel.alpha.coreos.com/backend-data: '{"VNI":1,"VtepMAC":"ee:b0:1d:b8:2a:97"}'
+    flannel.alpha.coreos.com/backend-type: vxlan
+    flannel.alpha.coreos.com/kube-subnet-manager: "true"
+    flannel.alpha.coreos.com/public-ip: 172.16.32.20
+    nfd.node.kubernetes.io/feature-labels: cpu-cpuid.ADX,cpu-cpuid.AESNI,cpu-cpuid.AVX,cpu-cpuid.AVX2,cpu-cpuid.CLZERO,cpu-cpuid.CMPXCHG8,cpu-cpuid.FMA3,cpu-cpuid.FSRM,cpu-cpuid.FXSR,cpu-cpuid.FXSROPT,cpu-cpuid.HYPERVISOR,cpu-cpuid.IA32_ARCH_CAP,cpu-cpuid.IBPB,cpu-cpuid.IBRS,cpu-cpuid.LAHF,cpu-cpuid.LBRVIRT,cpu-cpuid.MCAOVERFLOW,cpu-cpuid.MOVBE,cpu-cpuid.NRIPS,cpu-cpuid.OSXSAVE,cpu-cpuid.PSFD,cpu-cpuid.SHA,cpu-cpuid.SPEC_CTRL_SSBD,cpu-cpuid.SSE4A,cpu-cpuid.STIBP,cpu-cpuid.STIBP_ALWAYSON,cpu-cpuid.SUCCOR,cpu-cpuid.SVM,cpu-cpuid.SVMNP,cpu-cpuid.SVMPF,cpu-cpuid.SVMPFT,cpu-cpuid.SYSCALL,cpu-cpuid.SYSEE,cpu-cpuid.TSCRATEMSR,cpu-cpuid.VAES,cpu-cpuid.VMCBCLEAN,cpu-cpuid.VPCLMULQDQ,cpu-cpuid.WBNOINVD,cpu-cpuid.X86_64_V1,cpu-cpuid.X86_64_V2,cpu-cpuid.X86_64_V3,cpu-cpuid.X87,cpu-cpuid.XGETBV1,cpu-cpuid.XSAVE,cpu-cpuid.XSAVEC,cpu-cpuid.XSAVEOPT,cpu-cpuid.XSAVES,cpu-hardware_multithreading,cpu-model.family,cpu-model.hypervisor,cpu-model.id,cpu-model.vendor_id,kernel-config.NO_HZ,kernel-config.NO_HZ_FULL,kernel-version.full,kernel-version.major,kernel-version.minor,kernel-version.revision,nvidia.com/cuda.driver-version.full,nvidia.com/cuda.driver-version.major,nvidia.com/cuda.driver-version.minor,nvidia.com/cuda.driver-version.revision,nvidia.com/cuda.driver.major,nvidia.com/cuda.driver.minor,nvidia.com/cuda.driver.rev,nvidia.com/cuda.runtime-version.full,nvidia.com/cuda.runtime-version.major,nvidia.com/cuda.runtime-version.minor,nvidia.com/cuda.runtime.major,nvidia.com/cuda.runtime.minor,nvidia.com/gfd.timestamp,nvidia.com/gpu.compute.major,nvidia.com/gpu.compute.minor,nvidia.com/gpu.count,nvidia.com/gpu.family,nvidia.com/gpu.machine,nvidia.com/gpu.memory,nvidia.com/gpu.mode,nvidia.com/gpu.product,nvidia.com/gpu.replicas,nvidia.com/gpu.sharing-strategy,nvidia.com/mig.capable,nvidia.com/mig.strategy,nvidia.com/mps.capable,nvidia.com/vgpu.present,pci-10de.present,pci-1af4.present,system-os_release.ID,system-os_release.VERSION_ID,system-os_release.VERSION_ID.major,system-os_release.VERSION_ID.minor
+    node.alpha.kubernetes.io/ttl: "0"
+    nvidia.com/gpu-driver-upgrade-enabled: "true"
+    nvsentinel.dgxc.nvidia.com/dcgm-bootstrap-completed: "true"
+    volumes.kubernetes.io/controller-managed-attach-detach: "true"
+  creationTimestamp: "2026-10-21T16:47:23Z"
+  labels:
+    beta.kubernetes.io/arch: amd64
+    beta.kubernetes.io/os: linux
+    eu1.io/pool: gpu
+    eu1.io/site: par
+    feature.node.kubernetes.io/cpu-cpuid.ADX: "true"
+    feature.node.kubernetes.io/cpu-cpuid.AESNI: "true"
+    feature.node.kubernetes.io/cpu-cpuid.AVX: "true"
+    feature.node.kubernetes.io/cpu-cpuid.AVX2: "true"
+    feature.node.kubernetes.io/cpu-cpuid.CLZERO: "true"
+    feature.node.kubernetes.io/cpu-cpuid.CMPXCHG8: "true"
+    feature.node.kubernetes.io/cpu-cpuid.FMA3: "true"
+    feature.node.kubernetes.io/cpu-cpuid.FSRM: "true"
+    feature.node.kubernetes.io/cpu-cpuid.FXSR: "true"
+    feature.node.kubernetes.io/cpu-cpuid.FXSROPT: "true"
+    feature.node.kubernetes.io/cpu-cpuid.HYPERVISOR: "true"
+    feature.node.kubernetes.io/cpu-cpuid.IA32_ARCH_CAP: "true"
+    feature.node.kubernetes.io/cpu-cpuid.IBPB: "true"
+    feature.node.kubernetes.io/cpu-cpuid.IBRS: "true"
+    feature.node.kubernetes.io/cpu-cpuid.LAHF: "true"
+    feature.node.kubernetes.io/cpu-cpuid.LBRVIRT: "true"
+    feature.node.kubernetes.io/cpu-cpuid.MCAOVERFLOW: "true"
+    feature.node.kubernetes.io/cpu-cpuid.MOVBE: "true"
+    feature.node.kubernetes.io/cpu-cpuid.NRIPS: "true"
+    feature.node.kubernetes.io/cpu-cpuid.OSXSAVE: "true"
+    feature.node.kubernetes.io/cpu-cpuid.PSFD: "true"
+    feature.node.kubernetes.io/cpu-cpuid.SHA: "true"
+    feature.node.kubernetes.io/cpu-cpuid.SPEC_CTRL_SSBD: "true"
+    feature.node.kubernetes.io/cpu-cpuid.SSE4A: "true"
+    feature.node.kubernetes.io/cpu-cpuid.STIBP: "true"
+    feature.node.kubernetes.io/cpu-cpuid.STIBP_ALWAYSON: "true"
+    feature.node.kubernetes.io/cpu-cpuid.SUCCOR: "true"
+    feature.node.kubernetes.io/cpu-cpuid.SVM: "true"
+    feature.node.kubernetes.io/cpu-cpuid.SVMNP: "true"
+    feature.node.kubernetes.io/cpu-cpuid.SVMPF: "true"
+    feature.node.kubernetes.io/cpu-cpuid.SVMPFT: "true"
+    feature.node.kubernetes.io/cpu-cpuid.SYSCALL: "true"
+    feature.node.kubernetes.io/cpu-cpuid.SYSEE: "true"
+    feature.node.kubernetes.io/cpu-cpuid.TSCRATEMSR: "true"
+    feature.node.kubernetes.io/cpu-cpuid.VAES: "true"
+    feature.node.kubernetes.io/cpu-cpuid.VMCBCLEAN: "true"
+    feature.node.kubernetes.io/cpu-cpuid.VPCLMULQDQ: "true"
+    feature.node.kubernetes.io/cpu-cpuid.WBNOINVD: "true"
+    feature.node.kubernetes.io/cpu-cpuid.X86_64_V1: "true"
+    feature.node.kubernetes.io/cpu-cpuid.X86_64_V2: "true"
+    feature.node.kubernetes.io/cpu-cpuid.X86_64_V3: "true"
+    feature.node.kubernetes.io/cpu-cpuid.X87: "true"
+    feature.node.kubernetes.io/cpu-cpuid.XGETBV1: "true"
+    feature.node.kubernetes.io/cpu-cpuid.XSAVE: "true"
+    feature.node.kubernetes.io/cpu-cpuid.XSAVEC: "true"
+    feature.node.kubernetes.io/cpu-cpuid.XSAVEOPT: "true"
+    feature.node.kubernetes.io/cpu-cpuid.XSAVES: "true"
+    feature.node.kubernetes.io/cpu-hardware_multithreading: "false"
+    feature.node.kubernetes.io/cpu-model.family: "25"
+    feature.node.kubernetes.io/cpu-model.hypervisor: kvm
+    feature.node.kubernetes.io/cpu-model.id: "1"
+    feature.node.kubernetes.io/cpu-model.vendor_id: AMD
+    feature.node.kubernetes.io/kernel-config.NO_HZ: "true"
+    feature.node.kubernetes.io/kernel-config.NO_HZ_FULL: "true"
+    feature.node.kubernetes.io/kernel-version.full: 6.8.0-136-generic
+    feature.node.kubernetes.io/kernel-version.major: "6"
+    feature.node.kubernetes.io/kernel-version.minor: "8"
+    feature.node.kubernetes.io/kernel-version.revision: "0"
+    feature.node.kubernetes.io/pci-10de.present: "true"
+    feature.node.kubernetes.io/pci-1af4.present: "true"
+    feature.node.kubernetes.io/system-os_release.ID: ubuntu
+    feature.node.kubernetes.io/system-os_release.VERSION_ID: "24.04"
+    feature.node.kubernetes.io/system-os_release.VERSION_ID.major: "24"
+    feature.node.kubernetes.io/system-os_release.VERSION_ID.minor: "04"
+    k8saas.nvidia.com/uncordon-by: NVSentinel
+    k8saas.nvidia.com/uncordon-reason: Syslog-fatal-error-ruleset-removed
+    k8saas.nvidia.com/uncordon-timestamp: 2026-10-21T17-08-05Z
+    kubernetes.io/arch: amd64
+    kubernetes.io/hostname: eu1-par-gpu-01
+    kubernetes.io/os: linux
+    nvidia.com/cuda.driver-version.full: 595.91.07
+    nvidia.com/cuda.driver-version.major: "595"
+    nvidia.com/cuda.driver-version.minor: "91"
+    nvidia.com/cuda.driver-version.revision: "07"
+    nvidia.com/cuda.driver.major: "595"
+    nvidia.com/cuda.driver.minor: "91"
+    nvidia.com/cuda.driver.rev: "07"
+    nvidia.com/cuda.runtime-version.full: "13.2"
+    nvidia.com/cuda.runtime-version.major: "13"
+    nvidia.com/cuda.runtime-version.minor: "2"
+    nvidia.com/cuda.runtime.major: "13"
+    nvidia.com/cuda.runtime.minor: "2"
+    nvidia.com/gfd.timestamp: "1792602450"
+    nvidia.com/gpu-driver-upgrade-state: upgrade-done
+    nvidia.com/gpu.compute.major: "8"
+    nvidia.com/gpu.compute.minor: "9"
+    nvidia.com/gpu.count: "1"
+    nvidia.com/gpu.deploy.client: "true"
+    nvidia.com/gpu.deploy.container-toolkit: "true"
+    nvidia.com/gpu.deploy.dcgm: "true"
+    nvidia.com/gpu.deploy.dcgm-exporter: "true"
+    nvidia.com/gpu.deploy.device-plugin: "true"
+    nvidia.com/gpu.deploy.driver: "true"
+    nvidia.com/gpu.deploy.gpu-feature-discovery: "true"
+    nvidia.com/gpu.deploy.node-status-exporter: "true"
+    nvidia.com/gpu.deploy.nvsm: ""
+    nvidia.com/gpu.deploy.operator-validator: "true"
+    nvidia.com/gpu.family: ada-lovelace
+    nvidia.com/gpu.machine: SCW-L4-1-24G
+    nvidia.com/gpu.memory: "23034"
+    nvidia.com/gpu.mode: compute
+    nvidia.com/gpu.present: "true"
+    nvidia.com/gpu.product: NVIDIA-L4
+    nvidia.com/gpu.replicas: "1"
+    nvidia.com/gpu.sharing-strategy: none
+    nvidia.com/mig.capable: "false"
+    nvidia.com/mig.strategy: single
+    nvidia.com/mps.capable: "false"
+    nvidia.com/vgpu.present: "false"
+    nvsentinel.dgxc.nvidia.com/dcgm.version: 4.x
+    nvsentinel.dgxc.nvidia.com/driver.installed: "true"
+    nvsentinel.dgxc.nvidia.com/gpu.count.current: "1"
+    nvsentinel.dgxc.nvidia.com/gpu.count.expected: "1"
+    nvsentinel.dgxc.nvidia.com/kata.enabled: "false"
+  name: eu1-par-gpu-01
+  resourceVersion: "450300"
+  uid: 9cb36d67-59ee-4de4-a198-18d741c57a71
+spec:
+  podCIDR: 10.244.4.0/24
+  podCIDRs:
+  - 10.244.4.0/24
+status:
+  addresses:
+  - address: 172.16.32.20
+    type: InternalIP
+  - address: eu1-par-gpu-01
+    type: Hostname
+  allocatable:
+    cpu: "8"
+    ephemeral-storage: "129759768362"
+    hugepages-1Gi: "0"
+    hugepages-2Mi: "0"
+    memory: 48176744Ki
+    nvidia.com/gpu: "1"
+    pods: "110"
+  capacity:
+    cpu: "8"
+    ephemeral-storage: 140798360Ki
+    hugepages-1Gi: "0"
+    hugepages-2Mi: "0"
+    memory: 48279144Ki
+    nvidia.com/gpu: "1"
+    pods: "110"
+  conditions:
+  - lastHeartbeatTime: "2026-10-21T17:05:34Z"
+    lastTransitionTime: "2026-10-21T17:05:34Z"
+    message: Flannel is running on this node
+    reason: FlannelIsUp
+    status: "False"
+    type: NetworkUnavailable
+  - lastHeartbeatTime: "2026-10-21T17:22:30Z"
+    lastTransitionTime: "2026-10-21T17:05:30Z"
+    message: kubelet has sufficient memory available
+    reason: KubeletHasSufficientMemory
+    status: "False"
+    type: MemoryPressure
+  - lastHeartbeatTime: "2026-10-21T17:22:30Z"
+    lastTransitionTime: "2026-10-21T17:05:30Z"
+    message: kubelet has no disk pressure
+    reason: KubeletHasNoDiskPressure
+    status: "False"
+    type: DiskPressure
+  - lastHeartbeatTime: "2026-10-21T17:22:30Z"
+    lastTransitionTime: "2026-10-21T17:05:30Z"
+    message: kubelet has sufficient PID available
+    reason: KubeletHasSufficientPID
+    status: "False"
+    type: PIDPressure
+  - lastHeartbeatTime: "2026-10-21T17:22:30Z"
+    lastTransitionTime: "2026-10-21T17:05:30Z"
+    message: kubelet is posting ready status
+    reason: KubeletReady
+    status: "True"
+    type: Ready
+  - lastHeartbeatTime: "2026-10-21T17:07:01Z"
+    lastTransitionTime: "2026-10-21T17:07:01Z"
+    message: No Health Failures
+    reason: SysLogsXIDErrorIsHealthy
+    status: "False"
+    type: SysLogsXIDError
+  - lastHeartbeatTime: "2026-10-21T16:49:24Z"
+    lastTransitionTime: "2026-10-21T16:49:24Z"
+    message: No Health Failures
+    reason: SysLogsSXIDErrorIsHealthy
+    status: "False"
+    type: SysLogsSXIDError
+  - lastHeartbeatTime: "2026-10-21T16:49:24Z"
+    lastTransitionTime: "2026-10-21T16:49:24Z"
+    message: No Health Failures
+    reason: SysLogsGPUFallenOffIsHealthy
+    status: "False"
+    type: SysLogsGPUFallenOff
+  - lastHeartbeatTime: "2026-10-21T17:08:05Z"
+    lastTransitionTime: "2026-10-21T17:08:05Z"
+    message: No Health Failures
+    reason: GpuDcgmConnectivityFailureIsHealthy
+    status: "False"
+    type: GpuDcgmConnectivityFailure
+  - lastHeartbeatTime: "2026-10-21T16:59:19Z"
+    lastTransitionTime: "2026-10-21T16:59:19Z"
+    message: No Health Failures
+    reason: GpuNvswitchFatalWatchIsHealthy
+    status: "False"
+    type: GpuNvswitchFatalWatch
+  - lastHeartbeatTime: "2026-10-21T16:59:19Z"
+    lastTransitionTime: "2026-10-21T16:59:19Z"
+    message: No Health Failures
+    reason: GpuPowerWatchIsHealthy
+    status: "False"
+    type: GpuPowerWatch
+  - lastHeartbeatTime: "2026-10-21T16:59:19Z"
+    lastTransitionTime: "2026-10-21T16:59:19Z"
+    message: No Health Failures
+    reason: GpuSmWatchIsHealthy
+    status: "False"
+    type: GpuSmWatch
+  - lastHeartbeatTime: "2026-10-21T16:59:19Z"
+    lastTransitionTime: "2026-10-21T16:59:19Z"
+    message: No Health Failures
+    reason: GpuThermalWatchIsHealthy
+    status: "False"
+    type: GpuThermalWatch
+  - lastHeartbeatTime: "2026-10-21T16:59:19Z"
+    lastTransitionTime: "2026-10-21T16:59:19Z"
+    message: No Health Failures
+    reason: GpuInforomWatchIsHealthy
+    status: "False"
+    type: GpuInforomWatch
+  - lastHeartbeatTime: "2026-10-21T16:59:19Z"
+    lastTransitionTime: "2026-10-21T16:59:19Z"
+    message: No Health Failures
+    reason: GpuMcuWatchIsHealthy
+    status: "False"
+    type: GpuMcuWatch
+  - lastHeartbeatTime: "2026-10-21T16:59:19Z"
+    lastTransitionTime: "2026-10-21T16:59:19Z"
+    message: No Health Failures
+    reason: GpuNvswitchNonfatalWatchIsHealthy
+    status: "False"
+    type: GpuNvswitchNonfatalWatch
+  - lastHeartbeatTime: "2026-10-21T16:59:19Z"
+    lastTransitionTime: "2026-10-21T16:59:19Z"
+    message: No Health Failures
+    reason: GpuPcieWatchIsHealthy
+    status: "False"
+    type: GpuPcieWatch
+  - lastHeartbeatTime: "2026-10-21T16:59:19Z"
+    lastTransitionTime: "2026-10-21T16:59:19Z"
+    message: No Health Failures
+    reason: GpuPmuWatchIsHealthy
+    status: "False"
+    type: GpuPmuWatch
+  - lastHeartbeatTime: "2026-10-21T16:59:19Z"
+    lastTransitionTime: "2026-10-21T16:59:19Z"
+    message: No Health Failures
+    reason: GpuAllWatchIsHealthy
+    status: "False"
+    type: GpuAllWatch
+  - lastHeartbeatTime: "2026-10-21T16:59:19Z"
+    lastTransitionTime: "2026-10-21T16:59:19Z"
+    message: No Health Failures
+    reason: GpuDriverWatchIsHealthy
+    status: "False"
+    type: GpuDriverWatch
+  - lastHeartbeatTime: "2026-10-21T16:59:19Z"
+    lastTransitionTime: "2026-10-21T16:59:19Z"
+    message: No Health Failures
+    reason: GpuMemWatchIsHealthy
+    status: "False"
+    type: GpuMemWatch
+  - lastHeartbeatTime: "2026-10-21T16:59:19Z"
+    lastTransitionTime: "2026-10-21T16:59:19Z"
+    message: No Health Failures
+    reason: GpuNvlinkWatchIsHealthy
+    status: "False"
+    type: GpuNvlinkWatch
+  daemonEndpoints:
+    kubeletEndpoint:
+      Port: 10250
+  declaredFeatures:
+  - ExtendWebSocketsToKubelet
+  - InPlacePodLevelResourcesVerticalScaling
+  - InPlacePodVerticalScalingInitContainers
+  - RestartAllContainersOnContainerExits
+  features:
+    supplementalGroupsPolicy: true
+  images:
+  - names:
+    - nvcr.io/nvidia/pytorch@sha256:38ed2ecb2c16d10677006d73fb0a150855d6ec81db8fc66e800b5ae92741007e
+    sizeBytes: 9108129521
+  - names:
+    - ghcr.io/yassineteimi/goodput-trainer@sha256:feda704575fb07b7cfbb56e567bc76d22779fd8481e5ff72c632f0677860f945
+    sizeBytes: 4276969107
+  - names:
+    - ghcr.io/nvidia/nvsentinel/gpu-health-monitor@sha256:d8a71746452a05e6e9d5f2af18f940102b99736c60e5041c3272b9ebe6a8bf48
+    - ghcr.io/nvidia/nvsentinel/gpu-health-monitor:v1.28.0-dcgm-4.x
+    sizeBytes: 2699860754
+  - names:
+    - nvcr.io/nvidia/cloud-native/dcgm@sha256:48464e50aa76671f5b204264cb4999739591112bf74330a727523f5655c6d7f2
+    - nvcr.io/nvidia/cloud-native/dcgm:4.6.1-1-ubuntu24.04
+    sizeBytes: 1901891245
+  - names:
+    - nvcr.io/nvidia/driver@sha256:dd2913cb7fe0240c32351ac50ccfbae7a8dfe068e3b336ae75b5575745cb000d
+    - nvcr.io/nvidia/driver:595.91.07-ubuntu24.04
+    sizeBytes: 685928884
+  - names:
+    - ghcr.io/nvidia/nvsentinel/metadata-collector@sha256:5a84e6916e30f1d8b45808452a4b2b90a93c65b2d5de2f18c1e27b8f1c250a25
+    - ghcr.io/nvidia/nvsentinel/metadata-collector:v1.28.0
+    sizeBytes: 215708770
+  - names:
+    - nvcr.io/nvidia/gpu-operator@sha256:02933b43d286d1321cd0dadd460b9ae8f5e5c0ee99a087e2d10254febc94ba45
+    - nvcr.io/nvidia/gpu-operator:v26.7.2
+    sizeBytes: 149045680
+  - names:
+    - nvcr.io/nvidia/cuda@sha256:5dca947f477ec8ea91624447bdad7cc5f6a0dfe038ef53642c884bf5416478a6
+    sizeBytes: 91447226
+  - names:
+    - nvcr.io/nvidia/k8s/cuda-sample@sha256:7c7540bdf1f942d4fb6db97069fd6c289471b54ac29e3c7fcdf914cf77af7d41
+    sizeBytes: 90422813
+  - names:
+    - registry.k8s.io/nfd/node-feature-discovery@sha256:2fa1c99ad09bdf2c8ad97706a4ad2fd548c84d5ecd70ba32a6152c667b96c4d2
+    - registry.k8s.io/nfd/node-feature-discovery:v0.19.0
+    sizeBytes: 85412382
+  - names:
+    - nvcr.io/nvidia/k8s/dcgm-exporter@sha256:148b0c025e5f2850256816fa33754fbf4733b7a086697a95613fc0ba3db5b003
+    - nvcr.io/nvidia/k8s/dcgm-exporter:4.6.1-4.8.4-distroless
+    sizeBytes: 62806267
+  - names:
+    - nvcr.io/nvidia/k8s/container-toolkit@sha256:00a422252dd875b112f5974321c2feebbdf11c338f8ad131e5ce18e5b3a3bfac
+    - nvcr.io/nvidia/k8s/container-toolkit:v1.20.1
+    sizeBytes: 58929387
+  - names:
+    - nvcr.io/nvidia/k8s-device-plugin@sha256:27c1b2553a690ca3d29889dcd61df97525d46f58272c0be8dc63c2b18f120075
+    - nvcr.io/nvidia/k8s-device-plugin:v0.20.1
+    sizeBytes: 55846754
+  - names:
+    - ghcr.io/nvidia/nvsentinel/syslog-health-monitor@sha256:e1de2ec922d936bb875b068d4fd541c0c046b0985393f4261f32906801be8015
+    - ghcr.io/nvidia/nvsentinel/syslog-health-monitor:v1.28.0
+    sizeBytes: 44223270
+  - names:
+    - nvcr.io/nvidia/cloud-native/k8s-driver-manager@sha256:37e6bf0cf02b5888288a173353b858da8823cc9f9fb9c6e8d6d1e2cf5bfb16c8
+    - nvcr.io/nvidia/cloud-native/k8s-driver-manager:v0.12.1
+    sizeBytes: 38257987
+  - names:
+    - ghcr.io/flannel-io/flannel@sha256:708a2c9c1cfbfe529d1dbb249cb7113af117f3ed26b5e3e4c8ee015e10555204
+    - ghcr.io/flannel-io/flannel:v0.28.9
+    sizeBytes: 33343647
+  - names:
+    - registry.k8s.io/kube-proxy@sha256:5f180e85f05b5b0949fc9d2886ca536c2aa8b8a3b8302b58e7d49c4a645f97a9
+    - registry.k8s.io/kube-proxy:v1.36.5
+    sizeBytes: 30076143
+  - names:
+    - registry.k8s.io/kube-apiserver@sha256:4b3e69973a1d58d3c1f670d3477a9b9f14a03a271823113e8e0c9a333eb84f48
+    - registry.k8s.io/kube-apiserver:v1.36.5
+    sizeBytes: 29843830
+  - names:
+    - registry.k8s.io/kube-controller-manager@sha256:2d717af134451db77ea053c3426bc82edc0e55415eb36e1260313c636ebe9a4d
+    - registry.k8s.io/kube-controller-manager:v1.36.5
+    sizeBytes: 26493523
+  - names:
+    - registry.k8s.io/coredns/coredns@sha256:e7e6440cfd1e919280958f5b5a6ab2b184d385bba774c12ad2a9e1e4183f90d9
+    - registry.k8s.io/coredns/coredns:v1.14.2
+    sizeBytes: 23257541
+  - names:
+    - ghcr.io/nvidia/nvsentinel/platform-connectors@sha256:95396c8985c174fb5ed5849dc33581cc69db0c04c6b60ae1e2102b38c6a8067f
+    - ghcr.io/nvidia/nvsentinel/platform-connectors:v1.28.0
+    sizeBytes: 23057937
+  - names:
+    - registry.k8s.io/etcd@sha256:397189418d1a00e500c0605ad18d1baf3b541a1004d768448c367e48071622e5
+    - registry.k8s.io/etcd:3.6.8-0
+    sizeBytes: 22885795
+  - names:
+    - registry.k8s.io/kube-scheduler@sha256:3804f66442962cefbe11fcd5330d5e7a797bfb3dc8535c322d005637b404a85f
+    - registry.k8s.io/kube-scheduler:v1.36.5
+    sizeBytes: 20513505
+  - names:
+    - quay.io/prometheus/node-exporter@sha256:8c9bac11973b94b59be88d6e11fee4429aa743c8846cdc75d65b18db33f6a106
+    - quay.io/prometheus/node-exporter:v1.12.1-distroless
+    sizeBytes: 13123706
+  - names:
+    - ghcr.io/flannel-io/flannel-cni-plugin@sha256:9fccdf677e6e26e76a4aa60da2113bab9852e8317287ba51b2c29778d2351345
+    - ghcr.io/flannel-io/flannel-cni-plugin:v1.9.1-flannel3
+    sizeBytes: 5171931
+  - names:
+    - public.ecr.aws/docker/library/busybox@sha256:bdf57e528e45e4433820e045b29b4597825a1c9e38353532d90a01445013f82e
+    - public.ecr.aws/docker/library/busybox:1.37.0
+    sizeBytes: 2222118
+  - names:
+    - registry.k8s.io/pause@sha256:f548e0e8e3dc1896ca956272154dde3314e8cc4fde0a57577ee9fa1c63f5baf4
+    - registry.k8s.io/pause:3.10.2
+    sizeBytes: 320805
+  nodeInfo:
+    architecture: amd64
+    bootID: 97af02a0-d89c-4a46-be4e-8f4ff99e515f
+    containerRuntimeVersion: containerd://2.3.6
+    kernelVersion: 6.8.0-136-generic
+    kubeProxyVersion: ""
+    kubeletVersion: v1.36.5
+    machineID: e683e1e08d8dbfd164df47936ad747f6
+    operatingSystem: linux
+    osImage: Ubuntu 24.04.5 LTS - 2026-10-20 - 9b403a0d
+    systemUUID: 070f27a4-f4cd-4dd1-82dc-20c95a7b9312
+  runtimeHandlers:
+  - features:
+      recursiveReadOnlyMounts: true
+      userNamespaces: true
+    name: ""
+  - features:
+      recursiveReadOnlyMounts: true
+      userNamespaces: true
+    name: nvidia
+  - features:
+      recursiveReadOnlyMounts: true
+      userNamespaces: true
+    name: nvidia-cdi
+  - features:
+      recursiveReadOnlyMounts: true
+      userNamespaces: true
+    name: nvidia-legacy
+  - features:
+      recursiveReadOnlyMounts: true
+      userNamespaces: true
+    name: runc
+== RebootNode objects
+apiVersion: v1
+items:
+- apiVersion: janitor.dgxc.nvidia.com/v1alpha1
+  kind: RebootNode
+  metadata:
+    annotations:
+      nvsentinel.nvidia.com/expiry: "2026-11-04T17:03:34Z"
+      nvsentinel.nvidia.com/span-id: ""
+      nvsentinel.nvidia.com/trace-id: "00000000000000000000000000000000"
+      nvsentinel.nvidia.com/ttl: 336h
+    creationTimestamp: "2026-10-21T17:03:34Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/managed-by: nvsentinel
+    name: maintenance-eu1-par-gpu-01-6ad8f05c81f7e5ec793c0233
+    ownerReferences:
+    - apiVersion: v1
+      blockOwnerDeletion: false
+      controller: false
+      kind: Node
+      name: eu1-par-gpu-01
+      uid: 9cb36d67-59ee-4de4-a198-18d741c57a71
+    resourceVersion: "443303"
+    uid: c9a755ce-a9ec-4928-80cb-0651a674dba5
+  spec:
+    force: false
+    nodeName: eu1-par-gpu-01
+  status:
+    completionTime: "2026-10-21T17:05:35Z"
+    conditions:
+    - lastTransitionTime: "2026-10-21T17:03:35Z"
+      message: 332dd2f9-cdb6-4deb-a196-6c23326f8979
+      reason: Succeeded
+      status: "True"
+      type: SignalSent
+    - lastTransitionTime: "2026-10-21T17:05:35Z"
+      message: Node reached ready state post-reboot
+      reason: Succeeded
+      status: "True"
+      type: NodeReady
+    startTime: "2026-10-21T17:03:35Z"
+kind: List
+metadata:
+  resourceVersion: ""
+== events on the node
+TIME                   SOURCE                  REASON                        MESSAGE
+<nil>                  <none>                  Starting                      <none>
+<nil>                  <none>                  Starting                      <none>
+2026-10-21T16:47:23Z   kubelet                 NodeAllocatableEnforced       Updated Node Allocatable limit across pods
+2026-10-21T16:47:24Z   kubelet                 NodeHasNoDiskPressure         Node eu1-par-gpu-01 status is now: NodeHasNoDiskPressure
+2026-10-21T16:47:24Z   kubelet                 NodeHasSufficientPID          Node eu1-par-gpu-01 status is now: NodeHasSufficientPID
+2026-10-21T16:47:24Z   kubelet                 NodeHasSufficientMemory       Node eu1-par-gpu-01 status is now: NodeHasSufficientMemory
+2026-10-21T16:47:25Z   node-controller         RegisteredNode                Node eu1-par-gpu-01 event: Registered Node eu1-par-gpu-01 in Controller
+2026-10-21T16:47:33Z   kubelet                 NodeReady                     Node eu1-par-gpu-01 status is now: NodeReady
+2026-10-21T16:49:50Z   nvidia-gpu-operator     GPUDriverUpgrade              Successfully updated node state label to upgrade-done
+2026-10-21T17:00:39Z   syslog-health-monitor   SysLogsXIDErrorIsNotHealthy   ErrorCode:13 PCI:0000:01:00 GPU_UUID:GPU-2b3af644-eb7c-0ecd-2a95-1097054adffd MESSAGE=[901.52] NVRM: Xid (PCI:0000:01:00): 13, pid=0, name=inject-xid.sh, SIMULATED by scripts/readiness/inject-xid.sh, not a real fault Recommended Action=NONE;
+2026-10-21T17:03:32Z   kubelet                 NodeNotSchedulable            Node eu1-par-gpu-01 status is now: NodeNotSchedulable
+2026-10-21T17:04:25Z   node-controller         NodeNotReady                  Node eu1-par-gpu-01 status is now: NodeNotReady
+2026-10-21T17:05:30Z   kubelet                 Starting                      Starting kubelet.
+2026-10-21T17:05:30Z   kubelet                 NodeHasSufficientMemory       Node eu1-par-gpu-01 status is now: NodeHasSufficientMemory
+2026-10-21T17:05:30Z   kubelet                 NodeHasNoDiskPressure         Node eu1-par-gpu-01 status is now: NodeHasNoDiskPressure
+2026-10-21T17:05:30Z   kubelet                 NodeHasSufficientPID          Node eu1-par-gpu-01 status is now: NodeHasSufficientPID
+2026-10-21T17:05:30Z   kubelet                 NodeNotReady                  Node eu1-par-gpu-01 status is now: NodeNotReady
+2026-10-21T17:05:30Z   kubelet                 NodeNotSchedulable            Node eu1-par-gpu-01 status is now: NodeNotSchedulable
+2026-10-21T17:05:30Z   kubelet                 NodeReady                     Node eu1-par-gpu-01 status is now: NodeReady
+2026-10-21T17:05:30Z   kubelet                 Rebooted                      Node eu1-par-gpu-01 has been rebooted, boot id: 97af02a0-d89c-4a46-be4e-8f4ff99e515f
+2026-10-21T17:05:30Z   kubelet                 NodeAllocatableEnforced       Updated Node Allocatable limit across pods
+2026-10-21T17:08:13Z   kubelet                 NodeSchedulable               Node eu1-par-gpu-01 status is now: NodeSchedulable
+== reboot Jobs
+NAME                                       STATUS     COMPLETIONS   DURATION   AGE     CONTAINERS     IMAGES                              SELECTOR
+create-mongodb-database-2592000-c9dfbc49   Complete   1/1           8s         5h39m   mongo-client   ghcr.io/rtsp/docker-mongosh:2.5.2   batch.kubernetes.io/controller-uid=cd31f231-9b61-44b0-9ad6-247dc7bf2113
+== NVSentinel pods
+NAME                                             READY   STATUS      RESTARTS        AGE     IP             NODE             NOMINATED NODE   READINESS GATES
+create-mongodb-database-2592000-c9dfbc49-g7wx5   0/1     Completed   0               5h39m   10.244.1.68    eu1-par-cpu-01   <none>           <none>
+fault-quarantine-86b76dd6c7-8hj6n                1/1     Running     0               6h36m   10.244.1.28    eu1-par-cpu-01   <none>           <none>
+fault-remediation-7d45c77bc6-h4fgj               1/1     Running     8 (5h16m ago)   6h31m   10.244.1.40    eu1-par-cpu-01   <none>           <none>
+gpu-health-monitor-dcgm-4.x-b5ffp                1/1     Running     1 (17m ago)     26m     10.244.4.22    eu1-par-gpu-01   <none>           <none>
+janitor-7b8dff5787-77688                         1/1     Running     0               6h31m   10.244.1.43    eu1-par-cpu-01   <none>           <none>
+janitor-provider-fdd66464d-4jlbj                 1/1     Running     0               6h31m   10.244.1.42    eu1-par-cpu-01   <none>           <none>
+labeler-5688d97cc6-dw62h                         1/1     Running     0               6h45m   10.244.1.23    eu1-par-cpu-01   <none>           <none>
+metadata-collector-g6jlf                         1/1     Running     0               15m     172.16.32.20   eu1-par-gpu-01   <none>           <none>
+mongodb-rs0-0                                    1/1     Running     0               6h45m   10.244.1.27    eu1-par-cpu-01   <none>           <none>
+node-drainer-67f4ff998d-6lnbv                    1/1     Running     0               6h36m   10.244.1.29    eu1-par-cpu-01   <none>           <none>
+nvsentinel-psmdb-operator-565bd99d6f-rhmr9       1/1     Running     9 (5h14m ago)   6h45m   10.244.1.24    eu1-par-cpu-01   <none>           <none>
+platform-connectors-c8xjn                        1/1     Running     0               5h38m   10.244.0.123   eu1-par-cp-01    <none>           <none>
+platform-connectors-gk76c                        1/1     Running     1 (17m ago)     35m     10.244.4.21    eu1-par-gpu-01   <none>           <none>
+platform-connectors-vvv48                        1/1     Running     0               5h39m   10.244.1.69    eu1-par-cpu-01   <none>           <none>
+syslog-health-monitor-regular-sd24b              1/1     Running     0               15m     10.244.4.26    eu1-par-gpu-01   <none>           <none>
+== restarts (compare with the uc3-check file; a last exit after the injection is the run's)
+nvsentinel/fault-remediation-7d45c77bc6-h4fgj fault-remediation restarts=8 last_exit=2026-10-21T12:06:07Z Error
+nvsentinel/gpu-health-monitor-dcgm-4.x-b5ffp gpu-health-monitor restarts=1 last_exit=2026-10-21T17:05:20Z Unknown
+nvsentinel/nvsentinel-psmdb-operator-565bd99d6f-rhmr9 psmdb-operator restarts=9 last_exit=2026-10-21T12:08:51Z Error
+nvsentinel/platform-connectors-gk76c platform-connector restarts=1 last_exit=2026-10-21T17:05:20Z Unknown
+nvcre/nvcre-manager-d6c6cc8c7-cfl2r manager restarts=9 last_exit=2026-10-21T12:09:13Z Error
+kubeflow-system/jobset-controller-5999749d98-ws522 controller restarts=9 last_exit=2026-10-21T12:06:07Z Error
+kubeflow-system/kubeflow-trainer-controller-manager-6b54cc4fc7-hlhcl manager restarts=10 last_exit=2026-10-21T12:09:13Z Error

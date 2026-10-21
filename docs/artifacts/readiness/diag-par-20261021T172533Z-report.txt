@@ -1,0 +1,35 @@
+Discovered 1 GPU nodes with product: NVIDIA-L4
+WorkloadRun eu1-par-diag-172533 created in namespace readiness-runs.
+
+Waiting for completion (timeout: 10m0s)...
+[watch] Waiting for status... (0s)
+[watch] eu1-par-diag-172533: InProgress (5s) -- Workflow eu1-par-diag-172533 created
+[watch] WorkloadRun succeeded. (10s)
+
+╔════════════════════════════════════════════════════════════════╗
+║                       WorkloadRun Report                       ║
+╚════════════════════════════════════════════════════════════════╝
+
+  Name:      eu1-par-diag-172533
+  Platform:  onprem
+  GPU:       l4
+  Nodes:     1
+
+┌────────────────────────────────────────────────────────────────┐
+│  workloadrun/eu1-par-diag-172533                               │
+├────────────────────────────────────────────────────────────────┤
+│  Status:    Succeeded                                          │
+│  Runtime:   8s                                                 │
+│  Scale:     intra-node                                         │
+│  Nodes/Job: 1                                                  │
+│  Jobs:      1                                                  │
+└────────────────────────────────────────────────────────────────┘
+
+┌────────────────────────────────────────────────────────────────┐
+│  Summary                                                       │
+├────────────────────────────────────────────────────────────────┤
+│  Categories:   1/1 passed                                      │
+│  Failed Nodes: none                                            │
+│  Result:       PASSED                                          │
+└────────────────────────────────────────────────────────────────┘
+
