@@ -107,7 +107,10 @@ case "$MODE" in
     q "GPU utilisation, max over the last 3 h" 'max by (site, modelName, Hostname, gpu) (max_over_time(DCGM_FI_DEV_GPU_UTIL[3h]))'
     q "DCGM series per GPU (recording rule)" 'max by (site, modelName, Hostname, gpu) (max_over_time(gpu:dcgm_series:count[3h]))'
     q "DCGM series per GPU, top metrics on fin" 'topk(15, max by (metric) (max_over_time(gpu:dcgm_series_by_metric:count{site="fin"}[3h])))'
-    q "All active series per site (not only DCGM)" 'count by (site) ({__name__=~".+", site=~"par|fin"})'
+    # Each site's own Prometheus reports its head: one series per site. A
+    # count over {__name__=~".+"} would make par's Prometheus, on the 4 vCPU
+    # control plane, touch every series it holds.
+    q "Head series in each site's Prometheus (not only DCGM)" 'max by (site) (prometheus_tsdb_head_series{job="kube-prometheus-stack-prometheus", site=~"par|fin"})'
     q "fin's remote write: samples sent, failed, retried" 'max by (__name__) ({__name__=~"prometheus_remote_storage_(samples_total|samples_failed_total|samples_retried_total|highest_timestamp_in_seconds|queue_highest_sent_timestamp_seconds)", site="fin"})'
     if [ "$MODE" = fin ]; then
       FIN_KUBECONFIG="${FIN_KUBECONFIG:-$REPO_ROOT/kubeconfig-fin}"
@@ -121,9 +124,10 @@ import json, sys
 d = json.load(sys.stdin)["data"]
 print("headStats:", d.get("headStats"))
 for k in ("seriesCountByMetricName", "labelValueCountByLabelName", "seriesCountByLabelValuePair"):
-    print(f"\n{k}:")
+    print()
+    print(k + ":")
     for e in d.get(k, []):
-        print(f"  {e[\"name\"]}: {e[\"value\"]}")
+        print("  %s: %s" % (e["name"], e["value"]))
 '
       else
         warn "no fin kubeconfig at $FIN_KUBECONFIG, skipping fin's own TSDB status"

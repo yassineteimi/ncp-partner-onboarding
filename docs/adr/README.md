@@ -9,8 +9,8 @@ One page per real choice, with at least two genuine alternatives. Written for an
 | [0003](0003-known-good-stack.md) | Known-good stack: AICR recipes vs hand-pinned values (and what AICR doesn't cover: L4, kubeadm) | ws-readiness | proposed |
 | [0004](0004-readiness-gate.md) | Readiness gate: NVCRE certification and a staging taint vs Part 1's burn-in scripts | ws-readiness | proposed |
 | [0005](0005-fault-remediation.md) | Fault remediation: NVSentinel vs Part 1's controller vs node-problem-detector with a generic remediator | ws-readiness | proposed |
-| 0006 | Batch scheduling for many tenants: KAI vs Kueue vs Volcano | ws-scheduling | proposed |
-| 0007 | HPC tenants: Slurm on Kubernetes (Slinky) vs a separate Slurm cluster | ws-scheduling | proposed |
-| 0008 | GPU sharing per tenant class: MIG vs time slicing vs whole GPUs | ws-scheduling | proposed |
+| [0006](0006-batch-scheduling.md) | Batch scheduling for many tenants: KAI vs Kueue vs Volcano | ws-scheduling | proposed |
+| [0007](0007-hpc-tenants-slurm.md) | HPC tenants: Slurm on Kubernetes (Slinky) vs a separate Slurm cluster | ws-scheduling | proposed |
+| [0008](0008-gpu-sharing.md) | GPU sharing per tenant class: MIG vs time slicing vs whole GPUs | ws-scheduling | proposed |
 | [0009](0009-metrics-across-sites.md) | Metrics across sites: Thanos Receive for fin, a sidecar for par (vs Mimir, VictoriaMetrics) | ws-platform | proposed |
 | [0010](0010-vm-tenants.md) | VM tenants: KubeVirt on the same cluster vs a separate IaaS; KVM vs emulation | ws-platform | proposed |
