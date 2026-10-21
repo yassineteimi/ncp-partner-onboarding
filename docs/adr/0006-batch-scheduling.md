@@ -23,7 +23,7 @@ KAI Scheduler, pinned at v0.18.6.
 
 Two reasons decided it. KAI does the three things EU1 needs in one place: queue shares with borrowing and reclaim, gangs placed as a unit by the scheduler itself (not admitted, then placed pod by pod), and MIG and fractions counted against queues. All of that runs on top of the GPU Operator's device plugin, untouched. And it is what AICR, NVIDIA's own known-good stack, installs, so EU1's choice matches what an NVIDIA architect expects to find.
 
-On the version: v0.18 is KAI's active long-term-support line (SUPPORT.md: September 2026 to September 2027). Upstream validates v0.16 to v0.18 on Kubernetes v1.36.1. AICR v1.1.0 resolves v0.16.9, the previous LTS line, now in maintenance. v0.16.12 already exists on that line, so AICR is three patches behind. AICR is a reference only in this project (ADR 0003), and KAI isn't part of fin's base, so EU1 runs the newer line and records the difference.
+On the version: v0.18 is KAI's active long-term-support line, supported from September 2026 to September 2027, and upstream validates v0.16 to v0.18 on Kubernetes v1.36.1. Both facts come from `SUPPORT.md` on main, read 21 October; the copy inside the v0.18.6 tag was written before the v0.18 line existed and doesn't list it. AICR v1.1.0 resolves v0.16.9, the previous LTS line, now in maintenance. v0.16.12 already exists on that line, so AICR is three patches behind. AICR is a reference only in this project (ADR 0003), and KAI isn't part of fin's base, so EU1 runs the newer line and records the difference.
 
 What would change the answer:
 
@@ -46,7 +46,8 @@ What would change the answer:
 ## Evidence
 
 - Free checks: [renders, digests, dry run on par](../artifacts/scheduling/free-checks-20261020T232008Z.txt); KAI's chart generates no secret at render time, and every KAI pod lands on the site's pool.
-- Source at v0.18.6: `SUPPORT.md`, `docs/queues/README.md`, `docs/batch/README.md`, `docs/gitops/README.md`, `pkg/scheduler/api/common_info/resources/mig.go`, `pkg/operator/operands/admission/resources.go`. AICR v1.1.0: `docs/user/component-version-matrix.md`, `recipes/overlays/base.yaml`. Kueue's README at v0.20.2 ("All-or-nothing with ready Pods"). Volcano's README and `docs/user-guide/how_to_use_volcano_vgpu.md` at v1.16.0.
+- KAI's `SUPPORT.md` on main, read 21 October (support dates and the Kubernetes matrix for v0.16 to v0.18; the copy at v0.18.6 stops at v0.17).
+- Source at v0.18.6: `docs/queues/README.md`, `docs/batch/README.md`, `docs/gitops/README.md`, `pkg/scheduler/api/common_info/resources/mig.go`, `pkg/operator/operands/admission/resources.go`. AICR v1.1.0: `docs/user/component-version-matrix.md`, `recipes/overlays/base.yaml`. Kueue's README at v0.20.2 ("All-or-nothing with ready Pods"). Volcano's README and `docs/user-guide/how_to_use_volcano_vgpu.md` at v1.16.0.
 - Planned, not run yet:
   - par, simulated: burst, reclaim, and a gang of 6 that binds nothing with 4 GPUs free (`make sched-sim-demo`, Wednesday's worker window)
   - fin, real H200s: the two-pod gang with NCCL between the pods, and a gang of 3 that stays Pending on 2 GPUs (W2 step 4)
