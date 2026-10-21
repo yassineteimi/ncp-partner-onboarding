@@ -10,13 +10,19 @@
 # pkg/virt-operator/resource/generate/components at v1.9.1). So each one is
 # set here: virt-launcher too, which virt-controller starts for every VM.
 #
-# Not set: VIRT_TEMPLATE_APISERVER_IMAGE and VIRT_TEMPLATE_CONTROLLER_IMAGE.
-# Their components only deploy with the Template feature gate, which is off
-# (kubevirt.yaml), and quay.io/kubevirt has no v1.9.1 tag for them.
+# virt-template-apiserver and virt-template-controller follow their own
+# releases, not KubeVirt's: the operator deploys them from a manifest it
+# embeds, at v0.2.3 for KubeVirt v1.9.1, unless VIRT_TEMPLATE_*_IMAGE
+# overrides it (getOverrideImageForDeployment in components/virttemplate.go).
+# They deploy by default: their Template feature gate is Beta, and Beta gates
+# are on unless disabled (featuregate/active.go). Seen on par on 21 October,
+# running from the v0.2.3 tags before these two lines were added.
 #
-# Index digests from quay.io's registry API for tag v1.9.1, checked against
-# its tag API, 2026-10-20 (all pushed 12 October). make kubevirt-check fails
-# if a reference here or in the rendered Deployment is a bare tag.
+# Index digests from quay.io's registry API, checked against its tag API:
+# tag v1.9.1 on 2026-10-20 (all pushed 12 October), tag v0.2.3 for the two
+# virt-template images on 2026-10-21 (pushed 24 August, the digests par had
+# pulled). make kubevirt-check fails if a reference here or in the rendered
+# Deployment is a bare tag.
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -51,3 +57,7 @@ spec:
               value: quay.io/kubevirt/pr-helper@sha256:c7724681efa3297091d0ce0edf4fda52c062455fb83b76484499a46ae261f61d
             - name: SIDECAR_SHIM_IMAGE
               value: quay.io/kubevirt/sidecar-shim@sha256:d48c6af64305c28de7e9a5509a11737b115cc0193f57f2a0f42faff85bebe5cd
+            - name: VIRT_TEMPLATE_APISERVER_IMAGE
+              value: quay.io/kubevirt/virt-template-apiserver@sha256:27defde24b4a4705d6096a86d134df0dc324243b56be8f0c057e1882c6da338b
+            - name: VIRT_TEMPLATE_CONTROLLER_IMAGE
+              value: quay.io/kubevirt/virt-template-controller@sha256:b45ac55de5fc9dbbee14974b45718c41eaed4d4979f92677dab3500598e33d22
