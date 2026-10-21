@@ -1,0 +1,10 @@
+# promote.py at 2026-10-21T17:25:54Z, inputs docs/artifacts/readiness/nvcre-par-20261021T172328Z.json and docs/artifacts/readiness/diag-par-20261021T172533Z.log
+taints before:
+eu1.io/staging=pending:NoSchedule
+PASS certification result is 'PASSED'
+PASS eu1-par-gpu-01 not excluded
+PASS communication/nccl-all-reduce Succeeded, max busBW 0.00 GB/s
+PASS dcgmi diag passed
+PROMOTE eu1-par-gpu-01
+node/eu1-par-gpu-01 untainted
+taints after:

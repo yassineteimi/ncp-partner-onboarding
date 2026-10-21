@@ -1,0 +1,50 @@
+Certification eu1-par-l4 created in namespace readiness-runs.
+Categories:
+  - communication/nccl-all-reduce
+
+[watch] Watching certification progress...
+[watch] communication/nccl-all-reduce: InProgress (0s)
+[watch] communication/nccl-all-reduce: InProgress (15s)
+[watch] communication/nccl-all-reduce: InProgress (30s)
+[watch] communication/nccl-all-reduce: InProgress (45s)
+[watch] communication/nccl-all-reduce: InProgress (1m0s)
+[watch] communication/nccl-all-reduce: InProgress (1m15s)
+[watch] communication/nccl-all-reduce: InProgress (1m30s)
+[watch] communication/nccl-all-reduce: InProgress (1m45s)
+[watch] communication/nccl-all-reduce: Succeeded (1m57s)
+[watch] Certification succeeded. (1m57s)
+
+╔════════════════════════════════════════════════════════════════╗
+║                      Certification Report                      ║
+╚════════════════════════════════════════════════════════════════╝
+
+  Name:      eu1-par-l4
+  Platform:  onprem
+  GPU:       l4
+  Nodes:     1
+
+┌────────────────────────────────────────────────────────────────┐
+│  communication/nccl-all-reduce                                 │
+├────────────────────────────────────────────────────────────────┤
+│  Status:    Succeeded                                          │
+│  Runtime:   1m 57s                                             │
+│  Scale:     intra-node                                         │
+│  Nodes/Job: 1                                                  │
+│  Jobs:      1                                                  │
+│  Env:       NCCL_DEBUG, NCCL_DEBUG_SUBSYS                      │
+│                                                                │
+│  Transport: Socket                                             │
+│  Bandwidth:                                                    │
+│    Size       AlgBW        BusBW        Samples                │
+│    4 GB       115.34 GB/s  0.00 GB/s    10                     │
+└────────────────────────────────────────────────────────────────┘
+
+┌────────────────────────────────────────────────────────────────┐
+│  Summary                                                       │
+├────────────────────────────────────────────────────────────────┤
+│  Categories:   1/1 passed                                      │
+│  Failed Nodes: none                                            │
+│  Result:       PASSED                                          │
+└────────────────────────────────────────────────────────────────┘
+
+Results written to /Users/yassineteimi/Desktop/ncp-partner-onboarding/.claude/worktrees/ws-readiness/docs/artifacts/readiness/nvcre-par-20261021T172328Z.json

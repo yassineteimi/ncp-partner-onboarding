@@ -1,0 +1,7 @@
+clock_offsets_at=2026-10-21T17:00:57Z reference=laptop
+gpu_node eu1-par-gpu-01 offset_s=+0.243 round_trip_s=0.532
+control_plane offset_s=+0.616 round_trip_s=1.309
+goodput_submitted=2026-10-21T17:01:07Z run_id=1ccba561-e34e-4fac-916a-60cbff01a15e
+clock_offsets_at=2026-10-21T17:26:37Z reference=laptop
+gpu_node eu1-par-gpu-01 offset_s=+0.235 round_trip_s=0.710
+control_plane offset_s=+0.701 round_trip_s=1.475

@@ -1,0 +1,3 @@
+TIME                   SRC                     REASON                        MSG
+2026-10-21T17:00:39Z   syslog-health-monitor   SysLogsXIDErrorIsNotHealthy   ErrorCode:13 PCI:0000:01:00 GPU_UUID:GPU-2b3af644-eb7c-0ecd-2a95-1097054adffd MESSAGE=[901.52] NVRM: Xid (PCI:0000:01:00): 13, pid=0, name=inject-xid.sh, SIMULATED by scripts/readiness/inject-xid.sh, not a real fault Recommended Action=NONE;
+unschedulable=

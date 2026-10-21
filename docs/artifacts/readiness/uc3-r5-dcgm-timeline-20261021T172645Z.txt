@@ -1,0 +1,21 @@
+# R5: SIMULATED XID 79 injected into DCGM's cache at 2026-10-21T17:26:45Z (second precision), no training running.
+# Node transitions from the recorder (uc3-r5-dcgm-recorder-20261021T172645Z.jsonl), then NVSentinel's condition,
+# then both RebootNode objects (R2's and R5's).
+#
+# Read: detection and cordon 5.7 s; Ready on a new boot 103.8 s after the cordon; GPU advertised again 121.4 s
+# later (driver rebuilt at boot); uncordon 52.4 s after that (the DCGM monitor sees a healthy GPU). 283.3 s in all.
+2026-10-21T17:26:40.743Z unschedulable=false ready=True boot_id=97af02a0 taints= gpus=1
+2026-10-21T17:26:50.714Z unschedulable=true ready=True boot_id=97af02a0 taints= gpus=1
+2026-10-21T17:26:50.747Z unschedulable=true ready=True boot_id=97af02a0 taints=node.kubernetes.io/unschedulable gpus=1
+2026-10-21T17:27:41.221Z unschedulable=true ready=Unknown boot_id=97af02a0 taints=node.kubernetes.io/unschedulable gpus=1
+2026-10-21T17:27:41.232Z unschedulable=true ready=Unknown boot_id=97af02a0 taints=node.kubernetes.io/unreachable,node.kubernetes.io/unschedulable gpus=1
+2026-10-21T17:27:41.245Z unschedulable=true ready=Unknown boot_id=97af02a0 taints=node.kubernetes.io/unreachable,node.kubernetes.io/unreachable,node.kubernetes.io/unschedulable gpus=1
+2026-10-21T17:28:34.538Z unschedulable=true ready=True boot_id=a5b567f2 taints=node.kubernetes.io/unreachable,node.kubernetes.io/unreachable,node.kubernetes.io/unschedulable gpus=0
+2026-10-21T17:28:34.561Z unschedulable=true ready=True boot_id=a5b567f2 taints=node.kubernetes.io/unreachable,node.kubernetes.io/unschedulable gpus=0
+2026-10-21T17:28:36.795Z unschedulable=true ready=True boot_id=a5b567f2 taints=node.kubernetes.io/unschedulable gpus=0
+2026-10-21T17:30:35.948Z unschedulable=true ready=True boot_id=a5b567f2 taints=node.kubernetes.io/unschedulable gpus=1
+2026-10-21T17:31:28.330Z unschedulable=false ready=True boot_id=a5b567f2 taints=node.kubernetes.io/unschedulable gpus=1
+2026-10-21T17:31:28.351Z unschedulable=false ready=True boot_id=a5b567f2 taints= gpus=1
+GpuAllWatch since=2026-10-21T17:26:50Z ErrorCode:DCGM_FR_FALLEN_OFF_BUS GPU:0 PCI:0000:01:00.0 GPU_UUID:GPU-2b3af644-eb7c-0ecd-2a95-1097054adffd GPU 0 has fallen off the bus Please re-seat the GPU, c
+maintenance-eu1-par-gpu-01-6ad8f05c81f7e5ec793c0233 created=2026-10-21T17:03:34Z SignalSent=True@2026-10-21T17:03:35Z NodeReady=True@2026-10-21T17:05:35Z
+maintenance-eu1-par-gpu-01-6ad8f5da1da08288ba02abc3 created=2026-10-21T17:26:50Z SignalSent=True@2026-10-21T17:26:50Z NodeReady=True@2026-10-21T17:28:50Z
