@@ -74,6 +74,7 @@ nav:
   - "Day 1: NVCRE": 10-day1-nvcre.md
   - "Day 2: NVSentinel": 10-day2-nvsentinel.md
   - "Tenancy: KAI and MIG": 20-tenancy.md
+  - "HPC: Slurm with Slinky": 21-hpc-slinky.md
   - "Metrics across sites": 30-metrics-across-sites.md
   - "VM tenants": 30-vm-tenants.md
   - "What is simulated": simulated.md
