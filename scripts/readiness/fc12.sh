@@ -35,10 +35,11 @@ LANE_NS=(nvsentinel nvcre kubeflow-system)
   kubectl_cp get nodes -L eu1.io/pool
 
   echo "== Lane pods, and where they run"
+  # From JSON, not columns: a restart count like "1 (10m ago)" shifts them.
   for ns in "${LANE_NS[@]}"; do
-    kubectl_cp -n "$ns" get pods -o wide --no-headers 2>/dev/null \
-      | awk -v ns="$ns" '{printf "%-16s %-60s %-10s %s\n", ns, $1, $3, $7}'
-  done
+    kubectl_cp -n "$ns" get pods -o json 2>/dev/null | jq -r '.items[]
+      | "\(.metadata.namespace)\t\(.metadata.name)\t\(.status.phase)\trestarts=\([.status.containerStatuses[]?.restartCount] | add // 0)\t\(.spec.nodeName // "-")"'
+  done | column -t
   misplaced="$(for ns in "${LANE_NS[@]}"; do
       kubectl_cp -n "$ns" get pods -o json 2>/dev/null | jq -r '.items[]
         | select(.status.phase == "Running" and (.metadata.ownerReferences[0].kind // "") != "DaemonSet")
