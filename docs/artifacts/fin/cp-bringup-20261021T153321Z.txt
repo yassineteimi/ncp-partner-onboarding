@@ -1,0 +1,13 @@
+# cp-bringup-20261021T153321Z.txt, laptop clock, UTC
+started=2026-10-21T15:33:21Z
+preflight_done=2026-10-21T15:33:26Z
+instance_running=2026-10-21T15:34:18Z
+bootstrap_complete=2026-10-21T15:36:18Z
+kubeadm_ready=2026-10-21T15:37:03Z
+platform_hook_done=2026-10-21T15:37:10Z
+argocd_installed=2026-10-21T15:38:17Z
+# Added by cos from par's Thanos Query and make fin-down:
+fin_series_in_par_query=2026-10-21T15:39:11Z (ws-platform) 15:39:30Z (cos, 9 up series, site="fin")
+fin_down_done=2026-10-21T15:40:26Z (instance and OS volume deleted, port 30291 closed to fin, sweep clean)
+fin_series_after_teardown=11 up series with site="fin" in par's Query at 15:40:50Z, last sample 15:39:53Z
+verda_balance_before=49.97142 verda_balance_after=49.94629 (cost 0.02513 usd)

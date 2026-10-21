@@ -9,7 +9,7 @@ EU1 has a permanent site, par, and a site that only exists while a GPU window is
 
 Two facts narrow the choice before any product comparison: fin opens no port to par (its firewall allows SSH and the Kubernetes API from admin ranges only), and par can't query a site that no longer exists. Whatever carries fin's metrics has to push them out of fin, while the window is still running.
 
-I started from Thanos because an NVIDIA architect named it as how they think about observability at thousands of GPUs. Mimir and VictoriaMetrics answer the same question, so they're in the table too.
+Thanos was the starting point. Mimir and VictoriaMetrics answer the same question, so they're in the table too.
 
 ## Options considered
 
@@ -42,11 +42,11 @@ What would change the answer:
 - A CA lives in the par cluster. A Job generates it and the certificates once, and they never go into Git. Adding a site means a new client certificate, and its common name becomes the tenant.
 - One Receive, no hashring: a single point of failure in the write path. If it's down during a window, fin's Prometheus keeps its WAL and retries. If the outage outlasts the WAL, those samples are lost.
 - The compactor must be the only one writing to the bucket. One replica here, and it stays that way.
-- **Rebuild order.** kube-prometheus-stack 91.4.1 only accepts the sidecar's bucket secret as `existingSecret`, and drops `optional` (`templates/prometheus/prometheus.yaml`). So par's Prometheus can't start without that Secret. Today Garage creates it at wave 5, after this chart's wave 0. A running par is fine; a par rebuilt from nothing would hold wave 0. The fix, raised with cos, is to generate the credentials before wave 0 and import them into Garage later.
+- **Rebuild order.** kube-prometheus-stack 91.4.1 only accepts the sidecar's bucket secret as `existingSecret`, and drops `optional` (`templates/prometheus/prometheus.yaml`). So par's Prometheus can't start without that Secret. Garage used to create it at wave 5, after this chart's wave 0, so a par rebuilt from nothing would have held at wave 0. Since 21 October the base Application `objstore-credentials` writes it at wave -1, and Garage's wave 5 Job imports that key ([findings](../findings.md)).
 - **What this PoC can't show:**
   - replication or a hashring, with one Receive and one site writing to it
   - cardinality beyond three GPUs: the 1,000 and 10,000 GPU figures are an extrapolation from measured per-GPU counts, not a load test
-  - downsampling on real data before about two days of par uploads have built up
+  - downsampling on real data before about two days of par uploads have built up (shown on SIMULATED blocks instead)
   - fin's write path over the internet, which only exists during rehearsal R and W2
 
 ## Evidence
@@ -58,7 +58,14 @@ What would change the answer:
   - every object passes a server-side dry run on par
   - promtool tests pass, and a deliberately broken rule fails them
 - Source, at the pinned versions: `cmd/thanos/receive.go`, `pkg/tenancy/tenancy.go` and `pkg/compact/downsample/downsample.go` at Thanos v0.42.4; `tsdb/head.go` at Prometheus v3.14.0; `pkg/prometheus/server/statefulset.go` at prometheus-operator v0.94.0; Mimir's "Authentication and authorization" page at mimir-3.2.2; VictoriaMetrics' README at v1.154.1.
+- [The hub on par](../artifacts/platform/thanos-hub-20261021T114455Z.txt), 21 October:
+  - deduplication merges fin-sim's two replicas
+  - Receive accepts fin-sim's writes
+  - par's sidecar has uploaded 14 blocks with no failures
+  - port 30291 doesn't answer from the laptop
+- [The bucket](../artifacts/platform/thanos-bucket-20261021T114314Z.txt), 21 October:
+  - the compactor's 5 minute blocks from SIMULATED backfill
+  - Receive's 12 s fin-sim block flushed at a power-off
 - Planned, not run yet:
-  - the hub after merge (`make thanos-capture MODE=hub`)
   - rehearsal R on fin CPU instances
   - W2 steps 6a to 6c, with the H200 series per GPU and the panel before and after teardown
