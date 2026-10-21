@@ -33,6 +33,23 @@ spec:
     server: https://kubernetes.default.svc
     namespace: kubeflow-system
 
+  # The chart renders these two Secrets empty and the Trainer and JobSet
+  # controllers write their webhook certificates into them. Without this, Argo
+  # CD saw them OutOfSync and self-heal put the empty data back every five
+  # minutes (seen on par on 21 October, FC12), making the controllers issue new
+  # certificates each time.
+  ignoreDifferences:
+    - kind: Secret
+      name: kubeflow-trainer-webhook-cert
+      namespace: kubeflow-system
+      jsonPointers:
+        - /data
+    - kind: Secret
+      name: jobset-webhook-server-cert
+      namespace: kubeflow-system
+      jsonPointers:
+        - /data
+
   syncPolicy:
     automated:
       prune: true
@@ -40,6 +57,7 @@ spec:
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true
+      - RespectIgnoreDifferences=true
     retry:
       limit: 5
       backoff:
