@@ -27,7 +27,13 @@ STARTED="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 timeline_start "$ARTIFACTS/cp-bringup-$(date -u +%Y%m%dT%H%M%SZ).txt"
 mark started
 
-if [ "$(tf_output cp_enabled)" = "true" ]; then
+# Converge only if the instance is in the state and the tfvars still ask for
+# it. The cp_enabled output alone isn't enough: a failed apply leaves it at
+# true, and a fin-down whose guard refused leaves the tfvars at false, so the
+# converge path then plans to destroy the SSH key and startup script (seen on
+# 21 October after Verda put an ordered instance in status "error").
+if terraform -chdir="$TF_DIR" state list 2>/dev/null | grep -qx 'verda_instance.cp\[0\]' \
+   && grep -qE '^cp_enabled[[:space:]]*=[[:space:]]*true' "$CP_TFVARS" 2>/dev/null; then
   warn "the fin control plane is already declared. Converging rather than creating."
   CP_PRICE="$(jq -r '.control_plane.price_per_hour' "$(ls -t "$ARTIFACTS"/preflight-*.json | head -1)")"
 else
