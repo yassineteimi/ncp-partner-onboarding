@@ -11,7 +11,8 @@
 # lookup of the existing Secret. ArgoCD renders offline, where lookup returns
 # nothing, so every render makes new keys for Secrets marked immutable
 # (templates/secrets/slurmkey.yaml and jwtkey.yaml at 1.2.3): Part 1 rule 5.
-# make slurm-keys creates them once, outside Git, before the first sync.
+# A bootstrap Job in the same Application creates them in the cluster, once
+# (gitops/manifests/scheduling/slurm-bootstrap).
 slurmKey:
   create: false
   secretRef:

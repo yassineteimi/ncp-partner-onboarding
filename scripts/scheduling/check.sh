@@ -180,6 +180,7 @@ builds=(
   "$MANIFESTS/sim-gpu"
   "$MANIFESTS/kai-queues/par"
   "$MANIFESTS/kai-queues/fin"
+  "$MANIFESTS/slurm-bootstrap"
   "$WORKLOADS/allreduce/fin"
   "$WORKLOADS/allreduce/fin-too-big"
   "$WORKLOADS/allreduce/par-gloo"
@@ -274,7 +275,7 @@ if [ "${DRY_RUN:-}" = "server" ]; then
   kubectl_cp api-resources --no-headers | awk '{print $NF, $(NF-1)}' | sort -u > "$known"
   kubectl_cp get namespaces -o name | sed 's|^namespace/||' > "$OUT/namespaces.txt"
   for f in kai-par.yaml gitops_manifests_scheduling_sim-gpu.yaml gitops_manifests_scheduling_kai-queues_par.yaml \
-    slinky-slurm-operator.yaml slinky-slurm.yaml; do
+    slinky-slurm-operator.yaml slinky-slurm.yaml gitops_manifests_scheduling_slurm-bootstrap.yaml; do
     python3 - "$OUT/$f" "$known" "$OUT/namespaces.txt" "$OUT/dry-$f" <<'PY'
 import sys, yaml
 src, known_path, ns_path, dst = sys.argv[1:]

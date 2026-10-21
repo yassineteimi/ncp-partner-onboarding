@@ -33,10 +33,7 @@ sched-prepull-status: ## UC4: fin: is the gang image on the H200 node yet
 sched-prepull-down: ## UC4: fin: remove the pre-pull DaemonSet, before step 4
 	./scripts/scheduling/prepull.sh down
 
-.PHONY: slurm-keys slurm-test
-
-slurm-keys: ## UC5: create the Slurm auth Secrets on par once, outside Git, before the slinky Application syncs
-	./scripts/scheduling/slurm-keys.sh
+.PHONY: slurm-test
 
 slurm-test: ## UC5: par: sbatch and srun from the login pod, prolog health drain, Kubernetes-to-Slurm drain (CPU worker on)
 	./scripts/scheduling/slurm-test.sh

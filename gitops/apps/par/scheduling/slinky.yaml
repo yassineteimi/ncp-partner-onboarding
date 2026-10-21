@@ -7,11 +7,14 @@
 # render into the slurm namespace. The Controller, NodeSet, LoginSet and
 # RestApi objects are retried until the webhook answers.
 #
-# Before the first sync, make slurm-keys creates the slurm.key and jwt.key
-# Secrets outside Git (gitops/values/scheduling/slurm.yaml says why).
+# A third source, gitops/manifests/scheduling/slurm-bootstrap, creates the
+# slurm.key and jwt.key Secrets in the cluster at wave -1, before the charts'
+# objects at wave 0 need them (gitops/values/scheduling/slurm.yaml says why the
+# chart doesn't).
 #
-# Everything runs on the CPU worker. With the worker off, this Application
-# reads Progressing or Degraded. Nothing in a later wave depends on it.
+# Everything else runs on the CPU worker. With the worker off, this
+# Application reads Progressing or Degraded. Nothing in a later wave depends
+# on it.
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -44,6 +47,10 @@ spec:
     - repoURL: https://github.com/yassineteimi/ncp-partner-onboarding
       targetRevision: main
       ref: values
+
+    - repoURL: https://github.com/yassineteimi/ncp-partner-onboarding
+      targetRevision: main
+      path: gitops/manifests/scheduling/slurm-bootstrap
 
   destination:
     server: https://kubernetes.default.svc
