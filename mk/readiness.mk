@@ -95,3 +95,8 @@ nvsentinel-kind: ## readiness: FC4, par's NVSentinel values in NVSentinel's KIND
 	./scripts/readiness/kind-rehearsal.sh $(NVSENTINEL_SRC)
 
 .PHONY: nvsentinel-kind
+
+fc12:          ## readiness: FC12 checks on par after a merge (LABEL=after-3|after-4|after-5|worker-off)
+	./scripts/readiness/fc12.sh $(or $(LABEL),check)
+
+.PHONY: fc12
