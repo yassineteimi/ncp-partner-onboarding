@@ -44,9 +44,11 @@ controller:
       repository: docker.io/library/alpine
       digest: sha256:5291449c3df73caf6ed85e649dec1b9e818b39a5d8c871e97afc13e9cd5e8fa8 # 3.22
   # slurmctld's save state on local-path, on the CPU worker's disk, which
-  # survives a power-off.
+  # survives a power-off. par has no default StorageClass, so the class is
+  # named: left null, the chart asks for the default and the claim never binds.
   persistence:
     enabled: true
+    storageClassName: local-path
     resources:
       requests:
         storage: 2Gi
