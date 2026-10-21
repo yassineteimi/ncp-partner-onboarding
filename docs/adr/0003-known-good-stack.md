@@ -64,6 +64,12 @@ and the lanes' open PRs; AICR's from the `k0s` H200 training recipe):
   `make aicr-recipe`.
 - Two of the differences are AICR being behind what EU1's other components need
   (cert-manager, Kubeflow Trainer). They go in the findings, not in fin.
+- `aicr diff` isn't EU1's drift detector for what Git owns. On par it missed a hand-made
+  version change (NVCRE v0.8.0 to v0.7.0): its snapshot keeps one `name: tag` per image's
+  last path segment, so a digest-pinned image reads `latest`, and real changes are buried
+  in runtime counters. Argo CD found and undid the same change in 11 seconds. AICR's
+  snapshot stays useful for what Git doesn't own (OS, kernel, services), once the
+  counters are filtered.
 - What this can't show: AICR as a deployer. The validation in W2 checks fin against the
   recipe; it doesn't prove the recipe would have built fin.
 

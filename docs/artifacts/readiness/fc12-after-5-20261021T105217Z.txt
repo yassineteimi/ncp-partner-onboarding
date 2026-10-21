@@ -1,0 +1,81 @@
+# FC12 after-5 on par, 2026-10-21T10:52:17Z, git main at 6d7da1b
+== Applications
+cert-manager      wave  3   Synced  Healthy  v1.21.2
+kubeflow-trainer  wave  10  Synced  Healthy  2.2.1
+nvcre             wave  10  Synced  Healthy  v0.8.0
+nvsentinel        wave  11  Synced  Healthy  v1.28.0
+== Nodes
+NAME             STATUS   ROLES           AGE   VERSION   POOL
+eu1-par-cp-01    Ready    control-plane   36h   v1.36.5   control
+eu1-par-cpu-01   Ready    <none>          34m   v1.36.5   cpu
+== Lane pods, and where they run
+nvsentinel       create-mongodb-database-2592000-c9dfbc49-bhhlg        Succeeded  restarts=0  eu1-par-cpu-01
+nvsentinel       fault-quarantine-86b76dd6c7-8hj6n                     Running    restarts=0  eu1-par-cpu-01
+nvsentinel       fault-remediation-7d45c77bc6-h4fgj                    Running    restarts=0  eu1-par-cpu-01
+nvsentinel       janitor-7b8dff5787-77688                              Running    restarts=0  eu1-par-cpu-01
+nvsentinel       janitor-provider-fdd66464d-4jlbj                      Running    restarts=0  eu1-par-cpu-01
+nvsentinel       labeler-5688d97cc6-dw62h                              Running    restarts=0  eu1-par-cpu-01
+nvsentinel       mongodb-rs0-0                                         Running    restarts=0  eu1-par-cpu-01
+nvsentinel       node-drainer-67f4ff998d-6lnbv                         Running    restarts=0  eu1-par-cpu-01
+nvsentinel       nvsentinel-psmdb-operator-565bd99d6f-rhmr9            Running    restarts=0  eu1-par-cpu-01
+nvsentinel       platform-connectors-7ft9x                             Running    restarts=0  eu1-par-cpu-01
+nvsentinel       platform-connectors-hdq5v                             Running    restarts=0  eu1-par-cp-01
+nvcre            nvcre-manager-d6c6cc8c7-cfl2r                         Running    restarts=0  eu1-par-cpu-01
+kubeflow-system  jobset-controller-5999749d98-ws522                    Running    restarts=1  eu1-par-cpu-01
+kubeflow-system  kubeflow-trainer-controller-manager-6b54cc4fc7-hlhcl  Running    restarts=1  eu1-par-cpu-01
+pods running off the CPU worker (should be none): none
+== NVSentinel Deployments and DaemonSets
+NAME                                          READY    UP-TO-DATE  AVAILABLE
+deployment.apps/fault-quarantine              1/1      1           1
+deployment.apps/fault-remediation             1/1      1           1
+deployment.apps/janitor                       1/1      1           1
+deployment.apps/janitor-provider              1/1      1           1
+deployment.apps/labeler                       1/1      1           1
+deployment.apps/node-drainer                  1/1      1           1
+deployment.apps/nvsentinel-psmdb-operator     1/1      1           1
+NAME                                          DESIRED  CURRENT     READY
+daemonset.apps/gpu-health-monitor-dcgm-3.x    0        0           0
+daemonset.apps/gpu-health-monitor-dcgm-4.x    0        0           0
+daemonset.apps/metadata-collector             0        0           0
+daemonset.apps/platform-connectors            2        2           2
+daemonset.apps/syslog-health-monitor-kata     0        0           0
+daemonset.apps/syslog-health-monitor-regular  0        0           0
+== MongoDB
+NAME      STATE
+mongodb   ready
+PVC                         STATUS   CLASS        SIZE
+mongod-data-mongodb-rs0-0   Bound    local-path   3Gi
+== circuit breaker
+no circuit-breaker ConfigMap
+== admission webhooks from the lane
+Validating  vrebootnode-v1alpha1.kb.io                             Fail  rebootnodes
+Validating  vterminatenode-v1alpha1.kb.io                          Fail  terminatenodes
+Validating  vgpureset-v1alpha1.kb.io                               Fail  gpuresets
+Validating  vextrr-v1.kb.io                                        Fail  externalremediationrequests
+Validating  validate-jobset-x-k8s-io-v1alpha2-jobset.x-k8s.io      Fail  jobsets
+Validating  validate--v1-pod.x-k8s.io                              Fail  pods
+Validating  validator.clustertrainingruntime.trainer.kubeflow.org  Fail  clustertrainingruntimes
+Validating  validator.trainingruntime.trainer.kubeflow.org         Fail  trainingruntimes
+Validating  validator.trainjob.trainer.kubeflow.org                Fail  trainjobs
+Mutating    defaulter.trainjob.trainer.kubeflow.org                Fail  trainjobs
+Mutating    mutate-jobset-x-k8s-io-v1alpha2-jobset.x-k8s.io        Fail  jobsets
+Mutating    mutate--v1-pod.x-k8s.io                                Fail  pods
+== nvcrectl setup status (its em dashes written as --, which this repository's lint requires)
+Component                       Status
+─────────────────────────       ──────────
+NVCRE CRDs                      ✓ installed
+NVCRE Controller                ✓ installed
+Kubeflow Trainer                ✓ installed (v2.2.1)
+Log Profiles                    ✓ installed
+GPU Operator                    ✗ not found
+DCGM (optional)                 ✓ installed
+Helm release nvcre              ✓ not installed
+Helm release kubeflow-trainer   ✓ not installed
+
+Status: not ready -- run 'nvcrectl setup init' to install missing components
+  GPU Operator must be installed by your cluster administrator
+== live settings that stage 3 depends on (read after the check)
+janitor-provider env: CSP=generic GENERIC_REBOOT_IMAGE=public.ecr.aws/docker/library/busybox:1.37.0
+  GENERIC_REBOOT_USE_SYSRQ=false GENERIC_REBOOT_JOB_NAMESPACE=nvsentinel GENERIC_REBOOT_JOB_TTL=3600
+janitor ConfigMap: nodes.exclusions = eu1.io/pool=control, eu1.io/pool=cpu (only a GPU node can be rebooted)
+fault-remediation, janitor, janitor-provider: 1/1 on eu1-par-cpu-01, 0 restarts

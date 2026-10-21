@@ -8,9 +8,9 @@
     pools and compared its answer with what they run.
 
 !!! warning "Partly planned"
-    The recipes, the refusals and the version comparison below ran on 20 and 21 October.
-    The validation of fin against the recipe runs in W2 (22 October) and the drift demo on
-    par before W1; both say "planned" until then.
+    The recipes, the refusals, the version comparison and the drift demo ran on 20 and 21 October.
+    The validation of fin against the recipe runs in W2 (22 October) and says "planned"
+    until then.
 
 ## What AICR v1.1.0 offers EU1
 
@@ -39,12 +39,33 @@ checksums ([listing](https://github.com/yassineteimi/ncp-partner-onboarding/blob
 and synced none of it: on fin it would install a second GPU Operator, NFD and Prometheus
 beside the ones the base platform runs.
 
-## Drift
+## Drift: AICR missed it
 
-!!! note "Planned, before W1"
-    On par: a snapshot, NVCRE's controller set back to v0.7.0 by hand with Argo CD paused
-    for that one Application, a second snapshot and `aicr diff` between them, then Argo CD
-    putting v0.8.0 back and a third snapshot.
+On 21 October on par, with Argo CD paused for the one Application: a snapshot, NVCRE's
+controller set back from v0.8.0 to v0.7.0 by hand, a second snapshot and `aicr diff`
+between them; then Argo CD resumed and a third snapshot
+([every command with its time](https://github.com/yassineteimi/ncp-partner-onboarding/blob/main/docs/artifacts/readiness/aicr/drift-demo-par.txt)).
+
+| UTC | What happened |
+|---|---|
+| 10:52:54 | Snapshot 1 |
+| 10:54:02 | Argo CD paused for `nvcre` (`skip-reconcile`) |
+| 10:54:15 | `kubectl set image` to `manager:v0.7.0`. The new pod crashlooped on `unknown flag: --namespace-access-timeout`, a flag the v0.8.0 chart passes; the rolling update kept the v0.8.0 pod serving |
+| 10:57:37 | Snapshot 2 and `aicr diff`: "DRIFT DETECTED", 16 changes, every one a runtime counter (sysctl, a random UUID, containerd and kubelet memory). The image change isn't among them |
+| 10:57:54 | Argo CD resumed |
+| 10:58:05 | v0.8.0 back, 11 seconds later; the v0.7.0 pod gone |
+| 10:58:12 | Snapshot 3 and `aicr diff`: 15 changes, again only counters |
+
+Why it missed the change: AICR's snapshot keeps one `name: tag` per image's last path
+segment. An image pinned by digest, as everything in this repository is, has no tag and
+reads `latest`, and the two pods were both called `manager`, so the inventory had one
+entry for them. A version change on a digest-pinned workload doesn't show, and what does
+show is buried in counters that change every second.
+
+So on a GitOps cluster `aicr diff` isn't EU1's drift detector: Argo CD found and undid
+the same change in 11 seconds. It stays useful for what Git doesn't own, the node's OS,
+kernel and services, provided someone filters the counters out first. On par it couldn't
+read the kernel configuration at all: the image has no `/boot/config-*`.
 
 ## Validation on fin
 

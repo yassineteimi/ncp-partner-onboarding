@@ -1,0 +1,70 @@
+# FC12 after-4 on par, 2026-10-21T10:47:27Z, git main at e593b80
+== Applications
+cert-manager      wave  3   Synced     Healthy  v1.21.2
+kubeflow-trainer  wave  10  OutOfSync  Healthy  2.2.1
+nvcre             wave  10  Synced     Healthy  v0.8.0
+nvsentinel        wave  11  Synced     Healthy  v1.28.0
+== Nodes
+NAME             STATUS   ROLES           AGE   VERSION   POOL
+eu1-par-cp-01    Ready    control-plane   36h   v1.36.5   control
+eu1-par-cpu-01   Ready    <none>          29m   v1.36.5   cpu
+== Lane pods, and where they run
+nvsentinel       create-mongodb-database-2592000-c9dfbc49-5fcfd        Succeeded  restarts=0  eu1-par-cpu-01
+nvsentinel       fault-quarantine-86b76dd6c7-8hj6n                     Running    restarts=0  eu1-par-cpu-01
+nvsentinel       labeler-5688d97cc6-dw62h                              Running    restarts=0  eu1-par-cpu-01
+nvsentinel       mongodb-rs0-0                                         Running    restarts=0  eu1-par-cpu-01
+nvsentinel       node-drainer-67f4ff998d-6lnbv                         Running    restarts=0  eu1-par-cpu-01
+nvsentinel       nvsentinel-psmdb-operator-565bd99d6f-rhmr9            Running    restarts=0  eu1-par-cpu-01
+nvsentinel       platform-connectors-7ft9x                             Running    restarts=0  eu1-par-cpu-01
+nvsentinel       platform-connectors-hdq5v                             Running    restarts=0  eu1-par-cp-01
+nvcre            nvcre-manager-d6c6cc8c7-cfl2r                         Running    restarts=0  eu1-par-cpu-01
+kubeflow-system  jobset-controller-5999749d98-ws522                    Running    restarts=1  eu1-par-cpu-01
+kubeflow-system  kubeflow-trainer-controller-manager-6b54cc4fc7-hlhcl  Running    restarts=1  eu1-par-cpu-01
+pods running off the CPU worker (should be none): none
+== NVSentinel Deployments and DaemonSets
+NAME                                          READY    UP-TO-DATE  AVAILABLE
+deployment.apps/fault-quarantine              1/1      1           1
+deployment.apps/labeler                       1/1      1           1
+deployment.apps/node-drainer                  1/1      1           1
+deployment.apps/nvsentinel-psmdb-operator     1/1      1           1
+NAME                                          DESIRED  CURRENT     READY
+daemonset.apps/gpu-health-monitor-dcgm-3.x    0        0           0
+daemonset.apps/gpu-health-monitor-dcgm-4.x    0        0           0
+daemonset.apps/metadata-collector             0        0           0
+daemonset.apps/platform-connectors            2        2           2
+daemonset.apps/syslog-health-monitor-kata     0        0           0
+daemonset.apps/syslog-health-monitor-regular  0        0           0
+== MongoDB
+NAME      STATE
+mongodb   ready
+PVC                         STATUS   CLASS        SIZE
+mongod-data-mongodb-rs0-0   Bound    local-path   3Gi
+== circuit breaker
+no circuit-breaker ConfigMap
+== admission webhooks from the lane
+Validating  validate-jobset-x-k8s-io-v1alpha2-jobset.x-k8s.io      Fail  jobsets
+Validating  validate--v1-pod.x-k8s.io                              Fail  pods
+Validating  validator.clustertrainingruntime.trainer.kubeflow.org  Fail  clustertrainingruntimes
+Validating  validator.trainingruntime.trainer.kubeflow.org         Fail  trainingruntimes
+Validating  validator.trainjob.trainer.kubeflow.org                Fail  trainjobs
+Mutating    defaulter.trainjob.trainer.kubeflow.org                Fail  trainjobs
+Mutating    mutate-jobset-x-k8s-io-v1alpha2-jobset.x-k8s.io        Fail  jobsets
+Mutating    mutate--v1-pod.x-k8s.io                                Fail  pods
+== nvcrectl setup status (its em dashes written as --, which this repository's lint requires)
+Component                       Status
+─────────────────────────       ──────────
+NVCRE CRDs                      ✓ installed
+NVCRE Controller                ✓ installed
+Kubeflow Trainer                ✓ installed (v2.2.1)
+Log Profiles                    ✓ installed
+GPU Operator                    ✗ not found
+DCGM (optional)                 ✓ installed
+Helm release nvcre              ✓ not installed
+Helm release kubeflow-trainer   ✓ not installed
+
+Status: not ready -- run 'nvcrectl setup init' to install missing components
+  GPU Operator must be installed by your cluster administrator
+== live settings that stage 2 depends on (read after the check)
+fault-quarantine Deployment args: --circuit-breaker-enabled=false
+node-drainer ConfigMap: userNamespaces "*" mode "Immediate"; evictionTimeoutInSeconds "60";
+  systemNamespaces "^(nvsentinel|kube-system|kube-flannel|gpu-operator|node-feature-discovery|cert-manager|local-path-storage|monitoring|argocd|checkpoint-store)$"
