@@ -50,7 +50,8 @@ check_images() {
 import sys, yaml
 OPERANDS = ["VIRT_OPERATOR_IMAGE", "VIRT_API_IMAGE", "VIRT_CONTROLLER_IMAGE", "VIRT_HANDLER_IMAGE",
             "VIRT_LAUNCHER_IMAGE", "VIRT_EXPORTPROXY_IMAGE", "VIRT_EXPORTSERVER_IMAGE",
-            "VIRT_SYNCHRONIZATIONCONTROLLER_IMAGE", "GS_IMAGE", "PR_HELPER_IMAGE", "SIDECAR_SHIM_IMAGE"]
+            "VIRT_SYNCHRONIZATIONCONTROLLER_IMAGE", "GS_IMAGE", "PR_HELPER_IMAGE", "SIDECAR_SHIM_IMAGE",
+            "VIRT_TEMPLATE_APISERVER_IMAGE", "VIRT_TEMPLATE_CONTROLLER_IMAGE"]
 errors, refs = [], 0
 
 def walk(obj, path):
@@ -162,7 +163,10 @@ for d in keep:
 keep = [d for d in keep if d["kind"] != "Namespace"]
 yaml.safe_dump_all(keep, open(sys.argv[2], "w"))
 PY
-  kubectl_cp apply --dry-run=server --server-side --field-manager=ws-platform-dry-run -f "$OUT/dry-run.yaml"
+  # Once deployed, the cluster-scoped objects (CRD, ClusterRoles,
+  # PriorityClass) belong to argocd-controller, so another field manager
+  # conflicts. ArgoCD's own server-side sync forces conflicts; so does this.
+  kubectl_cp apply --dry-run=server --server-side --force-conflicts --field-manager=ws-platform-dry-run -f "$OUT/dry-run.yaml"
   kubectl_cp apply --dry-run=server -f "$REPO_ROOT/gitops/apps/par/platform/kubevirt.yaml"
 fi
 
