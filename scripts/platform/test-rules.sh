@@ -24,7 +24,7 @@ sed -n '/^spec:/,$p' "$SRC/gpu-cardinality.yaml" | sed '1d; s/^  //' > "$WORK/gp
 cp "$SRC/tests/gpu-cardinality.test.yaml" "$WORK/"
 
 if [ "${BREAK:-0}" = 1 ]; then
-  sed -i.bak 's/count by (Hostname, gpu, UUID, modelName)/count by (Hostname, gpu, UUID, modelName, pod)/' \
+  sed -i.bak 's/count by (hostname, gpu, UUID, modelName)/count by (hostname, gpu, UUID, modelName, pod)/' \
     "$WORK/gpu-cardinality.rules.yaml"
   grep -q 'modelName, pod)' "$WORK/gpu-cardinality.rules.yaml" || die "the break did not apply"
 fi

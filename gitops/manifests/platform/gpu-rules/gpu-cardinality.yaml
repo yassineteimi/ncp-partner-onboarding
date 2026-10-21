@@ -23,7 +23,7 @@ spec:
         # they live on, which is the number capacity planning needs.
         - record: gpu:dcgm_series:count
           expr: |
-            count by (Hostname, gpu, UUID, modelName) ({__name__=~"DCGM_.+"})
+            count by (hostname, gpu, UUID, modelName) ({__name__=~"DCGM_.+"})
 
         # The same, split by metric, to see which ones multiply: the XID
         # counter (one series per code), clock events (one per reason), and
@@ -31,6 +31,6 @@ spec:
         # because a recording rule replaces __name__.
         - record: gpu:dcgm_series_by_metric:count
           expr: |
-            count by (Hostname, gpu, modelName, metric) (
+            count by (hostname, gpu, modelName, metric) (
               label_replace({__name__=~"DCGM_.+"}, "metric", "$1", "__name__", "(.+)")
             )
