@@ -125,6 +125,45 @@ PY
 log "GPU Operator renders on fin with $((${#gpu_values[@]} / 2)) value files"
 
 ########################################
+# 2b. Slinky on par
+########################################
+
+SLINKY_VERSION=1.2.3
+for chart in slurm-operator slurm; do
+  helm pull "oci://ghcr.io/slinkyproject/charts/$chart" --version "$SLINKY_VERSION" \
+    --untar --untardir "$OUT/charts" >/dev/null 2>&1
+  # Both render into the slurm namespace, as the multi-source Application does.
+  helm template "$chart" "$OUT/charts/$chart" --namespace slurm \
+    -f "$VALUES/scheduling/$chart.yaml" > "$OUT/slinky-$chart.yaml"
+done
+python3 - "$OUT/slinky-slurm-operator.yaml" "$OUT/slinky-slurm.yaml" <<'PY'
+import sys, yaml
+docs = [d for p in sys.argv[1:] for d in yaml.safe_load_all(open(p)) if d]
+bad = []
+for d in docs:
+    kind, name = d["kind"], d["metadata"]["name"]
+    if kind in ("Deployment", "Controller", "RestApi", "LoginSet", "NodeSet"):
+        sel = d["spec"]["template"]["spec"].get("nodeSelector") or {}
+        if sel.get("eu1.io/pool") != "cpu":
+            bad.append(f"{kind}/{name}")
+if bad:
+    sys.exit(f"without eu1.io/pool=cpu: {', '.join(bad)}")
+secrets = sorted(d["metadata"]["name"] for d in docs if d["kind"] == "Secret")
+assert secrets == ["slurm-sssd-conf"], f"rendered Secrets: {secrets} (keys must come from make slurm-keys)"
+for d in docs:
+    if d["kind"].endswith("WebhookConfiguration"):
+        assert "cert-manager.io/inject-ca-from" in d["metadata"]["annotations"], d["metadata"]["name"]
+        assert all(not w["clientConfig"].get("caBundle") for w in d["webhooks"]), "caBundle rendered"
+crs = {d["kind"]: d for d in docs if d["kind"] in ("NodeSet", "LoginSet")}
+assert crs["NodeSet"]["spec"]["replicas"] == 2
+svc = crs["LoginSet"]["spec"].get("service", {}).get("spec", {}).get("type")
+assert svc == "ClusterIP", f"login Service type {svc}"
+print("    every Slinky pod template on eu1.io/pool=cpu; only the static sssd Secret rendered;")
+print("    webhook CA from cert-manager (no caBundle at render); 2 Slurm nodes; login Service ClusterIP")
+PY
+log "Slinky renders on par"
+
+########################################
 # 3. Vendored manifests and kustomizations
 ########################################
 
@@ -162,7 +201,7 @@ log "every kustomization builds"
 # Rule 7: every image the lane's manifests and workloads name, including
 # images passed in env values, is pinned by digest. KWOK Stage templates
 # ({{ .image }}) aren't images.
-unpinned="$(cat "$OUT"/gitops_manifests_scheduling_*.yaml "$OUT"/workloads_scheduling_*.yaml \
+unpinned="$(cat "$OUT"/gitops_manifests_scheduling_*.yaml "$OUT"/workloads_scheduling_*.yaml "$OUT"/slinky-*.yaml \
   | grep -E '^\s*(- )?image: *"?[a-z0-9]|^\s*(- )?value: *"?[a-z0-9.-]+\.[a-z]{2,}/[^ ]+:[^ ]+' \
   | grep -v -E '@sha256:|\{\{' || true)"
 if [ -n "$unpinned" ]; then
@@ -170,6 +209,24 @@ if [ -n "$unpinned" ]; then
   fail "image references without a digest"
 fi
 log "every image reference is pinned by digest"
+
+# Custom resources whose CRDs a dry run can't see yet, against those CRDs.
+if python3 -c 'import jsonschema' 2>/dev/null; then
+  for pair in \
+    "kai-par.yaml kai-par.yaml gitops_manifests_scheduling_kai-queues_par.yaml" \
+    "kai-fin.yaml kai-fin.yaml gitops_manifests_scheduling_kai-queues_fin.yaml" \
+    "slinky-slurm-operator.yaml slinky-slurm.yaml" \
+    "gitops_manifests_scheduling_sim-gpu.yaml gitops_manifests_scheduling_sim-gpu.yaml"; do
+    # shellcheck disable=SC2086 # word splitting into file names is intended
+    set -- $pair
+    crd_file="$1"
+    shift
+    (cd "$OUT" && python3 "$REPO_ROOT/scripts/scheduling/validate-crs.py" "$crd_file" "$@") | sed 's/^/    /'
+  done
+  log "custom resources match their CRD schemas"
+else
+  warn "jsonschema not installed: custom resources not validated against their CRDs"
+fi
 
 ########################################
 # 4. Workloads say what they claim
@@ -216,7 +273,8 @@ if [ "${DRY_RUN:-}" = "server" ]; then
   # namespaces that exist.
   kubectl_cp api-resources --no-headers | awk '{print $NF, $(NF-1)}' | sort -u > "$known"
   kubectl_cp get namespaces -o name | sed 's|^namespace/||' > "$OUT/namespaces.txt"
-  for f in kai-par.yaml gitops_manifests_scheduling_sim-gpu.yaml gitops_manifests_scheduling_kai-queues_par.yaml; do
+  for f in kai-par.yaml gitops_manifests_scheduling_sim-gpu.yaml gitops_manifests_scheduling_kai-queues_par.yaml \
+    slinky-slurm-operator.yaml slinky-slurm.yaml; do
     python3 - "$OUT/$f" "$known" "$OUT/namespaces.txt" "$OUT/dry-$f" <<'PY'
 import sys, yaml
 src, known_path, ns_path, dst = sys.argv[1:]

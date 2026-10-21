@@ -1,0 +1,165 @@
+# scripts/scheduling/check.sh, 20261021T065230Z, laptop clock, UTC. git 68d7a29. DRY_RUN=server
+==> renders go to /Users/yassineteimi/.claude/jobs/b95b4772/tmp/check
+==> KAI chart generates no secret at render time
+    every KAI pod template and the Config select eu1.io/pool=cpu; hooks left: kai-scheduler-crd-manager, kai-scheduler-crd-manager, kai-scheduler-crd-manager, crd-upgrader
+==> KAI renders on par
+    every KAI pod template and the Config select eu1.io/pool=control; hooks left: kai-scheduler-crd-manager, kai-scheduler-crd-manager, kai-scheduler-crd-manager, crd-upgrader
+==> KAI renders on fin
+    ClusterPolicy: mig.strategy=mixed, migManager on with mig-parted-eu1, WITH_REBOOT=false, driver off
+    configs: all-disabled, h200-split
+==> GPU Operator renders on fin with 3 value files
+    every Slinky pod template on eu1.io/pool=cpu; only the static sssd Secret rendered;
+    webhook CA from cert-manager (no caBundle at render); 2 Slurm nodes; login Service ClusterIP
+==> Slinky renders on par
+==> vendored sim-gpu manifests match a fresh render
+    46 objects from gitops/manifests/scheduling/sim-gpu
+    5 objects from gitops/manifests/scheduling/kai-queues/par
+    5 objects from gitops/manifests/scheduling/kai-queues/fin
+    3 objects from workloads/scheduling/allreduce/fin
+    3 objects from workloads/scheduling/allreduce/fin-too-big
+    3 objects from workloads/scheduling/allreduce/par-gloo
+    3 objects from workloads/scheduling/sim-demo
+    3 objects from workloads/scheduling/mig
+    1 objects from workloads/scheduling/prepull
+==> every kustomization builds
+==> every image reference is pinned by digest
+    valid: kai.scheduler/v1 Config kai-config
+    valid: scheduling.run.ai/v2 Queue default-parent-queue
+    valid: scheduling.run.ai/v2 Queue default-queue
+    valid: kai.scheduler/v1 SchedulingShard default
+    valid: scheduling.run.ai/v2 Queue eu1
+    valid: scheduling.run.ai/v2 Queue team-a
+    valid: scheduling.run.ai/v2 Queue team-b
+    valid: kai.scheduler/v1 Config kai-config
+    valid: scheduling.run.ai/v2 Queue default-parent-queue
+    valid: scheduling.run.ai/v2 Queue default-queue
+    valid: kai.scheduler/v1 SchedulingShard default
+    valid: scheduling.run.ai/v2 Queue eu1
+    valid: scheduling.run.ai/v2 Queue team-a
+    valid: scheduling.run.ai/v2 Queue team-b
+    valid: slinky.slurm.net/v1beta1 Controller slurm
+    valid: slinky.slurm.net/v1beta1 LoginSet slurm-login-hpc
+    valid: slinky.slurm.net/v1beta1 NodeSet slurm-worker-cpu
+    valid: slinky.slurm.net/v1beta1 RestApi slurm
+    valid: kwok.x-k8s.io/v1alpha1 Stage node-heartbeat-with-lease
+    valid: kwok.x-k8s.io/v1alpha1 Stage node-initialize
+    valid: kwok.x-k8s.io/v1alpha1 Stage pod-delete
+    valid: kwok.x-k8s.io/v1alpha1 Stage pod-ready
+==> custom resources match their CRD schemas
+    workloads_scheduling_allreduce_fin.yaml: gang of 2, pool gpu, 1 GPU per pod, nccl, no staging toleration
+    workloads_scheduling_allreduce_fin-too-big.yaml: gang of 3, pool gpu, 1 GPU per pod, nccl, no staging toleration
+    workloads_scheduling_allreduce_par-gloo.yaml: gang of 2, pool cpu, 0 GPU per pod, gloo, no staging toleration
+==> workloads checked
+    38 objects to dry-run; skipped, CRD not installed yet: {'Config': 1, 'Queue': 2, 'SchedulingShard': 1}; validated in default, namespace created at sync: {'kai-scheduler': 4, 'kai-resource-reservation': 2}
+    customresourcedefinition.apiextensions.k8s.io/configs.kai.scheduler
+    customresourcedefinition.apiextensions.k8s.io/schedulingshards.kai.scheduler
+    customresourcedefinition.apiextensions.k8s.io/topologies.kai.scheduler
+    customresourcedefinition.apiextensions.k8s.io/bindrequests.scheduling.run.ai
+    customresourcedefinition.apiextensions.k8s.io/podgroups.scheduling.run.ai
+    customresourcedefinition.apiextensions.k8s.io/queues.scheduling.run.ai
+    priorityclass.scheduling.k8s.io/build-preemptible
+    priorityclass.scheduling.k8s.io/build
+    priorityclass.scheduling.k8s.io/inference
+    priorityclass.scheduling.k8s.io/train
+    namespace/kai-resource-reservation
+    serviceaccount/kai-operator
+    serviceaccount/kai-resource-reservation
+    clusterrole.rbac.authorization.k8s.io/kai-admission
+    clusterrole.rbac.authorization.k8s.io/kai-binder
+    clusterrole.rbac.authorization.k8s.io/kai-node-scale-adjuster
+    clusterrole.rbac.authorization.k8s.io/kai-numa-placement-exporter
+    clusterrole.rbac.authorization.k8s.io/kai-operator
+    clusterrole.rbac.authorization.k8s.io/kai-podgroup-controller
+    clusterrole.rbac.authorization.k8s.io/kai-podgrouper
+    clusterrole.rbac.authorization.k8s.io/queuecontroller
+    clusterrole.rbac.authorization.k8s.io/kai-resource-reservation
+    clusterrole.rbac.authorization.k8s.io/kai-scheduler
+    clusterrolebinding.rbac.authorization.k8s.io/kai-admission
+    clusterrolebinding.rbac.authorization.k8s.io/kai-binder
+    clusterrolebinding.rbac.authorization.k8s.io/kai-node-scale-adjuster
+    clusterrolebinding.rbac.authorization.k8s.io/kai-numa-placement-exporter
+    clusterrolebinding.rbac.authorization.k8s.io/kai-operator
+    clusterrolebinding.rbac.authorization.k8s.io/kai-podgroup-controller
+    clusterrolebinding.rbac.authorization.k8s.io/kai-podgrouper
+    clusterrolebinding.rbac.authorization.k8s.io/kai-queuecontroller
+    clusterrolebinding.rbac.authorization.k8s.io/kai-scheduler
+    rolebinding.rbac.authorization.k8s.io/kai-resource-reservation
+    deployment.apps/kai-operator
+    serviceaccount/kai-scheduler-crd-manager
+    clusterrole.rbac.authorization.k8s.io/kai-scheduler-crd-manager
+    clusterrolebinding.rbac.authorization.k8s.io/kai-scheduler-crd-manager
+    job.batch/crd-upgrader
+    42 objects to dry-run; skipped, CRD not installed yet: {'Stage': 4}; validated in default, namespace created at sync: {'fake-gpu': 12}
+    namespace/fake-gpu
+    customresourcedefinition.apiextensions.k8s.io/attaches.kwok.x-k8s.io
+    customresourcedefinition.apiextensions.k8s.io/clusterattaches.kwok.x-k8s.io
+    customresourcedefinition.apiextensions.k8s.io/clusterexecs.kwok.x-k8s.io
+    customresourcedefinition.apiextensions.k8s.io/clusterlogs.kwok.x-k8s.io
+    customresourcedefinition.apiextensions.k8s.io/clusterportforwards.kwok.x-k8s.io
+    customresourcedefinition.apiextensions.k8s.io/clusterresourceusages.kwok.x-k8s.io
+    customresourcedefinition.apiextensions.k8s.io/execs.kwok.x-k8s.io
+    customresourcedefinition.apiextensions.k8s.io/logs.kwok.x-k8s.io
+    customresourcedefinition.apiextensions.k8s.io/metrics.kwok.x-k8s.io
+    customresourcedefinition.apiextensions.k8s.io/portforwards.kwok.x-k8s.io
+    customresourcedefinition.apiextensions.k8s.io/resourceusages.kwok.x-k8s.io
+    customresourcedefinition.apiextensions.k8s.io/stages.kwok.x-k8s.io
+    serviceaccount/kwok-gpu-device-plugin
+    serviceaccount/status-updater
+    serviceaccount/topology-server
+    serviceaccount/kwok-controller
+    role.rbac.authorization.k8s.io/fake-kwok-gpu-device-plugin
+    role.rbac.authorization.k8s.io/fake-status-updater
+    clusterrole.rbac.authorization.k8s.io/fake-kwok-gpu-device-plugin
+    clusterrole.rbac.authorization.k8s.io/fake-status-updater
+    clusterrole.rbac.authorization.k8s.io/fake-status-updater-pod-patch
+    clusterrole.rbac.authorization.k8s.io/kwok-controller
+    clusterrole.rbac.authorization.k8s.io/topology-server
+    rolebinding.rbac.authorization.k8s.io/fake-kwok-gpu-device-plugin
+    rolebinding.rbac.authorization.k8s.io/fake-status-updater
+    clusterrolebinding.rbac.authorization.k8s.io/fake-kwok-gpu-device-plugin
+    clusterrolebinding.rbac.authorization.k8s.io/fake-status-updater
+    clusterrolebinding.rbac.authorization.k8s.io/fake-status-updater-pod-patch
+    clusterrolebinding.rbac.authorization.k8s.io/kwok-controller
+    clusterrolebinding.rbac.authorization.k8s.io/topology-server
+    configmap/topology
+    configmap/kwok
+    service/topology-server
+    service/kwok-controller
+    deployment.apps/kwok-gpu-device-plugin
+    deployment.apps/status-updater
+    deployment.apps/topology-server
+    deployment.apps/kwok-controller
+    flowschema.flowcontrol.apiserver.k8s.io/kwok-controller
+    node/eu1-par-sim-gpu-01
+    node/eu1-par-sim-gpu-02
+    2 objects to dry-run; skipped, CRD not installed yet: {'Queue': 3}; validated in default, namespace created at sync: none
+    namespace/team-a
+    namespace/team-b
+    22 objects to dry-run; skipped, CRD not installed yet: none; validated in default, namespace created at sync: {'slurm': 10}
+    serviceaccount/slurm-operator
+    serviceaccount/slurm-operator-webhook
+    customresourcedefinition.apiextensions.k8s.io/accountings.slinky.slurm.net
+    customresourcedefinition.apiextensions.k8s.io/controllers.slinky.slurm.net
+    customresourcedefinition.apiextensions.k8s.io/loginsets.slinky.slurm.net
+    customresourcedefinition.apiextensions.k8s.io/nodesets.slinky.slurm.net
+    customresourcedefinition.apiextensions.k8s.io/restapis.slinky.slurm.net
+    customresourcedefinition.apiextensions.k8s.io/tokens.slinky.slurm.net
+    clusterrole.rbac.authorization.k8s.io/slurm-operator
+    clusterrole.rbac.authorization.k8s.io/slurm-operator-webhook
+    clusterrolebinding.rbac.authorization.k8s.io/slurm-operator
+    clusterrolebinding.rbac.authorization.k8s.io/slurm-operator-webhook
+    service/slurm-operator
+    service/slurm-operator-webhook
+    deployment.apps/slurm-operator
+    deployment.apps/slurm-operator-webhook
+    mutatingwebhookconfiguration.admissionregistration.k8s.io/slurm-operator-webhook
+    validatingwebhookconfiguration.admissionregistration.k8s.io/slurm-operator-webhook
+    certificate.cert-manager.io/slurm-operator-webhook-root-ca
+    certificate.cert-manager.io/slurm-operator-webhook-ca
+    issuer.cert-manager.io/slurm-operator-webhook-self-issuer
+    issuer.cert-manager.io/slurm-operator-webhook-root-issuer
+    2 objects to dry-run; skipped, CRD not installed yet: {'Controller': 1, 'LoginSet': 1, 'NodeSet': 1, 'RestApi': 1}; validated in default, namespace created at sync: {'slurm': 2}
+    secret/slurm-sssd-conf
+    configmap/slurm-prolog-scripts
+==> server-side dry run on par passed
+==> all scheduling checks passed

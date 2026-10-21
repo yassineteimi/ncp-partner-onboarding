@@ -1,0 +1,79 @@
+# Slurm through Slinky on par, use case 5, sync wave 10.
+#
+# The operator chart (with its CRDs) and the slurm chart are one Application:
+# the operator's validating webhook (failurePolicy Fail) checks every Slurm
+# object and runs on the CPU worker, so a separate later-wave cluster
+# Application would depend on the worker, which CLAUDE.md forbids. Both charts
+# render into the slurm namespace. The Controller, NodeSet, LoginSet and
+# RestApi objects are retried until the webhook answers.
+#
+# Before the first sync, make slurm-keys creates the slurm.key and jwt.key
+# Secrets outside Git (gitops/values/scheduling/slurm.yaml says why).
+#
+# Everything runs on the CPU worker. With the worker off, this Application
+# reads Progressing or Degraded. Nothing in a later wave depends on it.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: slinky
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+
+  sources:
+    - repoURL: ghcr.io/slinkyproject/charts
+      chart: slurm-operator
+      targetRevision: 1.2.3
+      helm:
+        releaseName: slurm-operator
+        valueFiles:
+          - $values/gitops/values/scheduling/slurm-operator.yaml
+
+    - repoURL: ghcr.io/slinkyproject/charts
+      chart: slurm
+      targetRevision: 1.2.3
+      helm:
+        releaseName: slurm
+        valueFiles:
+          - $values/gitops/values/scheduling/slurm.yaml
+
+    - repoURL: https://github.com/yassineteimi/ncp-partner-onboarding
+      targetRevision: main
+      ref: values
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: slurm
+
+  # cert-manager's CA injector writes the webhook CA into these after sync
+  # (cert-manager.io/inject-ca-from); the chart leaves caBundle empty on
+  # purpose when cert-manager is on.
+  ignoreDifferences:
+    - group: admissionregistration.k8s.io
+      kind: MutatingWebhookConfiguration
+      jqPathExpressions:
+        - .webhooks[]?.clientConfig.caBundle
+    - group: admissionregistration.k8s.io
+      kind: ValidatingWebhookConfiguration
+      jqPathExpressions:
+        - .webhooks[]?.clientConfig.caBundle
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+      - SkipDryRunOnMissingResource=true
+      - RespectIgnoreDifferences=true
+    retry:
+      limit: 10
+      backoff:
+        duration: 20s
+        factor: 2
+        maxDuration: 5m
