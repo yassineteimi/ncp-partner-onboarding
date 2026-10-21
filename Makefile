@@ -1,7 +1,7 @@
 SHELL := /bin/bash
 VENV  := .venv
 
-.PHONY: help par-cluster par-argocd par-cpu-up par-cpu-down par-cpu-destroy par-gpu-up par-acceptance par-gpu-down par-images par-sweep fin-preflight fin-availability fin-cp-up fin-gpu-up fin-up fin-down fin-sweep argocd-ui grafana-ui cost lint shellcheck fmt docs docs-serve test-goodput
+.PHONY: help par-cluster par-argocd par-cpu-up par-cpu-down par-cpu-destroy par-gpu-up par-acceptance par-gpu-down par-images par-sweep fin-preflight fin-availability fin-cp-up fin-gpu-up fin-acceptance fin-up fin-down fin-sweep argocd-ui grafana-ui cost lint shellcheck fmt docs docs-serve test-goodput
 
 help:
 	@grep -hE '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN{FS=":.*?## "}{printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2}'
@@ -29,7 +29,7 @@ par-gpu-up:    ## par: create the L4 node, join it, wait for nvidia.com/gpu (sta
 	./scripts/par/gpu-up.sh
 
 par-acceptance: ## par: W1 step 2, cuda-vectoradd and nvidia-smi on the L4, versions on the node (free once the L4 is up)
-	./scripts/par/acceptance.sh
+	SITE=par ./scripts/par/acceptance.sh
 
 par-gpu-down:  ## par: drain the L4 node, remove it, destroy it, sweep for leftovers
 	./scripts/par/gpu-down.sh
@@ -55,6 +55,9 @@ fin-cp-up:     ## fin: preflight, then the control plane, kubeadm and ArgoCD (ce
 
 fin-gpu-up:    ## fin: preflight, then the H200 node, join, wait for its GPUs (REHEARSAL=1: CPU stand-in)
 	./scripts/fin/gpu-up.sh
+
+fin-acceptance: ## fin: W2 at node Ready, the same acceptance on the 2x H200, still in staging (free once the node is up)
+	SITE=fin ./scripts/par/acceptance.sh
 
 fin-up: fin-cp-up fin-gpu-up ## fin: the whole site from zero, timed
 
