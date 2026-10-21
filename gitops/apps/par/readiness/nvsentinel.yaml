@@ -1,0 +1,69 @@
+# NVSentinel v1.28.0 on par (use case 3), sync wave 11.
+#
+# Wave 11 because its Certificates need cert-manager's CRDs and webhook, which
+# the base platform installs in an earlier wave (cert-manager v1.21 or newer, as
+# the README asks). Values and the reason for every override are in
+# gitops/values/readiness/nvsentinel-par.yaml; the stages are switched on there,
+# one commit each.
+#
+# The chart comes from the OCI registry, not from Git: at the tag, the chart in
+# Git still says image tag "main", and the release job rewrites it to v1.28.0
+# only when it publishes the OCI chart. Argo CD takes OCI repositories without
+# the oci:// prefix. Pulled on 20 October: digest
+# sha256:db71323dfe9a595465e6165c1e0da5e68a5e4b0893c1efcfbef85b9393f033b3.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: nvsentinel
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "11"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+
+  sources:
+    - repoURL: ghcr.io/nvidia
+      chart: nvsentinel
+      targetRevision: v1.28.0
+      helm:
+        releaseName: nvsentinel
+        valueFiles:
+          - $values/gitops/values/readiness/nvsentinel-par.yaml
+
+    - repoURL: https://github.com/yassineteimi/ncp-partner-onboarding
+      targetRevision: main
+      ref: values
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: nvsentinel
+
+  # cert-manager writes the CA bundle into the webhook configurations after
+  # sync; without this Argo CD would report them as drift forever.
+  ignoreDifferences:
+    - group: admissionregistration.k8s.io
+      kind: ValidatingWebhookConfiguration
+      jqPathExpressions:
+        - .webhooks[]?.clientConfig.caBundle
+    - group: admissionregistration.k8s.io
+      kind: MutatingWebhookConfiguration
+      jqPathExpressions:
+        - .webhooks[]?.clientConfig.caBundle
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      # The Percona operator's CRDs are too large for a client-side apply.
+      - ServerSideApply=true
+      - RespectIgnoreDifferences=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 20s
+        factor: 2
+        maxDuration: 5m

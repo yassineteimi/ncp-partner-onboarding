@@ -1,0 +1,59 @@
+# The use case 2 certification of fin's H200 node, run in W2 by
+#   make nvcre-certify SITE=fin
+# and read by scripts/readiness/promote.py, which removes the staging taint
+# only if this passes and dcgmi diag -r 2 passes too.
+#
+# Two categories, both inside the node: nccl-all-reduce across the two GPUs,
+# and nccl-loopback-nvswitch, the loopback variant that keeps P2P on and so
+# goes over NVLink (plain nccl-loopback disables P2P and SHM, which tests the
+# network path instead). Nothing here can show the inter-node fabric: there is
+# one node.
+apiVersion: nvcre.nvidia.com/v1alpha1
+kind: Certification
+metadata:
+  name: eu1-fin-h200
+spec:
+  target:
+    nodeSelector:
+      eu1.io/site: fin
+      eu1.io/pool: gpu
+    # Selects only nodes that still carry the staging taint, and lets the
+    # workload pods tolerate it (NVCRE injects the toleration).
+    taintSelectors:
+      - key: eu1.io/staging
+        effect: NoSchedule
+
+  # The catalog's NCCL image, nvcr.io/nvidia/pytorch:26.01-py3, pinned by the
+  # index digest nvcr.io served on 20 October: the catalog names it by tag. It
+  # is built for driver 590.48.01 (CUDA 13.1.1), above fin's 580.178.04, so it
+  # runs there through CUDA forward compatibility. WORKLOAD_IMAGE overrides
+  # this at run time if that fails (see scripts/readiness/nvcre.sh).
+  image: nvcr.io/nvidia/pytorch:26.01-py3@sha256:38ed2ecb2c16d10677006d73fb0a150855d6ec81db8fc66e800b5ae92741007e
+
+  # NVCRE assumes 8 GPUs per node for an H200 and would find no node able to
+  # supply them (pkg/catalog/entries/_lib/gpu-defaults.yaml at v0.8.0). This
+  # Verda type is a 2-GPU slice of an HGX board.
+  gpusPerNode: 2
+
+  # The raw NCCL log, with the transport each channel uses, is evidence in its
+  # own right; ws-scheduling cites it for use case 4.
+  env:
+    - name: NCCL_DEBUG
+      value: INFO
+    - name: NCCL_DEBUG_SUBSYS
+      value: INIT,GRAPH
+
+  # NVCRE ships no thresholds: without one, PASSED only means the test ran.
+  # No published figure gives the all-reduce bus bandwidth of two H200s, so
+  # this is not a performance target. It's the floor that proves the path:
+  # NVIDIA's H200 page gives PCIe Gen5 at 128 GB/s, 64 GB/s each way, so a
+  # bus bandwidth above 64 GB/s can only have crossed NVLink (900 GB/s, about
+  # 450 GB/s each way). The measured figure is reported against 450.
+  thresholds:
+    busBandwidthGBps: "value >= 64.0"
+
+  categories:
+    - domain: communication
+      variant: nccl-all-reduce
+    - domain: communication
+      variant: nccl-loopback-nvswitch

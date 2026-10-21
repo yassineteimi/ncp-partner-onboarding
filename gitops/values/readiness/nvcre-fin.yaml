@@ -1,0 +1,29 @@
+# NVCRE v0.8.0 on fin, read by gitops/apps/fin/readiness/nvcre.yaml.
+#
+# The promotion gate of use case 2: the H200 node joins with the staging taint,
+# a Certification runs on it, and scripts/readiness/promote.py removes the taint
+# only if every category passed. Same as par (see nvcre-par.yaml) except the
+# pool: the controller goes on fin's control plane, its only node without GPUs.
+
+manager:
+  image:
+    digest: sha256:0ae58498427d1238dc15b6f4c92479a90104a55670b125042ec9dca60e6b5a3b
+
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: eu1.io/pool
+                operator: In
+                values: [control]
+              - key: nvidia.com/gpu.present
+                operator: DoesNotExist
+
+rbac:
+  scope: cluster
+
+metrics:
+  serviceMonitor:
+    labels:
+      release: kube-prometheus-stack

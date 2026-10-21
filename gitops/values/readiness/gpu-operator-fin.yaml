@@ -1,0 +1,20 @@
+# GPU Operator overlay on fin from the readiness lane (use case 2).
+#
+# fin's GPU node joins with the staging taint eu1.io/staging=pending:NoSchedule
+# and keeps it until scripts/readiness/promote.py removes it after an NVCRE
+# certification passes. The operands (container toolkit, device plugin, DCGM,
+# the exporter, validators) must run on the node before that: the certification
+# needs nvidia.com/gpu advertised, and the node is only useful once they are up.
+#
+# Helm replaces lists, so the chart's own toleration (nvidia.com/gpu, from
+# values.yaml of chart v26.7.2) is listed again. Another lane setting
+# daemonsets.tolerations on fin must keep both entries.
+
+daemonsets:
+  tolerations:
+    - key: nvidia.com/gpu
+      operator: Exists
+      effect: NoSchedule
+    - key: eu1.io/staging
+      operator: Exists
+      effect: NoSchedule

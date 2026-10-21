@@ -1,0 +1,49 @@
+# NVIDIA Cluster Readiness Engine v0.8.0 on par (use case 2), sync wave 10.
+#
+# The chart from the OCI registry, release nvcre in namespace nvcre, as
+# `nvcrectl setup init` names them. Pulled on 20 October: chart digest
+# sha256:889342a75de8599728625479b3337fc67f4f99e83f8fab2df5c3a40585d48d1a,
+# matching the release notes. The controller image is pinned by digest in
+# gitops/values/readiness/nvcre-par.yaml.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: nvcre
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+
+  sources:
+    - repoURL: ghcr.io/nvidia
+      chart: cluster-readiness-engine
+      targetRevision: v0.8.0
+      helm:
+        releaseName: nvcre
+        valueFiles:
+          - $values/gitops/values/readiness/nvcre-par.yaml
+
+    - repoURL: https://github.com/yassineteimi/ncp-partner-onboarding
+      targetRevision: main
+      ref: values
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: nvcre
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 20s
+        factor: 2
+        maxDuration: 5m

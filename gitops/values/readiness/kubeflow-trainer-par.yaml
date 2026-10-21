@@ -1,0 +1,22 @@
+# Kubeflow Trainer 2.2.1 on par, read by gitops/apps/par/readiness/kubeflow-trainer.yaml.
+#
+# NVCRE v0.8.0 runs its workloads as TrainJobs and accepts this exact Trainer
+# version (kubeflowTrainerVersion in pkg/setup at v0.8.0); `nvcrectl setup
+# status` fails on any other. `nvcrectl setup init` would install it with helm.
+# Here ArgoCD does, with the same values setup init passes (pkg/setup/helm.go
+# at v0.8.0) plus our placement.
+
+manager:
+  nodeSelector:
+    eu1.io/pool: cpu
+  # From setup init.
+  tolerations:
+    - operator: Exists
+
+jobset:
+  controller:
+    nodeSelector:
+      eu1.io/pool: cpu
+    # From setup init.
+    tolerations:
+      - operator: Exists

@@ -1,0 +1,39 @@
+# NVCRE v0.8.0 on par, read by gitops/apps/par/readiness/nvcre.yaml.
+#
+# par's run is the single-GPU subset of use case 2: on one L4 an all-reduce has
+# one rank and a bus bandwidth of 0 by definition, so it proves the gate's
+# plumbing (staging taint, tolerations injected, results file, promotion), not
+# the GPU.
+
+manager:
+  image:
+    # v0.8.0, multi-arch index (amd64, arm64). The tag can be repointed; the
+    # digest can't. Read with `docker manifest inspect` on 20 October.
+    digest: sha256:0ae58498427d1238dc15b6f4c92479a90104a55670b125042ec9dca60e6b5a3b
+
+  # The docs say the controller needs a node without GPUs, but the chart doesn't
+  # enforce it: affinity is empty and the toleration is Exists. This keeps it
+  # off any GPU node, on the CPU worker. It replaces the chart's default
+  # affinity, a preferred anti-affinity that only matters with replicas > 1.
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: eu1.io/pool
+                operator: In
+                values: [cpu]
+              - key: nvidia.com/gpu.present
+                operator: DoesNotExist
+
+rbac:
+  # Written out: cluster is v0.8.0's default and becomes namespaced in the next
+  # minor. `nvcrectl certification run` creates a namespace per run, and this
+  # lets the controller write there without a RoleBinding committed per run.
+  scope: cluster
+
+metrics:
+  serviceMonitor:
+    # kube-prometheus-stack on par selects ServiceMonitors by its release name.
+    labels:
+      release: kube-prometheus-stack

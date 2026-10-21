@@ -1,0 +1,51 @@
+# dcgmi diag -r 2 on fin's H200 node, as an NVCRE WorkloadRun, so the gate's
+# hardware diagnostic lives beside the certification in NVCRE's own objects.
+# Run in W2 by
+#   make readiness-diag SITE=fin
+# The fallback, if this can't run (it's first tried on par's L4 in W1), is the
+# same command through kubectl exec in the nvidia-dcgm pod, as Part 1 did.
+#
+# Why not the catalog's diagnostics/dcgm-level4: the level is hardcoded to 4,
+# about 90 minutes with 20 minutes each of targeted power and targeted stress.
+# Level 2 is minutes. What it leaves out is said in docs/10-day1-nvcre.md.
+#
+# The diagnostic runs inside the node's nv-hostengine (GPU Operator's standalone
+# DCGM, dcgm.enabled=true); this pod is only the client asking for it, so it
+# needs no privileges. It requests both GPUs so that nothing else is scheduled
+# onto them while the diagnostic runs.
+apiVersion: nvcre.nvidia.com/v1alpha1
+kind: WorkloadRun
+metadata:
+  name: eu1-fin-h200-diag-r2
+spec:
+  # The same image and version as GPU Operator v26.7.2's host engine, pinned
+  # by the index digest nvcr.io served on 20 October.
+  image: nvcr.io/nvidia/cloud-native/dcgm:4.6.1-1-ubuntu24.04@sha256:48464e50aa76671f5b204264cb4999739591112bf74330a727523f5655c6d7f2
+  framework:
+    exec:
+      command: ["/bin/bash", "/config/diag.sh"]
+  numNodes: 1
+  gpusPerNode: 2
+  target:
+    nodeSelector:
+      eu1.io/site: fin
+      eu1.io/pool: gpu
+    taintSelectors:
+      - key: eu1.io/staging
+        effect: NoSchedule
+  config:
+    inline:
+      diag.sh: |
+        #!/bin/bash
+        # Ask the node's host engine for a level 2 diagnostic, keep the JSON in
+        # the pod log for the evidence, and fail the pod if any test failed.
+        set -o pipefail
+        dcgmi diag --host nvidia-dcgm.gpu-operator.svc:5555 -r 2 -j | tee /tmp/diag.json
+        rc=$?
+        echo "dcgmi_exit=$rc"
+        [ "$rc" = 0 ] || exit "$rc"
+        if grep -Eq '"(status|result)"[[:space:]]*:[[:space:]]*"Fail' /tmp/diag.json; then
+          echo "diag_result=FAIL"
+          exit 1
+        fi
+        echo "diag_result=PASS"

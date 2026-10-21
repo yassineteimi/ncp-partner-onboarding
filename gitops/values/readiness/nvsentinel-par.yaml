@@ -1,0 +1,161 @@
+# NVSentinel v1.28.0 on site par (use case 3), read by
+# gitops/apps/par/readiness/nvsentinel.yaml.
+#
+# Started from the chart's own small-cluster values, demos/local-fault-injection-
+# demo/config/nvsentinel-values.yaml at v1.28.0, and changed where par differs.
+# Every default that would have stopped the use case 3 run is overridden below
+# with the reason, read from the chart at the tag.
+#
+# Stages are switched on one commit at a time under global:
+#   1. health monitoring: syslog and DCGM monitors, labeler, metadata collector,
+#      the MongoDB store (events are written and kept)
+#   2. quarantine and drain: fault-quarantine, node-drainer
+#   3. remediation: fault-remediation, janitor, janitor-provider (generic)
+# The settings of later stages are already here, inert until their switch flips,
+# so each stage commit is one line.
+
+global:
+  # Control-plane components (Deployments, the MongoDB replica set and its
+  # operator) go on the CPU worker, as every lane workload does. par's control
+  # plane has 4 vCPU and 8 GB and already runs ArgoCD, Prometheus and Garage.
+  # While the worker is powered off they wait Pending, and this Application
+  # shows Progressing.
+  systemNodeSelector:
+    eu1.io/pool: cpu
+
+  # The node agents (monitors, labeler, metadata collector) select GPU nodes
+  # through the labeler's own labels; the platform connector DaemonSet runs on
+  # every node. The chart's default toleration is Exists, which they keep.
+
+  # Stage 1
+  gpuHealthMonitor:
+    enabled: true
+  syslogHealthMonitor:
+    enabled: true
+  labeler:
+    enabled: true
+  metadataCollector:
+    enabled: true
+  mongodbStore:
+    enabled: true
+
+  # Stage 2
+  faultQuarantine:
+    enabled: false
+  nodeDrainer:
+    enabled: false
+
+  # Stage 3
+  faultRemediation:
+    enabled: false
+  janitor:
+    enabled: false
+  janitorProvider:
+    enabled: false
+
+  # Off, and kept off on purpose. Post-remediation validation (lifecycle-manager)
+  # would run a DCGM diagnostic before the node returns. Use case 3 measures
+  # NVSentinel as shipped, and the doc says what that leaves out.
+  lifecycleManager:
+    enabled: false
+  healthEventsAnalyzer:
+    enabled: false
+  preflight:
+    enabled: false
+
+# The Prometheus Operator CRDs exist on par, but kube-prometheus-stack selects
+# monitors by its release label, which this chart doesn't set. Off rather than a
+# PodMonitor nothing scrapes.
+podMonitor:
+  enabled: false
+
+mongodb-store:
+  # Percona, not the chart's default Bitnami: the Bitnami MongoDB images are
+  # amd64 only (docs/configuration/mongodb-store.md at v1.28.0), so the values
+  # rehearsed in KIND on an arm64 laptop wouldn't be the values deployed here.
+  # The Percona operator generates its users, keyfile and encryption key in the
+  # cluster; nothing secret is in Git.
+  useBitnami: false
+  usePerconaOperator: true
+
+  job:
+    nodeSelector:
+      eu1.io/pool: cpu
+
+  psmdb-operator:
+    nodeSelector:
+      eu1.io/pool: cpu
+
+  psmdb-db:
+    # One member. A replica set of one has no failover, which is fine for one
+    # GPU node and a two-day test; the chart refuses it without this flag.
+    unsafeFlags:
+      replsetSize: true
+
+    replsets:
+      rs0:
+        size: 1
+        nodeSelector:
+          eu1.io/pool: cpu
+        resources:
+          requests:
+            cpu: "200m"
+            memory: "512Mi"
+          limits:
+            cpu: "1"
+            memory: "1Gi"
+        volumeSpec:
+          pvc:
+            # local-path is par's only StorageClass and isn't marked default.
+            # The volume lives on the CPU worker's disk, which survives power-off.
+            storageClassName: local-path
+            resources:
+              requests:
+                storage: 3Gi
+        # The exporter sidecar has nothing to report to (podMonitor is off).
+        sidecars: []
+
+# Stage 2 settings.
+fault-quarantine:
+  # Off on par, as the README advises for small and demo clusters. The breaker
+  # trips when the GPU nodes cordoned within 5 minutes reach 50% of all GPU
+  # nodes, then pauses all event processing, healthy events included, and never
+  # resets by itself. With one GPU node the first cordon trips it, and it then
+  # blocks the uncordon (docs/circuit-breaker.md at v1.28.0). On a fleet it stays
+  # on; ADR 0005 says what I'd set.
+  circuitBreaker:
+    enabled: false
+
+node-drainer:
+  # The default mode for every namespace is AllowCompletion, which never evicts:
+  # a training run would hold the node until it finished, and remediation would
+  # never start. Immediate evicts through the Eviction API, so the trainer gets
+  # the DisruptionTarget condition that the goodput Job's podFailurePolicy
+  # ignores, as it did with Part 1's controller.
+  userNamespaces:
+    - name: "*"
+      mode: "Immediate"
+
+  # Never drained: the platform's own namespaces on par. The chart's list plus
+  # the ones par adds (ArgoCD, storage, monitoring, the checkpoint store). In
+  # practice nothing of theirs runs on the GPU node except DaemonSets, which the
+  # drainer skips anyway; the list is there for the day something does.
+  systemNamespaces: "^(nvsentinel|kube-system|kube-flannel|gpu-operator|node-feature-discovery|cert-manager|local-path-storage|monitoring|argocd|checkpoint-store)$"
+
+# Stage 3 settings.
+janitor:
+  config:
+    nodes:
+      # Never reboot a node that isn't a GPU node, whatever an event says.
+      exclusions:
+        - matchLabels:
+            eu1.io/pool: control
+        - matchLabels:
+            eu1.io/pool: cpu
+
+janitor-provider:
+  csp:
+    # The chart default is kind, which sleeps a few seconds and reports a reboot
+    # that never happened. generic runs a privileged busybox Job on the node:
+    # chroot /host reboot. The Scaleway VM has no BMC or provider API wired in.
+    provider: generic
