@@ -33,6 +33,17 @@ kubectl_cp -n kubevirt get kubevirt kubevirt \
   -o jsonpath='{"phase: "}{.status.phase}{"\nversion: "}{.status.observedKubeVirtVersion}{"\nuseEmulation: "}{.spec.configuration.developerConfiguration.useEmulation}{"\n"}'
 kubectl_cp -n kubevirt get pods -o wide
 
+section "What each KubeVirt pod runs: the reference it was given, and the digest the node pulled"
+kubectl_cp -n kubevirt get pods -o json | python3 -c '
+import json, sys
+for p in json.load(sys.stdin)["items"]:
+    ids = {s["name"]: s.get("imageID", "") for s in p.get("status", {}).get("containerStatuses", [])}
+    for c in p["spec"]["containers"]:
+        pinned = "by digest" if "@sha256:" in c["image"] else "BY TAG"
+        print("%-44s %-9s %s" % (p["metadata"]["name"], pinned, c["image"]))
+        print("%-44s %-9s pulled %s" % ("", "", ids.get(c["name"], "?")))
+'
+
 section "Nodes"
 kubectl_cp get nodes -L eu1.io/site,eu1.io/pool -o wide
 
@@ -47,10 +58,11 @@ print("node:", st.get("nodeName"), " phase:", st.get("phase"))
 ts = st.get("phaseTransitionTimestamps", [])
 created = datetime.fromisoformat(v["metadata"]["creationTimestamp"].replace("Z", "+00:00"))
 for t in ts:
-    at = datetime.fromisoformat(t["phaseTransitionTimestamp"].replace("Z", "+00:00"))
-    print(f"  {t[\"phase\"]:<12} {t[\"phaseTransitionTimestamp\"]}  +{(at - created).total_seconds():.0f} s after the VMI was created")
+    stamp = t["phaseTransitionTimestamp"]
+    at = datetime.fromisoformat(stamp.replace("Z", "+00:00"))
+    print("  %-12s %s  +%.0f s after the VMI was created" % (t["phase"], stamp, (at - created).total_seconds()))
 for c in st.get("conditions", []):
-    print(f"  condition {c[\"type\"]}={c[\"status\"]} {c.get(\"reason\", \"\")}")
+    print("  condition %s=%s %s" % (c["type"], c["status"], c.get("reason", "")))
 '
 
 section "What the VM costs the cluster: virt-launcher's requests against the quota"
@@ -60,7 +72,7 @@ for p in json.load(sys.stdin)["items"]:
     print("pod", p["metadata"]["name"], "on", p["spec"].get("nodeName"))
     for c in p["spec"]["containers"]:
         r = c.get("resources", {})
-        print(f"  {c[\"name\"]:<20} requests {r.get(\"requests\", {})}  limits {r.get(\"limits\", {})}")
+        print("  %-20s requests %s  limits %s" % (c["name"], r.get("requests", {}), r.get("limits", {})))
 '
 kubectl_cp -n tenant-vm describe resourcequota tenant-vm | sed -n '/Resource/,$p'
 
