@@ -40,7 +40,7 @@ What would change the answer:
 - ArgoCD's Healthy says little about this app. Slinky's Controller has no status and the NodeSet's is empty, so ArgoCD reports them healthy as soon as they're applied, and the pods belong to the operator, not the Application. On 21 October slinky read Healthy while slurmctld sat Pending on an unbound volume. Whether Slurm works is what `make slurm-test` answers.
 - **What this PoC can't show:**
   - two Slurm nodes on one VM (`oversubscribeNode`, which Slinky marks as not for production), standing in for two machines
-  - GPUs in Slurm: par's Slurm is CPU-only, and Slurm on fin's H200s is W2 step 7, only if time remains
+  - GPUs in Slurm: par's Slurm is CPU-only, and Slurm on fin's H200s isn't built in this PoC
   - shared storage: with no ReadWriteMany volume, a job's output stays on the node that ran it
   - performance next to a bare-metal Slurm
 
