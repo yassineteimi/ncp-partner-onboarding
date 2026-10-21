@@ -1,0 +1,21 @@
+# SIMULATED. make thanos-backfill-sim, 20261021T103510Z, laptop clock, UTC. git 28f386b
+# promtool, version 3.14.0 (branch: HEAD, revision: d7598b7141418fa35be2b5ec5d0fefb634199610)
+# thanos, version 0.42.4 (branch: HEAD, revision: 45c4f39487e1653e606307d3952a6259fb96acae)
+
+./scripts/platform/backfill-downsampling.sh
+==> writing five days of synthetic samples
+1792136112 to 1792568112, 2 series, one sample a minute
+==> promtool tsdb create-blocks-from openmetrics
+01M5F0FFXRGQXXF9BGRWPDYKZC  1792548012000  1792555152001  1h59m0.001s  240          2            2            2160
+01M5F0FG7HAWJ4N21H12FACCPK  1792555212000  1792562352001  1h59m0.001s  240          2            2            2189
+01M5F0FGGD54Q9R0DGYK9G8AD1  1792562412000  1792568052001  1h34m0.001s  190          2            2            1904
+==> 61 blocks
+==> port-forwarding to Garage
+==> uploading with site=sim-backfill, simulated=true
+ts=2026-10-21T10:35:42.787644Z caller=shipper.go:479 level=info msg="upload new block" id=01M5F0FFXRGQXXF9BGRWPDYKZC
+ts=2026-10-21T10:35:42.977Z caller=shipper.go:479 level=info msg="upload new block" id=01M5F0FG7HAWJ4N21H12FACCPK
+ts=2026-10-21T10:35:43.211432Z caller=shipper.go:479 level=info msg="upload new block" id=01M5F0FGGD54Q9R0DGYK9G8AD1
+ts=2026-10-21T10:35:43.387493Z caller=tools_bucket.go:1515 level=info msg="synced blocks" uploaded=61
+ts=2026-10-21T10:35:43.387786Z caller=main.go:172 level=info msg=exiting
+==> uploaded. The compactor should show 5 minute blocks for site=sim-backfill in about an hour
+make: *** [thanos-backfill-sim] Error 143

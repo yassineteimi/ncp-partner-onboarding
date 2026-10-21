@@ -31,7 +31,8 @@ require_kubeconfig
 WORK="$(mktemp -d)"
 PF_PID=""
 cleanup() {
-  [ -n "$PF_PID" ] && kill "$PF_PID" 2>/dev/null && wait "$PF_PID" 2>/dev/null
+  # wait returns the port-forward's SIGTERM status (143); it isn't ours.
+  if [ -n "$PF_PID" ]; then kill "$PF_PID" 2>/dev/null; wait "$PF_PID" 2>/dev/null || true; fi
   rm -rf "$WORK"
 }
 trap cleanup EXIT
