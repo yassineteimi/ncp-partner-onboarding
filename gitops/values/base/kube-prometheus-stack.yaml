@@ -107,12 +107,17 @@ alertmanager:
 grafana:
   nodeSelector:
     node-role.kubernetes.io/control-plane: ""
+  # The limit has to hold the Grafana binary's pages as well as its heap: the
+  # kernel counts them against the pod's memory. At Part 1's 384Mi, with a
+  # 188 MB heap, the binary kept being evicted and read back from par's
+  # network disk at about 180 MB/s, which starved etcd on the same disk until
+  # the API server stopped answering (21 October).
   resources:
     requests:
       cpu: 50m
-      memory: 192Mi
-    limits:
       memory: 384Mi
+    limits:
+      memory: 1Gi
   sidecar:
     dashboards:
       enabled: true
