@@ -1,0 +1,71 @@
+# par GPU acceptance, 20261021T165702Z, laptop clock, UTC. Node eu1-par-gpu-01, driver pinned in Git: 595.91.07
+
+== allocatable
+{"cpu":"8","ephemeral-storage":"129759768362","hugepages-1Gi":"0","hugepages-2Mi":"0","memory":"48176948Ki","nvidia.com/gpu":"1","pods":"110"}
+
+== GPU labels
+"feature.node.kubernetes.io/pci-10de.present": "true"
+"nvidia.com/cuda.driver-version.full": "595.91.07"
+"nvidia.com/cuda.runtime-version.full": "13.2"
+"nvidia.com/gpu.count": "1"
+"nvidia.com/gpu.deploy.client": "true"
+"nvidia.com/gpu.deploy.container-toolkit": "true"
+"nvidia.com/gpu.deploy.dcgm-exporter": "true"
+"nvidia.com/gpu.deploy.dcgm": "true"
+"nvidia.com/gpu.deploy.device-plugin": "true"
+"nvidia.com/gpu.deploy.driver": "true"
+"nvidia.com/gpu.deploy.gpu-feature-discovery": "true"
+"nvidia.com/gpu.deploy.node-status-exporter": "true"
+"nvidia.com/gpu.deploy.nvsm": ""
+"nvidia.com/gpu.deploy.operator-validator": "true"
+"nvidia.com/gpu.memory": "23034"
+"nvidia.com/gpu.product": "NVIDIA-L4"
+
+== GPU Operator pods on eu1-par-gpu-01: image references and the digests the node pulled
+gpu-feature-discovery-w4zjt gpu-feature-discovery nvcr.io/nvidia/k8s-device-plugin:v0.20.1 pulled=nvcr.io/nvidia/k8s-device-plugin@sha256:27c1b2553a690ca3d29889dcd61df97525d46f58272c0be8dc63c2b18f120075
+nvidia-container-toolkit-daemonset-tw45h nvidia-container-toolkit-ctr nvcr.io/nvidia/k8s/container-toolkit:v1.20.1 pulled=nvcr.io/nvidia/k8s/container-toolkit@sha256:00a422252dd875b112f5974321c2feebbdf11c338f8ad131e5ce18e5b3a3bfac
+nvidia-cuda-validator-lg5gw nvidia-cuda-validator nvcr.io/nvidia/gpu-operator:v26.7.2 pulled=nvcr.io/nvidia/gpu-operator@sha256:02933b43d286d1321cd0dadd460b9ae8f5e5c0ee99a087e2d10254febc94ba45
+nvidia-dcgm-77zgb nvidia-dcgm-ctr nvcr.io/nvidia/cloud-native/dcgm:4.6.1-1-ubuntu24.04 pulled=nvcr.io/nvidia/cloud-native/dcgm@sha256:48464e50aa76671f5b204264cb4999739591112bf74330a727523f5655c6d7f2
+nvidia-dcgm-exporter-9lpzd nvidia-dcgm-exporter nvcr.io/nvidia/k8s/dcgm-exporter:4.6.1-4.8.4-distroless pulled=nvcr.io/nvidia/k8s/dcgm-exporter@sha256:148b0c025e5f2850256816fa33754fbf4733b7a086697a95613fc0ba3db5b003
+nvidia-device-plugin-daemonset-x9vzj nvidia-device-plugin nvcr.io/nvidia/k8s-device-plugin:v0.20.1 pulled=nvcr.io/nvidia/k8s-device-plugin@sha256:27c1b2553a690ca3d29889dcd61df97525d46f58272c0be8dc63c2b18f120075
+nvidia-driver-daemonset-vcgz9 nvidia-driver-ctr nvcr.io/nvidia/driver:595.91.07-ubuntu24.04 pulled=nvcr.io/nvidia/driver@sha256:dd2913cb7fe0240c32351ac50ccfbae7a8dfe068e3b336ae75b5575745cb000d
+nvidia-operator-validator-6zxsk nvidia-operator-validator nvcr.io/nvidia/gpu-operator:v26.7.2 pulled=nvcr.io/nvidia/gpu-operator@sha256:02933b43d286d1321cd0dadd460b9ae8f5e5c0ee99a087e2d10254febc94ba45
+
+== cuda-vectoradd
+[Vector addition of 50000 elements]
+Copy input data from the host memory to the CUDA device
+CUDA kernel launch with 196 blocks of 256 threads
+Copy output data from the CUDA device to the host memory
+Test PASSED
+Done
+
+== nvidia-smi
+Wed Oct 21 16:59:00 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 595.91.07              Driver Version: 595.91.07      CUDA Version: 13.2     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA L4                      On  |   00000000:01:00.0 Off |                    0 |
+| N/A   30C    P8             16W /   72W |       0MiB /  23034MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+
+== verdict
+PASS  node advertises nvidia.com/gpu: 1
+PASS  node carries pci-10de.present=true
+INFO  DCGM exporter image on the node: nvcr.io/nvidia/k8s/dcgm-exporter:4.6.1-4.8.4-distroless
+PASS  cuda-vectoradd printed Test PASSED
+PASS  nvidia-smi sees the L4
+PASS  driver in use is 595.91.07, the version pinned in Git
+[36m==>[0m acceptance PASSED. Evidence: docs/artifacts/par/acceptance-20261021T165702Z.txt

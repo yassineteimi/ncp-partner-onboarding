@@ -28,6 +28,8 @@ Things that didn't behave the way the documentation or my first assumption said,
 
 - **PLAY2-MICRO costs €0.055 an hour, not "about 4 cents".** Part 1's prerequisites page carried the lower figure, and my first budget for this project used it. Scaleway's API read 0.05508 in fr-par-1 and fr-par-2 on 20 October ([prices](artifacts/par/scaleway-prices-20261020.json)). With its 80 GB disk the always-on control plane comes to about €0.065 an hour, or €11 a week.
 
+- **dcgm-exporter starts before the DCGM host engine it needs.** On the L4 on 21 October, GPU Operator v26.7.2's dcgm-exporter 4.8.4 started while `nvidia-dcgm` was still in Init, failed to connect to `nvidia-dcgm:5555` and exited. It went through three restarts in about a minute and then served normally. Nothing was lost, but a restart counter on the exporter means nothing on a fresh node, so alerts on exporter restarts need to ignore a node's first minutes ([acceptance](artifacts/par/acceptance-20261021T165702Z.txt) records the version).
+
 ## NVSentinel, NVCRE and AICR
 
 - **NVSentinel's syslog monitor never sees Part 1's simulated XID line.** It reads journald, and journald takes `NVRM:` from a userspace `/dev/kmsg` write as the syslog identifier and strips it from the message. A real driver XID, written by the kernel, isn't affected. Shown on systemd 255 (`fc2-journald-*.txt` in the readiness evidence); an `[uptime]` prefix fixes it, as NVSentinel's own acceptance tests do.
