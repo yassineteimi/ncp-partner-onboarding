@@ -202,7 +202,11 @@ yaml.safe_dump(d, open(sys.argv[3], "w"), sort_keys=False)' "$cert" "$WORKLOAD_I
       kubectl_cp taint node "$node" "$TAINT_KEY-" | tee -a "$file"
       echo "promoted=$(now) node=$node" | tee -a "$OUT/nvcre-$SITE-timeline.txt"
     else
-      echo "refused=$(now) node=$node exit=$rc" | tee -a "$OUT/nvcre-$SITE-timeline.txt"
+      # hardware cuts the later W2 steps, tooling allows a recorded override,
+      # unclear goes to Yassine (W2 run sheet).
+      cause="$(sed -n 's/^REFUSE .* cause=//p' "$file" | tail -1)"
+      echo "refused=$(now) node=$node exit=$rc cause=${cause:-unknown}" | tee -a "$OUT/nvcre-$SITE-timeline.txt"
+      warn "staging taint kept on $node. Cause: ${cause:-unknown}; the FAIL lines above say which check and why"
     fi
     { echo "taints after:"; taints "$node"; } | tee -a "$file"
     exit "$rc"
