@@ -70,9 +70,14 @@ plugins:
 nav:
   - Overview: index.md
   - "The story": story.md
+  - "Day 1: NVCRE": 10-day1-nvcre.md
+  - "Day 2: NVSentinel": 10-day2-nvsentinel.md
   - "What is simulated": simulated.md
   - Decisions:
       - "All decisions": adr/README.md
+      - "0003: Known-good stack": adr/0003-known-good-stack.md
+      - "0004: Readiness gate": adr/0004-readiness-gate.md
+      - "0005: Fault remediation": adr/0005-fault-remediation.md
       - "0009: Metrics across sites": adr/0009-metrics-across-sites.md
       - "0010: VM tenants": adr/0010-vm-tenants.md
   - Findings: findings.md
