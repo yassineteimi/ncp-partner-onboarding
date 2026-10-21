@@ -95,3 +95,25 @@ nvsentinel-kind: ## readiness: FC4, par's NVSentinel values in NVSentinel's KIND
 	./scripts/readiness/kind-rehearsal.sh $(NVSENTINEL_SRC)
 
 .PHONY: nvsentinel-kind
+
+fc12:          ## readiness: FC12 checks on par after a merge (LABEL=after-3|after-4|after-5|worker-off)
+	./scripts/readiness/fc12.sh $(or $(LABEL),check)
+
+.PHONY: fc12
+
+readiness-tidy: ## readiness: before committing window evidence, write em dashes in docs/artifacts/readiness as -- (CI lint)
+	./scripts/readiness/tidy-evidence.sh
+
+.PHONY: readiness-tidy
+
+aicr-snapshot: $(READINESS_BIN)/aicr ## readiness: AICR snapshot of a site (SITE=par|fin), privileged agent Job
+	SITE=$(or $(SITE),par) ./scripts/readiness/aicr.sh snapshot
+
+aicr-validate: $(READINESS_BIN)/aicr ## readiness: validate the newest snapshot against the H200 reference recipe, deployment phase (SITE=)
+	SITE=$(or $(SITE),fin) ./scripts/readiness/aicr.sh snapshot
+	SITE=$(or $(SITE),fin) ./scripts/readiness/aicr.sh validate
+
+aicr-drift: $(READINESS_BIN)/aicr ## readiness: aicr diff of the two newest snapshots of a site (SITE=)
+	SITE=$(or $(SITE),par) ./scripts/readiness/aicr.sh diff
+
+.PHONY: aicr-snapshot aicr-validate aicr-drift
