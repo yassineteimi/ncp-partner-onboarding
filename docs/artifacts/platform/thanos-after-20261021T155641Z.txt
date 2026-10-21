@@ -1,0 +1,53 @@
+# capture-thanos.sh after, 20261021T155641Z, laptop clock, UTC. git 4818575
+
+## Stores Query sees
+receive 10.244.1.4:10901 labelSets: [{'receive_replica': 'thanos-receive-0', 'tenant_id': 'fin-sim'}, {'receive_replica': 'thanos-receive-0', 'tenant_id': 'default-tenant'}, {'receive_replica': 'thanos-receive-0', 'tenant_id': 'fin'}] minTime: 1792510895800 maxTime: 9223372036854775807 lastError: None
+sidecar 10.244.0.47:10901 labelSets: [{'prometheus': 'monitoring/kube-prometheus-stack-prometheus', 'prometheus_replica': 'prometheus-kube-prometheus-stack-prometheus-0', 'site': 'par'}] minTime: 1792447090000 maxTime: 9223372036854775807 lastError: None
+store 10.244.1.5:10901 labelSets: [{'prometheus': 'monitoring/kube-prometheus-stack-prometheus', 'prometheus_replica': 'prometheus-kube-prometheus-stack-prometheus-0', 'site': 'par'}, {'receive_replica': 'thanos-receive-0', 'tenant_id': 'fin-sim'}, {'simulated': 'true', 'site': 'sim-backfill'}] minTime: 1792136112000 maxTime: 1792591200000 lastError: None
+
+## Sites and tenants seen (last value within 3 h)
+# count by (site, tenant_id) (last_over_time(up[3h]))   (dedup=true)
+{site="fin", tenant_id="fin"} 11
+{site="fin-sim", tenant_id="fin-sim"} 2
+{site="par"} 31
+
+## Last sample per site (Unix seconds)
+# max by (site) (max_over_time(timestamp(up)[3h:15s]))   (dedup=true)
+{site="fin"} 1792597193.482
+{site="fin-sim"} 1792598168.446
+{site="par"} 1792598189.741
+
+## GPUs per site and model (last value within 3 h)
+# count by (site, modelName) (last_over_time(DCGM_FI_DEV_GPU_UTIL[3h]))   (dedup=true)
+(no data)
+
+## GPU utilisation (last value within 3 h)
+# max by (site, modelName, Hostname, gpu) (last_over_time(DCGM_FI_DEV_GPU_UTIL[3h]))   (dedup=true)
+(no data)
+
+## GPU utilisation, max over the last 3 h
+# max by (site, modelName, Hostname, gpu) (max_over_time(DCGM_FI_DEV_GPU_UTIL[3h]))   (dedup=true)
+(no data)
+
+## DCGM series per GPU (recording rule)
+# max by (site, modelName, Hostname, gpu) (max_over_time(gpu:dcgm_series:count[3h]))   (dedup=true)
+(no data)
+
+## DCGM series per GPU, top metrics on fin
+# topk(15, max by (metric) (max_over_time(gpu:dcgm_series_by_metric:count{site="fin"}[3h])))   (dedup=true)
+(no data)
+
+## Head series in each site's Prometheus (last value within 3 h, not only DCGM)
+# max by (site) (last_over_time(prometheus_tsdb_head_series{job="kube-prometheus-stack-prometheus", site=~"par|fin"}[3h]))   (dedup=true)
+{site="fin"} 33677
+{site="par"} 95566
+
+## fin's remote write: samples sent, failed, retried (last value within 3 h)
+# max by (__name__) (last_over_time({__name__=~"prometheus_remote_storage_(samples_total|samples_failed_total|samples_retried_total|highest_timestamp_in_seconds|queue_highest_sent_timestamp_seconds)", site="fin"}[3h]))   (dedup=true)
+{__name__="prometheus_remote_storage_highest_timestamp_in_seconds"} 1792597191
+{__name__="prometheus_remote_storage_queue_highest_sent_timestamp_seconds"} 1792597191
+{__name__="prometheus_remote_storage_samples_failed_total"} 0
+{__name__="prometheus_remote_storage_samples_retried_total"} 0
+{__name__="prometheus_remote_storage_samples_total"} 45032
+
+# written to docs/artifacts/platform/thanos-after-20261021T155641Z.txt

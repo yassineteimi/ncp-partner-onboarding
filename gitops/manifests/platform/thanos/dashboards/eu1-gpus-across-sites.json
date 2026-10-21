@@ -85,7 +85,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "max by (site, modelName, Hostname, gpu) (gpu:dcgm_series:count{site=~\"$site\"})",
+          "expr": "max by (site, modelName, Hostname, gpu) (max_over_time(gpu:dcgm_series:count{site=~\"$site\"}[$__range]))",
           "instant": true,
           "format": "table"
         }
@@ -101,7 +101,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "topk(10, max by (metric) (gpu:dcgm_series_by_metric:count{site=~\"$site\"}))",
+          "expr": "topk(10, max by (metric) (max_over_time(gpu:dcgm_series_by_metric:count{site=~\"$site\"}[$__range])))",
           "instant": true,
           "format": "table",
           "legendFormat": "{{metric}}"

@@ -47,7 +47,7 @@ What would change the answer:
   - replication or a hashring, with one Receive and one site writing to it
   - cardinality beyond three GPUs: the 1,000 and 10,000 GPU figures are an extrapolation from measured per-GPU counts, not a load test
   - downsampling on real data before about two days of par uploads have built up (shown on SIMULATED blocks instead)
-  - fin's write path over the internet, which only exists during rehearsal R and W2
+  - fin's write path over the internet beyond a 7 minute rehearsal: W2 is the first time it carries GPU metrics
 
 ## Evidence
 
@@ -66,6 +66,8 @@ What would change the answer:
 - [The bucket](../artifacts/platform/thanos-bucket-20261021T114314Z.txt), 21 October:
   - the compactor's 5 minute blocks from SIMULATED backfill
   - Receive's 12 s fin-sim block flushed at a power-off
+- Rehearsal R, 21 October, a fin control plane on a CPU instance:
+  - [step 2](../artifacts/platform/thanos-fin-20261021T153930Z.txt): fin's series in par's Query as `tenant_id="fin"`, 0 failed samples
+  - [step 4](../artifacts/platform/thanos-after-20261021T155641Z.txt): still there 16 minutes after fin was deleted
 - Planned, not run yet:
-  - rehearsal R on fin CPU instances
   - W2 steps 6a to 6c, with the H200 series per GPU and the panel before and after teardown

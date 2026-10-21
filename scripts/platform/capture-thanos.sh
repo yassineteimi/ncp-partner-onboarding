@@ -9,7 +9,9 @@
 #   capture-thanos.sh fin       during a window: fin's series seen from par,
 #                               DCGM series per GPU, and fin's own TSDB
 #                               status (needs FIN_KUBECONFIG)
-#   capture-thanos.sh after     after fin-down: the same queries, with fin gone
+#   capture-thanos.sh after     after fin-down: the same queries, each series's last value within 3 h
+#   capture-thanos.sh par       during W1: the L4's DCGM series per GPU, and
+#                               par's own TSDB status
 #   capture-thanos.sh bucket    the blocks in Garage, by tenant and resolution
 #
 # Each run writes docs/artifacts/platform/thanos-<mode>-<timestamp>.txt.
@@ -21,7 +23,7 @@ source "$(dirname "${BASH_SOURCE[0]}")/../lib.sh"
 require_tools kubectl python3 curl
 
 MODE="${1:-}"
-case "$MODE" in hub | fin | after | bucket) ;; *) die "usage: $0 hub|fin|after|bucket" ;; esac
+case "$MODE" in hub | fin | after | par | bucket) ;; *) die "usage: $0 hub|fin|after|par|bucket" ;; esac
 
 use_site par
 require_kubeconfig
@@ -67,6 +69,25 @@ for kind, stores in sorted(json.load(sys.stdin)["data"].items()):
 '
 }
 
+# A site's own Prometheus: head series and the top label pairs, read on that site.
+# tsdb_status <kubeconfig> <site>
+tsdb_status() {
+  echo
+  echo "## $2's own TSDB status (head series, top label pairs), read on $2"
+  kubectl --kubeconfig "$1" get --raw \
+    "/api/v1/namespaces/monitoring/services/kube-prometheus-stack-prometheus:9090/proxy/api/v1/status/tsdb?limit=15" \
+    | python3 -c '
+import json, sys
+d = json.load(sys.stdin)["data"]
+print("headStats:", d.get("headStats"))
+for k in ("seriesCountByMetricName", "labelValueCountByLabelName", "seriesCountByLabelValuePair"):
+    print()
+    print(k + ":")
+    for e in d.get(k, []):
+        print("  %s: %s" % (e["name"], e["value"]))
+'
+}
+
 bucket() {
   echo
   echo "## Blocks in the thanos bucket (thanos tools bucket inspect, from the compactor pod)"
@@ -99,40 +120,49 @@ case "$MODE" in
     fi
     ;;
   fin | after)
+    # An instant query only sees a series for 5 minutes after its last sample
+    # (Prometheus's lookback). After fin-down, every fin series is older than
+    # that, so "after" reads each one's last value within 3 hours instead.
+    if [ "$MODE" = after ]; then
+      last() { echo "last_over_time($1[3h])"; }
+      at="last value within 3 h"
+      stamp='max by (site) (max_over_time(timestamp(up)[3h:15s]))'
+    else
+      last() { echo "$1"; }
+      at="now"
+      stamp='max by (site) (timestamp(up))'
+    fi
     stores
-    q "Sites and tenants seen" 'count by (site, tenant_id) (up)'
-    q "Last sample per site (Unix seconds)" 'max by (site) (timestamp(up))'
-    q "GPUs per site and model" 'count by (site, modelName) (DCGM_FI_DEV_GPU_UTIL)'
-    q "GPU utilisation now" 'max by (site, modelName, Hostname, gpu) (DCGM_FI_DEV_GPU_UTIL)'
+    q "Sites and tenants seen ($at)" "count by (site, tenant_id) ($(last up))"
+    q "Last sample per site (Unix seconds)" "$stamp"
+    q "GPUs per site and model ($at)" "count by (site, modelName) ($(last DCGM_FI_DEV_GPU_UTIL))"
+    q "GPU utilisation ($at)" "max by (site, modelName, Hostname, gpu) ($(last DCGM_FI_DEV_GPU_UTIL))"
     q "GPU utilisation, max over the last 3 h" 'max by (site, modelName, Hostname, gpu) (max_over_time(DCGM_FI_DEV_GPU_UTIL[3h]))'
     q "DCGM series per GPU (recording rule)" 'max by (site, modelName, Hostname, gpu) (max_over_time(gpu:dcgm_series:count[3h]))'
     q "DCGM series per GPU, top metrics on fin" 'topk(15, max by (metric) (max_over_time(gpu:dcgm_series_by_metric:count{site="fin"}[3h])))'
     # Each site's own Prometheus reports its head: one series per site. A
     # count over {__name__=~".+"} would make par's Prometheus, on the 4 vCPU
     # control plane, touch every series it holds.
-    q "Head series in each site's Prometheus (not only DCGM)" 'max by (site) (prometheus_tsdb_head_series{job="kube-prometheus-stack-prometheus", site=~"par|fin"})'
-    q "fin's remote write: samples sent, failed, retried" 'max by (__name__) ({__name__=~"prometheus_remote_storage_(samples_total|samples_failed_total|samples_retried_total|highest_timestamp_in_seconds|queue_highest_sent_timestamp_seconds)", site="fin"})'
+    q "Head series in each site's Prometheus ($at, not only DCGM)" "max by (site) ($(last 'prometheus_tsdb_head_series{job="kube-prometheus-stack-prometheus", site=~"par|fin"}'))"
+    q "fin's remote write: samples sent, failed, retried ($at)" "max by (__name__) ($(last '{__name__=~"prometheus_remote_storage_(samples_total|samples_failed_total|samples_retried_total|highest_timestamp_in_seconds|queue_highest_sent_timestamp_seconds)", site="fin"}'))"
     if [ "$MODE" = fin ]; then
       FIN_KUBECONFIG="${FIN_KUBECONFIG:-$REPO_ROOT/kubeconfig-fin}"
       if [ -f "$FIN_KUBECONFIG" ]; then
-        echo
-        echo "## fin's own TSDB status (head series, top label pairs), read on fin"
-        kubectl --kubeconfig "$FIN_KUBECONFIG" get --raw \
-          "/api/v1/namespaces/monitoring/services/kube-prometheus-stack-prometheus:9090/proxy/api/v1/status/tsdb?limit=15" \
-          | python3 -c '
-import json, sys
-d = json.load(sys.stdin)["data"]
-print("headStats:", d.get("headStats"))
-for k in ("seriesCountByMetricName", "labelValueCountByLabelName", "seriesCountByLabelValuePair"):
-    print()
-    print(k + ":")
-    for e in d.get(k, []):
-        print("  %s: %s" % (e["name"], e["value"]))
-'
+        tsdb_status "$FIN_KUBECONFIG" fin
       else
         warn "no fin kubeconfig at $FIN_KUBECONFIG, skipping fin's own TSDB status"
       fi
     fi
+    ;;
+  par)
+    # W1-b: the L4's DCGM cardinality, the same figures W2 takes on fin.
+    q "GPUs on par" 'count by (site, modelName, Hostname) (DCGM_FI_DEV_GPU_UTIL{site="par"})'
+    q "DCGM series per GPU (recording rule, now)" 'max by (site, modelName, Hostname, gpu) (gpu:dcgm_series:count{site="par"})'
+    q "DCGM series per GPU (recording rule, max over the last 3 h)" 'max by (site, modelName, Hostname, gpu) (max_over_time(gpu:dcgm_series:count{site="par"}[3h]))'
+    q "DCGM series per GPU, top metrics on par" 'topk(15, max by (metric) (max_over_time(gpu:dcgm_series_by_metric:count{site="par"}[3h])))'
+    q "DCGM series per GPU, counted directly (cross-check of the rule)" 'count by (Hostname, gpu) ({__name__=~"DCGM_.+", site="par"})'
+    q "Head series in par's Prometheus" 'max(prometheus_tsdb_head_series{job="kube-prometheus-stack-prometheus", site="par"})'
+    tsdb_status "$KUBECONFIG_PATH" par
     ;;
   bucket)
     bucket
