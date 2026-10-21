@@ -1,0 +1,95 @@
+# capture-thanos.sh par, 20261021T170231Z, laptop clock, UTC. git 3118718
+
+## GPUs on par
+# count by (site, modelName, Hostname) (DCGM_FI_DEV_GPU_UTIL{site="par"})   (dedup=true)
+{modelName="NVIDIA L4", site="par"} 1
+
+## DCGM series per GPU (recording rule, now)
+# max by (site, modelName, Hostname, gpu) (gpu:dcgm_series:count{site="par"})   (dedup=true)
+{gpu="0", modelName="NVIDIA L4", site="par"} 40
+
+## DCGM series per GPU (recording rule, max over the last 3 h)
+# max by (site, modelName, Hostname, gpu) (max_over_time(gpu:dcgm_series:count{site="par"}[3h]))   (dedup=true)
+{gpu="0", modelName="NVIDIA L4", site="par"} 40
+
+## DCGM series per GPU, top metrics on par
+# topk(15, max by (metric) (max_over_time(gpu:dcgm_series_by_metric:count{site="par"}[3h])))   (dedup=true)
+{metric="DCGM_EXP_GPU_HEALTH_STATUS"} 11
+{metric="DCGM_FI_DEV_CORRECTABLE_REMAPPED_ROWS"} 1
+{metric="DCGM_FI_DEV_DEC_UTIL"} 1
+{metric="DCGM_FI_DEV_ECC_DBE_AGG_TOTAL"} 1
+{metric="DCGM_FI_DEV_ECC_DBE_VOL_TOTAL"} 1
+{metric="DCGM_FI_DEV_ECC_SBE_AGG_TOTAL"} 1
+{metric="DCGM_FI_DEV_ECC_SBE_VOL_TOTAL"} 1
+{metric="DCGM_FI_DEV_ENC_UTIL"} 1
+{metric="DCGM_FI_DEV_FB_FREE"} 1
+{metric="DCGM_FI_DEV_FB_RESERVED"} 1
+{metric="DCGM_FI_DEV_FB_USED"} 1
+{metric="DCGM_FI_DEV_GPU_TEMP"} 1
+{metric="DCGM_FI_DEV_GPU_UTIL"} 1
+{metric="DCGM_FI_DEV_MEMORY_TEMP"} 1
+{metric="DCGM_FI_DEV_MEM_CLOCK"} 1
+
+## DCGM series per GPU, counted directly (cross-check of the rule)
+# count by (Hostname, gpu) ({__name__=~"DCGM_.+", site="par"})   (dedup=true)
+{gpu="0"} 41
+
+## Head series in par's Prometheus
+# max(prometheus_tsdb_head_series{job="kube-prometheus-stack-prometheus", site="par"})   (dedup=true)
+{} 105491
+
+## par's own TSDB status (head series, top label pairs), read on par
+headStats: {'numSeries': 105491, 'numLabelPairs': 8682, 'chunkCount': 189958, 'minTime': 1792598400005, 'maxTime': 1792602151574}
+
+seriesCountByMetricName:
+  apiserver_request_duration_seconds_bucket: 7250
+  apiserver_request_body_size_bytes_bucket: 6592
+  apiserver_request_sli_duration_seconds_bucket: 4144
+  etcd_request_duration_seconds_bucket: 3610
+  apiserver_watch_list_duration_seconds_bucket: 3186
+  apiserver_response_sizes_bucket: 2960
+  apiserver_watch_cache_read_wait_seconds_bucket: 2086
+  prober_probe_duration_seconds_bucket: 1716
+  apiserver_watch_events_sizes_bucket: 1350
+  grafana_feature_toggles_info: 1128
+  kubernetes_feature_enabled: 968
+  kubelet_runtime_operations_duration_seconds_bucket: 825
+  apiserver_request_total: 818
+  grafana_apiserver_request_duration_seconds_bucket: 816
+  apiserver_request_duration_seconds_count: 725
+
+labelValueCountByLabelName:
+  __name__: 2400
+  name: 1030
+  resource: 372
+  le: 333
+  id: 322
+  uid: 175
+  address: 159
+  container_id: 154
+  owner_name: 145
+  image: 112
+  pod: 112
+  container: 106
+  device: 103
+  ip: 98
+  pod_ip: 96
+
+seriesCountByLabelValuePair:
+  endpoint=https: 46679
+  namespace=default: 45652
+  service=kubernetes: 45642
+  job=apiserver: 45639
+  instance=172.16.32.10:6443: 45638
+  namespace=monitoring: 24441
+  component=apiserver: 20967
+  service=kube-prometheus-stack-kubelet: 20629
+  job=kubelet: 20626
+  endpoint=https-metrics: 20626
+  version=v1: 15627
+  endpoint=http: 13893
+  endpoint=http-web: 13803
+  scope=cluster: 11639
+  container=grafana: 11544
+
+# written to docs/artifacts/platform/thanos-par-20261021T170231Z.txt
