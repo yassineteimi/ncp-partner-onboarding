@@ -41,9 +41,9 @@ global:
 
   # Stage 2
   faultQuarantine:
-    enabled: false
+    enabled: true
   nodeDrainer:
-    enabled: false
+    enabled: true
 
   # Stage 3
   faultRemediation:
