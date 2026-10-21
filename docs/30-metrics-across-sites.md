@@ -7,11 +7,11 @@
     sidecar, and one Thanos Query reads both and the bucket. The design and its
     alternatives (Mimir, VictoriaMetrics) are in [ADR 0009](adr/0009-metrics-across-sites.md).
 
-!!! warning "Planned: fin's real write path, rehearsal R (21 October) and W2 (22 October)"
+!!! warning "Planned: fin's GPUs, W2 (22 October)"
     par's side ran on 21 October: Receive, the sidecar, deduplication, uploads and
-    downsampling. fin's write path over the internet only exists while fin does. R
-    didn't get that far (see below), so the results for fin say "planned" until W2,
-    or a retried R, has run.
+    downsampling. Rehearsal R on the same day ran fin's write path over the internet,
+    from a fin control plane on a CPU instance. What needs fin's H200s (their DCGM
+    series in par's Query, series per GPU) says "planned" until W2 has run.
 
 ## How it fits together
 
@@ -79,19 +79,35 @@ compactor had merged the 61 blocks into 8 hour and then 2 day blocks, and writte
 **5 minute** blocks: 16 to 17 October and 18 to 19 October. The 1 hour level needs
 10 days and doesn't appear.
 
-## fin over the internet (planned)
+## fin over the internet: rehearsal R, 21 October
 
-- **Rehearsal R, 21 October: didn't reach the metrics path.** A fin control plane on
-  CPU instances was to write to par. At 12:16 UTC Verda's instance went to status
-  "error" during `make fin-cp-up`, so no fin Prometheus ever ran. A watch on par's
-  Query saw no `site="fin"` series from 12:17 to 12:38 UTC, as expected with no fin.
-  Whether R is retried before W2 is Yassine's call. Until it is, fin's write path over
-  the internet has only been tested locally
-  ([mTLS end to end](artifacts/platform/mtls-local-20261020T084352Z.txt)) and through
-  fin-sim on par.
-- **W2, 22 October.** Steps 6a to 6c: the H200s' DCGM series in par's Query, DCGM
-  series per GPU from the recording rules, and the cross-site panel before and after
-  fin is torn down.
+The first attempt never got a machine: at 12:16 UTC Verda put the instance in status
+"error" during `make fin-cp-up`, and no fin Prometheus ran. Yassine chose to retry once.
+The retry ordered a fin control plane (CPU.8V.32G, FIN-01) at 15:33 UTC. It deleted it at
+15:40 UTC, from the [step 2](artifacts/platform/thanos-fin-20261021T153930Z.txt) and
+[step 4](artifacts/platform/thanos-after-20261021T155641Z.txt) captures:
+
+| Check | Result |
+|---|---|
+| First `site="fin"` series in par's Query | 15:39:11 UTC, the same second kube-prometheus-stack was Healthy on fin |
+| Tenant | `tenant_id="fin"`, from the client certificate cos's hook installed at 15:37 UTC |
+| fin's remote write | 45,032 samples sent, 0 failed, 0 retried. The last sent timestamp equals the newest sample, so nothing was left behind |
+| After `make fin-down` (15:40:26 UTC) | 16 minutes later, par's Query still serves fin's 11 `up` series, last sample 15:39:53 UTC |
+
+That covers what only a real fin could test: port 30291 open to fin's actual address,
+the certificate reaching fin, and remote write across the internet.
+
+One thing the after-capture taught me: an instant query only sees a series for
+5 minutes after its last sample. My first step 4 query asked "now", 16 minutes after
+fin was gone, and found nothing, although Receive held all of it. Queries about a
+deleted site have to look back, as `MODE=after` now does (`last_over_time(...[3h])`).
+A dashboard panel showing fin after teardown needs a time range covering the window,
+not "now".
+
+## fin's GPUs (planned, W2, 22 October)
+
+Steps 6a to 6c: the H200s' DCGM series in par's Query, DCGM series per GPU from the
+recording rules, and the cross-site panel before and after fin is torn down.
 
 ## What's simulated
 
