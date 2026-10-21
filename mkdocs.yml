@@ -70,6 +70,7 @@ plugins:
 nav:
   - Overview: index.md
   - "The story": story.md
+  - "Day 0: AICR": 10-day0-aicr.md
   - "Day 1: NVCRE": 10-day1-nvcre.md
   - "Day 2: NVSentinel": 10-day2-nvsentinel.md
   - "What is simulated": simulated.md
