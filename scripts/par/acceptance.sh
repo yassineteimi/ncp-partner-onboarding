@@ -42,7 +42,11 @@ case "$SITE" in
   fin)
     GPU_NODE="$(tf_output gpu_name)"
     EXPECTED_GPUS=2 PRODUCT=H200 DRIVER_SOURCE="reported by the provider image at boot"
-    INVENTORY="$(ls -t "$ARTIFACTS"/image-inventory-*.txt 2>/dev/null | grep -v rehearsal | head -n1 || true)"
+    # Names carry a UTC timestamp, so the glob's last match is the newest.
+    INVENTORY=""
+    for f in "$ARTIFACTS"/image-inventory-*.txt; do
+      case "$f" in *-rehearsal.txt) ;; *) [ -e "$f" ] && INVENTORY="$f" ;; esac
+    done
     [ -n "$INVENTORY" ] || die "no image inventory in ${ARTIFACTS#"$REPO_ROOT"/}. make fin-gpu-up writes it."
     PINNED_DRIVER="$(sed -n 's/^driver_version=//p' "$INVENTORY" | head -n1)"
     ;;
