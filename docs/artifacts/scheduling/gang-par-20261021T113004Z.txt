@@ -1,0 +1,82 @@
+# gang on par, 20261021T113004Z, laptop clock, UTC. git bc2e858
+
+## Before   [11:30:04Z]
+NODE                 POOL      GPU      TAINTS
+eu1-par-cp-01        control   <none>   <none>
+eu1-par-cpu-01       cpu       <none>   <none>
+eu1-par-sim-gpu-01   sim-gpu   4        kwok.x-k8s.io/node,eu1.io/simulated
+eu1-par-sim-gpu-02   sim-gpu   4        kwok.x-k8s.io/node,eu1.io/simulated
+after 0s: no gang pods left
+### queues (GPUs allocated, requested)
+QUEUE                  PARENT                 GPU_QUOTA   GPU_ALLOCATED   GPU_REQUESTED   NONPREEMPTIBLE
+default-parent-queue   <none>                 0           <none>          <none>          <none>
+default-queue          default-parent-queue   0           <none>          <none>          <none>
+eu1                    <none>                 8           <none>          <none>          <none>
+team-a                 eu1                    4           <none>          <none>          <none>
+team-b                 eu1                    4           <none>          <none>          <none>
+### podgroups in team-a
+PODGROUP   QUEUE   MIN_MEMBER   STATE   PRIORITY
+
+## Submit the gang of 2 (par-gloo)   [11:30:05Z]
+configmap/allreduce-kh58k7h8m4 created
+service/allreduce-gang created
+job.batch/allreduce-gang created
+Job created at 2026-10-21T11:30:06Z (API server)
+after 1s: both gang pods bound
+PodScheduled per pod (API server time):
+allreduce-gang-0-5lr7l  eu1-par-cpu-01  scheduled 2026-10-21T11:30:06Z  started 2026-10-21T11:30:06Z
+allreduce-gang-1-5hjlr  eu1-par-cpu-01  scheduled 2026-10-21T11:30:06Z  started 2026-10-21T11:30:06Z
+### queues (GPUs allocated, requested)
+QUEUE                  PARENT                 GPU_QUOTA   GPU_ALLOCATED   GPU_REQUESTED   NONPREEMPTIBLE
+default-parent-queue   <none>                 0           <none>          <none>          <none>
+default-queue          default-parent-queue   0           <none>          <none>          <none>
+eu1                    <none>                 8           <none>          <none>          <none>
+team-a                 eu1                    4           <none>          <none>          <none>
+team-b                 eu1                    4           <none>          <none>          <none>
+### podgroups in team-a
+PODGROUP                                                 QUEUE    MIN_MEMBER   STATE    PRIORITY
+pg-allreduce-gang-9fe8af18-a7fc-4bed-96b9-ab72226fc351   team-a   2            <none>   train
+
+## Run   [11:30:08Z]
+after 104s: the all-reduce Job finished
+NAME                     READY   STATUS      RESTARTS   AGE    IP            NODE             NOMINATED NODE   READINESS GATES
+allreduce-gang-0-5lr7l   0/1     Completed   0          106s   10.244.1.57   eu1-par-cpu-01   <none>           <none>
+allreduce-gang-1-5hjlr   0/1     Completed   0          106s   10.244.1.58   eu1-par-cpu-01   <none>           <none>
+
+## Logs   [11:31:52Z]
+full logs: docs/artifacts/scheduling/gang-par-20261021T113004Z.txt.logs
+rank 0/2 host allreduce-gang-0 backend gloo device cpu torch 2.11.0+cu128 nccl None CUDA_VISIBLE_DEVICES=None
+rank 0: process group up in 0.4 s
+     1048576 B       854.1 us  algbw     1.23 GB/s  busbw     1.23 GB/s
+     2097152 B      1191.7 us  algbw     1.76 GB/s  busbw     1.76 GB/s
+     4194304 B      1742.1 us  algbw     2.41 GB/s  busbw     2.41 GB/s
+     8388608 B      3681.7 us  algbw     2.28 GB/s  busbw     2.28 GB/s
+    16777216 B      7522.1 us  algbw     2.23 GB/s  busbw     2.23 GB/s
+    33554432 B     14592.8 us  algbw     2.30 GB/s  busbw     2.30 GB/s
+    67108864 B     29607.9 us  algbw     2.27 GB/s  busbw     2.27 GB/s
+RESULT {"backend": "gloo", "world_size": 2, "device": "cpu", "torch": "2.11.0+cu128", "nccl": null, "iters": 20, "peak_busbw_GBps": 2.41, "results": [{"bytes": 1048576, "time_us": 854.1, "algbw_GBps": 1.23, "busbw_GBps": 1.23}, {"bytes": 2097152, "time_us": 1191.7, "algbw_GBps": 1.76, "busbw_GBps": 1.76}, {"bytes": 4194304, "time_us": 1742.1, "algbw_GBps": 2.41, "busbw_GBps": 2.41}, {"bytes": 8388608, "time_us": 3681.7, "algbw_GBps": 2.28, "busbw_GBps": 2.28}, {"bytes": 16777216, "time_us": 7522.1, "algbw_GBps": 2.23, "busbw_GBps": 2.23}, {"bytes": 33554432, "time_us": 14592.8, "algbw_GBps": 2.3, "busbw_GBps": 2.3}, {"bytes": 67108864, "time_us": 29607.9, "algbw_GBps": 2.27, "busbw_GBps": 2.27}]}
+rank 1/2 host allreduce-gang-1 backend gloo device cpu torch 2.11.0+cu128 nccl None CUDA_VISIBLE_DEVICES=None
+rank 1: process group up in 0.0 s
+
+## NCCL transport   [11:31:53Z]
+gloo on par: no NCCL transport to report
+2026-10-21T11:30:06Z   2026-10-21T11:30:06Z   1       Normal    SuccessfulCreate    allreduce-gang                                    job-controller   Created pod: allreduce-gang-0-5lr7l
+2026-10-21T11:30:06Z   2026-10-21T11:30:06Z   1       Normal    SuccessfulCreate    allreduce-gang                                    job-controller   Created pod: allreduce-gang-1-5hjlr
+2026-10-21T11:30:06Z   2026-10-21T11:30:06Z   1       Normal    Scheduled           allreduce-gang-1-5hjlr                            kai-scheduler    Successfully assigned pod team-a/allreduce-gang-1-5hjlr to node eu1-par-cpu-01 at node-pool default
+2026-10-21T11:30:06Z   2026-10-21T11:30:06Z   1       Normal    Bound               allreduce-gang-1-5hjlr                            binder           Pod bound successfully to node eu1-par-cpu-01
+2026-10-21T11:30:06Z   2026-10-21T11:30:06Z   1       Normal    Scheduled           allreduce-gang-0-5lr7l                            kai-scheduler    Successfully assigned pod team-a/allreduce-gang-0-5lr7l to node eu1-par-cpu-01 at node-pool default
+2026-10-21T11:30:06Z   2026-10-21T11:30:06Z   1       Normal    Bound               allreduce-gang-0-5lr7l                            binder           Pod bound successfully to node eu1-par-cpu-01
+2026-10-21T11:30:07Z   2026-10-21T11:30:07Z   1       Normal    Pulling             allreduce-gang-1-5hjlr                            kubelet          Pulling image "pytorch/pytorch:2.11.0-cuda12.8-cudnn9-runtime@sha256:eee11b3b3872a8c838e35ef48f08b2d5def2080902c7f666831310ca1a0ef2be"
+2026-10-21T11:30:07Z   2026-10-21T11:30:07Z   1       Normal    Pulling             allreduce-gang-0-5lr7l                            kubelet          Pulling image "pytorch/pytorch:2.11.0-cuda12.8-cudnn9-runtime@sha256:eee11b3b3872a8c838e35ef48f08b2d5def2080902c7f666831310ca1a0ef2be"
+2026-10-21T11:31:42Z   2026-10-21T11:31:42Z   1       Normal    Started             allreduce-gang-1-5hjlr                            kubelet          Container started
+2026-10-21T11:31:42Z   2026-10-21T11:31:42Z   1       Normal    Created             allreduce-gang-0-5lr7l                            kubelet          Container created
+2026-10-21T11:31:42Z   2026-10-21T11:31:42Z   1       Normal    Pulled              allreduce-gang-0-5lr7l                            kubelet          Successfully pulled image "pytorch/pytorch:2.11.0-cuda12.8-cudnn9-runtime@sha256:eee11b3b3872a8c838e35ef48f08b2d5def2080902c7f666831310ca1a0ef2be" in 1m34.817s (1m34.817s including waiting). Image size: 4261686202 bytes.
+2026-10-21T11:31:42Z   2026-10-21T11:31:42Z   1       Normal    Started             allreduce-gang-0-5lr7l                            kubelet          Container started
+2026-10-21T11:31:42Z   2026-10-21T11:31:42Z   1       Normal    Created             allreduce-gang-1-5hjlr                            kubelet          Container created
+2026-10-21T11:31:42Z   2026-10-21T11:31:42Z   1       Normal    Pulled              allreduce-gang-1-5hjlr                            kubelet          Successfully pulled image "pytorch/pytorch:2.11.0-cuda12.8-cudnn9-runtime@sha256:eee11b3b3872a8c838e35ef48f08b2d5def2080902c7f666831310ca1a0ef2be" in 515ms (1m35.324s including waiting). Image size: 4261686202 bytes.
+2026-10-21T11:31:49Z   2026-10-21T11:31:49Z   1       Normal    Completed           allreduce-gang                                    job-controller   Job completed
+
+## Cleanup   [11:31:54Z]
+
+## Result   [11:31:54Z]
+gang bound together, all-reduce completed
