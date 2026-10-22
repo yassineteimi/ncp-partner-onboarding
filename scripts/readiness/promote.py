@@ -26,8 +26,14 @@ Refused when any of these holds:
   - a required category is missing or didn't succeed
   - a bandwidth row is provisional, so its threshold verdict isn't final
   - the diagnostic log has no diag_result=PASS line, or has a FAIL
+  - DCGM skipped any test, although its overall verdict was PASS (unclear)
+  - a GPU's current ECC mode, recorded before the diagnostic, isn't Enabled
+    (unclear), or wasn't recorded at all (tooling)
   - the NCCL log shows a channel over the network (via NET/), or no NVLink
     channel at all (via P2P/ or NVLS)
+
+The two DCGM rules came from Finland's H200s: ECC was off, DCGM skipped its
+memory test, still said PASS, and this gate trusted it.
 """
 
 import argparse
@@ -38,6 +44,8 @@ from pathlib import Path
 
 GBPS = re.compile(r"([0-9.]+)\s*GB/s")
 HARDWARE_REASONS = ("HardwareFailureDetected", "ThresholdViolation")
+# Written by the diagnostic's script before dcgmi diag runs, one per GPU.
+ECC_LINE = re.compile(r"^ecc_mode gpu=(\S+) current=(\S+)", re.M)
 
 
 def bus_bandwidth(category):
@@ -91,15 +99,49 @@ def check_results(results, node, required):
     return out
 
 
+def skipped_tests(text):
+    """(test, GPU, reason) for every result dcgmi diag -j marked Skip.
+
+    Reads the JSON report (DCGM 4.x: test_categories, tests, results); if the
+    log holds no parseable report, any "status": "Skip" still counts."""
+    start = text.find("{")
+    try:
+        report, _ = json.JSONDecoder().raw_decode(text[start:]) if start >= 0 else (None, 0)
+    except ValueError:
+        report = None
+    if not isinstance(report, dict) or "DCGM Diagnostic" not in report:
+        n = len(re.findall(r'"status"\s*:\s*"Skip"', text))
+        return [("a test", "?", "unparsed report")] * n
+    skipped = []
+    for category in report.get("DCGM Diagnostic", {}).get("test_categories", []):
+        for test in category.get("tests", []):
+            for result in test.get("results", []):
+                if result.get("status") == "Skip":
+                    info = " ".join(result.get("info") or []) or "no reason given"
+                    skipped.append((test.get("name"), result.get("entity_id"), info))
+    return skipped
+
+
+def check_ecc(text):
+    modes = ECC_LINE.findall(text)
+    if not modes:
+        return [finding(False, "no ECC mode recorded before the diagnostic", "tooling")]
+    return [finding(mode == "Enabled", f"ECC {mode} on GPU {gpu}", "unclear") for gpu, mode in modes]
+
+
 def check_diag(text):
     if re.search(r"^diag_result=FAIL", text, re.M):
         failing = [line.strip() for line in text.splitlines() if re.search(r'"Fail', line)][:3]
         shown = f": {' | '.join(failing)}" if failing else ""
         return [finding(False, f"dcgmi diag reported a failed test{shown}", "hardware")]
-    if re.search(r"^diag_result=PASS", text, re.M):
-        return [finding(True, "dcgmi diag passed")]
-    last = next((line.strip() for line in reversed(text.splitlines()) if line.strip()), "empty log")
-    return [finding(False, f"the diagnostic never gave a verdict: {last[:200]}", "tooling")]
+    if not re.search(r"^diag_result=PASS", text, re.M):
+        last = next((line.strip() for line in reversed(text.splitlines()) if line.strip()), "empty log")
+        return [finding(False, f"the diagnostic never gave a verdict: {last[:200]}", "tooling")]
+    # DCGM counts a skipped test as passed. A skip means the node wasn't
+    # checked, not that it's broken, so it's unclear rather than hardware.
+    skipped = [finding(False, f"dcgmi diag skipped {test} on GPU {gpu}: {info[:200]}", "unclear")
+               for test, gpu, info in skipped_tests(text)]
+    return check_ecc(text) + (skipped or [finding(True, "dcgmi diag passed, no test skipped")])
 
 
 def check_nccl(text, ran, link_fault):
