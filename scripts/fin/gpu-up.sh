@@ -144,7 +144,7 @@ fi
 # Evidence: the image as it arrived, its driver, the node as it joined
 ########################################
 
-INVENTORY="$ARTIFACTS/image-inventory-$(date -u +%Y%m%dT%H%M%SZ)$([ "$REHEARSAL" = 1 ] && echo -rehearsal).txt"
+INVENTORY="$ARTIFACTS/image-inventory-$(date -u +%Y%m%dT%H%M%SZ)$([ "$REHEARSAL" = 1 ] && echo -rehearsal || true).txt"
 {
   echo "# $NAME ($TYPE, image $IMAGE), captured $(date -u +%Y-%m-%dT%H:%M:%SZ) by scripts/fin/gpu-up.sh"
   node_ssh "$IP" cat /var/lib/eu1/image-inventory.txt /var/lib/eu1/bootstrap-facts.txt
