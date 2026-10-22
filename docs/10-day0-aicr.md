@@ -7,10 +7,9 @@
     renders it for Argo CD and checks a live cluster against it. I asked it for EU1's two
     pools and compared its answer with what they run.
 
-!!! warning "Partly planned"
-    The recipes, the refusals, the version comparison and the drift demo ran on 20 and 21 October.
-    The validation of fin against the recipe runs in W2 (22 October) and says "planned"
-    until then.
+!!! success "Done"
+    The recipes, the refusals, the version comparison and the drift demo ran on 20 and 21
+    October, and the validation of fin against the recipe in W2 on 22 October.
 
 ## What AICR v1.1.0 offers EU1
 
@@ -69,9 +68,19 @@ read the kernel configuration at all: the image has no `/boot/config-*`.
 
 ## Validation on fin
 
-!!! note "Planned, W2"
-    `aicr validate`, deployment phase, of fin against the `k0s` H200 recipe. The readiness
-    pre-flight is expected to refuse Ubuntu 26.04; whatever it says is kept as it is.
+In W2 I took a snapshot of fin's H200 node and ran `aicr validate` against the `k0s` H200
+training recipe. It never reached the deployment checks. Its readiness pre-flight passed
+Kubernetes (v1.36.5 against ">= 1.34") and the OS family, then stopped:
+
+```text
+readiness check failed: OS.release.VERSION_ID expected 24.04, got 26.04
+```
+
+That's the refusal I expected, and it's the whole result: AICR can tell EU1 that fin
+isn't the OS it tested, not whether fin's components match. The version table above,
+built by hand, is still the comparison. As on par, the snapshot couldn't read the
+kernel configuration ([validation log](https://github.com/yassineteimi/ncp-partner-onboarding/blob/main/docs/artifacts/readiness/aicr/validate-fin-20261022T101408Z.log),
+[snapshot](https://github.com/yassineteimi/ncp-partner-onboarding/blob/main/docs/artifacts/readiness/aicr/snapshot-fin-20261022T101356Z.yaml)).
 
 ## What this can't show
 
