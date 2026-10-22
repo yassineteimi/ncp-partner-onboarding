@@ -6,9 +6,9 @@ One page per real choice, with at least two genuine alternatives. Written for an
 |---|---|---|---|
 | 0001 | Two sites on two providers for one partner | cos | proposed |
 | 0002 | Who owns the GPU driver: the GPU Operator or the provider image | cos | proposed |
-| [0003](0003-known-good-stack.md) | Known-good stack: AICR recipes vs hand-pinned values (and what AICR doesn't cover: L4, kubeadm) | ws-readiness | proposed |
-| [0004](0004-readiness-gate.md) | Readiness gate: NVCRE certification and a staging taint vs Part 1's burn-in scripts | ws-readiness | proposed |
-| [0005](0005-fault-remediation.md) | Fault remediation: NVSentinel vs Part 1's controller vs node-problem-detector with a generic remediator | ws-readiness | proposed |
+| [0003](0003-known-good-stack.md) | Known-good stack: AICR recipes vs hand-pinned values (and what AICR doesn't cover: L4, kubeadm) | ws-readiness | accepted |
+| [0004](0004-readiness-gate.md) | Readiness gate: NVCRE certification and a staging taint vs Part 1's burn-in scripts | ws-readiness | accepted |
+| [0005](0005-fault-remediation.md) | Fault remediation: NVSentinel vs Part 1's controller vs node-problem-detector with a generic remediator | ws-readiness | accepted |
 | [0006](0006-batch-scheduling.md) | Batch scheduling for many tenants: KAI vs Kueue vs Volcano | ws-scheduling | proposed |
 | [0007](0007-hpc-tenants-slurm.md) | HPC tenants: Slurm on Kubernetes (Slinky) vs a separate Slurm cluster | ws-scheduling | proposed |
 | [0008](0008-gpu-sharing.md) | GPU sharing per tenant class: MIG vs time slicing vs whole GPUs | ws-scheduling | proposed |
