@@ -1,0 +1,5 @@
+certify_started=2026-10-22T10:03:08Z node=eu1-fin-gpu-01 name=eu1-fin-100307 image=catalog
+certify_ended=2026-10-22T10:12:08Z name=eu1-fin-100307 exit=0
+diag_started=2026-10-22T10:12:41Z node=eu1-fin-gpu-01 level=2 via=workloadrun
+diag_ended=2026-10-22T10:12:54Z diag_result=PASS
+promoted=2026-10-22T10:13:49Z node=eu1-fin-gpu-01
