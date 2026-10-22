@@ -1,0 +1,97 @@
+Certification eu1-fin-h200 created in namespace readiness-runs.
+Categories:
+  - communication/nccl-all-reduce
+  - communication/nccl-loopback-nvswitch
+
+[watch] Watching certification progress...
+[watch] communication/nccl-all-reduce: InProgress (0s)
+[watch] communication/nccl-loopback-nvswitch: Pending (0s)
+[watch] communication/nccl-all-reduce: InProgress (15s)
+[watch] communication/nccl-all-reduce: InProgress (30s)
+[watch] communication/nccl-all-reduce: InProgress (45s)
+[watch] communication/nccl-all-reduce: InProgress (1m0s)
+[watch] communication/nccl-all-reduce: InProgress (1m15s)
+[watch] communication/nccl-all-reduce: InProgress (1m30s)
+[watch] communication/nccl-all-reduce: InProgress (1m45s)
+[watch] communication/nccl-all-reduce: InProgress (2m0s)
+[watch] communication/nccl-all-reduce: InProgress (2m15s)
+[watch] communication/nccl-all-reduce: InProgress (2m30s)
+[watch] communication/nccl-all-reduce: InProgress (2m45s)
+[watch] communication/nccl-all-reduce: InProgress (3m0s)
+[watch] communication/nccl-all-reduce: InProgress (3m15s)
+[watch] communication/nccl-all-reduce: InProgress (3m30s)
+[watch] communication/nccl-all-reduce: InProgress (3m45s)
+[watch] communication/nccl-all-reduce: InProgress (4m0s)
+[watch] communication/nccl-all-reduce: InProgress (4m15s)
+[watch] communication/nccl-all-reduce: InProgress (4m30s)
+[watch] communication/nccl-all-reduce: Succeeded (4m31s)
+[watch] communication/nccl-loopback-nvswitch: InProgress (4m31s)
+[watch] communication/nccl-loopback-nvswitch: InProgress (4m45s)
+[watch] communication/nccl-loopback-nvswitch: InProgress (5m0s)
+[watch] communication/nccl-loopback-nvswitch: InProgress (5m15s)
+[watch] communication/nccl-loopback-nvswitch: InProgress (5m30s)
+[watch] communication/nccl-loopback-nvswitch: InProgress (5m45s)
+[watch] communication/nccl-loopback-nvswitch: InProgress (6m0s)
+[watch] communication/nccl-loopback-nvswitch: InProgress (6m15s)
+[watch] communication/nccl-loopback-nvswitch: InProgress (6m30s)
+[watch] communication/nccl-loopback-nvswitch: InProgress (6m45s)
+[watch] communication/nccl-loopback-nvswitch: InProgress (7m0s)
+[watch] communication/nccl-loopback-nvswitch: InProgress (7m15s)
+[watch] communication/nccl-loopback-nvswitch: InProgress (7m30s)
+[watch] communication/nccl-loopback-nvswitch: InProgress (7m45s)
+[watch] communication/nccl-loopback-nvswitch: InProgress (8m0s)
+[watch] communication/nccl-loopback-nvswitch: InProgress (8m15s)
+[watch] communication/nccl-loopback-nvswitch: InProgress (8m30s)
+[watch] communication/nccl-loopback-nvswitch: InProgress (8m45s)
+[watch] communication/nccl-loopback-nvswitch: Succeeded (8m58s)
+[watch] Certification succeeded. (8m58s)
+
+╔════════════════════════════════════════════════════════════════╗
+║                      Certification Report                      ║
+╚════════════════════════════════════════════════════════════════╝
+
+  Name:      eu1-fin-h200
+  Platform:  onprem
+  GPU:       h200
+  Nodes:     1
+
+┌────────────────────────────────────────────────────────────────┐
+│  communication/nccl-all-reduce                                 │
+├────────────────────────────────────────────────────────────────┤
+│  Status:    Succeeded                                          │
+│  Runtime:   4m 31s                                             │
+│  Scale:     intra-node                                         │
+│  Nodes/Job: 1                                                  │
+│  Jobs:      1                                                  │
+│  Env:       NCCL_DEBUG, NCCL_DEBUG_SUBSYS                      │
+│                                                                │
+│  Transport: Socket                                             │
+│  Bandwidth:                                                    │
+│    Size       AlgBW        BusBW        Samples                │
+│    16 GB      351.45 GB/s  351.45 GB/s  10                     │
+└────────────────────────────────────────────────────────────────┘
+
+┌────────────────────────────────────────────────────────────────┐
+│  communication/nccl-loopback-nvswitch                          │
+├────────────────────────────────────────────────────────────────┤
+│  Status:    Succeeded                                          │
+│  Runtime:   4m 27s                                             │
+│  Scale:     intra-node                                         │
+│  Nodes/Job: 1                                                  │
+│  Jobs:      1                                                  │
+│  Env:       NCCL_DEBUG, NCCL_DEBUG_SUBSYS                      │
+│                                                                │
+│  Bandwidth:                                                    │
+│    Size       AlgBW        BusBW        Samples                │
+│    16 GB      351.87 GB/s  351.87 GB/s  10                     │
+└────────────────────────────────────────────────────────────────┘
+
+┌────────────────────────────────────────────────────────────────┐
+│  Summary                                                       │
+├────────────────────────────────────────────────────────────────┤
+│  Categories:   2/2 passed                                      │
+│  Failed Nodes: none                                            │
+│  Result:       PASSED                                          │
+└────────────────────────────────────────────────────────────────┘
+
+Results written to /Users/yassineteimi/Desktop/ncp-partner-onboarding/.claude/worktrees/ws-readiness/docs/artifacts/readiness/nvcre-fin-20261022T100307Z.json

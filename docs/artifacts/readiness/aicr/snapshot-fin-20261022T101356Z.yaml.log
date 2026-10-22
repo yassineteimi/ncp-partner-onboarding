@@ -1,0 +1,19 @@
+[cli] snapshot agent run: runID=20261022-121357-3f4859c9636f610f
+[cli] deploying agent: namespace=aicr-validation
+I1022 12:13:59.122849   19375 request.go:754] "Waited before sending request" delay="1.145255875s" reason="client-side throttling, not priority and fairness" verb="POST" URL="https://86.38.238.179:6443/apis/authorization.k8s.io/v1/selfsubjectaccessreviews"
+[cli] agent deployed successfully
+[cli] waiting for Job completion: job=aicr-20261022-121357-3f4859c9636f610f timeout=5m0s
+[cli] pod current phase: name=aicr-20261022-121357-3f4859c9636f610f-wvvq5 status=Pending waitingReason=ContainerCreating
+[cli] pod current phase: name=aicr-20261022-121357-3f4859c9636f610f-wvvq5 status=Running
+[agent] collecting GPU information
+[agent] collecting Kubernetes cluster information
+[agent] collecting SystemD service configurations
+[agent] collecting OS configuration
+E1022 10:14:05.422999   27064 kernel.go:135] "failed to read kconfig" err="failed to read kernel config from [ /proc/config.gz /usr/src/linux-7.0.0-38-generic/.config /usr/src/linux-rt-7.0.0-38-generic/.config /usr/src/linux/.config /usr/lib/modules/7.0.0-38-generic/config /usr/lib/ostree-boot/config-7.0.0-38-generic /usr/lib/kernel/config-7.0.0-38-generic /usr/src/linux-headers-7.0.0-38-generic/.config /lib/modules/7.0.0-38-generic/build/.config /usr/src/linux-rt-headers-7.0.0-38-generic/.config /boot/config-7.0.0-38-generic]"
+E1022 10:14:05.423219   27064 kernel.go:150] "failed to get builtin kernel modules" err="failed to read file /lib/modules/7.0.0-38-generic/modules.builtin: open /lib/modules/7.0.0-38-generic/modules.builtin: no such file or directory"
+[agent] collecting node topology information
+[agent] node topology collection complete: nodes=2 taints=0 labels=126
+[agent] configmap operation: namespace=aicr-validation name=aicr-agent-snapshot-20261022-121357-3f4859c9636f610f auth_method=bearer-token format=yaml
+[agent] applying ConfigMap: namespace=aicr-validation name=aicr-agent-snapshot-20261022-121357-3f4859c9636f610f format=yaml
+[cli] job completed successfully
+[cli] snapshot saved to file: path=/Users/yassineteimi/Desktop/ncp-partner-onboarding/.claude/worktrees/ws-readiness/docs/artifacts/readiness/aicr/snapshot-fin-20261022T101356Z.yaml format=yaml
