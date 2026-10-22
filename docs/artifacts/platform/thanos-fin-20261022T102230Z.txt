@@ -108,7 +108,7 @@ seriesCountByLabelValuePair:
   namespace=default: 37876
   service=kubernetes: 37866
   job=apiserver: 37863
-  instance=86.38.238.179:6443: 37862
+  instance=<fin-cp-ip>:6443: 37862
   component=apiserver: 14647
   version=v1: 13126
   service=kube-prometheus-stack-kubelet: 11924

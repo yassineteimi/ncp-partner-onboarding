@@ -94,7 +94,7 @@ seriesCountByLabelValuePair:
   namespace=default: 29216
   service=kubernetes: 29206
   job=apiserver: 29203
-  instance=86.38.238.179:6443: 29202
+  instance=<fin-cp-ip>:6443: 29202
   version=v1: 10811
   component=apiserver: 10017
   service=kube-prometheus-stack-kubelet: 9783
@@ -104,6 +104,6 @@ seriesCountByLabelValuePair:
   node=eu1-fin-cp-01: 6631
   scope=cluster: 6552
   namespace=kube-system: 6320
-  instance=86.38.238.179:10250: 6264
+  instance=<fin-cp-ip>:10250: 6264
 
 # written to docs/artifacts/platform/thanos-fin-20261022T095815Z.txt

@@ -92,7 +92,7 @@ seriesCountByLabelValuePair:
   job=kubelet: 3025
   endpoint=https-metrics: 3025
   service=kube-prometheus-stack-kubelet: 3025
-  instance=86.38.238.179:10250: 3025
+  instance=<fin-cp-ip>:10250: 3025
   node=eu1-fin-cp-01: 3025
   metrics_path=/metrics/cadvisor: 2415
   endpoint=http-metrics: 1924
@@ -100,7 +100,7 @@ seriesCountByLabelValuePair:
   container=node-exporter: 1719
   service=kube-prometheus-stack-prometheus-node-exporter: 1662
   job=node-exporter: 1662
-  instance=86.38.238.179:9100: 1662
+  instance=<fin-cp-ip>:9100: 1662
   pod=prometheus-kube-prometheus-stack-prometheus-0: 1511
   container=prometheus: 1418
 

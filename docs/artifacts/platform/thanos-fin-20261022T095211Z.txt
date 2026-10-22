@@ -92,14 +92,14 @@ seriesCountByLabelValuePair:
   namespace=default: 27012
   service=kubernetes: 27002
   job=apiserver: 26999
-  instance=86.38.238.179:6443: 26998
+  instance=<fin-cp-ip>:6443: 26998
   version=v1: 9474
   component=apiserver: 8413
   node=eu1-fin-cp-01: 6498
   service=kube-prometheus-stack-kubelet: 6176
   endpoint=https-metrics: 6173
   job=kubelet: 6173
-  instance=86.38.238.179:10250: 6170
+  instance=<fin-cp-ip>:10250: 6170
   scope=cluster: 5276
   namespace=monitoring: 5180
   scope=resource: 4373
