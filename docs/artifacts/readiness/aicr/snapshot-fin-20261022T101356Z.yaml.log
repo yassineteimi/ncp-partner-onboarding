@@ -1,6 +1,6 @@
 [cli] snapshot agent run: runID=20261022-121357-3f4859c9636f610f
 [cli] deploying agent: namespace=aicr-validation
-I1022 12:13:59.122849   19375 request.go:754] "Waited before sending request" delay="1.145255875s" reason="client-side throttling, not priority and fairness" verb="POST" URL="https://86.38.238.179:6443/apis/authorization.k8s.io/v1/selfsubjectaccessreviews"
+I1022 12:13:59.122849   19375 request.go:754] "Waited before sending request" delay="1.145255875s" reason="client-side throttling, not priority and fairness" verb="POST" URL="https://<fin-cp-ip>:6443/apis/authorization.k8s.io/v1/selfsubjectaccessreviews"
 [cli] agent deployed successfully
 [cli] waiting for Job completion: job=aicr-20261022-121357-3f4859c9636f610f timeout=5m0s
 [cli] pod current phase: name=aicr-20261022-121357-3f4859c9636f610f-wvvq5 status=Pending waitingReason=ContainerCreating
