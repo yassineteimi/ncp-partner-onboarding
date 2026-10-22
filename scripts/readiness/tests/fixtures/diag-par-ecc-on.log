@@ -1,0 +1,109 @@
+{
+	"DCGM Diagnostic" : 
+	{
+		"test_categories" : 
+		[
+			{
+				"category" : "Deployment",
+				"tests" : 
+				[
+					{
+						"name" : "software",
+						"results" : 
+						[
+							{
+								"entity_group" : "GPU",
+								"entity_group_id" : 1,
+								"entity_id" : 0,
+								"status" : "Pass"
+							}
+						],
+						"test_summary" : 
+						{
+							"status" : "Pass"
+						}
+					}
+				]
+			},
+			{
+				"category" : "Hardware",
+				"tests" : 
+				[
+					{
+						"name" : "memory",
+						"results" : 
+						[
+							{
+								"entity_group" : "GPU",
+								"entity_group_id" : 1,
+								"entity_id" : 0,
+								"info" : 
+								[
+									"Allocated 23221170324 bytes (98.1%)"
+								],
+								"status" : "Pass"
+							}
+						],
+						"test_summary" : 
+						{
+							"status" : "Pass"
+						}
+					}
+				]
+			},
+			{
+				"category" : "Integration",
+				"tests" : 
+				[
+					{
+						"name" : "pcie",
+						"results" : 
+						[
+							{
+								"entity_group" : "GPU",
+								"entity_group_id" : 1,
+								"entity_id" : 0,
+								"info" : 
+								[
+									"GPU to Host bandwidth:\t\t26.38 GB/s",
+									"Host to GPU bandwidth:\t\t26.53 GB/s",
+									"bidirectional bandwidth:\t41.81 GB/s",
+									"GPU to Host latency:\t\t1.665 us",
+									"Host to GPU latency:\t\t1.827 us",
+									"bidirectional latency:\t\t3.519 us"
+								],
+								"status" : "Pass"
+							}
+						],
+						"test_summary" : 
+						{
+							"status" : "Pass"
+						}
+					}
+				]
+			}
+		]
+	},
+	"entity_groups" : 
+	[
+		{
+			"entities" : 
+			[
+				{
+					"device_id" : "27b8",
+					"entity_id" : 0,
+					"serial_num" : "1324423007551"
+				}
+			],
+			"entity_group" : "GPU",
+			"entity_group_id" : 1
+		}
+	],
+	"metadata" : 
+	{
+		"Driver Version Detected" : "595.91.07",
+		"version" : "4.6.1"
+	}
+}
+dcgmi_exit=0
+diag_result=PASS

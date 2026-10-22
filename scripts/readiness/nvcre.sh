@@ -161,7 +161,10 @@ yaml.safe_dump(d, open(sys.argv[3], "w"), sort_keys=False)' "$cert" "$WORKLOAD_I
       pod="$(kubectl_cp -n gpu-operator get pods -l app=nvidia-dcgm --field-selector "spec.nodeName=$node" -o jsonpath='{.items[0].metadata.name}')"
       [ -n "$pod" ] || die "no nvidia-dcgm pod on $node"
       set +e
-      kubectl_cp -n gpu-operator exec "$pod" -- dcgmi diag -r "$LEVEL" -j > "$file" 2>&1
+      # The ECC mode first, as the WorkloadRun's script does (diag-<site>.yaml).
+      kubectl_cp -n gpu-operator exec "$pod" -- dcgmi dmon -e 300 -c 1 2>&1 \
+        | awk '$1 == "GPU" { m = ($3 == "1") ? "Enabled" : ($3 == "0") ? "Disabled" : $3; print "ecc_mode gpu=" $2 " current=" m }' > "$file"
+      kubectl_cp -n gpu-operator exec "$pod" -- dcgmi diag -r "$LEVEL" -j >> "$file" 2>&1
       rc=$?
       set -e
       echo "dcgmi_exit=$rc" >> "$file"

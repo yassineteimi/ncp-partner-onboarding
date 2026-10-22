@@ -54,10 +54,11 @@ gate rehearsed on par's L4 the day before. Two things change how I'd run it:
 
 - **A skipped test passed.** ECC is off on Verda's H200s, so DCGM skipped its memory test
   and still reported PASS, and the gate, which trusts DCGM's overall result, opened the
-  node with no memory check. The next change to the gate: refuse with cause "unclear"
-  when any DCGM test is skipped, and check `ecc.mode.current` before the diagnostic,
-  so a provider image with ECC off is caught before a window is spent on it. Whether
-  W3 runs with that rule, and so would refuse fin, is Yassine's call.
+  node with no memory check. The gate now refuses with cause "unclear" when DCGM skips
+  any test, and the diagnostic first records each GPU's current ECC mode (DCGM field
+  300, read from the same host engine); a GPU with ECC off is refused as "unclear", and
+  a missing record as "tooling". Fed the H200's diagnostic log unchanged, the gate now
+  refuses that node. The ECC read itself hasn't run on a GPU yet.
 - **NVCRE's summary can't be the record of the transport.** It printed
   `Transport: Socket` for a run that went over NVLink on every channel. The gate already
   reads the raw NCCL channel lines, which is why it wasn't misled; that stays a rule.

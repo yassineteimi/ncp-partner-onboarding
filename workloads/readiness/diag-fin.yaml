@@ -40,6 +40,13 @@ spec:
         # Ask the node's host engine for a level 2 diagnostic, keep the JSON in
         # the pod log for the evidence, and fail the pod if any test failed.
         set -o pipefail
+        # First each GPU's current ECC mode, from the same host engine: DCGM
+        # field 300, DCGM_FI_DEV_ECC_CURRENT, 1 on and 0 off. With ECC off DCGM
+        # skips its memory test and still says PASS, so the gate refuses a node
+        # whose GPUs run without it. Written from DCGM's field list; this line
+        # hasn't run on a GPU yet, and if it prints nothing the gate refuses.
+        dcgmi dmon --host nvidia-dcgm.gpu-operator.svc:5555 -e 300 -c 1 \
+          | awk '$1 == "GPU" { m = ($3 == "1") ? "Enabled" : ($3 == "0") ? "Disabled" : $3; print "ecc_mode gpu=" $2 " current=" m }'
         dcgmi diag --host nvidia-dcgm.gpu-operator.svc:5555 -r 2 -j | tee /tmp/diag.json
         rc=$?
         echo "dcgmi_exit=$rc"

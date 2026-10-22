@@ -30,7 +30,9 @@ PASSED = {
     "failedNodes": [],
     "result": "PASSED",
 }
-DIAG_PASS = '{"tests": []}\ndcgmi_exit=0\ndiag_result=PASS\n'
+FIXTURES = Path(__file__).parent / "fixtures"
+ECC_ON = "ecc_mode gpu=0 current=Enabled\necc_mode gpu=1 current=Enabled\n"
+DIAG_PASS = ECC_ON + '{"tests": []}\ndcgmi_exit=0\ndiag_result=PASS\n'
 NCCL_NVLINK = "NCCL INFO Channel 00/0 : 0[0] -> 1[1] via P2P/CUMEM\nNCCL INFO Channel 01/0 : 1[1] -> 0[0] via P2P/CUMEM\n"
 
 
@@ -215,6 +217,61 @@ def test_hardware_and_tooling_together_is_unclear(tmp_path, capsys):
     assert run(tmp_path, broken(lambda r: r.update(result="INCOMPLETE")),
                diag="dcgmi_exit=226\ndiag_result=FAIL\n") == 1
     assert last_line(capsys) == f"REFUSE {NODE} cause=unclear"
+
+
+# A skipped DCGM test, and ECC off. Finland's H200 diagnostic, kept unchanged
+# as a fixture: overall PASS, memory test skipped on both GPUs because ECC is
+# off. The gate promoted that node; it must refuse it now.
+
+def test_finland_diag_with_ecc_off_refuses(tmp_path, capsys):
+    diag = (FIXTURES / "diag-fin-ecc-off.log").read_text()
+    assert run(tmp_path, PASSED, diag=diag) == 1
+    out = capsys.readouterr().out
+    assert "FAIL [unclear] dcgmi diag skipped memory on GPU 0: Skipping test Memory because ECC is not enabled" in out
+    assert "FAIL [unclear] dcgmi diag skipped memory on GPU 1" in out
+    # That run predates the ECC line, so the gate also says it wasn't recorded.
+    assert "FAIL [tooling] no ECC mode recorded before the diagnostic" in out
+    assert out.strip().endswith(f"REFUSE {NODE} cause=unclear")
+
+
+def test_ecc_off_alone_is_unclear(tmp_path, capsys):
+    diag = "ecc_mode gpu=0 current=Disabled\necc_mode gpu=1 current=Disabled\n" + (
+        FIXTURES / "diag-fin-ecc-off.log").read_text()
+    assert run(tmp_path, PASSED, diag=diag) == 1
+    out = capsys.readouterr().out
+    assert "FAIL [unclear] ECC Disabled on GPU 0" in out
+    assert out.strip().endswith(f"REFUSE {NODE} cause=unclear")
+
+
+def test_skip_with_ecc_on_is_unclear(tmp_path, capsys):
+    diag = ECC_ON + (FIXTURES / "diag-fin-ecc-off.log").read_text()
+    assert run(tmp_path, PASSED, diag=diag) == 1
+    out = capsys.readouterr().out
+    assert "PASS ECC Enabled on GPU 1" in out
+    assert out.strip().endswith(f"REFUSE {NODE} cause=unclear")
+
+
+def test_missing_ecc_line_is_tooling(tmp_path, capsys):
+    assert run(tmp_path, PASSED, diag='{"tests": []}\ndcgmi_exit=0\ndiag_result=PASS\n') == 1
+    assert last_line(capsys) == f"REFUSE {NODE} cause=tooling"
+
+
+def test_paris_diag_with_nothing_skipped_promotes(tmp_path, capsys):
+    # Paris's L4 diagnostic, unchanged, ran software, memory and pcie with
+    # nothing skipped. Its ECC line is added here: that run predates it.
+    single = broken(lambda r: r["categories"].pop())
+    r = tmp_path / "results.json"
+    r.write_text(json.dumps(single))
+    diag = tmp_path / "diag.log"
+    diag.write_text("ecc_mode gpu=0 current=Enabled\n" + (FIXTURES / "diag-par-ecc-on.log").read_text())
+    assert promote.main(["--node", "eu1-par-gpu-01", "--results", str(r),
+                         "--require", "communication/nccl-all-reduce", "--diag", str(diag)]) == 0
+    assert "PASS dcgmi diag passed, no test skipped" in capsys.readouterr().out
+
+
+def test_skip_counts_without_a_parseable_report():
+    text = 'garbage { "status" : "Skip" } and "status": "Skip"\ndiag_result=PASS\n'
+    assert len(promote.skipped_tests(text)) == 2
 
 
 def test_unreadable_inputs_say_tooling(tmp_path, capsys):
