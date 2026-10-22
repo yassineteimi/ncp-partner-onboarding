@@ -29,7 +29,7 @@
       "id": 1,
       "type": "timeseries",
       "title": "GPU utilisation, every GPU of every site",
-      "description": "DCGM_FI_DEV_GPU_UTIL, one line per GPU. Aggregated by GPU, not by exporter pod, so a restart of the exporter doesn't draw a second line. Query tested in gitops/manifests/platform/gpu-rules/tests/.",
+      "description": "Whole GPUs: DCGM_FI_DEV_GPU_UTIL, one line per GPU. MIG instances don't report GPU_UTIL, so each instance gets a line from DCGM_FI_PROF_GR_ENGINE_ACTIVE, the share of time its graphics engine was active, as a percentage. The two are close but not the same measure. Aggregated by GPU or instance, not by exporter pod, so a restart of the exporter doesn't draw a second line. Queries tested in gitops/manifests/platform/gpu-rules/tests/.",
       "gridPos": {"h": 10, "w": 24, "x": 0, "y": 0},
       "datasource": {"type": "prometheus", "uid": "thanos-eu1"},
       "targets": [
@@ -37,6 +37,11 @@
           "refId": "A",
           "expr": "max by (site, modelName, hostname, gpu) (DCGM_FI_DEV_GPU_UTIL{site=~\"$site\"})",
           "legendFormat": "{{site}} {{modelName}} {{hostname}} gpu{{gpu}}"
+        },
+        {
+          "refId": "B",
+          "expr": "100 * max by (site, modelName, hostname, gpu, GPU_I_ID, GPU_I_PROFILE) (DCGM_FI_PROF_GR_ENGINE_ACTIVE{site=~\"$site\", GPU_I_ID!=\"\"})",
+          "legendFormat": "{{site}} {{modelName}} {{hostname}} gpu{{gpu}} MIG {{GPU_I_ID}} ({{GPU_I_PROFILE}})"
         }
       ],
       "fieldConfig": {
@@ -64,12 +69,13 @@
       "id": 3,
       "type": "timeseries",
       "title": "Framebuffer used",
+      "description": "Per physical GPU. A GPU split by MIG reports framebuffer per instance, so its instances are added up.",
       "gridPos": {"h": 8, "w": 12, "x": 12, "y": 10},
       "datasource": {"type": "prometheus", "uid": "thanos-eu1"},
       "targets": [
         {
           "refId": "A",
-          "expr": "max by (site, modelName, hostname, gpu) (DCGM_FI_DEV_FB_USED{site=~\"$site\"})",
+          "expr": "sum by (site, modelName, hostname, gpu) (max by (site, modelName, hostname, gpu, GPU_I_ID) (DCGM_FI_DEV_FB_USED{site=~\"$site\"}))",
           "legendFormat": "{{site}} {{modelName}} gpu{{gpu}}"
         }
       ],
@@ -79,7 +85,7 @@
       "id": 4,
       "type": "table",
       "title": "DCGM series per GPU",
-      "description": "From the recording rule gpu:dcgm_series:count, evaluated on each site. MIG instances count against their GPU.",
+      "description": "From the recording rule gpu:dcgm_series:count, evaluated on each site. MIG instances count against their GPU; the table below splits them. A series count, not a GPU count.",
       "gridPos": {"h": 8, "w": 12, "x": 0, "y": 18},
       "datasource": {"type": "prometheus", "uid": "thanos-eu1"},
       "targets": [
@@ -126,6 +132,40 @@
       ],
       "fieldConfig": {"defaults": {"unit": "dateTimeAsIso"}, "overrides": []},
       "transformations": [{"id": "organize", "options": {"excludeByName": {"Time": true}, "renameByName": {"Value": "last sample"}}}]
+    },
+    {
+      "id": 7,
+      "type": "table",
+      "title": "DCGM series per GPU and MIG instance",
+      "description": "From the recording rule gpu:dcgm_series_by_instance:count. A whole GPU has one row; a GPU split by MIG has a row for the device and one per instance. Empty for any period before the rule was deployed on that site.",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 33},
+      "datasource": {"type": "prometheus", "uid": "thanos-eu1"},
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "max by (site, modelName, hostname, gpu, GPU_I_ID, GPU_I_PROFILE) (max_over_time(gpu:dcgm_series_by_instance:count{site=~\"$site\"}[$__range]))",
+          "instant": true,
+          "format": "table"
+        }
+      ],
+      "transformations": [{"id": "organize", "options": {"excludeByName": {"Time": true}}}]
+    },
+    {
+      "id": 8,
+      "type": "table",
+      "title": "GPUs per site in this time range",
+      "description": "Physical GPUs that reported framebuffer at any time in the range, whole or split by MIG. Counted by GPU, not by series: a GPU's series change with its exporter pod and the tenant pods on it.",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 33},
+      "datasource": {"type": "prometheus", "uid": "thanos-eu1"},
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "count by (site, modelName) (max by (site, modelName, hostname, gpu) (last_over_time(DCGM_FI_DEV_FB_USED{site=~\"$site\"}[$__range])))",
+          "instant": true,
+          "format": "table"
+        }
+      ],
+      "transformations": [{"id": "organize", "options": {"excludeByName": {"Time": true}, "renameByName": {"Value": "GPUs"}}}]
     }
   ]
 }

@@ -20,10 +20,21 @@ spec:
       rules:
         # Series per physical GPU, all DCGM metrics together. MIG instances
         # carry their parent's gpu and UUID, so they count against the GPU
-        # they live on, which is the number capacity planning needs.
+        # they live on, which is the number capacity planning needs. It is not
+        # a GPU count: a GPU's series change with the exporter pod and the
+        # tenant pods on it.
         - record: gpu:dcgm_series:count
           expr: |
             count by (hostname, gpu, UUID, modelName) ({__name__=~"DCGM_.+"})
+
+        # The same, split by MIG instance. On the H200 split into two
+        # 3g.71gb instances, each instance had 20 series of its own, labelled
+        # GPU_I_ID and GPU_I_PROFILE, and the device kept 11 without those
+        # labels: 51 for the physical GPU above. A whole GPU has one row here,
+        # without GPU_I_ID.
+        - record: gpu:dcgm_series_by_instance:count
+          expr: |
+            count by (hostname, gpu, UUID, modelName, GPU_I_ID, GPU_I_PROFILE) ({__name__=~"DCGM_.+"})
 
         # The same, split by metric, to see which ones multiply: the XID
         # counter (one series per code), clock events (one per reason), and
