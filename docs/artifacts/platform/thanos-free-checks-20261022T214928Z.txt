@@ -1,0 +1,95 @@
+# make thanos-check DRY_RUN=server and make thanos-test-rules (BREAK=0, then BREAK=1)
+# 20261022T214928Z, laptop clock, UTC. git 2c15ae3 plus the MIG rule and dashboard working tree
+# thanos, version 0.42.4 (branch: HEAD, revision: 45c4f39487e1653e606307d3952a6259fb96acae)
+# promtool, version 3.14.0 (branch: HEAD, revision: d7598b7141418fa35be2b5ec5d0fefb634199610)
+# kubectl v1.36.5
+
+./scripts/platform/check-thanos.sh
+==> renders go to $TMPDIR/tmp.5vRAE6JnV7
+==> kustomize build of thanos and gpu-rules
+==> dashboard JSON parses
+==> 37 thanos flags exist in v0.42.4
+==> thanos query starts with the endpoint config
+==> helm template kube-prometheus-stack 91.4.1 for par
+==> helm template kube-prometheus-stack 91.4.1 for fin
+ok   par Prometheus keeps site=par
+ok   par sidecar image pinned by digest
+ok   par sidecar uploads with monitoring/thanos-objstore
+ok   par keeps 15 days locally
+ok   sidecar Service is kube-prometheus-stack-thanos-discovery, as query.yaml expects
+ok   sidecar Service exposes grpc 10901
+ok   Grafana gets the Thanos (EU1) data source
+ok   fin Prometheus keeps site=fin
+ok   fin has no sidecar
+ok   fin has exactly one remote write
+ok   fin writes to the CPU worker's NodePort over https
+ok   fin verifies the server name in Receive's certificate
+ok   fin's client key comes from thanos-remote-write
+ok   no Grafana on fin
+==> rendered kube-prometheus-stack objects match the overlays
+==> server-side dry run on par: thanos (fin-sim objects in namespace thanos) and gpu-rules
+serviceaccount/prometheus-fin-sim created (server dry run)
+serviceaccount/thanos-certs configured (server dry run)
+role.rbac.authorization.k8s.io/prometheus-fin-sim created (server dry run)
+role.rbac.authorization.k8s.io/thanos-certs configured (server dry run)
+role.rbac.authorization.k8s.io/thanos-certs configured (server dry run)
+rolebinding.rbac.authorization.k8s.io/prometheus-fin-sim created (server dry run)
+rolebinding.rbac.authorization.k8s.io/thanos-certs configured (server dry run)
+rolebinding.rbac.authorization.k8s.io/thanos-certs configured (server dry run)
+configmap/eu1-gpus-across-sites-dashboard configured (server dry run)
+configmap/thanos-query-endpoints configured (server dry run)
+service/thanos-compact configured (server dry run)
+service/thanos-query configured (server dry run)
+service/thanos-receive configured (server dry run)
+service/thanos-receive-headless configured (server dry run)
+service/thanos-receive-public configured (server dry run)
+service/thanos-store configured (server dry run)
+deployment.apps/thanos-query configured (server dry run)
+statefulset.apps/thanos-compact configured (server dry run)
+statefulset.apps/thanos-receive configured (server dry run)
+statefulset.apps/thanos-store configured (server dry run)
+job.batch/thanos-certs configured (server dry run)
+podmonitor.monitoring.coreos.com/thanos configured (server dry run)
+prometheus.monitoring.coreos.com/fin-sim created (server dry run)
+servicemonitor.monitoring.coreos.com/fin-sim-self created (server dry run)
+prometheusrule.monitoring.coreos.com/gpu-cardinality configured (server dry run)
+==> server-side dry run on par: the Prometheus objects rendered for par and for fin
+prometheus.monitoring.coreos.com/kube-prometheus-stack-prometheus serverside-applied (server dry run)
+prometheus.monitoring.coreos.com/kube-prometheus-stack-prometheus serverside-applied (server dry run)
+application.argoproj.io/gpu-rules configured (server dry run)
+application.argoproj.io/kubevirt configured (server dry run)
+application.argoproj.io/thanos configured (server dry run)
+==> all checks passed
+
+./scripts/platform/test-rules.sh
+==> promtool 3.14.0
+==> checking rule syntax
+Checking $TMPDIR/tmp.ELjK6xGF4H/gpu-cardinality.rules.yaml
+  SUCCESS: 3 rules found
+
+==> running unit tests
+  SUCCESS
+
+
+./scripts/platform/test-rules.sh
+==> promtool 3.14.0
+==> checking rule syntax
+Checking $TMPDIR/tmp.OEWKm02n3l/gpu-cardinality.rules.yaml
+  SUCCESS: 3 rules found
+
+==> running unit tests
+  FAILED:
+    expr: "gpu:dcgm_series:count", time: 2m,
+        exp: {UUID="GPU-l4", __name__="gpu:dcgm_series:count", gpu="0", hostname="eu1-par-gpu-01", modelName="NVIDIA L4"} 4E+00
+        got: {UUID="GPU-l4", __name__="gpu:dcgm_series:count", gpu="0", hostname="eu1-par-gpu-01", modelName="NVIDIA L4", pod="nvidia-dcgm-exporter-a"} 4E+00
+
+    expr: "gpu:dcgm_series:count", time: 2m,
+        exp: {UUID="GPU-l4", __name__="gpu:dcgm_series:count", gpu="0", hostname="eu1-par-gpu-01", modelName="NVIDIA L4"} 2E+00
+        got: {UUID="GPU-l4", __name__="gpu:dcgm_series:count", gpu="0", hostname="eu1-par-gpu-01", modelName="NVIDIA L4", pod="nvidia-dcgm-exporter-a"} 1E+00, {UUID="GPU-l4", __name__="gpu:dcgm_series:count", gpu="0", hostname="eu1-par-gpu-01", modelName="NVIDIA L4", pod="nvidia-dcgm-exporter-b"} 1E+00
+
+    expr: "gpu:dcgm_series:count", time: 4m,
+        exp: {UUID="GPU-l4", __name__="gpu:dcgm_series:count", gpu="0", hostname="eu1-par-gpu-01", modelName="NVIDIA L4"} 1E+00
+        got: {UUID="GPU-l4", __name__="gpu:dcgm_series:count", gpu="0", hostname="eu1-par-gpu-01", modelName="NVIDIA L4", pod="nvidia-dcgm-exporter-b"} 1E+00
+
+
+==> the broken rule failed its tests, as it should

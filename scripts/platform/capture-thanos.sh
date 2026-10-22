@@ -14,6 +14,10 @@
 #                               par's own TSDB status
 #   capture-thanos.sh bucket    the blocks in Garage, by tenant and resolution
 #
+# AT=<RFC 3339 or Unix time> evaluates every query at that moment instead of
+# now, to read a site as it was: AT=2026-10-22T10:23:00Z MODE=fin shows the
+# Finland H200s five minutes after the MIG split, from what Thanos stored.
+#
 # Each run writes docs/artifacts/platform/thanos-<mode>-<timestamp>.txt.
 # Times are this laptop's clock, UTC, plus Prometheus's own sample timestamps.
 #
@@ -33,12 +37,19 @@ OUTFILE="$REPO_ROOT/docs/artifacts/platform/thanos-$MODE-$STAMP.txt"
 mkdir -p "$(dirname "$OUTFILE")"
 exec > >(perl -pe 'BEGIN { $| = 1 } s/\e\[[0-9;]*m//g' | tee "$OUTFILE") 2>&1
 echo "# capture-thanos.sh $MODE, $STAMP, laptop clock, UTC. git $(git -C "$REPO_ROOT" rev-parse --short HEAD)"
+AT="${AT:-}"
+[ -z "$AT" ] || echo "# every query evaluated at $AT, not now"
 
 # PromQL through Thanos Query, via the API server's service proxy.
 # q <title> <query> [dedup true|false]
 q() {
   local title="$1" query="$2" dedup="${3:-true}" path
-  path="$(python3 -c 'import sys, urllib.parse as u; print("/api/v1/namespaces/thanos/services/thanos-query:9090/proxy/api/v1/query?" + u.urlencode({"query": sys.argv[1], "dedup": sys.argv[2]}))' "$query" "$dedup")"
+  path="$(python3 -c '
+import sys, urllib.parse as u
+p = {"query": sys.argv[1], "dedup": sys.argv[2]}
+if sys.argv[3]:
+    p["time"] = sys.argv[3]
+print("/api/v1/namespaces/thanos/services/thanos-query:9090/proxy/api/v1/query?" + u.urlencode(p))' "$query" "$dedup" "$AT")"
   echo
   echo "## $title"
   echo "# $query   (dedup=$dedup)"
@@ -135,10 +146,24 @@ case "$MODE" in
     stores
     q "Sites and tenants seen ($at)" "count by (site, tenant_id) ($(last up))"
     q "Last sample per site (Unix seconds)" "$stamp"
-    q "GPUs per site and model ($at)" "count by (site, modelName) ($(last DCGM_FI_DEV_GPU_UTIL))"
-    q "GPU utilisation ($at)" "max by (site, modelName, hostname, gpu) ($(last DCGM_FI_DEV_GPU_UTIL))"
+    # Counted by GPU, from a field every whole GPU and every MIG instance
+    # reports. Counting series read 13 for 2 H200s after fin-down, and
+    # counting GPU_UTIL read 1 after the MIG split.
+    q "GPUs per site and model ($at)" "count by (site, modelName) (max by (site, modelName, hostname, gpu) ($(last DCGM_FI_DEV_FB_USED)))"
+    q "GPU utilisation, whole GPUs ($at)" "max by (site, modelName, hostname, gpu) ($(last DCGM_FI_DEV_GPU_UTIL))"
     q "GPU utilisation, max over the last 3 h" 'max by (site, modelName, hostname, gpu) (max_over_time(DCGM_FI_DEV_GPU_UTIL[3h]))'
+    # MIG instances don't report GPU_UTIL: graphics engine active, as a percentage.
+    q "MIG instance utilisation, graphics engine active, % ($at)" "100 * max by (site, modelName, hostname, gpu, GPU_I_ID, GPU_I_PROFILE) ($(last 'DCGM_FI_PROF_GR_ENGINE_ACTIVE{GPU_I_ID!=""}'))"
     q "DCGM series per GPU (recording rule)" 'max by (site, modelName, hostname, gpu) (max_over_time(gpu:dcgm_series:count[3h]))'
+    q "DCGM series per GPU and MIG instance (recording rule)" 'max by (site, modelName, hostname, gpu, GPU_I_ID, GPU_I_PROFILE) (max_over_time(gpu:dcgm_series_by_instance:count[3h]))'
+    if [ "$MODE" = fin ]; then
+      # The same, counted from the raw series at one instant, so it also works
+      # on data stored before the rule existed (with AT).
+      q "DCGM series per GPU and MIG instance, counted directly (now)" 'count by (site, hostname, gpu, GPU_I_ID, GPU_I_PROFILE) ({__name__=~"DCGM_.+", site="fin"})'
+      # Which fields a MIG instance reports, by name: the MIG utilisation
+      # query above assumes DCGM_FI_PROF_GR_ENGINE_ACTIVE is one of them.
+      q "DCGM metrics reported per MIG instance, by name (now)" 'count by (__name__) ({__name__=~"DCGM_.+", site="fin", GPU_I_ID!=""})'
+    fi
     q "DCGM series per GPU, top metrics on fin" 'topk(15, max by (metric) (max_over_time(gpu:dcgm_series_by_metric:count{site="fin"}[3h])))'
     # Each site's own Prometheus reports its head: one series per site. A
     # count over {__name__=~".+"} would make par's Prometheus, on the 4 vCPU
