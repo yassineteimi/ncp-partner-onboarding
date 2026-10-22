@@ -1,0 +1,26 @@
+[cli] generating bundle: deployer=argocd type=Argo CD applications recipe=/Users/yassineteimi/Desktop/ncp-partner-onboarding/.claude/worktrees/ws-readiness/docs/artifacts/readiness/aicr/recipe-k0s-h200-training.yaml output=/Users/yassineteimi/Desktop/ncp-partner-onboarding/.claude/worktrees/ws-readiness/.cache/readiness/aicr-bundle/bundle-argocd oci=false
+[cli] skipping component: component=dra-node-labeler reason=DRA eviction is not opted in (--dra-eviction-node-label unset), so the eviction label it would apply is not selected on
+[cli] wrote local chart folder: index=1 dir=001-cert-manager kind=upstream-helm parent=cert-manager
+[cli] wrote local chart folder: index=2 dir=002-nfd kind=upstream-helm parent=nfd
+[cli] wrote local chart folder: index=3 dir=003-nodewright-operator kind=upstream-helm parent=nodewright-operator
+[cli] wrote local chart folder: index=4 dir=004-prometheus-operator-crds kind=upstream-helm parent=prometheus-operator-crds
+[cli] wrote local chart folder: index=5 dir=005-kube-prometheus-stack kind=upstream-helm parent=kube-prometheus-stack
+[cli] wrote local chart folder: index=6 dir=006-gpu-operator kind=upstream-helm parent=gpu-operator
+[cli] wrote local chart folder: index=7 dir=007-k8s-ephemeral-storage-metrics kind=upstream-helm parent=k8s-ephemeral-storage-metrics
+[cli] wrote local chart folder: index=8 dir=008-kai-scheduler kind=upstream-helm parent=kai-scheduler
+[cli] wrote local chart folder: index=9 dir=009-nvidia-dra-driver-gpu kind=upstream-helm parent=nvidia-dra-driver-gpu
+[cli] wrote local chart folder: index=10 dir=010-nvsentinel kind=upstream-helm parent=nvsentinel
+[cli] wrote local chart folder: index=11 dir=011-prometheus-adapter kind=upstream-helm parent=prometheus-adapter
+[cli] bundle generated: type=Argo CD applications files=28 size_bytes=143012 duration_sec=0.035255625 output_dir=/Users/yassineteimi/Desktop/ncp-partner-onboarding/.claude/worktrees/ws-readiness/.cache/readiness/aicr-bundle/bundle-argocd
+
+Argo CD applications generated successfully!
+Output directory: /Users/yassineteimi/Desktop/ncp-partner-onboarding/.claude/worktrees/ws-readiness/.cache/readiness/aicr-bundle/bundle-argocd
+Files generated: 28
+
+Note:
+  ⚠ nodewright-operator requires manual steps when upgrading from <0.18.0; read UPGRADING.md before applying this bundle over an existing installation
+  ⚠ nvsentinel requires manual steps when upgrading from >=1.25.0 <1.28.0; read UPGRADING.md before applying this bundle over an existing installation
+
+To deploy:
+  1. Push the generated files to your GitOps repository
+  2. kubectl apply -f /Users/yassineteimi/Desktop/ncp-partner-onboarding/.claude/worktrees/ws-readiness/.cache/readiness/aicr-bundle/bundle-argocd/app-of-apps.yaml

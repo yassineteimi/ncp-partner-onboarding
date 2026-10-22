@@ -1,0 +1,1753 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Part 2 of my GPU fleet work. Nordhaven, a fictional European GPU cloud partner, goes from hardware handover to its first production workloads on NVIDIA's open stack, across a Paris site and a Finland site on two providers, driven by one Git repository.">
+      
+      
+        <meta name="author" content="Yassine TEIMI">
+      
+      
+        <link rel="canonical" href="https://yassineteimi.github.io/ncp-partner-onboarding/10-day2-nvsentinel/">
+      
+      
+        <link rel="prev" href="../10-day1-nvcre/">
+      
+      
+        <link rel="next" href="../20-tenancy/">
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.49">
+    
+    
+      
+        <title>Day 2: NVSentinel - Nordhaven: a GPU cloud partner from handover to first workloads</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.6f8fc17f.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../stylesheets/terminal.css">
+    
+      <link rel="stylesheet" href="../stylesheets/diagram-zoom.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="teal" data-md-color-accent="lime">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#day-2-from-a-gpu-fault-back-to-service-with-nvsentinel" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Nordhaven: a GPU cloud partner from handover to first workloads" class="md-header__button md-logo" aria-label="Nordhaven: a GPU cloud partner from handover to first workloads" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Nordhaven: a GPU cloud partner from handover to first workloads
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Day 2: NVSentinel
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="teal" data-md-color-accent="lime"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="purple"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 6H7c-3.31 0-6 2.69-6 6s2.69 6 6 6h10c3.31 0 6-2.69 6-6s-2.69-6-6-6m0 10H7c-2.21 0-4-1.79-4-4s1.79-4 4-4h10c2.21 0 4 1.79 4 4s-1.79 4-4 4M7 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/yassineteimi/ncp-partner-onboarding" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    yassineteimi/ncp-partner-onboarding
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+    
+  
+  Overview
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../story/" class="md-tabs__link">
+        
+  
+    
+  
+  The story
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../architecture/" class="md-tabs__link">
+        
+  
+    
+  
+  Architecture
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../10-day0-aicr/" class="md-tabs__link">
+        
+  
+    
+  
+  Day 0: AICR
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../10-day1-nvcre/" class="md-tabs__link">
+        
+  
+    
+  
+  Day 1: NVCRE
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+    
+  
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
+        
+  
+    
+  
+  Day 2: NVSentinel
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../20-tenancy/" class="md-tabs__link">
+        
+  
+    
+  
+  Tenancy: KAI and MIG
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../21-hpc-slinky/" class="md-tabs__link">
+        
+  
+    
+  
+  HPC: Slurm with Slinky
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../30-metrics-across-sites/" class="md-tabs__link">
+        
+  
+    
+  
+  Metrics across sites
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../30-vm-tenants/" class="md-tabs__link">
+        
+  
+    
+  
+  VM tenants
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../simulated/" class="md-tabs__link">
+        
+  
+    
+  
+  What is simulated
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../adr/" class="md-tabs__link">
+          
+  
+  Decisions
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../findings/" class="md-tabs__link">
+        
+  
+    
+  
+  Findings
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Nordhaven: a GPU cloud partner from handover to first workloads" class="md-nav__button md-logo" aria-label="Nordhaven: a GPU cloud partner from handover to first workloads" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Nordhaven: a GPU cloud partner from handover to first workloads
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/yassineteimi/ncp-partner-onboarding" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    yassineteimi/ncp-partner-onboarding
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../story/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    The story
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Architecture
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../10-day0-aicr/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Day 0: AICR
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../10-day1-nvcre/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Day 1: NVCRE
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Day 2: NVSentinel
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Day 2: NVSentinel
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#part-1-the-number-to-beat" class="md-nav__link">
+    <span class="md-ellipsis">
+      Part 1, the number to beat
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-nvsentinel-does-with-an-xid-79" class="md-nav__link">
+    <span class="md-ellipsis">
+      What NVSentinel does with an XID 79
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-i-had-to-change-from-the-defaults" class="md-nav__link">
+    <span class="md-ellipsis">
+      What I had to change from the defaults
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#checked-without-a-gpu-first" class="md-nav__link">
+    <span class="md-ellipsis">
+      Checked without a GPU first
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-i-measure-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      How I measure it
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#results" class="md-nav__link">
+    <span class="md-ellipsis">
+      Results
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Results">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-run-as-it-happened" class="md-nav__link">
+    <span class="md-ellipsis">
+      The run, as it happened
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#before-and-after" class="md-nav__link">
+    <span class="md-ellipsis">
+      Before and after
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-the-outage-is-still-almost-five-minutes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Why the outage is still almost five minutes
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-same-fault-through-dcgm" class="md-nav__link">
+    <span class="md-ellipsis">
+      The same fault through DCGM
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-went-well-and-what-didnt" class="md-nav__link">
+    <span class="md-ellipsis">
+      What went well, and what didn't
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-still-isnt-automated" class="md-nav__link">
+    <span class="md-ellipsis">
+      What still isn't automated
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-was-simulated" class="md-nav__link">
+    <span class="md-ellipsis">
+      What was simulated
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-one-l4-cant-show" class="md-nav__link">
+    <span class="md-ellipsis">
+      What one L4 can't show
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../20-tenancy/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Tenancy: KAI and MIG
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../21-hpc-slinky/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    HPC: Slurm with Slinky
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../30-metrics-across-sites/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Metrics across sites
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../30-vm-tenants/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    VM tenants
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../simulated/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    What is simulated
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_12" >
+        
+          
+          <label class="md-nav__link" for="__nav_12" id="__nav_12_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Decisions
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_12">
+            <span class="md-nav__icon md-icon"></span>
+            Decisions
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    All decisions
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0001-two-sites-two-providers/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    0001: Two sites, two providers
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0002-driver-ownership/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    0002: Driver ownership
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0003-known-good-stack/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    0003: Known-good stack
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0004-readiness-gate/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    0004: Readiness gate
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0005-fault-remediation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    0005: Fault remediation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0006-batch-scheduling/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    0006: Batch scheduling
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0007-hpc-tenants-slurm/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    0007: HPC tenants
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0008-gpu-sharing/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    0008: GPU sharing
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0009-metrics-across-sites/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    0009: Metrics across sites
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0010-vm-tenants/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    0010: VM tenants
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../findings/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Findings
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="day-2-from-a-gpu-fault-back-to-service-with-nvsentinel">Day 2: from a GPU fault back to service, with NVSentinel</h1>
+<div class="admonition abstract">
+<p class="admonition-title">The use case</p>
+<p>A GPU fails in the middle of a training run. Software should notice, take the node
+out of service, move the work, repair the node and bring it back, with nobody awake.
+Part 1 did this with a controller I wrote; here NVIDIA's NVSentinel does it on the same
+L4, with the same training job and the same injected fault, and I compare the two
+timelines phase by phase.</p>
+</div>
+<div class="admonition success">
+<p class="admonition-title">Ran on the Paris L4, 21 October 2026</p>
+<p>Fault to resumed training in 288.8 seconds against Part 1's 360.9, goodput 73.0%
+against 66.4%, and no person involved at any step. The time didn't disappear, though:
+82% of it is now a reboot and a driver rebuild that Part 1 never did.
+<a href="#results">Results</a>, <a href="https://github.com/yassineteimi/ncp-partner-onboarding/tree/main/docs/artifacts/readiness">evidence</a>.</p>
+</div>
+<h2 id="part-1-the-number-to-beat">Part 1, the number to beat</h2>
+<p>In Part 1 a simulated XID 79 hit a training job at step 394 and cost it 360.9 seconds
+of outage; the run finished at 66.4% goodput (918.2 s useful out of 1383 s). Most of
+that outage wasn't the fault at all:</p>
+<table>
+<thead>
+<tr>
+<th>Phase</th>
+<th>Seconds</th>
+<th>What it was</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Lookback</td>
+<td>299.4</td>
+<td>A five-minute rule I wrote, because node-problem-detector replays old kernel lines when it restarts</td>
+</tr>
+<tr>
+<td>Waiting for a person</td>
+<td>about 40</td>
+<td>Nobody had run <code>make return-to-service</code> yet</td>
+</tr>
+<tr>
+<td><code>dcgmi diag -r 2</code></td>
+<td>6</td>
+<td>The diagnostic that decides whether the GPU can go back</td>
+</tr>
+<tr>
+<td>Reset and uncordon</td>
+<td>12</td>
+<td>Restarting node-problem-detector so its condition cleared</td>
+</tr>
+<tr>
+<td>Restart</td>
+<td>3.9</td>
+<td>Scheduling, container start, CUDA start</td>
+</tr>
+</tbody>
+</table>
+<p>83% of it was my timer and 11% was a human. That's what NVSentinel has to answer:
+does a maintained, event-driven pipeline remove those two, and what does it cost
+instead? (<a href="https://yassineteimi.github.io/nvidia-gpu-fleet-poc/04-goodput-and-burn-in/">Part 1, session D</a>)</p>
+<h2 id="what-nvsentinel-does-with-an-xid-79">What NVSentinel does with an XID 79</h2>
+<p>Read in the source at v1.28.0, before trusting anything else:</p>
+<pre class="mermaid"><code>flowchart LR
+  inj["SIMULATED XID 79&lt;br/&gt;kernel log line"] --&gt; sys["syslog-health-monitor&lt;br/&gt;reads journald every 15 s"]
+  sys --&gt; pc["platform-connectors&lt;br/&gt;node condition, MongoDB event"]
+  pc --&gt; fq["fault-quarantine&lt;br/&gt;cordon"]
+  fq --&gt; nd["node-drainer&lt;br/&gt;evicts through the Eviction API"]
+  nd --&gt; fr["fault-remediation&lt;br/&gt;XID 79 = RESTART_BM"]
+  fr --&gt; j["janitor&lt;br/&gt;RebootNode"]
+  j --&gt; jp["janitor-provider generic&lt;br/&gt;busybox Job: chroot /host reboot"]
+  jp --&gt; back["new boot ID, node Ready,&lt;br/&gt;healthy events, uncordon"]</code></pre>
+<ul>
+<li>The syslog monitor reads the systemd journal, not <code>/dev/kmsg</code>, and matches the
+  <code>NVRM: Xid (PCI:...)</code> pattern in <code>pkg/patterns/xid.go</code>.</li>
+<li>XID 79 maps to <code>RESTART_BM</code> in NVIDIA's XID catalog, which NVSentinel embeds, so
+  the remediation is a node reboot, not a GPU reset.</li>
+<li>The node comes back by itself: when the monitors report healthy after the new boot,
+  fault-quarantine uncordons it. Nothing runs a diagnostic first unless post-remediation
+  validation is turned on, and I left it off (see <a href="#what-still-isnt-automated">what still isn't automated</a>).</li>
+</ul>
+<h2 id="what-i-had-to-change-from-the-defaults">What I had to change from the defaults</h2>
+<p>Each of these would have stopped the run on one GPU node, and each comes from reading
+the chart at v1.28.0 (<a href="https://github.com/yassineteimi/ncp-partner-onboarding/blob/main/gitops/values/readiness/nvsentinel-par.yaml"><code>nvsentinel-par.yaml</code></a>):</p>
+<table>
+<thead>
+<tr>
+<th>Default</th>
+<th>Why it breaks here</th>
+<th>Set to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Drain mode <code>AllowCompletion</code> for every namespace</td>
+<td>Never evicts: a training job would hold the node until it finished, and remediation would never start</td>
+<td><code>Immediate</code>, so the trainer gets the same <code>DisruptionTarget</code> eviction Part 1's Job expects</td>
+</tr>
+<tr>
+<td>Circuit breaker on (50% of GPU nodes in 5 minutes)</td>
+<td>With one GPU node the first cordon trips it, and a tripped breaker also blocks the uncordon, with no automatic reset</td>
+<td>Off in Paris. On a fleet I'd keep it, with an absolute cap (<code>maxCordonedNodes</code>) as well as the percentage</td>
+</tr>
+<tr>
+<td><code>janitor-provider.csp.provider: kind</code></td>
+<td>Sleeps a few seconds and reports a reboot that never happened</td>
+<td><code>generic</code>: a privileged busybox Job that reboots the node</td>
+</tr>
+<tr>
+<td>MongoDB through Bitnami</td>
+<td>The Bitnami images are amd64 only, so the values I test on an arm64 laptop wouldn't be the values deployed</td>
+<td>Percona, one member, on <code>local-path</code></td>
+</tr>
+</tbody>
+</table>
+<p>Part 1's injection needed a change too. Its kernel log line never reaches NVSentinel:
+a line written to <code>/dev/kmsg</code> from userspace gets logged at <code>LOG_USER</code>, and journald then
+treats <code>NVRM:</code> as the syslog identifier and strips it from the message, so the pattern
+can't match. A real XID comes from the kernel and keeps it. I showed this on systemd 255,
+the version the Paris nodes run (<a href="https://github.com/yassineteimi/ncp-partner-onboarding/tree/main/docs/artifacts/readiness">fc2-journald</a>),
+and the injection now puts the node's uptime in front of <code>NVRM</code>, which is also how
+NVSentinel's own tests write it. Same write, same moment in the run, one prefix.</p>
+<h2 id="checked-without-a-gpu-first">Checked without a GPU first</h2>
+<table>
+<thead>
+<tr>
+<th>Check</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Every chart rendered as Argo CD will, all three stages on</td>
+<td>Every NVSentinel control pod asks for the CPU pool; no webhook can block core resources while that worker is off; images pinned</td>
+</tr>
+<tr>
+<td>Server-side dry run against the Paris cluster</td>
+<td>177 objects accepted</td>
+</tr>
+<tr>
+<td>NVSentinel's own KIND demo, on an arm64 Mac</td>
+<td>Fault, cordon, eviction, RebootNode, recovery</td>
+</tr>
+<tr>
+<td>The Paris values in KIND, one stage at a time</td>
+<td>Stage 1 a condition only; stage 2 cordon and drain; stage 3 a RebootNode; NVSentinel uncordoned the node itself each time</td>
+</tr>
+</tbody>
+</table>
+<p>KIND couldn't cover three pieces: the syslog monitor, the labeler and a real reboot.
+The L4 run on 21 October was their first time on real hardware, and all three worked on
+the first try.</p>
+<h2 id="how-i-measure-it">How I measure it</h2>
+<p>The training job, its checkpoints in Garage and the goodput analysis are Part 1's,
+unchanged, so 66.4% and the new figure mean the same thing. The injection time comes from
+the L4's own clock, in the same SSH command that writes the line. Everything after it
+comes from a recorder on my laptop that watches the node, the trainer's pods, the
+<code>RebootNode</code> objects and the GPU Operator's pods, with the clock offsets between laptop,
+node and control plane measured at the start.</p>
+<table>
+<thead>
+<tr>
+<th>Phase</th>
+<th>Ends when</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Detection</td>
+<td>NVSentinel's node condition goes True</td>
+</tr>
+<tr>
+<td>Quarantine</td>
+<td>The node is cordoned</td>
+</tr>
+<tr>
+<td>Drain</td>
+<td>The trainer pod is gone</td>
+</tr>
+<tr>
+<td>Remediation</td>
+<td>A <code>RebootNode</code> exists</td>
+</tr>
+<tr>
+<td>Reboot</td>
+<td>The node is Ready on a new boot ID</td>
+</tr>
+<tr>
+<td>Driver</td>
+<td>The GPU Operator has rebuilt the driver and the GPU is allocatable again</td>
+</tr>
+<tr>
+<td>Return</td>
+<td>The node is uncordoned</td>
+</tr>
+<tr>
+<td>Resume</td>
+<td>The next attempt starts loading its checkpoint</td>
+</tr>
+</tbody>
+</table>
+<h2 id="results">Results</h2>
+<h3 id="the-run-as-it-happened">The run, as it happened</h3>
+<p>Part 1's Job started at 17:01:07 UTC and wrote its step-400 checkpoint at 17:03:16. Seven
+seconds later I wrote the SIMULATED XID 79 into the L4's kernel log. From there on
+nobody touched anything until the Job had finished. Times are UTC, from the recorder;
+the L4's clock was 0.24 s ahead of the laptop's (round trip 0.53 s).</p>
+<table>
+<thead>
+<tr>
+<th>Time</th>
+<th>What happened</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>17:03:23.4</td>
+<td>SIMULATED XID 79 written on the L4, at step 427</td>
+</tr>
+<tr>
+<td>17:03:24.8</td>
+<td>The syslog monitor raised <code>SysLogsXIDError</code>; the node was cordoned 9 ms later</td>
+</tr>
+<tr>
+<td>17:03:24.8</td>
+<td>The node-drainer evicted the trainer; its pod was gone at 17:03:26.5</td>
+</tr>
+<tr>
+<td>17:03:34.9</td>
+<td>fault-remediation created a <code>RebootNode</code></td>
+</tr>
+<tr>
+<td>17:03:35</td>
+<td>The janitor's busybox Job ran <code>chroot /host reboot</code></td>
+</tr>
+<tr>
+<td>17:05:29.7</td>
+<td>The node was Ready again, on a new boot ID</td>
+</tr>
+<tr>
+<td>17:06:04</td>
+<td>The DCGM monitor reported it couldn't reach DCGM (<code>GpuDcgmConnectivityFailure</code>)</td>
+</tr>
+<tr>
+<td>17:07:01</td>
+<td>The syslog monitor reported healthy on the new boot</td>
+</tr>
+<tr>
+<td>17:07:33.0</td>
+<td>The GPU Operator had rebuilt and loaded the driver; the GPU was allocatable again</td>
+</tr>
+<tr>
+<td>17:08:05.3</td>
+<td>DCGM reachable again; NVSentinel uncordoned the node in the same second</td>
+</tr>
+<tr>
+<td>17:08:12.3</td>
+<td>The replacement pod, waiting since 17:03:35, started restoring checkpoint 400 (1.8 s)</td>
+</tr>
+<tr>
+<td>17:22:14</td>
+<td>The Job completed, 3000 steps</td>
+</tr>
+</tbody>
+</table>
+<p>The capture after the Job read the phases back from the recorder:</p>
+<div class="terminal highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>$<span class="w"> </span>make<span class="w"> </span>uc3-capture
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>...
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w"> </span><span class="s2">"injected"</span>:<span class="w"> </span><span class="s2">"2026-10-21T17:03:23.443Z"</span>,
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w"> </span><span class="s2">"phases"</span>:<span class="w"> </span><span class="o">[</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">  </span><span class="o">{</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">   </span><span class="s2">"phase"</span>:<span class="w"> </span><span class="s2">"detection"</span>,
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">   </span><span class="s2">"from"</span>:<span class="w"> </span><span class="s2">"2026-10-21T17:03:23.443Z"</span>,
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">   </span><span class="s2">"to"</span>:<span class="w"> </span><span class="s2">"2026-10-21T17:03:24.757Z"</span>,
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">   </span><span class="s2">"seconds"</span>:<span class="w"> </span><span class="m">1</span>.3
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">  </span><span class="o">}</span>,
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">  </span>...
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">  </span><span class="o">{</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">   </span><span class="s2">"phase"</span>:<span class="w"> </span><span class="s2">"reboot"</span>,
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">   </span><span class="s2">"from"</span>:<span class="w"> </span><span class="s2">"2026-10-21T17:03:34.924Z"</span>,
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="w">   </span><span class="s2">"to"</span>:<span class="w"> </span><span class="s2">"2026-10-21T17:05:29.736Z"</span>,
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="w">   </span><span class="s2">"seconds"</span>:<span class="w"> </span><span class="m">114</span>.8
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="w">  </span><span class="o">}</span>,
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="w">  </span><span class="o">{</span>
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="w">   </span><span class="s2">"phase"</span>:<span class="w"> </span><span class="s2">"driver"</span>,
+<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="w">   </span><span class="s2">"from"</span>:<span class="w"> </span><span class="s2">"2026-10-21T17:05:29.736Z"</span>,
+<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="w">   </span><span class="s2">"to"</span>:<span class="w"> </span><span class="s2">"2026-10-21T17:07:32.994Z"</span>,
+<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="w">   </span><span class="s2">"seconds"</span>:<span class="w"> </span><span class="m">123</span>.3
+<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="w">  </span><span class="o">}</span>,
+<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="w">  </span>...
+<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a><span class="w"> </span><span class="o">]</span>,
+<a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a><span class="w"> </span><span class="s2">"total_s"</span>:<span class="w"> </span><span class="m">288</span>.8
+<a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a><span class="o">}</span>
+</code></pre></div>
+<p>Full output: <a href="https://github.com/yassineteimi/ncp-partner-onboarding/blob/main/docs/artifacts/readiness/uc3-phases-20261021T172243Z.json">uc3-phases-20261021T172243Z.json</a>.</p>
+<h3 id="before-and-after">Before and after</h3>
+<table>
+<thead>
+<tr>
+<th>Phase</th>
+<th>Part 1 (s)</th>
+<th>NVSentinel (s)</th>
+<th>What it is now</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Detection</td>
+<td>299.4 (the lookback)</td>
+<td>1.3</td>
+<td>The syslog monitor polls the journal every 15 s; this injection landed just before a poll. The XID 13 smoke test took 11.8 s</td>
+</tr>
+<tr>
+<td>Quarantine and drain</td>
+<td>(inside the lookback)</td>
+<td>1.7</td>
+<td>Cordon, then an eviction through the Eviction API</td>
+</tr>
+<tr>
+<td>Remediation</td>
+<td>about 40 (waiting for a person)</td>
+<td>8.4</td>
+<td>XID 79 maps to <code>RESTART_BM</code>, so a <code>RebootNode</code>, with no one asked</td>
+</tr>
+<tr>
+<td>Reboot</td>
+<td>none</td>
+<td>114.8</td>
+<td>Shutdown, the Scaleway VM's boot, kubelet and node Ready</td>
+</tr>
+<tr>
+<td>Driver</td>
+<td>none</td>
+<td>123.3</td>
+<td>The GPU Operator compiles and loads the driver after every boot in Paris</td>
+</tr>
+<tr>
+<td>Diagnostic</td>
+<td>6</td>
+<td>none</td>
+<td>Not run: post-remediation validation is off (<a href="#what-still-isnt-automated">below</a>)</td>
+</tr>
+<tr>
+<td>Return</td>
+<td>12</td>
+<td>32.3</td>
+<td>NVSentinel waits for every monitor to report healthy; the last one was DCGM, back once its host engine was</td>
+</tr>
+<tr>
+<td>Resume</td>
+<td>3.9</td>
+<td>7.0</td>
+<td>The pending pod was scheduled at the uncordon, then its container started</td>
+</tr>
+<tr>
+<td><strong>Outage</strong></td>
+<td><strong>360.9</strong></td>
+<td><strong>288.8</strong></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>Goodput went from 66.4% to 73.0%. Part 1's analysis, unchanged, counts the outage from
+the trainer's last step, so 287.6 s here, and adds the 27 steps redone since the
+checkpoint, the checkpoint writes and the restore:</p>
+<div class="terminal highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>$<span class="w"> </span>make<span class="w"> </span>uc3-capture
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>...
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="s2">"final_step"</span>:<span class="w"> </span><span class="m">3000</span>,
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span><span class="s2">"steps_kept"</span>:<span class="w"> </span><span class="m">3000</span>,
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">  </span><span class="s2">"steps_redone"</span>:<span class="w"> </span><span class="m">27</span>,
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">  </span><span class="s2">"total_s"</span>:<span class="w"> </span><span class="m">1267</span>.0,
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">  </span><span class="s2">"useful_s"</span>:<span class="w"> </span><span class="m">925</span>.268,
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">  </span><span class="s2">"redone_s"</span>:<span class="w"> </span><span class="m">8</span>.298,
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">  </span><span class="s2">"checkpoint_s"</span>:<span class="w"> </span><span class="m">34</span>.791,
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">  </span><span class="s2">"restore_s"</span>:<span class="w"> </span><span class="m">1</span>.829,
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="w">  </span><span class="s2">"outage_s"</span>:<span class="w"> </span><span class="m">287</span>.583,
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="w">  </span><span class="s2">"other_s"</span>:<span class="w"> </span><span class="m">9</span>.232,
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="w">  </span><span class="s2">"goodput"</span>:<span class="w"> </span><span class="m">0</span>.7303,
+</code></pre></div>
+<p>Full output: <a href="https://github.com/yassineteimi/ncp-partner-onboarding/blob/main/docs/artifacts/readiness/uc3-goodput.json">uc3-goodput.json</a>.</p>
+<h3 id="why-the-outage-is-still-almost-five-minutes">Why the outage is still almost five minutes</h3>
+<p>The waiting is gone: no timer, no person. What replaced it is work Part 1 skipped.
+Part 1 treated XID 79 by running a diagnostic and handing the GPU back; NVIDIA's catalog
+says XID 79 ("GPU has fallen off the bus") needs a reboot, so NVSentinel reboots. On the
+Paris L4 that costs 238 s: 115 s for the VM to come back and 123 s for the GPU Operator
+to rebuild the driver, because the operator compiles it on the node at every boot there.
+A precompiled driver would take most of those 123 s away; that's a trade for the driver
+decision (ADR 0002), not for this page. On a fleet the job wouldn't wait for any of it:
+it would restart on another node as soon as the drain finished, about 3 s after the fault.</p>
+<p>The kubelet's own events show the same reboot from the node's side, a few seconds behind
+the API (the cordon was at 17:03:24.8; the kubelet logged it at 17:03:32):</p>
+<div class="terminal highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>$<span class="w"> </span>make<span class="w"> </span>uc3-capture
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>...
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="o">==</span><span class="w"> </span>events<span class="w"> </span>on<span class="w"> </span>the<span class="w"> </span>node
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>TIME<span class="w">                   </span>SOURCE<span class="w">                  </span>REASON<span class="w">                        </span>MESSAGE
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="m">2026</span>-10-21T17:03:32Z<span class="w">   </span>kubelet<span class="w">                 </span>NodeNotSchedulable<span class="w">            </span>Node<span class="w"> </span>eu1-par-gpu-01<span class="w"> </span>status<span class="w"> </span>is<span class="w"> </span>now:<span class="w"> </span>NodeNotSchedulable
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="m">2026</span>-10-21T17:04:25Z<span class="w">   </span>node-controller<span class="w">         </span>NodeNotReady<span class="w">                  </span>Node<span class="w"> </span>eu1-par-gpu-01<span class="w"> </span>status<span class="w"> </span>is<span class="w"> </span>now:<span class="w"> </span>NodeNotReady
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="m">2026</span>-10-21T17:05:30Z<span class="w">   </span>kubelet<span class="w">                 </span>Starting<span class="w">                      </span>Starting<span class="w"> </span>kubelet.
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>...
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="m">2026</span>-10-21T17:05:30Z<span class="w">   </span>kubelet<span class="w">                 </span>Rebooted<span class="w">                      </span>Node<span class="w"> </span>eu1-par-gpu-01<span class="w"> </span>has<span class="w"> </span>been<span class="w"> </span>rebooted,<span class="w"> </span>boot<span class="w"> </span>id:<span class="w"> </span>97af02a0-d89c-4a46-be4e-8f4ff99e515f
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="m">2026</span>-10-21T17:05:30Z<span class="w">   </span>kubelet<span class="w">                 </span>NodeAllocatableEnforced<span class="w">       </span>Updated<span class="w"> </span>Node<span class="w"> </span>Allocatable<span class="w"> </span>limit<span class="w"> </span>across<span class="w"> </span>pods
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="m">2026</span>-10-21T17:08:13Z<span class="w">   </span>kubelet<span class="w">                 </span>NodeSchedulable<span class="w">               </span>Node<span class="w"> </span>eu1-par-gpu-01<span class="w"> </span>status<span class="w"> </span>is<span class="w"> </span>now:<span class="w"> </span>NodeSchedulable
+</code></pre></div>
+<p>Full output: <a href="https://github.com/yassineteimi/ncp-partner-onboarding/blob/main/docs/artifacts/readiness/uc3-nvsentinel-state-20261021T172243Z.txt">uc3-nvsentinel-state-20261021T172243Z.txt</a>.</p>
+<h3 id="the-same-fault-through-dcgm">The same fault through DCGM</h3>
+<p>After the measured run I injected XID 79 a second way, into DCGM's cache, with no
+training running. The DCGM monitor raised <code>GpuAllWatch</code> (<code>DCGM_FR_FALLEN_OFF_BUS</code>) and
+the node was cordoned 5.7 s after the injection; it was Ready on a new boot 103.8 s
+later, allocatable 121.4 s after that, and uncordoned 52.4 s after that: 283.3 s in all,
+within 6 s of the first run
+(<a href="https://github.com/yassineteimi/ncp-partner-onboarding/blob/main/docs/artifacts/readiness/uc3-r5-dcgm-timeline-20261021T172645Z.txt">timeline</a>).
+Both of NVSentinel's detection paths work on the real L4.</p>
+<p>Before the measured run, a SIMULATED XID 13, which the catalog marks as needing no
+action, raised an event 11.8 s after injection and left the node schedulable:</p>
+<div class="terminal highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>$<span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>events<span class="w"> </span>-A<span class="w"> </span>--field-selector<span class="w"> </span>involvedObject.name<span class="o">=</span>eu1-par-gpu-01,reason<span class="o">=</span>SysLogsXIDErrorIsNotHealthy<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span>-o<span class="w"> </span>custom-columns<span class="o">=</span><span class="s1">'TIME:.lastTimestamp,SRC:.source.component,REASON:.reason,MSG:.message'</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>TIME<span class="w">                   </span>SRC<span class="w">                     </span>REASON<span class="w">                        </span>MSG
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="m">2026</span>-10-21T17:00:39Z<span class="w">   </span>syslog-health-monitor<span class="w">   </span>SysLogsXIDErrorIsNotHealthy<span class="w">   </span>ErrorCode:13<span class="w"> </span>PCI:0000:01:00<span class="w"> </span>GPU_UUID:GPU-2b3af644-eb7c-0ecd-2a95-1097054adffd<span class="w"> </span><span class="nv">MESSAGE</span><span class="o">=[</span><span class="m">901</span>.52<span class="o">]</span><span class="w"> </span>NVRM:<span class="w"> </span>Xid<span class="w"> </span><span class="o">(</span>PCI:0000:01:00<span class="o">)</span>:<span class="w"> </span><span class="m">13</span>,<span class="w"> </span><span class="nv">pid</span><span class="o">=</span><span class="m">0</span>,<span class="w"> </span><span class="nv">name</span><span class="o">=</span>inject-xid.sh,<span class="w"> </span>SIMULATED<span class="w"> </span>by<span class="w"> </span>scripts/readiness/inject-xid.sh,<span class="w"> </span>not<span class="w"> </span>a<span class="w"> </span>real<span class="w"> </span>fault<span class="w"> </span>Recommended<span class="w"> </span><span class="nv">Action</span><span class="o">=</span>NONE<span class="p">;</span>
+</code></pre></div>
+<p>Full output: <a href="https://github.com/yassineteimi/ncp-partner-onboarding/blob/main/docs/artifacts/readiness/uc3-xid13-smoke-20261021T170027Z.txt">uc3-xid13-smoke-20261021T170027Z.txt</a>.</p>
+<h3 id="what-went-well-and-what-didnt">What went well, and what didn't</h3>
+<p>The first real test of three things KIND couldn't show, the syslog monitor, the labeler
+and a real reboot, passed without a retry, and the <code>[uptime]</code> prefix on the injection
+did what the journald analysis said it would. The cordon came 1.3 s after the fault, so
+the fallback I had ready (injecting through DCGM if nothing happened within 2 minutes)
+was never needed.</p>
+<p>Two things nearly got in the way. Scaleway showed no L4 free in either Paris zone a few
+minutes before the run; one freed up shortly after. And the Paris API server had stalled
+at 12:07 UTC that day, when Grafana starved etcd's disk, so every NVSentinel, NVCRE and
+Trainer controller carried 8 to 10 restarts into the run. The restart counts I took
+before the injection are what show that the run itself caused only two, both on the L4
+when it rebooted
+(<a href="https://github.com/yassineteimi/ncp-partner-onboarding/blob/main/docs/artifacts/readiness/uc3-check-20261021T170021Z.txt">before</a>,
+<a href="https://github.com/yassineteimi/ncp-partner-onboarding/blob/main/docs/artifacts/readiness/uc3-nvsentinel-state-20261021T172243Z.txt">after</a>).</p>
+<h2 id="what-still-isnt-automated">What still isn't automated</h2>
+<p>The node went back to tenants without a diagnostic. It returned 32 s after the GPU was
+allocatable, because the monitors said healthy, and nothing ran <code>dcgmi diag</code> first;
+Part 1's return did. Post-remediation validation (fault-quarantine's validation with
+lifecycle-manager) would run a DCGM diagnostic for <code>RESTART_BM</code> before the uncordon. I
+left it off to measure NVSentinel as shipped, and I'd turn it on for tenants: it adds
+the diagnostic's minutes to every outage, which is cheap next to a tenant landing on a
+bad GPU.</p>
+<p>Two more gaps, both read in the source and not exercised here. An XID the catalog maps
+to <code>CONTACT_SUPPORT</code> leaves the node cordoned until a person acts. And NVSentinel only
+protects the L4 while the Paris CPU worker is on, since its control pods live there: with
+the worker off, a fault would be logged by the monitors on the L4 and nothing would act
+on it.</p>
+<h2 id="what-was-simulated">What was simulated</h2>
+<p>The fault. A healthy GPU can't be made to fall off the bus on request, so every XID on
+this page was written by a script: XID 79 and XID 13 as kernel log lines, prefixed with
+the node's uptime, and XID 79 again into DCGM's field cache. Everything after the
+injection was real: the cordon, the eviction, the reboot of the VM, the driver rebuild,
+the uncordon and the training job resuming from its checkpoint.
+(<a href="../simulated/">What is simulated</a>, for the whole project.)</p>
+<h2 id="what-one-l4-cant-show">What one L4 can't show</h2>
+<p>The job can only resume on the node that failed, where a fleet would move it elsewhere
+and the reboot would cost the job nothing but the reschedule. And a real XID 79 usually
+kills the process mid-step with a CUDA error, where this trainer gets a clean SIGTERM
+from the eviction.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      &copy; 2026 <a href="https://github.com/yassineteimi" target="_blank" rel="noopener">Yassine TEIMI</a>
+
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/yassineteimi" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 512"><!--! Font Awesome Free 6.7.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M186.1 328.7c0 20.9-10.9 55.1-36.7 55.1s-36.7-34.2-36.7-55.1 10.9-55.1 36.7-55.1 36.7 34.2 36.7 55.1M480 278.2c0 31.9-3.2 65.7-17.5 95-37.9 76.6-142.1 74.8-216.7 74.8-75.8 0-186.2 2.7-225.6-74.8-14.6-29-20.2-63.1-20.2-95 0-41.9 13.9-81.5 41.5-113.6-5.2-15.8-7.7-32.4-7.7-48.8 0-21.5 4.9-32.3 14.6-51.8 45.3 0 74.3 9 108.8 36 29-6.9 58.8-10 88.7-10 27 0 54.2 2.9 80.4 9.2 34-26.7 63-35.2 107.8-35.2 9.8 19.5 14.6 30.3 14.6 51.8 0 16.4-2.6 32.7-7.7 48.2 27.5 32.4 39 72.3 39 114.2m-64.3 50.5c0-43.9-26.7-82.6-73.5-82.6-18.9 0-37 3.4-56 6-14.9 2.3-29.8 3.2-45.1 3.2-15.2 0-30.1-.9-45.1-3.2-18.7-2.6-37-6-56-6-46.8 0-73.5 38.7-73.5 82.6 0 87.8 80.4 101.3 150.4 101.3h48.2c70.3 0 150.6-13.4 150.6-101.3m-82.6-55.1c-25.8 0-36.7 34.2-36.7 55.1s10.9 55.1 36.7 55.1 36.7-34.2 36.7-55.1-10.9-55.1-36.7-55.1"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://linkedin.com/in/yassine-teimi" target="_blank" rel="noopener" title="linkedin.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3M135.4 416H69V202.2h66.5V416zm-33.2-243c-21.3 0-38.5-17.3-38.5-38.5S80.9 96 102.2 96c21.2 0 38.5 17.3 38.5 38.5 0 21.3-17.2 38.5-38.5 38.5m282.1 243h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.tabs", "navigation.sections", "toc.integrate", "navigation.top", "search.suggest", "search.highlight", "content.tabs.link", "content.code.annotation", "content.code.copy"], "search": "../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.88dd0f4e.min.js"></script>
+      
+        <script src="../javascripts/diagram-zoom.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,54 @@
+# kwok-targets on par, 20261021T113535Z, laptop clock, UTC. git a5ea577
+# Do the SIMULATED KWOK nodes (eu1-par-sim-gpu-01/02) show up as down scrape targets?
+# Instant queries against par's Prometheus through the API server proxy, and how it discovers kubelets.
+
+-- up == 0
+{'__name__': 'up', 'endpoint': 'https-metrics', 'instance': '10.244.1.48:10250', 'job': 'kubelet', 'metrics_path': '/metrics', 'namespace': 'kube-system', 'node': 'eu1-par-sim-gpu-01', 'service': 'kube-prometheus-stack-kubelet'} 0
+{'__name__': 'up', 'endpoint': 'https-metrics', 'instance': '10.244.1.48:10250', 'job': 'kubelet', 'metrics_path': '/metrics/probes', 'namespace': 'kube-system', 'node': 'eu1-par-sim-gpu-02', 'service': 'kube-prometheus-stack-kubelet'} 0
+{'__name__': 'up', 'endpoint': 'https-metrics', 'instance': '10.244.1.48:10250', 'job': 'kubelet', 'metrics_path': '/metrics/cadvisor', 'namespace': 'kube-system', 'node': 'eu1-par-sim-gpu-02', 'service': 'kube-prometheus-stack-kubelet'} 0
+{'__name__': 'up', 'endpoint': 'https-metrics', 'instance': '10.244.1.48:10250', 'job': 'kubelet', 'metrics_path': '/metrics/cadvisor', 'namespace': 'kube-system', 'node': 'eu1-par-sim-gpu-01', 'service': 'kube-prometheus-stack-kubelet'} 0
+{'__name__': 'up', 'endpoint': 'https-metrics', 'instance': '10.244.1.48:10250', 'job': 'kubelet', 'metrics_path': '/metrics', 'namespace': 'kube-system', 'node': 'eu1-par-sim-gpu-02', 'service': 'kube-prometheus-stack-kubelet'} 0
+{'__name__': 'up', 'endpoint': 'https-metrics', 'instance': '10.244.1.48:10250', 'job': 'kubelet', 'metrics_path': '/metrics/probes', 'namespace': 'kube-system', 'node': 'eu1-par-sim-gpu-01', 'service': 'kube-prometheus-stack-kubelet'} 0
+-- up for targets on the sim-gpu nodes
+{'__name__': 'up', 'endpoint': 'https-metrics', 'instance': '10.244.1.48:10250', 'job': 'kubelet', 'metrics_path': '/metrics', 'namespace': 'kube-system', 'node': 'eu1-par-sim-gpu-01', 'service': 'kube-prometheus-stack-kubelet'} 0
+{'__name__': 'up', 'endpoint': 'https-metrics', 'instance': '10.244.1.48:10250', 'job': 'kubelet', 'metrics_path': '/metrics/probes', 'namespace': 'kube-system', 'node': 'eu1-par-sim-gpu-02', 'service': 'kube-prometheus-stack-kubelet'} 0
+{'__name__': 'up', 'endpoint': 'https-metrics', 'instance': '10.244.1.48:10250', 'job': 'kubelet', 'metrics_path': '/metrics/cadvisor', 'namespace': 'kube-system', 'node': 'eu1-par-sim-gpu-02', 'service': 'kube-prometheus-stack-kubelet'} 0
+{'__name__': 'up', 'endpoint': 'https-metrics', 'instance': '10.244.1.48:10250', 'job': 'kubelet', 'metrics_path': '/metrics/cadvisor', 'namespace': 'kube-system', 'node': 'eu1-par-sim-gpu-01', 'service': 'kube-prometheus-stack-kubelet'} 0
+{'__name__': 'up', 'endpoint': 'https-metrics', 'instance': '10.244.1.48:10250', 'job': 'kubelet', 'metrics_path': '/metrics', 'namespace': 'kube-system', 'node': 'eu1-par-sim-gpu-02', 'service': 'kube-prometheus-stack-kubelet'} 0
+{'__name__': 'up', 'endpoint': 'https-metrics', 'instance': '10.244.1.48:10250', 'job': 'kubelet', 'metrics_path': '/metrics/probes', 'namespace': 'kube-system', 'node': 'eu1-par-sim-gpu-01', 'service': 'kube-prometheus-stack-kubelet'} 0
+-- firing alerts
+{'__name__': 'ALERTS', 'alertname': 'Watchdog', 'alertstate': 'firing', 'severity': 'none'} 1
+{'__name__': 'ALERTS', 'alertname': 'TargetDown', 'alertstate': 'firing', 'job': 'kubelet', 'namespace': 'kube-system', 'service': 'kube-prometheus-stack-kubelet', 'severity': 'warning'} 1
+{'__name__': 'ALERTS', 'alertname': 'KubeletInstanceUnreachable', 'alertstate': 'firing', 'endpoint': 'https-metrics', 'instance': '10.244.1.48:10250', 'job': 'kubelet', 'metrics_path': '/metrics', 'namespace': 'kube-system', 'node': 'eu1-par-sim-gpu-01', 'service': 'kube-prometheus-stack-kubelet', 'severity': 'warning'} 1
+{'__name__': 'ALERTS', 'alertname': 'KubeletInstanceUnreachable', 'alertstate': 'firing', 'endpoint': 'https-metrics', 'instance': '10.244.1.48:10250', 'job': 'kubelet', 'metrics_path': '/metrics', 'namespace': 'kube-system', 'node': 'eu1-par-sim-gpu-02', 'service': 'kube-prometheus-stack-kubelet', 'severity': 'warning'} 1
+-- pods on KWOK nodes
+NAMESPACE     NAME                        READY   STATUS    RESTARTS   AGE   IP            NODE                 NOMINATED NODE   READINESS GATES
+kube-system   kube-proxy-tvnz9            1/1     Running   0          36m   10.244.1.48   eu1-par-sim-gpu-01   <none>           <none>
+nvsentinel    platform-connectors-cpqg5   1/1     Running   0          36m   10.244.2.1    eu1-par-sim-gpu-01   <none>           <none>
+NAMESPACE     NAME                        READY   STATUS    RESTARTS   AGE   IP            NODE                 NOMINATED NODE   READINESS GATES
+kube-system   kube-proxy-gw85w            1/1     Running   0          36m   10.244.1.48   eu1-par-sim-gpu-02   <none>           <none>
+nvsentinel    platform-connectors-qp8vs   1/1     Running   0          36m   10.244.3.1    eu1-par-sim-gpu-02   <none>           <none>
+
+-- Prometheus serviceDiscoveryRole
+kube-prometheus-stack-prometheus role=
+-- kubelet ServiceMonitor
+servicemonitor.monitoring.coreos.com/kube-prometheus-stack-kubelet
+
+ relabelings=[{"action":"replace","sourceLabels":["__metrics_path__"],"targetLabel":"metrics_path"}]
+/metrics/cadvisor relabelings=[{"action":"replace","sourceLabels":["__metrics_path__"],"targetLabel":"metrics_path"}]
+/metrics/probes relabelings=[{"action":"replace","sourceLabels":["__metrics_path__"],"targetLabel":"metrics_path"}]
+-- kubelet Endpoints addresses (nodeName, targetRef)
+172.16.32.10 nodeName=eu1-par-cp-01 target=Node/eu1-par-cp-01
+172.16.32.30 nodeName=eu1-par-cpu-01 target=Node/eu1-par-cpu-01
+10.244.1.48 nodeName=eu1-par-sim-gpu-01 target=Node/eu1-par-sim-gpu-01
+10.244.1.48 nodeName=eu1-par-sim-gpu-02 target=Node/eu1-par-sim-gpu-02
+-- kubelet EndpointSlices
+172.16.32.30 nodeName=eu1-par-cpu-01 target=Node/eu1-par-cpu-01
+10.244.1.48 nodeName=eu1-par-sim-gpu-02 target=Node/eu1-par-sim-gpu-02
+172.16.32.10 nodeName=eu1-par-cp-01 target=Node/eu1-par-cp-01
+10.244.1.48 nodeName=eu1-par-sim-gpu-01 target=Node/eu1-par-sim-gpu-01
+-- KWOK node addresses and labels
+[{"address":"10.244.1.48","type":"InternalIP"}]
+{"beta.kubernetes.io/arch":"amd64","beta.kubernetes.io/os":"linux","eu1.io/pool":"sim-gpu","eu1.io/simulated":"true","eu1.io/site":"par","kubernetes.io/arch":"amd64","kubernetes.io/hostname":"eu1-par-sim-gpu-01","kubernetes.io/os":"linux","nvsentinel.dgxc.nvidia.com/kata.enabled":"false","run.ai/simulated-gpu-node-pool":"sim-h200","type":"kwok"}
+-- operator kubelet flags
+["--kubelet-service=kube-system/kube-prometheus-stack-kubelet","--kubelet-endpoints=true","--kubelet-endpointslice=false","--localhost=127.0.0.1","--prometheus-config-reloader=quay.io/prometheus-operator/prometheus-config-reloader:v0.94.0","--config-reloader-cpu-request=0","--config-reloader-cpu-limit=0","--config-reloader-memory-request=0","--config-reloader-memory-limit=0","--thanos-default-base-image=quay.io/thanos/thanos:v0.42.4","--secret-field-selector=type!=kubernetes.io/dockercfg,type!=helm.sh/release.v1","--web.enable-tls=true","--web.cert-file=/cert/cert","--web.key-file=/cert/key","--web.listen-address=:10250","--web.tls-min-version=VersionTLS13"]

@@ -1,0 +1,89 @@
+# FC6: scripts/readiness/render.sh at f1ad36d, helm v4.2.2+gb05881c
+== fin-base-gpu-operator: 18 objects
+  ClusterPolicy operands tolerate ['eu1.io/staging', 'nvidia.com/gpu']
+  Helm hook pre-upgrade: ServiceAccount/gpu-operator-upgrade-crd-hook-sa
+  Helm hook pre-upgrade: ClusterRole/gpu-operator-upgrade-crd-hook-role
+  Helm hook pre-upgrade: ClusterRoleBinding/gpu-operator-upgrade-crd-hook-binding
+  Helm hook pre-delete: Job/gpu-operator-cleanup-gpucluster
+  Helm hook pre-upgrade: Job/gpu-operator-upgrade-crd
+== fin-readiness-kubeflow-trainer: 28 objects
+  Deployment/jobset-controller placed by eu1.io/pool
+  Deployment/kubeflow-trainer-controller-manager placed by eu1.io/pool
+  Mutating mutate-jobset-x-k8s-io-v1alpha2-jobset.x-k8s.io: Fail on jobset.x-k8s.io/jobsets
+  Mutating mutate--v1-pod.x-k8s.io: Fail on core/pods, only objects matching {'matchExpressions': [{'key': 'jobset.sigs.k8s.io/jobset-name', 'operator': 'Exists'}]}
+  Mutating defaulter.trainjob.trainer.kubeflow.org: Fail on trainer.kubeflow.org/trainjobs
+  Validati validate-jobset-x-k8s-io-v1alpha2-jobset.x-k8s.io: Fail on jobset.x-k8s.io/jobsets
+  Validati validate--v1-pod.x-k8s.io: Fail on core/pods, only objects matching {'matchExpressions': [{'key': 'jobset.sigs.k8s.io/jobset-name', 'operator': 'Exists'}]}
+  Validati validator.clustertrainingruntime.trainer.kubeflow.org: Fail on trainer.kubeflow.org/clustertrainingruntimes
+  Validati validator.trainingruntime.trainer.kubeflow.org: Fail on trainer.kubeflow.org/trainingruntimes
+  Validati validator.trainjob.trainer.kubeflow.org: Fail on trainer.kubeflow.org/trainjobs
+== fin-readiness-nvcre: 45 objects
+  Deployment/nvcre-manager placed by eu1.io/pool
+== par-readiness-kubeflow-trainer: 28 objects
+  Deployment/jobset-controller placed by eu1.io/pool
+  Deployment/kubeflow-trainer-controller-manager placed by eu1.io/pool
+  Mutating mutate-jobset-x-k8s-io-v1alpha2-jobset.x-k8s.io: Fail on jobset.x-k8s.io/jobsets
+  Mutating mutate--v1-pod.x-k8s.io: Fail on core/pods, only objects matching {'matchExpressions': [{'key': 'jobset.sigs.k8s.io/jobset-name', 'operator': 'Exists'}]}
+  Mutating defaulter.trainjob.trainer.kubeflow.org: Fail on trainer.kubeflow.org/trainjobs
+  Validati validate-jobset-x-k8s-io-v1alpha2-jobset.x-k8s.io: Fail on jobset.x-k8s.io/jobsets
+  Validati validate--v1-pod.x-k8s.io: Fail on core/pods, only objects matching {'matchExpressions': [{'key': 'jobset.sigs.k8s.io/jobset-name', 'operator': 'Exists'}]}
+  Validati validator.clustertrainingruntime.trainer.kubeflow.org: Fail on trainer.kubeflow.org/clustertrainingruntimes
+  Validati validator.trainingruntime.trainer.kubeflow.org: Fail on trainer.kubeflow.org/trainingruntimes
+  Validati validator.trainjob.trainer.kubeflow.org: Fail on trainer.kubeflow.org/trainjobs
+== par-readiness-nvcre: 45 objects
+  Deployment/nvcre-manager placed by eu1.io/pool
+== par-readiness-nvsentinel-all-stages: 77 objects
+  DaemonSet/gpu-health-monitor-dcgm-3.x on nodes with {'nvsentinel.dgxc.nvidia.com/dcgm.version': '3.x'}
+  DaemonSet/gpu-health-monitor-dcgm-4.x on nodes with {'nvsentinel.dgxc.nvidia.com/dcgm.version': '4.x'}
+  DaemonSet/metadata-collector on nodes with {'nvidia.com/gpu.present': 'true', 'nvsentinel.dgxc.nvidia.com/driver.installed': 'true'}
+  DaemonSet/syslog-health-monitor-kata on nodes with {'nvsentinel.dgxc.nvidia.com/driver.installed': 'true', 'nvsentinel.dgxc.nvidia.com/kata.enabled': 'true'}
+  DaemonSet/syslog-health-monitor-regular on nodes with {'nvsentinel.dgxc.nvidia.com/driver.installed': 'true', 'nvsentinel.dgxc.nvidia.com/kata.enabled': 'false'}
+  DaemonSet/platform-connectors on nodes with any label
+  Deployment/fault-quarantine placed by eu1.io/pool
+  Deployment/fault-remediation placed by eu1.io/pool
+  Deployment/janitor-provider placed by eu1.io/pool
+  Deployment/janitor placed by eu1.io/pool
+  Deployment/labeler placed by eu1.io/pool
+  Deployment/nvsentinel-psmdb-operator placed by eu1.io/pool
+  Deployment/node-drainer placed by eu1.io/pool
+  Job/create-mongodb-database-2592000-c9dfbc49 placed by eu1.io/pool
+  Validati vrebootnode-v1alpha1.kb.io: Fail on janitor.dgxc.nvidia.com/rebootnodes
+  Validati vterminatenode-v1alpha1.kb.io: Fail on janitor.dgxc.nvidia.com/terminatenodes
+  Validati vgpureset-v1alpha1.kb.io: Fail on janitor.dgxc.nvidia.com/gpuresets
+  Validati vextrr-v1.kb.io: Fail on nvsentinel.dgxc.nvidia.com/externalremediationrequests
+  MongoDB replset rs0: size 1, eu1.io/pool=cpu, storage class local-path
+== par-readiness-nvsentinel: 38 objects
+  DaemonSet/gpu-health-monitor-dcgm-3.x on nodes with {'nvsentinel.dgxc.nvidia.com/dcgm.version': '3.x'}
+  DaemonSet/gpu-health-monitor-dcgm-4.x on nodes with {'nvsentinel.dgxc.nvidia.com/dcgm.version': '4.x'}
+  DaemonSet/metadata-collector on nodes with {'nvidia.com/gpu.present': 'true', 'nvsentinel.dgxc.nvidia.com/driver.installed': 'true'}
+  DaemonSet/syslog-health-monitor-kata on nodes with {'nvsentinel.dgxc.nvidia.com/driver.installed': 'true', 'nvsentinel.dgxc.nvidia.com/kata.enabled': 'true'}
+  DaemonSet/syslog-health-monitor-regular on nodes with {'nvsentinel.dgxc.nvidia.com/driver.installed': 'true', 'nvsentinel.dgxc.nvidia.com/kata.enabled': 'false'}
+  DaemonSet/platform-connectors on nodes with any label
+  Deployment/labeler placed by eu1.io/pool
+  Deployment/nvsentinel-psmdb-operator placed by eu1.io/pool
+  Job/create-mongodb-database-2592000-c9dfbc49 placed by eu1.io/pool
+  MongoDB replset rs0: size 1, eu1.io/pool=cpu, storage class local-path
+== all checks passed
+
+# FC7: kubectl apply --dry-run=server --server-side on par, 2026-10-20T15:53:35Z
+# Namespaces stripped and dry-run in default: the lane's namespaces don't exist
+# until Argo CD creates them, and a dry run into a missing namespace fails first.
+par-readiness-kubeflow-trainer: 28 to dry-run, 0 set aside (kind not served yet)
+par-readiness-nvcre: 41 to dry-run, 4 set aside (kind not served yet)
+  set aside: nvcre.nvidia.com/v1alpha1 LogProfile/megatron-bridge
+  set aside: nvcre.nvidia.com/v1alpha1 LogProfile/megatron-training
+  set aside: nvcre.nvidia.com/v1alpha1 LogProfile/nccl-bandwidth
+  set aside: nvcre.nvidia.com/v1alpha1 LogProfile/nccl-loopback
+par-readiness-nvsentinel-all-stages: 72 to dry-run, 5 set aside (kind not served yet)
+  set aside: cert-manager.io/v1 Certificate/janitor-provider-grpc-cert
+  set aside: cert-manager.io/v1 Certificate/janitor-webhook-cert
+  set aside: cert-manager.io/v1 Certificate/mongo-app-client-cert
+  set aside: cert-manager.io/v1 Issuer/janitor-selfsigned-issuer
+  set aside: psmdb.percona.com/v1 PerconaServerMongoDB/mongodb
+par-readiness-nvsentinel: 36 to dry-run, 2 set aside (kind not served yet)
+  set aside: cert-manager.io/v1 Certificate/mongo-app-client-cert
+  set aside: psmdb.percona.com/v1 PerconaServerMongoDB/mongodb
+par-readiness-kubeflow-trainer: 28 objects accepted
+par-readiness-nvcre: 41 objects accepted
+par-readiness-nvsentinel-all-stages: 72 objects accepted
+par-readiness-nvsentinel: 36 objects accepted

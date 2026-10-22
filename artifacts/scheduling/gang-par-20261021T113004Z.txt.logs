@@ -1,0 +1,14 @@
+### rank 0 (pod/allreduce-gang-0-5lr7l)
+rank 0/2 host allreduce-gang-0 backend gloo device cpu torch 2.11.0+cu128 nccl None CUDA_VISIBLE_DEVICES=None
+rank 0: process group up in 0.4 s
+     1048576 B       854.1 us  algbw     1.23 GB/s  busbw     1.23 GB/s
+     2097152 B      1191.7 us  algbw     1.76 GB/s  busbw     1.76 GB/s
+     4194304 B      1742.1 us  algbw     2.41 GB/s  busbw     2.41 GB/s
+     8388608 B      3681.7 us  algbw     2.28 GB/s  busbw     2.28 GB/s
+    16777216 B      7522.1 us  algbw     2.23 GB/s  busbw     2.23 GB/s
+    33554432 B     14592.8 us  algbw     2.30 GB/s  busbw     2.30 GB/s
+    67108864 B     29607.9 us  algbw     2.27 GB/s  busbw     2.27 GB/s
+RESULT {"backend": "gloo", "world_size": 2, "device": "cpu", "torch": "2.11.0+cu128", "nccl": null, "iters": 20, "peak_busbw_GBps": 2.41, "results": [{"bytes": 1048576, "time_us": 854.1, "algbw_GBps": 1.23, "busbw_GBps": 1.23}, {"bytes": 2097152, "time_us": 1191.7, "algbw_GBps": 1.76, "busbw_GBps": 1.76}, {"bytes": 4194304, "time_us": 1742.1, "algbw_GBps": 2.41, "busbw_GBps": 2.41}, {"bytes": 8388608, "time_us": 3681.7, "algbw_GBps": 2.28, "busbw_GBps": 2.28}, {"bytes": 16777216, "time_us": 7522.1, "algbw_GBps": 2.23, "busbw_GBps": 2.23}, {"bytes": 33554432, "time_us": 14592.8, "algbw_GBps": 2.3, "busbw_GBps": 2.3}, {"bytes": 67108864, "time_us": 29607.9, "algbw_GBps": 2.27, "busbw_GBps": 2.27}]}
+### rank 1 (pod/allreduce-gang-1-5hjlr)
+rank 1/2 host allreduce-gang-1 backend gloo device cpu torch 2.11.0+cu128 nccl None CUDA_VISIBLE_DEVICES=None
+rank 1: process group up in 0.0 s

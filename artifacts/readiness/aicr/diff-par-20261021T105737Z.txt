@@ -1,0 +1,22 @@
+[cli] snapshot diff complete: added=0 removed=0 modified=16
+CHANGES (0 added, 0 removed, 16 modified)
+KIND      PATH                                        BASELINE                              TARGET
+----      ----                                        --------                              ------
+MODIFIED  OS.sysctl./proc/sys/fs/dentry-state         185696                                168456  45                   0     52407  0  186331  168958  45  0  52684  0
+MODIFIED  OS.sysctl./proc/sys/fs/file-nr              3072                                  0       9223372036854775807  3136  0      9223372036854775807
+MODIFIED  OS.sysctl./proc/sys/fs/inode-nr             131930                                353     132268               353
+MODIFIED  OS.sysctl./proc/sys/fs/inode-state          131930                                353     0                    0  0  0  0  132268  353  0  0  0  0  0
+MODIFIED  OS.sysctl./proc/sys/fs/quota/syncs          200                                   216
+MODIFIED  OS.sysctl./proc/sys/kernel/ns_last_pid      46758                                 51647
+MODIFIED  OS.sysctl./proc/sys/kernel/random/uuid      fdc5589e-a70c-4fbd-9b2b-bea2a5fb7e05  15a9f270-204f-40c3-a2ae-da8657512bd6
+MODIFIED  SystemD.containerd.service.CPUUsageNSec     161826597000                          183748188000
+MODIFIED  SystemD.containerd.service.MemoryAvailable  30403862528                           30462521344
+MODIFIED  SystemD.containerd.service.MemoryCurrent    8239538176                            8326635520
+MODIFIED  SystemD.containerd.service.MemoryPeak       8245485568                            8335384576
+MODIFIED  SystemD.containerd.service.TasksCurrent     351                                   366
+MODIFIED  SystemD.kubelet.service.CPUUsageNSec        55845322000                           66248703000
+MODIFIED  SystemD.kubelet.service.MemoryAvailable     30399164416                           30460456960
+MODIFIED  SystemD.kubelet.service.MemoryCurrent       87183360                              81620992
+MODIFIED  SystemD.kubelet.service.MemoryPeak          91459584                              98009088
+
+DRIFT DETECTED

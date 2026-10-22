@@ -1,0 +1,107 @@
+# capture-thanos.sh fin, 20261022T095130Z, laptop clock, UTC. git 17ecc08
+
+## Stores Query sees
+receive 10.244.5.41:10901 labelSets: [{'receive_replica': 'thanos-receive-0', 'tenant_id': 'fin-sim'}, {'receive_replica': 'thanos-receive-0', 'tenant_id': 'default-tenant'}, {'receive_replica': 'thanos-receive-0', 'tenant_id': 'fin'}] minTime: 1792510895800 maxTime: 9223372036854775807 lastError: None
+sidecar 10.244.0.47:10901 labelSets: [{'prometheus': 'monitoring/kube-prometheus-stack-prometheus', 'prometheus_replica': 'prometheus-kube-prometheus-stack-prometheus-0', 'site': 'par'}] minTime: 1792447090000 maxTime: 9223372036854775807 lastError: None
+store 10.244.5.11:10901 labelSets: [{'prometheus': 'monitoring/kube-prometheus-stack-prometheus', 'prometheus_replica': 'prometheus-kube-prometheus-stack-prometheus-0', 'site': 'par'}, {'receive_replica': 'thanos-receive-0', 'tenant_id': 'fin'}, {'receive_replica': 'thanos-receive-0', 'tenant_id': 'fin-sim'}, {'simulated': 'true', 'site': 'sim-backfill'}] minTime: 1792136112000 maxTime: 1792656000000 lastError: None
+
+## Sites and tenants seen (now)
+# count by (site, tenant_id) (up)   (dedup=true)
+{site="fin", tenant_id="fin"} 3
+{site="fin-sim", tenant_id="fin-sim"} 2
+{site="par"} 27
+
+## Last sample per site (Unix seconds)
+# max by (site) (timestamp(up))   (dedup=true)
+{site="fin"} 1792662687.052
+{site="fin-sim"} 1792662685.853
+{site="par"} 1792662690.668
+
+## GPUs per site and model (now)
+# count by (site, modelName) (DCGM_FI_DEV_GPU_UTIL)   (dedup=true)
+(no data)
+
+## GPU utilisation (now)
+# max by (site, modelName, hostname, gpu) (DCGM_FI_DEV_GPU_UTIL)   (dedup=true)
+(no data)
+
+## GPU utilisation, max over the last 3 h
+# max by (site, modelName, hostname, gpu) (max_over_time(DCGM_FI_DEV_GPU_UTIL[3h]))   (dedup=true)
+(no data)
+
+## DCGM series per GPU (recording rule)
+# max by (site, modelName, hostname, gpu) (max_over_time(gpu:dcgm_series:count[3h]))   (dedup=true)
+(no data)
+
+## DCGM series per GPU, top metrics on fin
+# topk(15, max by (metric) (max_over_time(gpu:dcgm_series_by_metric:count{site="fin"}[3h])))   (dedup=true)
+(no data)
+
+## Head series in each site's Prometheus (now, not only DCGM)
+# max by (site) (prometheus_tsdb_head_series{job="kube-prometheus-stack-prometheus", site=~"par|fin"})   (dedup=true)
+{site="fin"} 0
+{site="par"} 98599
+
+## fin's remote write: samples sent, failed, retried (now)
+# max by (__name__) ({__name__=~"prometheus_remote_storage_(samples_total|samples_failed_total|samples_retried_total|highest_timestamp_in_seconds|queue_highest_sent_timestamp_seconds)", site="fin"})   (dedup=true)
+{__name__="prometheus_remote_storage_highest_timestamp_in_seconds"} 0
+{__name__="prometheus_remote_storage_queue_highest_sent_timestamp_seconds"} 0
+{__name__="prometheus_remote_storage_samples_failed_total"} 0
+{__name__="prometheus_remote_storage_samples_retried_total"} 0
+{__name__="prometheus_remote_storage_samples_total"} 0
+
+## fin's own TSDB status (head series, top label pairs), read on fin
+headStats: {'numSeries': 6295, 'numLabelPairs': 1570, 'chunkCount': 6295, 'minTime': 1792662669359, 'maxTime': 1792662691659}
+
+seriesCountByMetricName:
+  prober_probe_duration_seconds_bucket: 480
+  container_memory_failures_total: 154
+  node_cpu_seconds_total: 128
+  coredns_proxy_request_duration_seconds_bucket: 85
+  container_memory_working_set_bytes: 77
+  container_start_time_seconds: 77
+  container_threads: 77
+  container_memory_failcnt: 77
+  container_last_seen: 77
+  container_pressure_cpu_waiting_seconds_total: 77
+  container_pressure_memory_waiting_seconds_total: 77
+  container_oom_events_total: 77
+  container_memory_rss: 77
+  container_pressure_io_stalled_seconds_total: 77
+  container_sockets: 77
+
+labelValueCountByLabelName:
+  __name__: 715
+  le: 131
+  name: 91
+  id: 78
+  handler: 63
+  collector: 49
+  device: 32
+  rule_group: 31
+  pod: 26
+  container: 24
+  address: 23
+  type: 22
+  image: 20
+  pod_uid: 18
+  cpu: 17
+
+seriesCountByLabelValuePair:
+  namespace=monitoring: 3537
+  job=kubelet: 3025
+  endpoint=https-metrics: 3025
+  service=kube-prometheus-stack-kubelet: 3025
+  instance=<fin-cp-ip>:10250: 3025
+  node=eu1-fin-cp-01: 3025
+  metrics_path=/metrics/cadvisor: 2415
+  endpoint=http-metrics: 1924
+  pod=kube-prometheus-stack-prometheus-node-exporter-4lclr: 1788
+  container=node-exporter: 1719
+  service=kube-prometheus-stack-prometheus-node-exporter: 1662
+  job=node-exporter: 1662
+  instance=<fin-cp-ip>:9100: 1662
+  pod=prometheus-kube-prometheus-stack-prometheus-0: 1511
+  container=prometheus: 1418
+
+# written to docs/artifacts/platform/thanos-fin-20261022T095130Z.txt

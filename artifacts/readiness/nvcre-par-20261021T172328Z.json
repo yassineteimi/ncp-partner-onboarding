@@ -1,0 +1,34 @@
+{
+  "name": "eu1-par-l4",
+  "platform": "onprem",
+  "gpu": "l4",
+  "totalNodes": 1,
+  "categories": [
+    {
+      "domain": "communication",
+      "variant": "nccl-all-reduce",
+      "status": "Succeeded",
+      "runtime": "1m 57s",
+      "testScale": "intra-node",
+      "nodesPerJob": 1,
+      "jobs": 1,
+      "env": [
+        "NCCL_DEBUG",
+        "NCCL_DEBUG_SUBSYS"
+      ],
+      "bandwidth": [
+        {
+          "size": "4 GB",
+          "algBW": "115.34 GB/s",
+          "busBW": "0.00 GB/s",
+          "samples": 10
+        }
+      ],
+      "transport": [
+        "Socket"
+      ]
+    }
+  ],
+  "failedNodes": [],
+  "result": "PASSED"
+}

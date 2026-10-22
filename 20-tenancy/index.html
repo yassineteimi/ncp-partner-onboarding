@@ -1,0 +1,1458 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Part 2 of my GPU fleet work. Nordhaven, a fictional European GPU cloud partner, goes from hardware handover to its first production workloads on NVIDIA's open stack, across a Paris site and a Finland site on two providers, driven by one Git repository.">
+      
+      
+        <meta name="author" content="Yassine TEIMI">
+      
+      
+        <link rel="canonical" href="https://yassineteimi.github.io/ncp-partner-onboarding/20-tenancy/">
+      
+      
+        <link rel="prev" href="../10-day2-nvsentinel/">
+      
+      
+        <link rel="next" href="../21-hpc-slinky/">
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.49">
+    
+    
+      
+        <title>Tenancy: KAI and MIG - Nordhaven: a GPU cloud partner from handover to first workloads</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.6f8fc17f.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../stylesheets/terminal.css">
+    
+      <link rel="stylesheet" href="../stylesheets/diagram-zoom.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="teal" data-md-color-accent="lime">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#use-case-4-sharing-scarce-gpus-between-tenants" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Nordhaven: a GPU cloud partner from handover to first workloads" class="md-header__button md-logo" aria-label="Nordhaven: a GPU cloud partner from handover to first workloads" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Nordhaven: a GPU cloud partner from handover to first workloads
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Tenancy: KAI and MIG
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="teal" data-md-color-accent="lime"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="purple"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 6H7c-3.31 0-6 2.69-6 6s2.69 6 6 6h10c3.31 0 6-2.69 6-6s-2.69-6-6-6m0 10H7c-2.21 0-4-1.79-4-4s1.79-4 4-4h10c2.21 0 4 1.79 4 4s-1.79 4-4 4M7 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/yassineteimi/ncp-partner-onboarding" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    yassineteimi/ncp-partner-onboarding
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+    
+  
+  Overview
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../story/" class="md-tabs__link">
+        
+  
+    
+  
+  The story
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../architecture/" class="md-tabs__link">
+        
+  
+    
+  
+  Architecture
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../10-day0-aicr/" class="md-tabs__link">
+        
+  
+    
+  
+  Day 0: AICR
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../10-day1-nvcre/" class="md-tabs__link">
+        
+  
+    
+  
+  Day 1: NVCRE
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../10-day2-nvsentinel/" class="md-tabs__link">
+        
+  
+    
+  
+  Day 2: NVSentinel
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+    
+  
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
+        
+  
+    
+  
+  Tenancy: KAI and MIG
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../21-hpc-slinky/" class="md-tabs__link">
+        
+  
+    
+  
+  HPC: Slurm with Slinky
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../30-metrics-across-sites/" class="md-tabs__link">
+        
+  
+    
+  
+  Metrics across sites
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../30-vm-tenants/" class="md-tabs__link">
+        
+  
+    
+  
+  VM tenants
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../simulated/" class="md-tabs__link">
+        
+  
+    
+  
+  What is simulated
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../adr/" class="md-tabs__link">
+          
+  
+  Decisions
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../findings/" class="md-tabs__link">
+        
+  
+    
+  
+  Findings
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Nordhaven: a GPU cloud partner from handover to first workloads" class="md-nav__button md-logo" aria-label="Nordhaven: a GPU cloud partner from handover to first workloads" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Nordhaven: a GPU cloud partner from handover to first workloads
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/yassineteimi/ncp-partner-onboarding" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    yassineteimi/ncp-partner-onboarding
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../story/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    The story
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Architecture
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../10-day0-aicr/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Day 0: AICR
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../10-day1-nvcre/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Day 1: NVCRE
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../10-day2-nvsentinel/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Day 2: NVSentinel
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Tenancy: KAI and MIG
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Tenancy: KAI and MIG
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#whats-built" class="md-nav__link">
+    <span class="md-ellipsis">
+      What's built
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-it-shows" class="md-nav__link">
+    <span class="md-ellipsis">
+      What it shows
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="What it shows">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#paris-simulated-gpus-borrowing-reclaim-all-or-nothing-21-october" class="md-nav__link">
+    <span class="md-ellipsis">
+      Paris, simulated GPUs: borrowing, reclaim, all or nothing (21 October)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#paris-a-gang-with-real-containers-21-october" class="md-nav__link">
+    <span class="md-ellipsis">
+      Paris, a gang with real containers (21 October)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#finland-two-h200s-the-gang-22-october" class="md-nav__link">
+    <span class="md-ellipsis">
+      Finland, two H200s: the gang (22 October)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#finland-two-h200s-mig-22-october" class="md-nav__link">
+    <span class="md-ellipsis">
+      Finland, two H200s: MIG (22 October)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#run-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      Run it
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-one-site-or-two-gpus-cant-show" class="md-nav__link">
+    <span class="md-ellipsis">
+      What one site or two GPUs can't show
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#evidence" class="md-nav__link">
+    <span class="md-ellipsis">
+      Evidence
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../21-hpc-slinky/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    HPC: Slurm with Slinky
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../30-metrics-across-sites/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Metrics across sites
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../30-vm-tenants/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    VM tenants
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../simulated/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    What is simulated
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_12" >
+        
+          
+          <label class="md-nav__link" for="__nav_12" id="__nav_12_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Decisions
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_12">
+            <span class="md-nav__icon md-icon"></span>
+            Decisions
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    All decisions
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0001-two-sites-two-providers/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    0001: Two sites, two providers
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0002-driver-ownership/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    0002: Driver ownership
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0003-known-good-stack/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    0003: Known-good stack
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0004-readiness-gate/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    0004: Readiness gate
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0005-fault-remediation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    0005: Fault remediation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0006-batch-scheduling/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    0006: Batch scheduling
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0007-hpc-tenants-slurm/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    0007: HPC tenants
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0008-gpu-sharing/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    0008: GPU sharing
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0009-metrics-across-sites/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    0009: Metrics across sites
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0010-vm-tenants/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    0010: VM tenants
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../findings/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Findings
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="use-case-4-sharing-scarce-gpus-between-tenants">Use case 4: sharing scarce GPUs between tenants</h1>
+<p>Nordhaven rents out GPUs that never cover demand, so it has to answer three questions for every tenant: how much is guaranteed, what can be borrowed when others are idle, and what happens to a distributed job that only partly fits. In Part 1 the answer was a ResourceQuota on a time-sliced L4, which capped each tenant and nothing more.</p>
+<p>Here the answer is <a href="https://github.com/kai-scheduler/KAI-Scheduler">KAI Scheduler</a> v0.18.6 on both sites, with MIG on the Finland H200s. <a href="../adr/0006-batch-scheduling/">ADR 0006</a> says why KAI and not Kueue or Volcano, and <a href="../adr/0008-gpu-sharing/">ADR 0008</a> says which tenants get MIG, time slicing or whole GPUs.</p>
+<div class="admonition note">
+<p class="admonition-title">What ran</p>
+<p>On simulated GPUs at the Paris site, on 21 October: borrowing, reclaim and a refused gang, plus a two-pod gang with real containers on the CPU worker. On the Finland H200 node, after it passed certification, on 22 October: the two-pod gang with NCCL, a refused gang of 3, and MIG with two tenants on one H200. One check failed there: KAI won't place a whole-GPU pod next to MIG slices on the same node, which changed <a href="../adr/0008-gpu-sharing/">ADR 0008</a>.</p>
+</div>
+<h2 id="whats-built">What's built</h2>
+<p><strong>The same KAI on both sites.</strong> One Application per site carries the chart and that site's queues (<code>gitops/apps/{par,fin}/scheduling/kai-scheduler.yaml</code>). Two teams, <code>team-a</code> and <code>team-b</code>, sit under one parent queue with half the GPUs each as quota and no limit:</p>
+<table>
+<thead>
+<tr>
+<th>Queue</th>
+<th>Paris (simulated)</th>
+<th>Finland (real)</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>eu1</code></td>
+<td>8 GPUs</td>
+<td>2 GPUs</td>
+<td>the pool</td>
+</tr>
+<tr>
+<td><code>team-a</code></td>
+<td>quota 4</td>
+<td>quota 1</td>
+<td>guaranteed; more can be borrowed while <code>team-b</code> is idle</td>
+</tr>
+<tr>
+<td><code>team-b</code></td>
+<td>quota 4</td>
+<td>quota 1</td>
+<td>the same</td>
+</tr>
+</tbody>
+</table>
+<p>Only GPUs count against these quotas, with CPU and memory left unlimited; otherwise every pod would sit over quota on CPU, and KAI could always take it back. A workload joins with <code>schedulerName: kai-scheduler</code> and the label <code>kai.scheduler/queue</code>. A Job becomes a gang with one annotation, <code>kai.scheduler/batch-min-member</code>, and KAI's pod grouper creates the PodGroup from it.</p>
+<p><strong>Paris: simulated GPUs.</strong> Two <a href="https://kwok.sigs.k8s.io/">KWOK</a> nodes, <code>eu1-par-sim-gpu-01</code> and <code>-02</code>, carry four simulated H200s each from <a href="https://github.com/run-ai/fake-gpu-operator">run-ai/fake-gpu-operator</a> 0.2.1. <strong>SIMULATED:</strong> no VM sits behind them, and a pod bound there shows Running without starting a container. KAI's decisions are real: which pod goes where, whose pods it takes back, and which gang it refuses. The <a href="../simulated/">simulated page</a> lists them.</p>
+<p>Running the fake operator at the Paris site took two changes from its quick start. Paris already runs the real GPU Operator, which strips the fake operator's <code>nvidia.com/gpu.deploy.*</code> labels from any real node without an NVIDIA PCI device (<code>controllers/nodelabeling_controller.go</code> at v26.7.2), so only the fake operator's KWOK path is installed: there, its device plugin writes <code>nvidia.com/gpu</code> straight into the KWOK node's status, and the labels don't matter. And neither KWOK nor the fake operator lets you set a nodeSelector, so both are vendored (<code>scripts/scheduling/render-sim-gpu.sh</code>) and patched onto the CPU worker, with every image pinned by digest.</p>
+<p>One side effect showed up once they joined. Prometheus found a kubelet on each KWOK node, couldn't scrape it, and fired <code>TargetDown</code> and <code>KubeletInstanceUnreachable</code> (<a href="../artifacts/scheduling/kwok-targets-par-20261021T113535Z.txt">capture</a>). The Paris kubelet ServiceMonitor now drops <code>eu1-par-sim-gpu-.*</code>, and both alerts cleared.</p>
+<p><strong>Finland: real GPUs and MIG.</strong> KAI runs on the Finland CPU node. The GPU Operator overlay enables the MIG manager with a layout of my own, <code>h200-split</code>: GPU0 becomes two <code>3g.71gb</code> instances, and GPU1 stays whole. Nothing changes until the node carries the label <code>nvidia.com/mig.config=h200-split</code>. A second layout, <code>rtxpro-split</code>, does the same on 2x RTX PRO 6000 (two <code>2g.48gb</code> instances), for the case where the provider has no H200 free. The H200 run didn't need it.</p>
+<h2 id="what-it-shows">What it shows</h2>
+<h3 id="paris-simulated-gpus-borrowing-reclaim-all-or-nothing-21-october">Paris, simulated GPUs: borrowing, reclaim, all or nothing (21 October)</h3>
+<p><code>make sched-sim-demo</code> runs three steps, and all passed. Times are UTC.</p>
+<div class="terminal highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>$<span class="w"> </span>make<span class="w"> </span>sched-sim-demo
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>...
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="c1">## 1. team-a bursts to 8 GPUs while team-b is idle   [11:27:36Z]</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>after<span class="w"> </span>5s:<span class="w"> </span><span class="m">8</span><span class="w"> </span>team-a<span class="w"> </span>pods<span class="w"> </span>bound
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>...
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>PASS:<span class="w"> </span>team-a<span class="w"> </span>pods<span class="w"> </span>bound,<span class="w"> </span><span class="m">4</span><span class="w"> </span>of<span class="w"> </span>them<span class="w"> </span>over<span class="w"> </span>quota<span class="w"> </span><span class="o">(</span><span class="m">8</span><span class="o">)</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>...
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="c1">## 2. team-b submits a gang of 4; KAI reclaims team-a's borrowed GPUs   [11:27:43Z]</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>after<span class="w"> </span>5s:<span class="w"> </span>team-b<span class="err">'</span>s<span class="w"> </span><span class="m">4</span><span class="w"> </span>gang<span class="w"> </span>pods<span class="w"> </span>bound
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>...
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>PASS:<span class="w"> </span>team-b<span class="w"> </span>gang<span class="w"> </span>pods<span class="w"> </span>bound<span class="w"> </span><span class="o">(</span><span class="m">4</span><span class="o">)</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>PASS:<span class="w"> </span>team-a<span class="w"> </span>pods<span class="w"> </span>still<span class="w"> </span>Running<span class="w"> </span><span class="o">(</span>its<span class="w"> </span>quota<span class="o">)</span><span class="w"> </span><span class="o">(</span><span class="m">4</span><span class="o">)</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>...
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="c1">## 3. team-a done; team-b asks for a gang of 6 with 4 GPUs free   [11:28:02Z]</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>...
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>PASS:<span class="w"> </span>gang<span class="w"> </span>of<span class="w"> </span><span class="m">6</span>:<span class="w"> </span>pods<span class="w"> </span>bound<span class="w"> </span><span class="o">(</span><span class="m">0</span><span class="o">)</span>
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>PASS:<span class="w"> </span>gang<span class="w"> </span>of<span class="w"> </span><span class="m">6</span>:<span class="w"> </span>pods<span class="w"> </span>Pending<span class="w"> </span><span class="o">(</span><span class="m">6</span><span class="o">)</span>
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>...
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>all<span class="w"> </span>checks<span class="w"> </span>passed
+</code></pre></div>
+<p><a href="../artifacts/scheduling/sim-demo-par-20261021T112733Z.txt">Full capture</a></p>
+<ol>
+<li><strong>Borrowing.</strong> <code>team-a</code> asked for 8 single-GPU pods while <code>team-b</code> was idle. All 8 bound within 5 seconds, and the <code>team-a</code> queue showed 8 GPUs allocated against a quota of 4.</li>
+<li><strong>Reclaim.</strong> <code>team-b</code> submitted a gang of 4 at 11:27:43. At 11:27:46 KAI evicted 4 of <code>team-a</code>'s pods, and at 11:27:48 it bound all 4 of <code>team-b</code>'s pods in the same second. <code>team-a</code> kept its other 4 pods, and both queues ended at 4 GPUs each: what was borrowed went back, and nothing in quota was touched. KAI's event says "preempted by workload team-b/…"; the pods it picked belonged to a queue running over its quota.</li>
+<li><strong>All or nothing.</strong> With <code>team-a</code> gone, 4 GPUs were free, and <code>team-b</code> asked for a gang of 6. After 90 seconds none of the 6 had bound, and the 4 free GPUs were still free. KAI's reason on the PodGroup: "Resources were found for 4 pods while 6 are required for gang scheduling." A scheduler without gangs would have bound 4 pods to wait for 2 that never come.</li>
+</ol>
+<h3 id="paris-a-gang-with-real-containers-21-october">Paris, a gang with real containers (21 October)</h3>
+<p><code>make sched-gang SITE=par</code> runs the same two-pod Job as on the H200s, with gloo instead of NCCL, on the CPU worker. KAI bound both pods at 11:30:06, in the same second, and the all-reduce completed (<a href="../artifacts/scheduling/gang-par-20261021T113004Z.txt">capture</a>). Its 2.41 GB/s peak says something about one VM's memory and pod network, not about GPUs. The number that mattered later is the image pull: 1 minute 35 seconds for the 4.26 GB trainer image, which is why the Finland node pulls it in advance, as soon as it joins.</p>
+<h3 id="finland-two-h200s-the-gang-22-october">Finland, two H200s: the gang (22 October)</h3>
+<p>The H200 node joined at 09:54 UTC, passed certification, and was opened to tenants at 10:13:49. The trainer image was already on it: the pull took 2 minutes 22 seconds, right after the node joined and before certification started.</p>
+<div class="terminal highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>$<span class="w"> </span>make<span class="w"> </span>sched-gang<span class="w"> </span><span class="nv">SITE</span><span class="o">=</span>fin
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>...
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>after<span class="w"> </span>5s:<span class="w"> </span>both<span class="w"> </span>gang<span class="w"> </span>pods<span class="w"> </span>bound
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>...
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>allreduce-gang-0-62gpk<span class="w">  </span>eu1-fin-gpu-01<span class="w">  </span>scheduled<span class="w"> </span><span class="m">2026</span>-10-22T10:14:27Z<span class="w">  </span>started<span class="w"> </span><span class="m">2026</span>-10-22T10:14:27Z
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>allreduce-gang-1-gc7lh<span class="w">  </span>eu1-fin-gpu-01<span class="w">  </span>scheduled<span class="w"> </span><span class="m">2026</span>-10-22T10:14:27Z<span class="w">  </span>started<span class="w"> </span><span class="m">2026</span>-10-22T10:14:27Z
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>...
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>rank<span class="w"> </span><span class="m">0</span>/2<span class="w"> </span>host<span class="w"> </span>allreduce-gang-0<span class="w"> </span>backend<span class="w"> </span>nccl<span class="w"> </span>device<span class="w"> </span>NVIDIA<span class="w"> </span>H200<span class="w"> </span>torch<span class="w"> </span><span class="m">2</span>.11.0+cu128<span class="w"> </span>nccl<span class="w"> </span><span class="m">2</span>.28.9<span class="w"> </span><span class="nv">CUDA_VISIBLE_DEVICES</span><span class="o">=</span>None
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>...
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">   </span><span class="m">536870912</span><span class="w"> </span>B<span class="w">    </span><span class="m">240174</span>.1<span class="w"> </span>us<span class="w">  </span>algbw<span class="w">     </span><span class="m">2</span>.24<span class="w"> </span>GB/s<span class="w">  </span>busbw<span class="w">     </span><span class="m">2</span>.24<span class="w"> </span>GB/s
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="w">  </span><span class="m">1073741824</span><span class="w"> </span>B<span class="w">    </span><span class="m">479571</span>.9<span class="w"> </span>us<span class="w">  </span>algbw<span class="w">     </span><span class="m">2</span>.24<span class="w"> </span>GB/s<span class="w">  </span>busbw<span class="w">     </span><span class="m">2</span>.24<span class="w"> </span>GB/s
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="c1">## NCCL transport   [10:15:03Z]</span>
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="w">   </span><span class="m">1</span><span class="w"> </span>allreduce-gang-1:1:1<span class="w"> </span><span class="o">[</span><span class="m">0</span><span class="o">]</span><span class="w"> </span>NCCL<span class="w"> </span>INFO<span class="w"> </span>Using<span class="w"> </span>network<span class="w"> </span>Socket
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>...
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="w">   </span><span class="m">1</span><span class="w"> </span>allreduce-gang-1:1:1<span class="w"> </span><span class="o">[</span><span class="m">0</span><span class="o">]</span><span class="w"> </span>NCCL<span class="w"> </span>INFO<span class="w"> </span>comm<span class="w"> </span>0xc0a7c00<span class="w"> </span>rank<span class="w"> </span><span class="m">1</span><span class="w"> </span>nRanks<span class="w"> </span><span class="m">2</span><span class="w"> </span>nNodes<span class="w"> </span><span class="m">2</span><span class="w"> </span>localRanks<span class="w"> </span><span class="m">1</span><span class="w"> </span>localRank<span class="w"> </span><span class="m">0</span><span class="w"> </span>MNNVL<span class="w"> </span><span class="m">0</span>
+<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>...
+<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="w">   </span><span class="m">1</span><span class="w"> </span>allreduce-gang-1:1:1<span class="w"> </span><span class="o">[</span><span class="m">0</span><span class="o">]</span><span class="w"> </span>NCCL<span class="w"> </span>INFO<span class="w"> </span>Channel<span class="w"> </span><span class="m">00</span>/0<span class="w"> </span>:<span class="w"> </span><span class="m">1</span><span class="o">[</span><span class="m">0</span><span class="o">]</span><span class="w"> </span>-&gt;<span class="w"> </span><span class="m">0</span><span class="o">[</span><span class="m">0</span><span class="o">]</span><span class="w"> </span><span class="o">[</span>send<span class="o">]</span><span class="w"> </span>via<span class="w"> </span>NET/Socket/0
+<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a>...
+<a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a><span class="c1">## Gang of 3 on 2 GPUs: none may bind   [10:15:03Z]</span>
+<a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a>...
+<a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a>allreduce-gang-3-0-8rgk9<span class="w">   </span><span class="m">0</span>/1<span class="w">     </span>Pending<span class="w">   </span><span class="m">0</span><span class="w">          </span>60s<span class="w">   </span>&lt;none&gt;<span class="w">   </span>&lt;none&gt;<span class="w">   </span>&lt;none&gt;<span class="w">           </span>&lt;none&gt;
+<a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a>allreduce-gang-3-1-5tjck<span class="w">   </span><span class="m">0</span>/1<span class="w">     </span>Pending<span class="w">   </span><span class="m">0</span><span class="w">          </span>60s<span class="w">   </span>&lt;none&gt;<span class="w">   </span>&lt;none&gt;<span class="w">   </span>&lt;none&gt;<span class="w">           </span>&lt;none&gt;
+<a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a>allreduce-gang-3-2-g66mj<span class="w">   </span><span class="m">0</span>/1<span class="w">     </span>Pending<span class="w">   </span><span class="m">0</span><span class="w">          </span>60s<span class="w">   </span>&lt;none&gt;<span class="w">   </span>&lt;none&gt;<span class="w">   </span>&lt;none&gt;<span class="w">           </span>&lt;none&gt;
+</code></pre></div>
+<p><a href="../artifacts/scheduling/gang-fin-20261022T101423Z.txt">Full capture</a>, <a href="../artifacts/scheduling/gang-fin-20261022T101423Z.txt.logs">NCCL logs of both ranks</a></p>
+<p>Two pods in <code>team-a</code>, one GPU each, run an all-reduce between them with NCCL (<code>workloads/scheduling/allreduce/</code>). KAI scheduled both at 10:14:27, one second after the Job was created. <code>team-a</code>'s quota is 1, so its second GPU was borrowed from idle <code>team-b</code>.</p>
+<p>The all-reduce between the two pods peaked at <strong>2.24 GB/s</strong> of bus bandwidth. Certification measured <strong>351 GB/s</strong> on the same two GPUs, inside one pod that sees both, about 157 times more, with every channel over NVLink:</p>
+<div class="terminal highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>$<span class="w"> </span>grep<span class="w"> </span>-m2<span class="w"> </span><span class="s2">"via P2P"</span><span class="w"> </span>docs/artifacts/readiness/nvcre-fin-20261022T100307Z-nccl.log
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="m">2026</span>-10-22T10:07:42.817807006Z<span class="w"> </span>eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:83<span class="w"> </span><span class="o">[</span><span class="m">0</span><span class="o">]</span><span class="w"> </span>NCCL<span class="w"> </span>INFO<span class="w"> </span>Channel<span class="w"> </span><span class="m">00</span>/0<span class="w"> </span>:<span class="w"> </span><span class="m">0</span><span class="o">[</span><span class="m">0</span><span class="o">]</span><span class="w"> </span>-&gt;<span class="w"> </span><span class="m">1</span><span class="o">[</span><span class="m">1</span><span class="o">]</span><span class="w"> </span>via<span class="w"> </span>P2P/direct<span class="w"> </span>pointer
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="m">2026</span>-10-22T10:07:42.818307424Z<span class="w"> </span>eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:82<span class="w"> </span><span class="o">[</span><span class="m">1</span><span class="o">]</span><span class="w"> </span>NCCL<span class="w"> </span>INFO<span class="w"> </span>Channel<span class="w"> </span><span class="m">00</span>/0<span class="w"> </span>:<span class="w"> </span><span class="m">1</span><span class="o">[</span><span class="m">1</span><span class="o">]</span><span class="w"> </span>-&gt;<span class="w"> </span><span class="m">0</span><span class="o">[</span><span class="m">0</span><span class="o">]</span><span class="w"> </span>via<span class="w"> </span>P2P/direct<span class="w"> </span>pointer
+</code></pre></div>
+<p><a href="../artifacts/readiness/nvcre-fin-20261022T100307Z-report.txt">NVCRE's report</a>, <a href="../artifacts/readiness/nvcre-fin-20261022T100307Z-nccl.log">its NCCL log</a>, <a href="../10-day1-nvcre/">use case 2</a></p>
+<p><code>NCCL_DEBUG=INFO</code> says why. Each pod reports <code>nNodes 2 localRanks 1</code>, then <code>Using network Socket</code>, and every channel runs <code>via NET/Socket/0</code> over <code>eth0</code>, the pod network. NCCL treats two pods on one machine as two machines, and NVLink sits unused between them. I expected that, and now it's measured. A tenant whose two-pod gang lands on one node gets a fraction of the interconnect they pay for. The safe fix on a shared platform is to run such a job as one pod holding both GPUs. Opening NVLink between separate pods means giving them more of the host than a multi-tenant platform should hand out by default, and I didn't test it.</p>
+<p>Then a gang of 3 on the node's 2 GPUs: after 60 seconds none of the 3 pods had bound. KAI's reason on the PodGroup: "Resources were found for 2 pods while 3 are required for gang scheduling."</p>
+<h3 id="finland-two-h200s-mig-22-october">Finland, two H200s: MIG (22 October)</h3>
+<p>The layout was checked first without a GPU: <code>make sched-mig-check</code> ran the rendered config through mig-parted v0.15.1's own loader on the Paris CPU worker, and <code>all-disabled</code>, <code>h200-split</code> and <code>rtxpro-split</code> are all valid (<a href="../artifacts/scheduling/mig-config-par-20261022T095114Z.txt">capture</a>). On the node, the label went on at 10:16:44:</p>
+<div class="terminal highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>$<span class="w"> </span>make<span class="w"> </span>sched-mig
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>...
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="m">10</span>:16:51Z<span class="w"> </span>+1s<span class="w"> </span>mig.config.state<span class="o">=</span>pending
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="m">10</span>:17:23Z<span class="w"> </span>+33s<span class="w"> </span>mig.config.state<span class="o">=</span>success
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>...
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>after<span class="w"> </span>44s:<span class="w"> </span>nvidia.com/mig-3g.71gb:<span class="w"> </span><span class="m">2</span><span class="w"> </span>allocatable
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>...
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>timeout<span class="w"> </span>after<span class="w"> </span>300s:<span class="w"> </span>team-a/whole-a<span class="w"> </span>running
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>...
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="c1">### team-a/mig-a: {"nvidia.com/mig-3g.71gb":"1"}</span>
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>GPU<span class="w"> </span><span class="m">0</span>:<span class="w"> </span>NVIDIA<span class="w"> </span>H200<span class="w"> </span><span class="o">(</span>UUID:<span class="w"> </span>GPU-4d345e6c-2a90-57e7-e5c7-3ffdb67e061d<span class="o">)</span>
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="w">  </span>MIG<span class="w"> </span>3g.71gb<span class="w">     </span>Device<span class="w">  </span><span class="m">0</span>:<span class="w"> </span><span class="o">(</span>UUID:<span class="w"> </span>MIG-82b6aa84-3e05-59bd-a396-690e13953fd3<span class="o">)</span>
+<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>cuda<span class="w"> </span>device:<span class="w"> </span>NVIDIA<span class="w"> </span>H200<span class="w"> </span>MIG<span class="w"> </span>3g.71gb<span class="w"> </span>total<span class="w"> </span>GiB:<span class="w"> </span><span class="m">69</span>.8
+<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="c1">### team-b/mig-b: {"nvidia.com/mig-3g.71gb":"1"}</span>
+<a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>GPU<span class="w"> </span><span class="m">0</span>:<span class="w"> </span>NVIDIA<span class="w"> </span>H200<span class="w"> </span><span class="o">(</span>UUID:<span class="w"> </span>GPU-4d345e6c-2a90-57e7-e5c7-3ffdb67e061d<span class="o">)</span>
+<a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a><span class="w">  </span>MIG<span class="w"> </span>3g.71gb<span class="w">     </span>Device<span class="w">  </span><span class="m">0</span>:<span class="w"> </span><span class="o">(</span>UUID:<span class="w"> </span>MIG-f8bb95eb-0760-582a-9634-f1f65e797a9f<span class="o">)</span>
+<a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a>cuda<span class="w"> </span>device:<span class="w"> </span>NVIDIA<span class="w"> </span>H200<span class="w"> </span>MIG<span class="w"> </span>3g.71gb<span class="w"> </span>total<span class="w"> </span>GiB:<span class="w"> </span><span class="m">69</span>.8
+</code></pre></div>
+<p><a href="../artifacts/scheduling/mig-fin-20261022T101643Z.txt">Full capture</a></p>
+<p>The MIG manager went to <code>pending</code> within a second and to <code>success</code> 33 seconds later, with no reboot. 44 seconds after that, the device plugin advertised two <code>3g.71gb</code> instances and <code>nvidia.com/gpu: 1</code>. <code>team-a</code>'s and <code>team-b</code>'s pods each asked for one instance and got one. Both ran on the same physical H200, on two different MIG devices, and CUDA in each saw 69.8 GiB, not the H200's 141 GB. That's two tenants on one GPU, each with its own memory, compute and fault domain: what Part 1's time slicing on the L4 couldn't give.</p>
+<p><strong>The whole-GPU pod didn't run.</strong> <code>team-a</code>'s third pod asked for <code>nvidia.com/gpu: 1</code>, meant for GPU1, and stayed Pending for 5 minutes although the node advertised that GPU. I resubmitted it alone, with no MIG pod running and <code>team-a</code> well within quota, and KAI refused it again:</p>
+<div class="terminal highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>$<span class="w"> </span>kubectl<span class="w"> </span>-n<span class="w"> </span>team-a<span class="w"> </span>get<span class="w"> </span>podgroups.scheduling.run.ai<span class="w"> </span>pg-whole-a-388d847f-caba-4ba1-99a2-7d15c518d67a<span class="w"> </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">'{.status}'</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="o">{</span><span class="s2">"resourcesStatus"</span>:<span class="o">{</span><span class="s2">"requested"</span>:<span class="o">{</span><span class="s2">"nvidia.com/gpu"</span>:<span class="s2">"1"</span><span class="o">}}</span>,<span class="s2">"schedulingConditions"</span>:<span class="o">[{</span><span class="s2">"lastTransitionTime"</span>:<span class="s2">"2026-10-22T10:24:38Z"</span>,<span class="s2">"message"</span>:<span class="s2">"PodSchedulingErrors: Resources were not found for pod team-a/whole-a due to: no nodes with enough resources were found: 1 node(s) didn't have enough resources: GPUs. \n1 non MIG jobs cant run on a node with MigStrategy='mixed'.."</span>,<span class="s2">"nodePool"</span>:<span class="s2">"default"</span>,<span class="s2">"reason"</span>:<span class="s2">"Unschedulable"</span>,<span class="s2">"reasons"</span>:<span class="o">[{</span><span class="s2">"message"</span>:<span class="s2">"Resources were not found for pod team-a/whole-a due to: no nodes with enough resources were found: 1 node(s) didn't have enough resources: GPUs. \n1 non MIG jobs cant run on a node with MigStrategy='mixed'."</span>,<span class="s2">"reason"</span>:<span class="s2">"PodSchedulingErrors"</span><span class="o">}]</span>,<span class="s2">"status"</span>:<span class="s2">"True"</span>,<span class="s2">"transitionID"</span>:<span class="s2">"1"</span>,<span class="s2">"type"</span>:<span class="s2">"UnschedulableOnNodePool"</span><span class="o">}]}</span>
+</code></pre></div>
+<p><a href="../artifacts/scheduling/mig-whole-gpu-fin-20261022T102435Z.txt">Full capture</a></p>
+<p>That's a rule in KAI v0.18.6 (<code>pkg/scheduler/api/node_info/node_info.go</code>): on a MIG-enabled node labelled <code>nvidia.com/mig.strategy=mixed</code>, any task that isn't a MIG request gets a fit error. The GPU Operator's mixed strategy exists to offer whole GPUs and MIG slices side by side on one node. KAI doesn't schedule that way. So with KAI, MIG and whole GPUs split per node, not per GPU. <a href="../adr/0008-gpu-sharing/">ADR 0008</a> says so, and it's in <a href="../findings/">the findings</a>.</p>
+<h2 id="run-it">Run it</h2>
+<table>
+<thead>
+<tr>
+<th>Target</th>
+<th>What it does</th>
+<th>Needs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>make sched-check</code></td>
+<td>Checks without a GPU: renders, digests, custom resources against their CRDs, workloads; <code>DRY_RUN=server</code> adds a dry run on the Paris site</td>
+<td>nothing</td>
+</tr>
+<tr>
+<td><code>make sched-sim-demo</code></td>
+<td>The simulated-GPU demo above</td>
+<td>the Paris CPU worker</td>
+</tr>
+<tr>
+<td><code>make sched-gang SITE=par</code></td>
+<td>The two-pod gang with gloo on the CPU worker: tests the gang and the script, not bandwidth</td>
+<td>the Paris CPU worker</td>
+</tr>
+<tr>
+<td><code>make sched-mig-check</code></td>
+<td>The Finland MIG config through mig-parted v0.15.1's own loader</td>
+<td>the Paris CPU worker</td>
+</tr>
+<tr>
+<td><code>make sched-prepull</code></td>
+<td>Pulls the gang's image onto the H200 node as soon as it joins</td>
+<td>the Finland GPU node</td>
+</tr>
+<tr>
+<td><code>make sched-gang SITE=fin</code></td>
+<td>The two-pod gang with NCCL on the H200s</td>
+<td>the Finland GPU node, after certification</td>
+</tr>
+<tr>
+<td><code>make sched-mig</code></td>
+<td>MIG <code>h200-split</code>, then a tenant per slice; <code>MIG_CONFIG=rtxpro-split</code> for the RTX PRO 6000 layout</td>
+<td>the Finland GPU node, labelled for the layout</td>
+</tr>
+</tbody>
+</table>
+<h2 id="what-one-site-or-two-gpus-cant-show">What one site or two GPUs can't show</h2>
+<ul>
+<li><strong>Gangs across nodes.</strong> The Finland site has one GPU node, so the gang is two pods on one machine. Placement across a rack, and topology-aware scheduling, need more than one node.</li>
+<li><strong>Real containers on the simulated queues.</strong> The KWOK pods bind and run nothing. The gang with real containers runs on the Paris CPU worker with gloo, and on the H200s with NCCL.</li>
+<li><strong>Fault containment between MIG instances.</strong> No fault was injected on the H200s; the isolation comes from NVIDIA's MIG documentation, not a capture.</li>
+<li><strong>Fairness over time.</strong> KAI's time-aware fairness needs its Prometheus integration, which is off. The demo shows shares at one moment, not over a week.</li>
+<li><strong>Scale.</strong> Two tenants and at most eight simulated GPUs, not hundreds of nodes.</li>
+</ul>
+<h2 id="evidence">Evidence</h2>
+<ul>
+<li><a href="../artifacts/scheduling/free-checks-20261021T065628Z.txt">Checks without a GPU, 21 October</a>: renders, every image by digest, 22 custom resources against their CRDs, a server-side dry run at the Paris site.</li>
+<li><a href="../artifacts/scheduling/allreduce-gloo-laptop-20261020T232031Z.txt">allreduce.py on two gloo ranks</a>, on a laptop.</li>
+<li><a href="../artifacts/scheduling/sim-demo-par-20261021T112733Z.txt">The simulated-GPU demo</a>: borrowing, reclaim and a gang of 6 refused.</li>
+<li><a href="../artifacts/scheduling/gang-par-20261021T113004Z.txt">The two-pod gloo gang at the Paris site</a>, with <a href="../artifacts/scheduling/gang-par-20261021T113004Z.txt.logs">both ranks' logs</a>.</li>
+<li><a href="../artifacts/scheduling/kwok-targets-par-20261021T113535Z.txt">The KWOK nodes as down scrape targets</a>, before the ServiceMonitor change.</li>
+<li>MIG config through mig-parted's loader: <a href="../artifacts/scheduling/mig-config-par-20261021T113350Z.txt">21 October</a>, and <a href="../artifacts/scheduling/mig-config-par-20261022T095114Z.txt">22 October</a> with all three layouts.</li>
+<li><a href="../artifacts/scheduling/gang-fin-20261022T101423Z.txt">The two-pod gang on the H200s</a>, with <a href="../artifacts/scheduling/gang-fin-20261022T101423Z.txt.logs">the NCCL logs</a>: 2.24 GB/s over <code>NET/Socket</code> between pods, and the gang of 3 refused.</li>
+<li><a href="../artifacts/readiness/nvcre-fin-20261022T100307Z-report.txt">The in-pod all-reduce from certification</a>, 351 GB/s over NVLink (<a href="../artifacts/readiness/nvcre-fin-20261022T100307Z-nccl.log">NCCL log</a>).</li>
+<li><a href="../artifacts/scheduling/mig-fin-20261022T101643Z.txt">MIG on the H200 node</a>: <code>h200-split</code> in 33 seconds, two tenants on two <code>3g.71gb</code> slices of one H200.</li>
+<li><a href="../artifacts/scheduling/mig-whole-gpu-fin-20261022T102435Z.txt">The whole-GPU pod KAI refused next to MIG</a>, with KAI's reason.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      &copy; 2026 <a href="https://github.com/yassineteimi" target="_blank" rel="noopener">Yassine TEIMI</a>
+
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/yassineteimi" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 512"><!--! Font Awesome Free 6.7.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M186.1 328.7c0 20.9-10.9 55.1-36.7 55.1s-36.7-34.2-36.7-55.1 10.9-55.1 36.7-55.1 36.7 34.2 36.7 55.1M480 278.2c0 31.9-3.2 65.7-17.5 95-37.9 76.6-142.1 74.8-216.7 74.8-75.8 0-186.2 2.7-225.6-74.8-14.6-29-20.2-63.1-20.2-95 0-41.9 13.9-81.5 41.5-113.6-5.2-15.8-7.7-32.4-7.7-48.8 0-21.5 4.9-32.3 14.6-51.8 45.3 0 74.3 9 108.8 36 29-6.9 58.8-10 88.7-10 27 0 54.2 2.9 80.4 9.2 34-26.7 63-35.2 107.8-35.2 9.8 19.5 14.6 30.3 14.6 51.8 0 16.4-2.6 32.7-7.7 48.2 27.5 32.4 39 72.3 39 114.2m-64.3 50.5c0-43.9-26.7-82.6-73.5-82.6-18.9 0-37 3.4-56 6-14.9 2.3-29.8 3.2-45.1 3.2-15.2 0-30.1-.9-45.1-3.2-18.7-2.6-37-6-56-6-46.8 0-73.5 38.7-73.5 82.6 0 87.8 80.4 101.3 150.4 101.3h48.2c70.3 0 150.6-13.4 150.6-101.3m-82.6-55.1c-25.8 0-36.7 34.2-36.7 55.1s10.9 55.1 36.7 55.1 36.7-34.2 36.7-55.1-10.9-55.1-36.7-55.1"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://linkedin.com/in/yassine-teimi" target="_blank" rel="noopener" title="linkedin.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3M135.4 416H69V202.2h66.5V416zm-33.2-243c-21.3 0-38.5-17.3-38.5-38.5S80.9 96 102.2 96c21.2 0 38.5 17.3 38.5 38.5 0 21.3-17.2 38.5-38.5 38.5m282.1 243h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.tabs", "navigation.sections", "toc.integrate", "navigation.top", "search.suggest", "search.highlight", "content.tabs.link", "content.code.annotation", "content.code.copy"], "search": "../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.88dd0f4e.min.js"></script>
+      
+        <script src="../javascripts/diagram-zoom.js"></script>
+      
+    
+  </body>
+</html>

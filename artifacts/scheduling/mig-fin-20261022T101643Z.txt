@@ -1,0 +1,284 @@
+# mig on fin, 20261022T101643Z, laptop clock, UTC. git 1932605
+
+## Before: eu1-fin-gpu-01   [10:16:43Z]
+mig.capable=true  mig.config=all-disabled  mig.config.state=success  mig.strategy=mixed
+"nvidia.com/gpu":"2"
+
+### pods on eu1-fin-gpu-01 asking for a GPU (must be none)
+(none)
+
+## Waiting for cos to label eu1-fin-gpu-01 nvidia.com/mig.config=h200-split   [10:16:44Z]
+cos runs: kubectl label node eu1-fin-gpu-01 nvidia.com/mig.config=h200-split --overwrite
+after 6s: node labelled h200-split
+label nvidia.com/mig.config=h200-split seen at 10:16:50Z
+
+## Wait for the MIG manager (time box 600s)   [10:16:50Z]
+10:16:51Z +1s mig.config.state=pending
+10:17:23Z +33s mig.config.state=success
+
+## Device plugin advertises the slices   [10:17:23Z]
+after 44s: nvidia.com/mig-3g.71gb: 2 allocatable
+mig.capable=true  mig.config=h200-split  mig.config.state=success  mig.strategy=mixed
+"nvidia.com/gpu":"1"
+"nvidia.com/mig-3g.71gb":"2"
+
+### MIG manager (pod/nvidia-mig-manager-wxxb2) logs
+Defaulted container "nvidia-mig-manager" out of: nvidia-mig-manager, toolkit-validation (init)
+time="2026-10-22T09:56:22Z" level=info msg="Current value of 'nvidia.com/gpu.deploy.client=true'\n"
+time="2026-10-22T09:56:22Z" level=info msg="Current value of 'nvidia.com/mig.config.state='\n"
+time="2026-10-22T09:56:22Z" level=info msg="Asserting that the requested configuration is present in the configuration file"
+Selected MIG configuration is valid
+time="2026-10-22T09:56:22Z" level=info msg="Checking if the selected MIG config is currently applied or not"
+2026/10/22 09:56:22 WARNING: unable to detect IOMMU FD for [0000:05:00.0 open /sys/bus/pci/devices/0000:05:00.0/vfio-dev: no such file or directory]: %!v(MISSING)
+2026/10/22 09:56:22 WARNING: unable to detect IOMMU FD for [0000:06:00.0 open /sys/bus/pci/devices/0000:06:00.0/vfio-dev: no such file or directory]: %!v(MISSING)
+2026/10/22 09:56:22 WARNING: unable to detect IOMMU FD for [0000:05:00.0 open /sys/bus/pci/devices/0000:05:00.0/vfio-dev: no such file or directory]: %!v(MISSING)
+2026/10/22 09:56:22 WARNING: unable to detect IOMMU FD for [0000:06:00.0 open /sys/bus/pci/devices/0000:06:00.0/vfio-dev: no such file or directory]: %!v(MISSING)
+2026/10/22 09:56:22 WARNING: unable to detect IOMMU FD for [0000:05:00.0 open /sys/bus/pci/devices/0000:05:00.0/vfio-dev: no such file or directory]: %!v(MISSING)
+2026/10/22 09:56:22 WARNING: unable to detect IOMMU FD for [0000:06:00.0 open /sys/bus/pci/devices/0000:06:00.0/vfio-dev: no such file or directory]: %!v(MISSING)
+Selected MIG configuration currently applied
+time="2026-10-22T09:56:22Z" level=info msg="Selected MIG config is already applied"
+time="2026-10-22T09:56:22Z" level=info msg="Restarting any GPU clients previously shutdown on the host by restarting their systemd services"
+time="2026-10-22T09:56:22Z" level=info msg="Restarting any GPU clients previously shutdown in Kubernetes by reenabling their component-specific nodeSelector labels"
+time="2026-10-22T09:56:22Z" level=info msg="Changing the 'nvidia.com/mig.config.state' node label to 'success'\n"
+time="2026-10-22T09:56:22Z" level=info msg="Successfully updated to MIG config: all-disabled"
+time="2026-10-22T09:56:22Z" level=info msg="Waiting for change to 'nvidia.com/mig.config' label"
+time="2026-10-22T10:16:45Z" level=info msg="Updating to MIG config: h200-split"
+time="2026-10-22T10:16:45Z" level=info msg="Current value of 'nvidia.com/gpu.deploy.device-plugin=true'\n"
+time="2026-10-22T10:16:45Z" level=info msg="Current value of 'nvidia.com/gpu.deploy.gpu-feature-discovery=true'\n"
+time="2026-10-22T10:16:45Z" level=info msg="Current value of 'nvidia.com/gpu.deploy.dcgm-exporter=true'\n"
+time="2026-10-22T10:16:45Z" level=info msg="Current value of 'nvidia.com/gpu.deploy.dcgm=true'\n"
+time="2026-10-22T10:16:45Z" level=info msg="Current value of 'nvidia.com/gpu.deploy.nvsm=true'\n"
+time="2026-10-22T10:16:45Z" level=info msg="Current value of 'nvidia.com/gpu.deploy.client=true'\n"
+time="2026-10-22T10:16:45Z" level=info msg="Current value of 'nvidia.com/mig.config.state=success'\n"
+time="2026-10-22T10:16:45Z" level=info msg="Asserting that the requested configuration is present in the configuration file"
+Selected MIG configuration is valid
+time="2026-10-22T10:16:45Z" level=info msg="Checking if the selected MIG config is currently applied or not"
+2026/10/22 10:16:45 WARNING: unable to detect IOMMU FD for [0000:05:00.0 open /sys/bus/pci/devices/0000:05:00.0/vfio-dev: no such file or directory]: %!v(MISSING)
+2026/10/22 10:16:45 WARNING: unable to detect IOMMU FD for [0000:06:00.0 open /sys/bus/pci/devices/0000:06:00.0/vfio-dev: no such file or directory]: %!v(MISSING)
+time="2026-10-22T10:16:45Z" level=fatal msg="Assertion failure: selected configuration not currently applied"
+time="2026-10-22T10:16:45Z" level=info msg="Checking if the MIG mode setting in the selected config is currently applied or not"
+time="2026-10-22T10:16:45Z" level=info msg="If the state is 'rebooting', we expect this to always return true"
+2026/10/22 10:16:45 WARNING: unable to detect IOMMU FD for [0000:05:00.0 open /sys/bus/pci/devices/0000:05:00.0/vfio-dev: no such file or directory]: %!v(MISSING)
+2026/10/22 10:16:45 WARNING: unable to detect IOMMU FD for [0000:06:00.0 open /sys/bus/pci/devices/0000:06:00.0/vfio-dev: no such file or directory]: %!v(MISSING)
+time="2026-10-22T10:16:45Z" level=fatal msg="Assertion failure: selected configuration not currently applied"
+time="2026-10-22T10:16:45Z" level=info msg="Shutting down all GPU clients in Kubernetes by disabling their component-specific nodeSelector labels"
+time="2026-10-22T10:16:45Z" level=info msg="Waiting for the device-plugin to shutdown"
+time="2026-10-22T10:16:46Z" level=info msg="Waiting for gpu-feature-discovery to shutdown"
+time="2026-10-22T10:16:47Z" level=info msg="Waiting for dcgm-exporter to shutdown"
+time="2026-10-22T10:16:48Z" level=info msg="Waiting for dcgm to shutdown"
+time="2026-10-22T10:16:49Z" level=info msg="Waiting for any daemon set pods with nodeSelector key nvidia.com/gpu.deploy.client to shutdown"
+time="2026-10-22T10:16:49Z" level=info msg="Removing the cuda-validator pod"
+time="2026-10-22T10:16:49Z" level=info msg="Removing the plugin-validator pod"
+time="2026-10-22T10:16:49Z" level=info msg="Shutting down all GPU clients on the host by stopping their systemd services"
+Skipping nvsm.service (no-exist)
+Skipping nvsm-mqtt.service (no-exist)
+Skipping nvsm-core.service (no-exist)
+Skipping nvsm-api-gateway.service (no-exist)
+Skipping nvsm-notifier.service (no-exist)
+Skipping nv_peer_mem.service (no-exist)
+Skipping nvidia-dcgm.service (no-exist)
+Skipping dcgm.service (no-exist)
+Skipping dcgm-exporter.service (no-exist)
+Stopping kubelet.service (active, will-restart)
+time="2026-10-22T10:17:19Z" level=info msg="Applying the MIG mode change from the selected config to the node (and double checking it took effect)"
+time="2026-10-22T10:17:19Z" level=info msg="If the -r option was passed, the node will be automatically rebooted if this is not successful"
+time="2026-10-22T10:17:19Z" level=debug msg="Parsing config file..."
+time="2026-10-22T10:17:19Z" level=debug msg="Selecting specific MIG config..."
+time="2026-10-22T10:17:19Z" level=debug msg="Running apply-start hook"
+time="2026-10-22T10:17:19Z" level=debug msg="Checking current MIG mode..."
+2026/10/22 10:17:19 WARNING: unable to detect IOMMU FD for [0000:05:00.0 open /sys/bus/pci/devices/0000:05:00.0/vfio-dev: no such file or directory]: %!v(MISSING)
+2026/10/22 10:17:19 WARNING: unable to detect IOMMU FD for [0000:06:00.0 open /sys/bus/pci/devices/0000:06:00.0/vfio-dev: no such file or directory]: %!v(MISSING)
+time="2026-10-22T10:17:19Z" level=debug msg="Walking MigConfig for (devices=[0])"
+time="2026-10-22T10:17:19Z" level=debug msg="  GPU 0: 0x233510DE:0x18BE10DE"
+time="2026-10-22T10:17:19Z" level=debug msg="    Asserting MIG mode: Enabled"
+time="2026-10-22T10:17:19Z" level=debug msg="    MIG capable: true\n"
+time="2026-10-22T10:17:19Z" level=debug msg="    Current MIG mode: Disabled"
+time="2026-10-22T10:17:19Z" level=debug msg="Running pre-apply-mode hook"
+time="2026-10-22T10:17:19Z" level=debug msg="Applying MIG mode change..."
+2026/10/22 10:17:19 WARNING: unable to detect IOMMU FD for [0000:05:00.0 open /sys/bus/pci/devices/0000:05:00.0/vfio-dev: no such file or directory]: %!v(MISSING)
+2026/10/22 10:17:19 WARNING: unable to detect IOMMU FD for [0000:06:00.0 open /sys/bus/pci/devices/0000:06:00.0/vfio-dev: no such file or directory]: %!v(MISSING)
+2026/10/22 10:17:19 WARNING: unable to detect IOMMU FD for [0000:05:00.0 open /sys/bus/pci/devices/0000:05:00.0/vfio-dev: no such file or directory]: %!v(MISSING)
+2026/10/22 10:17:19 WARNING: unable to detect IOMMU FD for [0000:06:00.0 open /sys/bus/pci/devices/0000:06:00.0/vfio-dev: no such file or directory]: %!v(MISSING)
+time="2026-10-22T10:17:19Z" level=debug msg="Walking MigConfig for (devices=[0])"
+time="2026-10-22T10:17:19Z" level=debug msg="  GPU 0: 0x233510DE:0x18BE10DE"
+time="2026-10-22T10:17:19Z" level=debug msg="    MIG capable: true\n"
+time="2026-10-22T10:17:19Z" level=debug msg="    Current MIG mode: Disabled"
+time="2026-10-22T10:17:19Z" level=debug msg="    Updating MIG mode: Enabled"
+time="2026-10-22T10:17:19Z" level=debug msg="    Mode change pending: false"
+time="2026-10-22T10:17:19Z" level=debug msg="Walking MigConfig for (devices=[1])"
+time="2026-10-22T10:17:19Z" level=debug msg="  GPU 1: 0x233510DE:0x18BE10DE"
+time="2026-10-22T10:17:19Z" level=debug msg="    MIG capable: true\n"
+time="2026-10-22T10:17:19Z" level=debug msg="    Current MIG mode: Disabled"
+time="2026-10-22T10:17:19Z" level=debug msg="    Updating MIG mode: Disabled"
+time="2026-10-22T10:17:19Z" level=debug msg="    Mode change pending: false"
+time="2026-10-22T10:17:19Z" level=debug msg="Running apply-exit hook"
+MIG configuration applied successfully
+time="2026-10-22T10:17:19Z" level=debug msg="Parsing config file..."
+time="2026-10-22T10:17:19Z" level=debug msg="Selecting specific MIG config..."
+time="2026-10-22T10:17:19Z" level=debug msg="Asserting MIG mode configuration..."
+2026/10/22 10:17:19 WARNING: unable to detect IOMMU FD for [0000:05:00.0 open /sys/bus/pci/devices/0000:05:00.0/vfio-dev: no such file or directory]: %!v(MISSING)
+2026/10/22 10:17:19 WARNING: unable to detect IOMMU FD for [0000:06:00.0 open /sys/bus/pci/devices/0000:06:00.0/vfio-dev: no such file or directory]: %!v(MISSING)
+time="2026-10-22T10:17:19Z" level=debug msg="Walking MigConfig for (devices=[0])"
+time="2026-10-22T10:17:19Z" level=debug msg="  GPU 0: 0x233510DE:0x18BE10DE"
+time="2026-10-22T10:17:19Z" level=debug msg="    Asserting MIG mode: Enabled"
+time="2026-10-22T10:17:19Z" level=debug msg="    MIG capable: true\n"
+time="2026-10-22T10:17:19Z" level=debug msg="    Current MIG mode: Enabled"
+time="2026-10-22T10:17:19Z" level=debug msg="Walking MigConfig for (devices=[1])"
+time="2026-10-22T10:17:19Z" level=debug msg="  GPU 1: 0x233510DE:0x18BE10DE"
+time="2026-10-22T10:17:19Z" level=debug msg="    Asserting MIG mode: Disabled"
+time="2026-10-22T10:17:19Z" level=debug msg="    MIG capable: true\n"
+time="2026-10-22T10:17:19Z" level=debug msg="    Current MIG mode: Disabled"
+Selected MIG mode settings from configuration currently applied
+time="2026-10-22T10:17:19Z" level=info msg="Applying the selected MIG config to the node"
+time="2026-10-22T10:17:19Z" level=debug msg="Parsing config file..."
+time="2026-10-22T10:17:19Z" level=debug msg="Selecting specific MIG config..."
+time="2026-10-22T10:17:19Z" level=debug msg="Running apply-start hook"
+time="2026-10-22T10:17:19Z" level=debug msg="Checking current MIG mode..."
+2026/10/22 10:17:19 WARNING: unable to detect IOMMU FD for [0000:05:00.0 open /sys/bus/pci/devices/0000:05:00.0/vfio-dev: no such file or directory]: %!v(MISSING)
+2026/10/22 10:17:19 WARNING: unable to detect IOMMU FD for [0000:06:00.0 open /sys/bus/pci/devices/0000:06:00.0/vfio-dev: no such file or directory]: %!v(MISSING)
+time="2026-10-22T10:17:19Z" level=debug msg="Walking MigConfig for (devices=[0])"
+time="2026-10-22T10:17:19Z" level=debug msg="  GPU 0: 0x233510DE:0x18BE10DE"
+time="2026-10-22T10:17:19Z" level=debug msg="    Asserting MIG mode: Enabled"
+time="2026-10-22T10:17:19Z" level=debug msg="    MIG capable: true\n"
+time="2026-10-22T10:17:19Z" level=debug msg="    Current MIG mode: Enabled"
+time="2026-10-22T10:17:19Z" level=debug msg="Walking MigConfig for (devices=[1])"
+time="2026-10-22T10:17:19Z" level=debug msg="  GPU 1: 0x233510DE:0x18BE10DE"
+time="2026-10-22T10:17:19Z" level=debug msg="    Asserting MIG mode: Disabled"
+time="2026-10-22T10:17:19Z" level=debug msg="    MIG capable: true\n"
+time="2026-10-22T10:17:19Z" level=debug msg="    Current MIG mode: Disabled"
+time="2026-10-22T10:17:19Z" level=debug msg="Checking current MIG device configuration..."
+2026/10/22 10:17:19 WARNING: unable to detect IOMMU FD for [0000:05:00.0 open /sys/bus/pci/devices/0000:05:00.0/vfio-dev: no such file or directory]: %!v(MISSING)
+2026/10/22 10:17:19 WARNING: unable to detect IOMMU FD for [0000:06:00.0 open /sys/bus/pci/devices/0000:06:00.0/vfio-dev: no such file or directory]: %!v(MISSING)
+2026/10/22 10:17:19 WARNING: unable to detect IOMMU FD for [0000:05:00.0 open /sys/bus/pci/devices/0000:05:00.0/vfio-dev: no such file or directory]: %!v(MISSING)
+2026/10/22 10:17:19 WARNING: unable to detect IOMMU FD for [0000:06:00.0 open /sys/bus/pci/devices/0000:06:00.0/vfio-dev: no such file or directory]: %!v(MISSING)
+time="2026-10-22T10:17:19Z" level=debug msg="Walking MigConfig for (devices=[0])"
+time="2026-10-22T10:17:19Z" level=debug msg="  GPU 0: 0x233510DE:0x18BE10DE"
+time="2026-10-22T10:17:19Z" level=debug msg="    Asserting MIG config: map[3g.71gb:2]"
+time="2026-10-22T10:17:19Z" level=debug msg="Walking MigConfig for (devices=[1])"
+time="2026-10-22T10:17:19Z" level=debug msg="  GPU 1: 0x233510DE:0x18BE10DE"
+time="2026-10-22T10:17:19Z" level=debug msg="Running pre-apply-config hook"
+time="2026-10-22T10:17:19Z" level=debug msg="Applying MIG device configuration..."
+2026/10/22 10:17:19 WARNING: unable to detect IOMMU FD for [0000:05:00.0 open /sys/bus/pci/devices/0000:05:00.0/vfio-dev: no such file or directory]: %!v(MISSING)
+2026/10/22 10:17:19 WARNING: unable to detect IOMMU FD for [0000:06:00.0 open /sys/bus/pci/devices/0000:06:00.0/vfio-dev: no such file or directory]: %!v(MISSING)
+time="2026-10-22T10:17:20Z" level=debug msg="Walking MigConfig for (devices=[0])"
+time="2026-10-22T10:17:20Z" level=debug msg="  GPU 0: 0x233510DE:0x18BE10DE"
+time="2026-10-22T10:17:20Z" level=debug msg="    MIG capable: true\n"
+time="2026-10-22T10:17:20Z" level=debug msg="    Updating MIG config: map[3g.71gb:2]"
+time="2026-10-22T10:17:20Z" level=debug msg="Walking MigConfig for (devices=[1])"
+time="2026-10-22T10:17:20Z" level=debug msg="  GPU 1: 0x233510DE:0x18BE10DE"
+time="2026-10-22T10:17:20Z" level=debug msg="    MIG capable: true\n"
+time="2026-10-22T10:17:20Z" level=debug msg="    Skipping MIG config -- MIG disabled"
+time="2026-10-22T10:17:20Z" level=debug msg="Running apply-exit hook"
+MIG configuration applied successfully
+time="2026-10-22T10:17:20Z" level=info msg="Running nvidia-smi"
+Thu Oct 22 10:17:20 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 580.178.04             Driver Version: 580.178.04     CUDA Version: 13.0     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H200                    On  |   00000000:05:00.0 Off |                  Off |
+| N/A   31C    P0             76W /  700W |      87MiB / 143771MiB |     N/A      Default |
+|                                         |                        |              Enabled |
++-----------------------------------------+------------------------+----------------------+
+|   1  NVIDIA H200                    On  |   00000000:06:00.0 Off |                  Off |
+| N/A   30C    P0             77W /  700W |       0MiB / 143771MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| MIG devices:                                                                            |
++------------------+----------------------------------+-----------+-----------------------+
+| GPU  GI  CI  MIG |              Shared Memory-Usage |        Vol|        Shared         |
+|      ID  ID  Dev |                Shared BAR1-Usage | SM     Unc| CE ENC  DEC  OFA  JPG |
+|                  |                                  |        ECC|                       |
+|==================+==================================+===========+=======================|
+|  0    1   0   0  |              44MiB / 71424MiB    | 60    N/A |  3   0    3    0    3 |
+|                  |               0MiB / 59238MiB    |           |                       |
++------------------+----------------------------------+-----------+-----------------------+
+|  0    2   0   1  |              44MiB / 71424MiB    | 60    N/A |  3   0    3    0    3 |
+|                  |               0MiB / 59238MiB    |           |                       |
++------------------+----------------------------------+-----------+-----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+time="2026-10-22T10:17:21Z" level=info msg="Creating NVIDIA control device nodes"
+time="2026-10-22T10:17:21Z" level=info msg="Creating control device nodes at /host"
+time="2026-10-22T10:17:21Z" level=info msg="Skipping: /host/dev/nvidiactl already exists"
+time="2026-10-22T10:17:21Z" level=info msg="Skipping: /host/dev/nvidia-modeset already exists"
+time="2026-10-22T10:17:21Z" level=info msg="Skipping: /host/dev/nvidia-uvm already exists"
+time="2026-10-22T10:17:21Z" level=info msg="Skipping: /host/dev/nvidia-uvm-tools already exists"
+time="2026-10-22T10:17:21Z" level=info msg="Creating management CDI spec"
+time="2026-10-22T10:17:21Z" level=info msg="Creating management CDI spec (simplified implementation)"
+time="2026-10-22T10:17:21Z" level=info msg="Restarting all GPU clients previously shutdown on the host by restarting their systemd services"
+Starting kubelet.service
+time="2026-10-22T10:17:21Z" level=info msg="Restarting validator pod to re-run all validations"
+time="2026-10-22T10:17:21Z" level=info msg="Restarting all GPU clients previously shutdown in Kubernetes by reenabling their component-specific nodeSelector labels"
+time="2026-10-22T10:17:21Z" level=info msg="Changing the 'nvidia.com/mig.config.state' node label to 'success'\n"
+time="2026-10-22T10:17:21Z" level=info msg="Successfully updated to MIG config: h200-split"
+time="2026-10-22T10:17:21Z" level=info msg="Waiting for change to 'nvidia.com/mig.config' label"
+### MIG layout the node reports (nvidia-mig-parted export)
+Defaulted container "nvidia-mig-manager" out of: nvidia-mig-manager, toolkit-validation (init)
+2026/10/22 10:18:09 WARNING: unable to detect IOMMU FD for [0000:05:00.0 open /sys/bus/pci/devices/0000:05:00.0/vfio-dev: no such file or directory]: %!v(MISSING)
+2026/10/22 10:18:09 WARNING: unable to detect IOMMU FD for [0000:06:00.0 open /sys/bus/pci/devices/0000:06:00.0/vfio-dev: no such file or directory]: %!v(MISSING)
+version: v1
+mig-configs:
+  current:
+  - devices: [0]
+    mig-enabled: true
+    mig-devices:
+      3g.71gb: 2
+  - devices: [1]
+    mig-enabled: false
+    mig-devices: {}
+
+## Tenants on their slices   [10:18:09Z]
+each slice pod should see about 71 GB (nvidia.com/mig-3g.71gb); the whole-GPU pod sees the full card
+pod/mig-a created
+pod/mig-b created
+pod/whole-a created
+after 5s: team-a/mig-a running
+after 1s: team-b/mig-b running
+timeout after 300s: team-a/whole-a running
+NAMESPACE   NAME      READY   STATUS    RESTARTS   AGE     IP            NODE             NOMINATED NODE   READINESS GATES
+team-a      mig-a     1/1     Running   0          5m30s   10.244.1.28   eu1-fin-gpu-01   <none>           <none>
+team-a      whole-a   0/1     Pending   0          5m29s   <none>        <none>           <none>           <none>
+team-b      mig-b     1/1     Running   0          5m29s   10.244.1.29   eu1-fin-gpu-01   <none>           <none>
+### team-a/mig-a: {"nvidia.com/mig-3g.71gb":"1"}
+GPU 0: NVIDIA H200 (UUID: GPU-4d345e6c-2a90-57e7-e5c7-3ffdb67e061d)
+  MIG 3g.71gb     Device  0: (UUID: MIG-82b6aa84-3e05-59bd-a396-690e13953fd3)
+cuda device: NVIDIA H200 MIG 3g.71gb total GiB: 69.8
+### team-b/mig-b: {"nvidia.com/mig-3g.71gb":"1"}
+GPU 0: NVIDIA H200 (UUID: GPU-4d345e6c-2a90-57e7-e5c7-3ffdb67e061d)
+  MIG 3g.71gb     Device  0: (UUID: MIG-f8bb95eb-0760-582a-9634-f1f65e797a9f)
+cuda device: NVIDIA H200 MIG 3g.71gb total GiB: 69.8
+### team-a/whole-a: {"nvidia.com/gpu":"1"}
+### queues (GPUs allocated, requested)
+QUEUE                  PARENT                 GPU_QUOTA   GPU_ALLOCATED   GPU_REQUESTED   NONPREEMPTIBLE
+default-parent-queue   <none>                 0           <none>          <none>          <none>
+default-queue          default-parent-queue   0           <none>          <none>          <none>
+eu1                    <none>                 2           <none>          1               <none>
+team-a                 eu1                    1           <none>          1               <none>
+team-b                 eu1                    1           <none>          <none>          <none>
+### podgroups in team-a
+PODGROUP                                          QUEUE    MIN_MEMBER   STATE    PRIORITY
+pg-mig-a-9e76222d-15bf-4688-bc36-3ce722d76b87     team-a   1            <none>   train
+pg-whole-a-8fe55b3c-0f94-4587-9ae4-e9794e24bc4b   team-a   1            <none>   train
+### podgroups in team-b
+PODGROUP                                        QUEUE    MIN_MEMBER   STATE    PRIORITY
+pg-mig-b-b77a25ea-06a9-4ca1-8e78-2d7ccda748a7   team-b   1            <none>   train
+
+## Cleanup (MIG layout kept until teardown)   [10:23:42Z]
+pod "mig-a" deleted
+pod "mig-b" deleted
+pod "whole-a" deleted
+
+## Result   [10:23:43Z]
+MIG h200-split applied on eu1-fin-gpu-01; tenants placed by KAI

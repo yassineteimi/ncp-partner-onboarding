@@ -1,0 +1,4 @@
+# cpu-up-20261022T094702Z.txt, laptop clock, UTC
+apply_started=2026-10-22T09:47:02Z
+instance_running=2026-10-22T09:47:10Z
+node_ready=2026-10-22T09:47:38Z
