@@ -22,7 +22,8 @@
 # is: the node is deleted at teardown.
 #
 # Writes docs/artifacts/scheduling/mig-fin-<stamp>.txt. KEEP=1 leaves the
-# tenant pods running.
+# tenant pods running. MIG_CONFIG=rtxpro-split runs the same steps on 2x RTX
+# PRO 6000 instead (2g.48gb slices), only with Yassine's approval.
 #
 
 source "$(dirname "${BASH_SOURCE[0]}")/../lib.sh"
@@ -32,8 +33,18 @@ require_tools kubectl perl
 source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
 
 MIG_TIMEOUT="${MIG_TIMEOUT:-600}"
-MIG_CONFIG=h200-split
 TENANTS="$REPO_ROOT/workloads/scheduling/mig/tenants.yaml"
+
+# The layout, from gitops/values/scheduling/gpu-operator-fin.yaml. h200-split
+# is the plan. MIG_CONFIG=rtxpro-split is the fallback on 2x RTX PRO 6000,
+# used only with Yassine's approval at the time.
+MIG_CONFIG="${MIG_CONFIG:-h200-split}"
+case "$MIG_CONFIG" in
+  h200-split) MIG_PROFILE=3g.71gb MIG_EXPECT_GB=71 ;;
+  rtxpro-split) MIG_PROFILE=2g.48gb MIG_EXPECT_GB=48 ;;
+  *) die "unknown MIG_CONFIG '$MIG_CONFIG', expected h200-split or rtxpro-split" ;;
+esac
+MIG_RESOURCE="nvidia.com/mig-$MIG_PROFILE"
 
 node="$(kubectl_cp get nodes -l eu1.io/pool=gpu -o jsonpath='{.items[0].metadata.name}')"
 [ -n "$node" ] || die "no node with eu1.io/pool=gpu on fin"
@@ -43,7 +54,7 @@ node_label() {
 }
 mig_state_is() { [ "$(node_label nvidia.com/mig.config.state)" = "$1" ]; }
 mig_allocatable_is() {
-  [ "$(kubectl_cp get node "$node" -o jsonpath='{.status.allocatable.nvidia\.com/mig-3g\.71gb}')" = "$1" ]
+  [ "$(kubectl_cp get node "$node" -o jsonpath="{.status.allocatable.${MIG_RESOURCE//./\\.}}")" = "$1" ]
 }
 mig_manager_pod() {
   kubectl_cp -n gpu-operator get pods -l app=nvidia-mig-manager \
@@ -128,7 +139,7 @@ if ! mig_state_is success; then
 fi
 
 section "Device plugin advertises the slices"
-if ! wait_for "nvidia.com/mig-3g.71gb: 2 allocatable" 180 mig_allocatable_is 2; then
+if ! wait_for "$MIG_RESOURCE: 2 allocatable" 180 mig_allocatable_is 2; then
   show_node
   capture_mig_manager
   echo "MIG applied but the slices are not advertised; cut."
@@ -138,7 +149,9 @@ show_node
 capture_mig_manager
 
 section "Tenants on their slices"
-kubectl_cp apply -f "$TENANTS"
+# tenants.yaml asks for the H200 slice; the fallback swaps in its own.
+echo "each slice pod should see about $MIG_EXPECT_GB GB ($MIG_RESOURCE); the whole-GPU pod sees the full card"
+sed "s#nvidia.com/mig-3g.71gb#$MIG_RESOURCE#" "$TENANTS" | kubectl_cp apply -f -
 pod_running() { [ "$(kubectl_cp -n "$1" get pod "$2" -o jsonpath='{.status.phase}' 2>/dev/null)" = Running ]; }
 for pod in team-a/mig-a team-b/mig-b team-a/whole-a; do
   ns="${pod%/*}" name="${pod#*/}"
