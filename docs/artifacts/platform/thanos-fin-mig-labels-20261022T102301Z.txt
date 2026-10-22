@@ -1,0 +1,34 @@
+# W2 6b part 2: MIG labels on fin's DCGM series, read on fin's own Prometheus, 20261022T102301Z, laptop clock, UTC. MIG success at 10:17:24Z (h200-split).
+## gpu:dcgm_series:count
+   UUID=GPU-0557d559-558e-dfb1-ed86-7d0138f9982d, gpu=1, hostname=eu1-fin-gpu-01, modelName=NVIDIA H200 => 40
+   UUID=GPU-4d345e6c-2a90-57e7-e5c7-3ffdb67e061d, gpu=0, hostname=eu1-fin-gpu-01, modelName=NVIDIA H200 => 51
+## count by (gpu, UUID, GPU_I_ID, GPU_I_PROFILE) ({__name__=~"DCGM_.+"})
+   UUID=GPU-0557d559-558e-dfb1-ed86-7d0138f9982d, gpu=1 => 40
+   UUID=GPU-4d345e6c-2a90-57e7-e5c7-3ffdb67e061d, gpu=0 => 11
+   GPU_I_ID=1, GPU_I_PROFILE=MIG 3g.71gb, UUID=GPU-4d345e6c-2a90-57e7-e5c7-3ffdb67e061d, gpu=0 => 20
+   GPU_I_ID=2, GPU_I_PROFILE=MIG 3g.71gb, UUID=GPU-4d345e6c-2a90-57e7-e5c7-3ffdb67e061d, gpu=0 => 20
+## count by (__name__) ({__name__=~"DCGM_.+", GPU_I_ID!=""})
+    => 2
+    => 2
+    => 2
+    => 2
+    => 2
+    => 2
+    => 2
+    => 2
+    => 2
+    => 2
+    => 2
+    => 2
+    => 2
+    => 2
+    => 2
+    => 2
+    => 2
+    => 2
+    => 2
+    => 2
+## DCGM_FI_DEV_FB_USED
+   DCGM_FI_DRIVER_VERSION=580.178.04, UUID=GPU-0557d559-558e-dfb1-ed86-7d0138f9982d, container=nvidia-dcgm-exporter, device=nvidia1, endpoint=gpu-metrics, gpu=1, hostname=eu1-fin-gpu-01, instance=10.244.1.25:9400, job=nvidia-dcgm-exporter, modelName=NVIDIA H200, namespace=gpu-operator, pci_bus_id=00000000:06:00.0, pod=nvidia-dcgm-exporter-82mpj, service=nvidia-dcgm-exporter => 0
+   DCGM_FI_DRIVER_VERSION=580.178.04, GPU_CI_ID=0, GPU_I_ID=1, GPU_I_PROFILE=MIG 3g.71gb, UUID=GPU-4d345e6c-2a90-57e7-e5c7-3ffdb67e061d, container=nvidia-dcgm-exporter, device=nvidia0, endpoint=gpu-metrics, exported_container=probe, exported_namespace=team-b, exported_pod=mig-b, gpu=0, hostname=eu1-fin-gpu-01, instance=10.244.1.25:9400, job=nvidia-dcgm-exporter, modelName=NVIDIA H200, namespace=gpu-operator, pci_bus_id=00000000:05:00.0, pod=nvidia-dcgm-exporter-82mpj, service=nvidia-dcgm-exporter => 43
+   DCGM_FI_DRIVER_VERSION=580.178.04, GPU_CI_ID=0, GPU_I_ID=2, GPU_I_PROFILE=MIG 3g.71gb, UUID=GPU-4d345e6c-2a90-57e7-e5c7-3ffdb67e061d, container=nvidia-dcgm-exporter, device=nvidia0, endpoint=gpu-metrics, exported_container=probe, exported_namespace=team-a, exported_pod=mig-a, gpu=0, hostname=eu1-fin-gpu-01, instance=10.244.1.25:9400, job=nvidia-dcgm-exporter, modelName=NVIDIA H200, namespace=gpu-operator, pci_bus_id=00000000:05:00.0, pod=nvidia-dcgm-exporter-82mpj, service=nvidia-dcgm-exporter => 43
