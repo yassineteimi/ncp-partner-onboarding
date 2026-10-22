@@ -25,8 +25,9 @@ The L4 has no MIG. fin's H200s do.
 
 Sharing depends on the tenant class and the hardware, not one setting for the whole fleet:
 
-- **Training tenants get whole GPUs**, as a gang through KAI (ADR 0006). On fin that's GPU1 after step 5, or both GPUs before it.
-- **Small tenants on MIG-capable GPUs get MIG instances.** On fin, the `h200-split` layout makes GPU0 into two `3g.71gb` instances, one per tenant, each with about 71 GB of its own. MIG is the only option here where a tenant's memory and faults stay inside what it pays for, and isolation between paying tenants is the property EU1 sells.
+- **Training tenants get whole GPUs**, as a gang through KAI (ADR 0006), on nodes with MIG off. On fin, that's both GPUs before step 5.
+- **Small tenants on MIG-capable GPUs get MIG instances.** On fin, the `h200-split` layout makes GPU0 into two `3g.71gb` instances, one per tenant, each with about 70 GiB of its own. MIG is the only option here where a tenant's memory and faults stay inside what it pays for, and isolation between paying tenants is the property EU1 sells.
+- **The split between the two is per node, not per GPU.** I first planned one node with both: MIG slices on GPU0 for small tenants, GPU1 whole for a training job. W2 showed KAI v0.18.6 won't do that. On a MIG-enabled node with `nvidia.com/mig.strategy=mixed`, it refuses every task that isn't a MIG request ("non MIG jobs cant run on a node with MigStrategy='mixed'", `pkg/scheduler/api/node_info/node_info.go`), although the GPU Operator still advertises the whole GPU. So EU1 runs MIG nodes and whole-GPU nodes as separate pools, and a MIG node's layout should slice every GPU it has. In `h200-split` as written, GPU1 is stranded under KAI.
 - **par's L4 pool stays time-sliced only for a single tenant's own pods** (dev and CI), never between two paying tenants. Without MIG on the L4, the honest offer to a second tenant is a whole L4.
 
 What would change the answer:
@@ -37,7 +38,8 @@ What would change the answer:
 
 ## Consequences
 
-- Two tenants on one H200, each with its own memory, SMs and fault containment, scheduled through the same KAI queues as whole-GPU jobs.
+- Two tenants on one H200, each with its own memory, SMs and fault containment, scheduled through the same KAI queues as whole-GPU jobs, but on different nodes from them.
+- Capacity planning works in nodes: deciding how many nodes are MIG nodes, and with which layout, is the operator's lever. On a fleet of 2-GPU nodes that's coarse, and fin's single node can show one mode at a time.
 - MIG is a node property EU1 operates: the layout lives in the GPU Operator overlay (`gitops/values/scheduling/gpu-operator-fin.yaml`), named after what it does (Part 1 rule 6), and a node label selects it. Changing it pauses that node's GPU clients, so layout changes are maintenance, not self-service.
 - `WITH_REBOOT` stays false: if a mode change fails, the node reports `failed` instead of rebooting itself mid-window.
 - **What this PoC can't show:**
@@ -52,4 +54,6 @@ What would change the answer:
 - Free check of the MIG config: the GPU Operator v26.7.2 render for fin has `mig.strategy=mixed`, the `mig-parted-eu1` ConfigMap and `WITH_REBOOT=false` ([free checks](../artifacts/scheduling/free-checks-20261020T232008Z.txt)).
 - Source: mig-parted v0.15.1, `pkg/mig/reconfigure/reconfigure.go` (state labels, the reboot fallback) and `cmd/nvidia-mig-parted/util/device.go` (`nvidia-smi -r` on a pending mode change); KAI v0.18.6, `pkg/scheduler/api/common_info/resources/mig.go`; H200 141GB profiles from NVIDIA's MIG user guide.
 - `make sched-mig-check`, 21 October ([capture](../artifacts/scheduling/mig-config-par-20261021T113350Z.txt)): fin's rendered config through mig-parted v0.15.1's own loader on par's CPU worker. `h200-split` and `all-disabled` are valid, an unknown name is refused.
-- Planned: W2 step 5 on fin, MIG applied, two tenants each seeing about 71 GB on their own instance, one whole-GPU pod beside them (`make sched-mig`).
+- W2 step 5 on fin, 22 October ([capture](../artifacts/scheduling/mig-fin-20261022T101643Z.txt)): `h200-split` applied in 33 seconds with no reboot; `team-a` and `team-b` each ran on their own `3g.71gb` instance of the same H200, and CUDA saw 69.8 GiB in each.
+- The whole-GPU pod beside them, refused ([capture](../artifacts/scheduling/mig-whole-gpu-fin-20261022T102435Z.txt)): resubmitted alone and within quota, KAI still held it with "1 non MIG jobs cant run on a node with MigStrategy='mixed'". Source: KAI v0.18.6, `pkg/scheduler/api/node_info/node_info.go`.
+- `make sched-mig-check`, 22 October ([capture](../artifacts/scheduling/mig-config-par-20261022T095114Z.txt)): `all-disabled`, `h200-split` and the RTX PRO 6000 fallback `rtxpro-split` all valid.

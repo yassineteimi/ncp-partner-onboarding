@@ -2,7 +2,9 @@
 # GPU0 is two 3g.71gb MIG instances, GPU1 is whole.
 #
 # One pod per team on its own slice, plus a whole-GPU pod for team-a on GPU1,
-# all placed by KAI through the teams' queues. Each prints the device it was
+# all submitted through the teams' queues. In W2 KAI placed both slice pods
+# and refused whole-a: it runs no non-MIG job on a MIG node with the mixed
+# strategy (ADR 0008). whole-a stays here as the check of that rule. Each prints the device it was
 # given (nvidia-smi -L shows the MIG UUID) and the memory CUDA sees, which on a
 # 3g.71gb slice is about 71 GB, not the H200's 141. Two tenants on one GPU, each
 # with its own memory, compute and fault domain: what Part 1's time slicing on
