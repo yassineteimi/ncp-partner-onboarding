@@ -1,21 +1,21 @@
 # ADR 0005: NVSentinel for GPU fault remediation
 
-Status: accepted, after W1 on 21 October (proposed the same day)
-Date: 2026-10-22. Owner: ws-readiness. Use case: 3.
+Status: accepted
+Scope: GPU fault detection and remediation, Nordhaven's GPU pools (measured on the Paris L4). Decided after the L4 run, 21 October 2026.
 
 ## Context
 
-When a GPU in EU1's fleet throws a fatal XID, the node has to leave service, its
+When a GPU in Nordhaven's fleet throws a fatal XID, the node has to leave service, its
 workloads have to move, it has to be repaired and come back, with nobody paged at 3 a.m.
 Part 1 did this on one L4 with node-problem-detector and a controller I wrote, and the
 outage it measured (360.9 s) was 83% a lookback timer of mine and 11% a person who
-hadn't yet run the return-to-service command. EU1 runs two GPU types on two providers,
-so whatever it picks has to know GPU faults, not just node failures, and cost little to
-operate per pool.
+hadn't yet run the return-to-service command. Nordhaven runs two GPU types on two
+providers, so whatever it picks has to know GPU faults, not just node failures, and cost
+little to operate per pool.
 
 ## Options considered
 
-| Option | What it is | For EU1 | Against, for EU1 |
+| Option | What it is | For Nordhaven | Against, for Nordhaven |
 |---|---|---|---|
 | A. NVSentinel v1.28.0 | NVIDIA's GPU fault pipeline: syslog and DCGM health monitors, quarantine, drain, remediation through a janitor with per-provider back ends, events in MongoDB | Knows GPU faults: NVIDIA's XID catalog decides reboot vs GPU reset vs "call support"; DCGM health watches catch faults the kernel log doesn't; the node returns by itself when the monitors report healthy; maintained, released weekly | Heavy for one node: MongoDB, cert-manager, seven Deployments and six DaemonSets with every stage on (two of them only for DCGM 3.x or Kata nodes). Its defaults assume a fleet (circuit breaker, a drain that never evicts) and had to be changed here. Weekly releases mean pinning and reading changelogs |
 | B. Part 1's controller | node-problem-detector turns the XID line into a node condition; 369 lines of Python cordon and evict; a scripted, gated return to service | Small, and every line is mine to read; Part 1 tested it (42 tests) and measured it; the return runs `dcgmi diag` before uncordoning | I maintain the XID knowledge; a person runs the return; the five-minute lookback exists only because node-problem-detector replays old kernel lines after a restart; no DCGM path, no reboot or GPU reset |
@@ -36,9 +36,9 @@ fleet.
 
 ## Consequences
 
-- EU1 now runs MongoDB (Percona, one member here) and cert-manager for its fault
+- Nordhaven now runs MongoDB (Percona, one member here) and cert-manager for its fault
   pipeline, and NVSentinel's control pods need somewhere to live that isn't a GPU node:
-  on par, the CPU worker, which is powered off between windows, so NVSentinel only
+  in Paris, the CPU worker, which is powered off between uses, so NVSentinel only
   protects the L4 while that worker is on.
 - The settings I changed are fleet decisions, not demo ones: on a real pool the circuit
   breaker stays on with an absolute cap, and the drain mode is chosen per namespace.
@@ -49,30 +49,30 @@ fleet.
   simulated XID is not a fleet's fault mix; and the generic reboot is the only
   remediation exercised, since Scaleway exposes no API NVSentinel's janitor knows.
 
-## What W1 showed
+## What the L4 run showed
 
-On par's L4, with Part 1's job and a SIMULATED XID 79: 288.8 s from fault to resumed
-training against 360.9 s, goodput 73.0% against 66.4%, and nobody acting at any step.
-The cordon came 1.3 s after the fault and the drain 1.7 s later. 82% of the outage is now
-the reboot the XID catalog prescribes (115 s) and the GPU Operator rebuilding the driver
-(123 s), which Part 1 skipped by handing the GPU back after a diagnostic. A second run
-through DCGM took 283.3 s, so both detection paths behave the same way. The decision
-stands; two consequences move up the list:
+On the Paris L4 on 21 October, with Part 1's job and a SIMULATED XID 79: 288.8 s from
+fault to resumed training against 360.9 s, goodput 73.0% against 66.4%, and nobody
+acting at any step. The cordon came 1.3 s after the fault and the drain 1.7 s later. 82%
+of the outage is now the reboot the XID catalog prescribes (115 s) and the GPU Operator
+rebuilding the driver (123 s), which Part 1 skipped by handing the GPU back after a
+diagnostic. A second run through DCGM took 283.3 s, so both detection paths behave the
+same way. The decision stands; two consequences move up the list:
 
 - Turn post-remediation validation on before tenants rely on it. The node returned
   32 s after the GPU was allocatable, with no diagnostic.
-- A precompiled driver on par would remove most of the 123 s; that belongs to the driver
-  decision (ADR 0002).
+- A precompiled driver in Paris would remove most of the 123 s; that belongs to the
+  driver decision (ADR 0002).
 
 ## Evidence
 
-- Use case 3 page: [10-day2-nvsentinel.md](../10-day2-nvsentinel.md), with the W1 results.
-- W1: `uc3-*-20261021T172243Z.*`, `uc3-goodput.json`, `uc3-r5-dcgm-*`,
+- Use case 3 page: [10-day2-nvsentinel.md](../10-day2-nvsentinel.md).
+- The L4 run: `uc3-*-20261021T172243Z.*`, `uc3-goodput.json`, `uc3-r5-dcgm-*`,
   `uc3-xid13-smoke-*` in `docs/artifacts/readiness/`.
 - NVSentinel at v1.28.0: `health-monitors/syslog-health-monitor/pkg/patterns/xid.go`
   (XID pattern), `docs/circuit-breaker.md`, `distros/kubernetes/nvsentinel/charts/node-drainer/values.yaml`
   (drain modes), `janitor-provider/pkg/csp/generic/generic.go` (the reboot Job).
-- Free checks: `docs/artifacts/readiness/fc2-journald-*.txt`, `fc3-kind-demo-*.txt`,
+- Checks without a GPU: `docs/artifacts/readiness/fc2-journald-*.txt`, `fc3-kind-demo-*.txt`,
   `fc4-kind-par-values-*.txt`, `fc6-fc7-render-dryrun-*.txt`.
 - Part 1: [session C](https://yassineteimi.github.io/nvidia-gpu-fleet-poc/03-fault-remediation/)
   and [session D](https://yassineteimi.github.io/nvidia-gpu-fleet-poc/04-goodput-and-burn-in/).
