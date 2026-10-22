@@ -1,7 +1,7 @@
 # ADR 0005: NVSentinel for GPU fault remediation
 
-Status: proposed (the before and after numbers come from W1, 21 October)
-Date: 2026-10-21. Owner: ws-readiness. Use case: 3.
+Status: accepted, after W1 on 21 October (proposed the same day)
+Date: 2026-10-22. Owner: ws-readiness. Use case: 3.
 
 ## Context
 
@@ -49,9 +49,26 @@ fleet.
   simulated XID is not a fleet's fault mix; and the generic reboot is the only
   remediation exercised, since Scaleway exposes no API NVSentinel's janitor knows.
 
+## What W1 showed
+
+On par's L4, with Part 1's job and a SIMULATED XID 79: 288.8 s from fault to resumed
+training against 360.9 s, goodput 73.0% against 66.4%, and nobody acting at any step.
+The cordon came 1.3 s after the fault and the drain 1.7 s later. 82% of the outage is now
+the reboot the XID catalog prescribes (115 s) and the GPU Operator rebuilding the driver
+(123 s), which Part 1 skipped by handing the GPU back after a diagnostic. A second run
+through DCGM took 283.3 s, so both detection paths behave the same way. The decision
+stands; two consequences move up the list:
+
+- Turn post-remediation validation on before tenants rely on it. The node returned
+  32 s after the GPU was allocatable, with no diagnostic.
+- A precompiled driver on par would remove most of the 123 s; that belongs to the driver
+  decision (ADR 0002).
+
 ## Evidence
 
-- Use case 3 page: [10-day2-nvsentinel.md](../10-day2-nvsentinel.md), results after W1.
+- Use case 3 page: [10-day2-nvsentinel.md](../10-day2-nvsentinel.md), with the W1 results.
+- W1: `uc3-*-20261021T172243Z.*`, `uc3-goodput.json`, `uc3-r5-dcgm-*`,
+  `uc3-xid13-smoke-*` in `docs/artifacts/readiness/`.
 - NVSentinel at v1.28.0: `health-monitors/syslog-health-monitor/pkg/patterns/xid.go`
   (XID pattern), `docs/circuit-breaker.md`, `distros/kubernetes/nvsentinel/charts/node-drainer/values.yaml`
   (drain modes), `janitor-provider/pkg/csp/generic/generic.go` (the reboot Job).

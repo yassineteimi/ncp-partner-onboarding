@@ -1,7 +1,7 @@
 # ADR 0004: NVCRE certification behind a staging taint as the readiness gate
 
-Status: proposed (the H200 run is W2, 22 October)
-Date: 2026-10-21. Owner: ws-readiness. Use case: 2.
+Status: accepted, after W2 on 22 October (proposed 21 October)
+Date: 2026-10-22. Owner: ws-readiness. Use case: 2.
 
 ## Context
 
@@ -46,9 +46,30 @@ catalog ever gets a shorter DCGM level, the diagnostic moves inside it.
 - What one node can't show: the inter-node fabric and rack-scale NVLink that NVCRE's
   multi-node categories are built for, and the training categories (4 GPUs at least).
 
+## What the windows showed
+
+The gate worked as designed on both sites. fin's 2× H200 node went from Ready to open in
+19 min 39 s, certified at 351 GB/s all-reduce bus bandwidth over NVLink, and the same
+gate rehearsed on par's L4 the day before. Two things change how I'd run it:
+
+- **A skipped test passed.** ECC is off on Verda's H200s, so DCGM skipped its memory test
+  and still reported PASS, and the gate, which trusts DCGM's overall result, opened the
+  node with no memory check. The next change to the gate: refuse with cause "unclear"
+  when any DCGM test is skipped, and check `ecc.mode.current` before the diagnostic,
+  so a provider image with ECC off is caught before a window is spent on it. Whether
+  W3 runs with that rule, and so would refuse fin, is Yassine's call.
+- **NVCRE's summary can't be the record of the transport.** It printed
+  `Transport: Socket` for a run that went over NVLink on every channel. The gate already
+  reads the raw NCCL channel lines, which is why it wasn't misled; that stays a rule.
+
 ## Evidence
 
-- Use case 2 page: [10-day1-nvcre.md](../10-day1-nvcre.md), results after W1 and W2.
+- Use case 2 page: [10-day1-nvcre.md](../10-day1-nvcre.md), with the W1 and W2 results.
+- W2: `nvcre-fin-20261022T100307Z*`, `diag-fin-20261022T101241Z.log`,
+  `promote-fin-20261022T101348Z.txt` in `docs/artifacts/readiness/`; the two findings in
+  [findings.md](../findings.md).
+- W1: `nvcre-par-20261021T172328Z*`, `diag-par-20261021T172533Z.log`,
+  `promote-par-20261021T172554Z.txt`.
 - NVCRE at v0.8.0: `pkg/catalog/entries/_lib/gpu-defaults.yaml` (8 GPUs for an H200),
   `docs/getting-started/first-certification.md` ("No thresholds ship by default"), the
   README ("NVCRE never cordons, taints, or otherwise modifies a node").

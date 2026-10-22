@@ -7,10 +7,11 @@
     L4, with the same training job and the same injected fault, and I compare the two
     timelines phase by phase.
 
-!!! warning "Planned: W1, Wednesday 21 October, 19:00 Paris"
-    Everything below the method is waiting for the GPU window. Until it has run, the
-    results tables say "planned" and contain no numbers. The free checks that already
-    ran are linked where they matter.
+!!! success "Ran in W1, Wednesday 21 October, on par's L4"
+    Fault to resumed training in 288.8 seconds against Part 1's 360.9, goodput 73.0%
+    against 66.4%, and no person involved at any step. The time didn't disappear, though:
+    82% of it is now a reboot and a driver rebuild that Part 1 never did.
+    [Results](#results), [evidence](https://github.com/yassineteimi/ncp-partner-onboarding/tree/main/docs/artifacts/readiness).
 
 ## Part 1, the number to beat
 
@@ -84,7 +85,7 @@ NVSentinel's own tests write it. Same write, same moment in the run, one prefix.
 | par's values in KIND, one stage at a time | Stage 1 a condition only; stage 2 cordon and drain; stage 3 a RebootNode; NVSentinel uncordoned the node itself each time |
 
 KIND couldn't cover three pieces: the syslog monitor, the labeler and a real reboot.
-W1 runs them for the first time on real hardware.
+W1 ran them for the first time on real hardware, and all three worked on the first try.
 
 ## How I measure it
 
@@ -108,15 +109,103 @@ node and control plane measured at the start.
 
 ## Results
 
-!!! note "Planned"
-    The before and after table, the goodput figure and every phase longer than 10
-    seconds explained, after W1.
+### The run, as it happened
+
+Part 1's Job started at 17:01:07 UTC and wrote its step-400 checkpoint at 17:03:16. Seven
+seconds later I wrote the SIMULATED XID 79 into the L4's kernel log. From there on
+nobody touched anything until the Job had finished. Times are UTC, from the recorder;
+the L4's clock was 0.24 s ahead of the laptop's (round trip 0.53 s).
+
+| Time | What happened |
+|---|---|
+| 17:03:23.4 | SIMULATED XID 79 written on the L4, at step 427 |
+| 17:03:24.8 | The syslog monitor raised `SysLogsXIDError`; the node was cordoned 9 ms later |
+| 17:03:24.8 | The node-drainer evicted the trainer; its pod was gone at 17:03:26.5 |
+| 17:03:34.9 | fault-remediation created a `RebootNode` |
+| 17:03:35 | The janitor's busybox Job ran `chroot /host reboot` |
+| 17:05:29.7 | The node was Ready again, on a new boot ID |
+| 17:06:04 | The DCGM monitor reported it couldn't reach DCGM (`GpuDcgmConnectivityFailure`) |
+| 17:07:01 | The syslog monitor reported healthy on the new boot |
+| 17:07:33.0 | The GPU Operator had rebuilt and loaded the driver; the GPU was allocatable again |
+| 17:08:05.3 | DCGM reachable again; NVSentinel uncordoned the node in the same second |
+| 17:08:12.3 | The replacement pod, waiting since 17:03:35, started restoring checkpoint 400 (1.8 s) |
+| 17:22:14 | The Job completed, 3000 steps |
+
+### Before and after
+
+| Phase | Part 1 (s) | NVSentinel (s) | What it is now |
+|---|---|---|---|
+| Detection | 299.4 (the lookback) | 1.3 | The syslog monitor polls the journal every 15 s; this injection landed just before a poll. The XID 13 smoke test took 11.8 s |
+| Quarantine and drain | (inside the lookback) | 1.7 | Cordon, then an eviction through the Eviction API |
+| Remediation | about 40 (waiting for a person) | 8.4 | XID 79 maps to `RESTART_BM`, so a `RebootNode`, with no one asked |
+| Reboot | none | 114.8 | Shutdown, the Scaleway VM's boot, kubelet and node Ready |
+| Driver | none | 123.3 | The GPU Operator compiles and loads the driver after every boot on par |
+| Diagnostic | 6 | none | Not run: post-remediation validation is off ([below](#what-still-isnt-automated)) |
+| Return | 12 | 32.3 | NVSentinel waits for every monitor to report healthy; the last one was DCGM, back once its host engine was |
+| Resume | 3.9 | 7.0 | The pending pod was scheduled at the uncordon, then its container started |
+| **Outage** | **360.9** | **288.8** | |
+
+Goodput went from 66.4% to 73.0%: 925.3 s of useful training in 1267 s, against
+918.2 s in 1383 s. Part 1's analysis, unchanged, counts the outage from the trainer's
+last step, 287.6 s here, and adds 27 steps redone since the checkpoint (8.3 s), the
+checkpoint writes (34.8 s) and the restore (1.8 s).
+
+### Why the outage is still almost five minutes
+
+The waiting is gone: no timer, no person. What replaced it is work Part 1 skipped.
+Part 1 treated XID 79 by running a diagnostic and handing the GPU back; NVIDIA's catalog
+says XID 79 ("GPU has fallen off the bus") needs a reboot, so NVSentinel reboots. On
+par that costs 238 s: 115 s for the VM to come back and 123 s for the GPU Operator to
+rebuild the driver, because par's operator compiles it on the node at every boot. A
+precompiled driver would take most of those 123 s away; that's a trade for the driver
+decision (ADR 0002), not for this page. On a fleet the job wouldn't wait for any of it: it would restart on another node
+as soon as the drain finished, about 3 s after the fault.
+
+### The second fault, through DCGM
+
+With time left in the window I injected XID 79 a second way, into DCGM's cache, with no
+training running. The DCGM monitor raised `GpuAllWatch` (`DCGM_FR_FALLEN_OFF_BUS`) and
+the node was cordoned 5.7 s after the injection; it was Ready on a new boot 103.8 s
+later, allocatable 121.4 s after that, and uncordoned 52.4 s after that: 283.3 s in all,
+within 6 s of the first run
+([timeline](https://github.com/yassineteimi/ncp-partner-onboarding/blob/main/docs/artifacts/readiness/uc3-r5-dcgm-timeline-20261021T172645Z.txt)).
+Both of NVSentinel's detection paths work on the real L4.
+
+Before the measured run, a SIMULATED XID 13, which the catalog marks as needing no
+action, raised an event 11.8 s after injection and left the node schedulable
+([smoke test](https://github.com/yassineteimi/ncp-partner-onboarding/blob/main/docs/artifacts/readiness/uc3-xid13-smoke-20261021T170027Z.txt)).
+
+### What went well, and what didn't
+
+The first real test of three things KIND couldn't show, the syslog monitor, the labeler
+and a real reboot, passed without a retry, and the `[uptime]` prefix on the injection
+did what the journald analysis said it would. None of the run sheet's abort lines came
+close: the cordon came 1.3 s after the fault, where the first abort was at 2 minutes.
+
+Two things nearly got in the way. Scaleway showed no L4 free in either Paris zone just
+before the window; one freed up minutes later. And par's API server had stalled at 12:07
+UTC that day, when Grafana starved etcd's disk, so every controller in this lane carried
+8 to 10 restarts into the window.
+The restart baseline taken before the injection is what shows that the run itself
+caused only two, both on the L4 when it rebooted
+([before](https://github.com/yassineteimi/ncp-partner-onboarding/blob/main/docs/artifacts/readiness/uc3-check-20261021T170021Z.txt),
+[after](https://github.com/yassineteimi/ncp-partner-onboarding/blob/main/docs/artifacts/readiness/uc3-nvsentinel-state-20261021T172243Z.txt)).
 
 ## What still isn't automated
 
-Planned for after W1, with what the run shows. Known already from the source: the node
-returns without a diagnostic unless post-remediation validation is on, and an XID the
-catalog maps to `CONTACT_SUPPORT` leaves the node cordoned for a person.
+The node went back to tenants without a diagnostic. It returned 32 s after the GPU was
+allocatable, because the monitors said healthy, and nothing ran `dcgmi diag` first;
+Part 1's return did. Post-remediation validation (fault-quarantine's validation with
+lifecycle-manager) would run a DCGM diagnostic for `RESTART_BM` before the uncordon. I
+left it off to measure NVSentinel as shipped, and I'd turn it on for tenants: it adds
+the diagnostic's minutes to every outage, which is cheap next to a tenant landing on a
+bad GPU.
+
+Two more gaps, both read in the source and not exercised here. An XID the catalog maps
+to `CONTACT_SUPPORT` leaves the node cordoned until a person acts. And NVSentinel only
+protects the L4 while par's CPU worker is on, since its control pods live there: with
+the worker off, a fault would be logged by the monitors on the L4 and nothing would act
+on it.
 
 ## What one L4 can't show
 

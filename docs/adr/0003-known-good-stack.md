@@ -1,7 +1,7 @@
 # ADR 0003: AICR as the known-good reference for the H200 pool, hand-pinned values for the L4
 
-Status: proposed (validate on fin in W2, 22 October)
-Date: 2026-10-21. Owner: ws-readiness. Use case: 1.
+Status: accepted, after the validation on fin in W2 on 22 October (proposed 21 October)
+Date: 2026-10-22. Owner: ws-readiness. Use case: 1.
 
 ## Context
 
@@ -72,6 +72,11 @@ and the lanes' open PRs; AICR's from the `k0s` H200 training recipe):
   counters are filtered.
 - What this can't show: AICR as a deployer. The validation in W2 checks fin against the
   recipe; it doesn't prove the recipe would have built fin.
+- In W2, `aicr validate` stopped at its readiness pre-flight, as expected: Kubernetes
+  v1.36.5 and the Ubuntu ID passed, and `OS.release.VERSION_ID` failed, 26.04 against the
+  recipe's 24.04. No deployment check ran after that, so the version table above remains
+  the comparison, done by hand. AICR also couldn't read fin's kernel configuration, as on
+  par.
 
 ## Evidence
 
@@ -80,4 +85,6 @@ and the lanes' open PRs; AICR's from the `k0s` H200 training recipe):
   `pkg/recipe/coverage.go` (no fallback), `recipes/mixins/os-ubuntu.yaml` (Ubuntu 24.04),
   `recipes/components/gpu-operator/values.yaml` (driver 580.173.02, "the exact measured
   baseline" for EFA).
-- The use case 1 page and the W2 validation report: planned.
+- The use case 1 page: [10-day0-aicr.md](../10-day0-aicr.md). The W2 snapshot and
+  validation log: `aicr/snapshot-fin-20261022T101356Z.yaml` and
+  `aicr/validate-fin-20261022T101408Z.log` in `docs/artifacts/readiness/`.
