@@ -127,7 +127,7 @@ KAI could also schedule the slurmd pods themselves, through an `hpc` queue whose
 
 ### fin's 580 driver and the CUDA in slurmd
 
-fin's image ships driver 580.178.04. The R580 branch is CUDA 13.0's own; CUDA 13.1 to 13.4 belong to R590 through R615, and run on 580 only through minor-version compatibility ("13.x: >= 580" in NVIDIA's CUDA Toolkit release notes, read 22 October). That mode has limits: anything that needs a newer driver fails, and PTX built by a newer toolkit can't be compiled by the older driver. So the ceiling for jobs on fin is CUDA 13.0 natively, or 13.x with those limits.
+fin's image ships driver 580.178.04. The R580 branch is CUDA 13.0's own; CUDA 13.1 to 13.4 belong to R590 through R615. They run on 580 in two ways. One is minor-version compatibility ("13.x: >= 580" in NVIDIA's CUDA Toolkit release notes, read 22 October), which has limits: anything that needs a newer driver fails, and PTX built by a newer toolkit can't be compiled by the older driver. The other is the forward-compatibility libraries that NGC images carry. W2 saw both on fin, in the same CUDA 13.1 image ([NVCRE's NCCL log](artifacts/readiness/nvcre-fin-20261022T100307Z-nccl.log)). The all-reduce job, under MPI, reported `cudaDriverVersion 13010`, so it had loaded the image's forward-compatibility `libcuda`. The single-process loopback job reported `13000`: minor-version compatibility on the host's driver. So jobs on fin get CUDA 13.0 natively, and anything newer only through one of those two routes, each with its own catch.
 
 The pinned slurmd image holds no CUDA at all. Its environment sets none, its layers carry no `libcuda`, and the driver's libraries arrive from the container runtime. So a job's CUDA comes from one of two places:
 
