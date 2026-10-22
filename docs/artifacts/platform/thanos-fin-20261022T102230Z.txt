@@ -1,0 +1,123 @@
+# capture-thanos.sh fin, 20261022T102230Z, laptop clock, UTC. git 17ecc08
+
+## Stores Query sees
+receive 10.244.5.41:10901 labelSets: [{'receive_replica': 'thanos-receive-0', 'tenant_id': 'default-tenant'}, {'receive_replica': 'thanos-receive-0', 'tenant_id': 'fin'}, {'receive_replica': 'thanos-receive-0', 'tenant_id': 'fin-sim'}] minTime: 1792510895800 maxTime: 9223372036854775807 lastError: None
+sidecar 10.244.0.47:10901 labelSets: [{'prometheus': 'monitoring/kube-prometheus-stack-prometheus', 'prometheus_replica': 'prometheus-kube-prometheus-stack-prometheus-0', 'site': 'par'}] minTime: 1792447090000 maxTime: 9223372036854775807 lastError: None
+store 10.244.5.11:10901 labelSets: [{'prometheus': 'monitoring/kube-prometheus-stack-prometheus', 'prometheus_replica': 'prometheus-kube-prometheus-stack-prometheus-0', 'site': 'par'}, {'receive_replica': 'thanos-receive-0', 'tenant_id': 'fin'}, {'receive_replica': 'thanos-receive-0', 'tenant_id': 'fin-sim'}, {'simulated': 'true', 'site': 'sim-backfill'}] minTime: 1792136112000 maxTime: 1792656000000 lastError: None
+
+## Sites and tenants seen (now)
+# count by (site, tenant_id) (up)   (dedup=true)
+{site="fin", tenant_id="fin"} 18
+{site="fin-sim", tenant_id="fin-sim"} 2
+{site="par"} 27
+
+## Last sample per site (Unix seconds)
+# max by (site) (timestamp(up))   (dedup=true)
+{site="fin"} 1792664547.052
+{site="fin-sim"} 1792664545.853
+{site="par"} 1792664550.668
+
+## GPUs per site and model (now)
+# count by (site, modelName) (DCGM_FI_DEV_GPU_UTIL)   (dedup=true)
+{modelName="NVIDIA H200", site="fin"} 1
+
+## GPU utilisation (now)
+# max by (site, modelName, hostname, gpu) (DCGM_FI_DEV_GPU_UTIL)   (dedup=true)
+{gpu="1", hostname="eu1-fin-gpu-01", modelName="NVIDIA H200", site="fin"} 0
+
+## GPU utilisation, max over the last 3 h
+# max by (site, modelName, hostname, gpu) (max_over_time(DCGM_FI_DEV_GPU_UTIL[3h]))   (dedup=true)
+{gpu="0", hostname="eu1-fin-gpu-01", modelName="NVIDIA H200", site="fin"} 100
+{gpu="1", hostname="eu1-fin-gpu-01", modelName="NVIDIA H200", site="fin"} 100
+
+## DCGM series per GPU (recording rule)
+# max by (site, modelName, hostname, gpu) (max_over_time(gpu:dcgm_series:count[3h]))   (dedup=true)
+{gpu="0", hostname="eu1-fin-gpu-01", modelName="NVIDIA H200", site="fin"} 51
+{gpu="1", hostname="eu1-fin-gpu-01", modelName="NVIDIA H200", site="fin"} 41
+
+## DCGM series per GPU, top metrics on fin
+# topk(15, max by (metric) (max_over_time(gpu:dcgm_series_by_metric:count{site="fin"}[3h])))   (dedup=true)
+{metric="DCGM_EXP_GPU_HEALTH_STATUS"} 11
+{metric="DCGM_FI_DEV_ECC_DBE_AGG_TOTAL"} 2
+{metric="DCGM_FI_DEV_ECC_DBE_VOL_TOTAL"} 2
+{metric="DCGM_FI_DEV_ECC_SBE_AGG_TOTAL"} 2
+{metric="DCGM_FI_DEV_ECC_SBE_VOL_TOTAL"} 2
+{metric="DCGM_FI_DEV_FB_FREE"} 2
+{metric="DCGM_FI_DEV_FB_RESERVED"} 2
+{metric="DCGM_FI_DEV_FB_USED"} 2
+{metric="DCGM_FI_DEV_GPU_TEMP"} 2
+{metric="DCGM_FI_DEV_MEMORY_TEMP"} 2
+{metric="DCGM_FI_DEV_MEM_CLOCK"} 2
+{metric="DCGM_FI_DEV_PCIE_REPLAY_COUNTER"} 2
+{metric="DCGM_FI_DEV_POWER_USAGE"} 2
+{metric="DCGM_FI_DEV_POWER_VIOLATION"} 2
+{metric="DCGM_FI_DEV_SM_CLOCK"} 2
+
+## Head series in each site's Prometheus (now, not only DCGM)
+# max by (site) (prometheus_tsdb_head_series{job="kube-prometheus-stack-prometheus", site=~"par|fin"})   (dedup=true)
+{site="fin"} 66491
+{site="par"} 101058
+
+## fin's remote write: samples sent, failed, retried (now)
+# max by (__name__) ({__name__=~"prometheus_remote_storage_(samples_total|samples_failed_total|samples_retried_total|highest_timestamp_in_seconds|queue_highest_sent_timestamp_seconds)", site="fin"})   (dedup=true)
+{__name__="prometheus_remote_storage_highest_timestamp_in_seconds"} 1792664540
+{__name__="prometheus_remote_storage_queue_highest_sent_timestamp_seconds"} 1792664540
+{__name__="prometheus_remote_storage_samples_failed_total"} 0
+{__name__="prometheus_remote_storage_samples_retried_total"} 0
+{__name__="prometheus_remote_storage_samples_total"} 3979914
+
+## fin's own TSDB status (head series, top label pairs), read on fin
+headStats: {'numSeries': 66491, 'numLabelPairs': 5428, 'chunkCount': 119486, 'minTime': 1792662669359, 'maxTime': 1792664552621}
+
+seriesCountByMetricName:
+  apiserver_request_body_size_bytes_bucket: 6784
+  apiserver_request_duration_seconds_bucket: 5640
+  apiserver_request_sli_duration_seconds_bucket: 3592
+  etcd_request_duration_seconds_bucket: 3170
+  apiserver_response_sizes_bucket: 2216
+  apiserver_watch_list_duration_seconds_bucket: 2106
+  apiserver_watch_cache_read_wait_seconds_bucket: 1330
+  apiserver_watch_events_sizes_bucket: 855
+  node_cpu_seconds_total: 832
+  prober_probe_duration_seconds_bucket: 756
+  kubernetes_feature_enabled: 726
+  apiserver_request_total: 660
+  apiserver_request_duration_seconds_sum: 564
+  apiserver_request_duration_seconds_count: 564
+  workqueue_queue_duration_seconds_bucket: 550
+
+labelValueCountByLabelName:
+  __name__: 1557
+  name: 616
+  le: 302
+  resource: 197
+  id: 189
+  uid: 104
+  container_id: 97
+  address: 90
+  cpu: 89
+  owner_name: 74
+  pod: 69
+  device: 66
+  handler: 63
+  container: 58
+  ip: 57
+
+seriesCountByLabelValuePair:
+  endpoint=https: 39479
+  namespace=default: 37876
+  service=kubernetes: 37866
+  job=apiserver: 37863
+  instance=86.38.238.179:6443: 37862
+  component=apiserver: 14647
+  version=v1: 13126
+  service=kube-prometheus-stack-kubelet: 11924
+  job=kubelet: 11917
+  endpoint=https-metrics: 11915
+  namespace=monitoring: 9057
+  scope=cluster: 6928
+  __name__=apiserver_request_body_size_bytes_bucket: 6784
+  node=eu1-fin-cp-01: 6631
+  namespace=kube-system: 6623
+
+# written to docs/artifacts/platform/thanos-fin-20261022T102230Z.txt

@@ -1,0 +1,107 @@
+# capture-thanos.sh fin, 20261022T095211Z, laptop clock, UTC. git 17ecc08
+
+## Stores Query sees
+receive 10.244.5.41:10901 labelSets: [{'receive_replica': 'thanos-receive-0', 'tenant_id': 'default-tenant'}, {'receive_replica': 'thanos-receive-0', 'tenant_id': 'fin'}, {'receive_replica': 'thanos-receive-0', 'tenant_id': 'fin-sim'}] minTime: 1792510895800 maxTime: 9223372036854775807 lastError: None
+sidecar 10.244.0.47:10901 labelSets: [{'prometheus': 'monitoring/kube-prometheus-stack-prometheus', 'prometheus_replica': 'prometheus-kube-prometheus-stack-prometheus-0', 'site': 'par'}] minTime: 1792447090000 maxTime: 9223372036854775807 lastError: None
+store 10.244.5.11:10901 labelSets: [{'prometheus': 'monitoring/kube-prometheus-stack-prometheus', 'prometheus_replica': 'prometheus-kube-prometheus-stack-prometheus-0', 'site': 'par'}, {'receive_replica': 'thanos-receive-0', 'tenant_id': 'fin'}, {'receive_replica': 'thanos-receive-0', 'tenant_id': 'fin-sim'}, {'simulated': 'true', 'site': 'sim-backfill'}] minTime: 1792136112000 maxTime: 1792656000000 lastError: None
+
+## Sites and tenants seen (now)
+# count by (site, tenant_id) (up)   (dedup=true)
+{site="fin", tenant_id="fin"} 11
+{site="fin-sim", tenant_id="fin-sim"} 2
+{site="par"} 27
+
+## Last sample per site (Unix seconds)
+# max by (site) (timestamp(up))   (dedup=true)
+{site="fin"} 1792662728.421
+{site="fin-sim"} 1792662715.853
+{site="par"} 1792662731.866
+
+## GPUs per site and model (now)
+# count by (site, modelName) (DCGM_FI_DEV_GPU_UTIL)   (dedup=true)
+(no data)
+
+## GPU utilisation (now)
+# max by (site, modelName, hostname, gpu) (DCGM_FI_DEV_GPU_UTIL)   (dedup=true)
+(no data)
+
+## GPU utilisation, max over the last 3 h
+# max by (site, modelName, hostname, gpu) (max_over_time(DCGM_FI_DEV_GPU_UTIL[3h]))   (dedup=true)
+(no data)
+
+## DCGM series per GPU (recording rule)
+# max by (site, modelName, hostname, gpu) (max_over_time(gpu:dcgm_series:count[3h]))   (dedup=true)
+(no data)
+
+## DCGM series per GPU, top metrics on fin
+# topk(15, max by (metric) (max_over_time(gpu:dcgm_series_by_metric:count{site="fin"}[3h])))   (dedup=true)
+(no data)
+
+## Head series in each site's Prometheus (now, not only DCGM)
+# max by (site) (prometheus_tsdb_head_series{job="kube-prometheus-stack-prometheus", site=~"par|fin"})   (dedup=true)
+{site="fin"} 39234
+{site="par"} 98808
+
+## fin's remote write: samples sent, failed, retried (now)
+# max by (__name__) ({__name__=~"prometheus_remote_storage_(samples_total|samples_failed_total|samples_retried_total|highest_timestamp_in_seconds|queue_highest_sent_timestamp_seconds)", site="fin"})   (dedup=true)
+{__name__="prometheus_remote_storage_highest_timestamp_in_seconds"} 1792662708
+{__name__="prometheus_remote_storage_queue_highest_sent_timestamp_seconds"} 1792662708
+{__name__="prometheus_remote_storage_samples_failed_total"} 0
+{__name__="prometheus_remote_storage_samples_retried_total"} 0
+{__name__="prometheus_remote_storage_samples_total"} 43637
+
+## fin's own TSDB status (head series, top label pairs), read on fin
+headStats: {'numSeries': 40733, 'numLabelPairs': 4246, 'chunkCount': 40733, 'minTime': 1792662669359, 'maxTime': 1792662733114}
+
+seriesCountByMetricName:
+  apiserver_request_body_size_bytes_bucket: 3616
+  apiserver_request_duration_seconds_bucket: 3030
+  etcd_request_duration_seconds_bucket: 2820
+  apiserver_request_sli_duration_seconds_bucket: 2224
+  apiserver_watch_list_duration_seconds_bucket: 2034
+  apiserver_response_sizes_bucket: 1344
+  apiserver_watch_cache_read_wait_seconds_bucket: 1330
+  apiserver_watch_events_sizes_bucket: 855
+  prober_probe_duration_seconds_bucket: 564
+  kubernetes_feature_enabled: 484
+  apiserver_admission_controller_admission_duration_seconds_bucket: 427
+  apiserver_request_total: 363
+  workqueue_queue_duration_seconds_bucket: 363
+  workqueue_work_duration_seconds_bucket: 363
+  apiserver_request_duration_seconds_count: 303
+
+labelValueCountByLabelName:
+  __name__: 1422
+  name: 461
+  le: 284
+  resource: 195
+  id: 100
+  handler: 63
+  uid: 63
+  owner_name: 54
+  collector: 49
+  address: 49
+  type: 42
+  device: 39
+  container_id: 38
+  crd: 38
+  container: 37
+
+seriesCountByLabelValuePair:
+  endpoint=https: 27494
+  namespace=default: 27012
+  service=kubernetes: 27002
+  job=apiserver: 26999
+  instance=86.38.238.179:6443: 26998
+  version=v1: 9474
+  component=apiserver: 8413
+  node=eu1-fin-cp-01: 6498
+  service=kube-prometheus-stack-kubelet: 6176
+  endpoint=https-metrics: 6173
+  job=kubelet: 6173
+  instance=86.38.238.179:10250: 6170
+  scope=cluster: 5276
+  namespace=monitoring: 5180
+  scope=resource: 4373
+
+# written to docs/artifacts/platform/thanos-fin-20261022T095211Z.txt
