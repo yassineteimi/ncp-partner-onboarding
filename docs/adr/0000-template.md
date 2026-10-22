@@ -1,15 +1,15 @@
 # ADR NNNN: <decision in a few words>
 
-Status: proposed | accepted | superseded by NNNN
-Date: YYYY-MM-DD. Owner: <session>. Use case: <#>.
+Status: accepted | not adopted | superseded by NNNN
+Scope: <what it covers, for example "readiness gate, Finland GPU pool">. Use case: <#>.
 
 ## Context
 
-What EU1 needs here, in two to four sentences. The constraint that matters most (hardware, scale, tenants, cost, operability).
+What Nordhaven needs here, in two to four sentences. The constraint that matters most (hardware, scale, tenants, cost, operability).
 
 ## Options considered
 
-| Option | What it is | For EU1 | Against, for EU1 |
+| Option | What it is | For Nordhaven | Against, for Nordhaven |
 |---|---|---|---|
 | A | | | |
 | B | | | |

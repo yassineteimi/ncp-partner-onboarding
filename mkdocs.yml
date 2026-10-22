@@ -1,10 +1,11 @@
-site_name: "EU1: a GPU cloud partner from handover to first workloads"
+site_name: "Nordhaven: a GPU cloud partner from handover to first workloads"
 site_author: Yassine TEIMI
 site_url: https://yassineteimi.github.io/ncp-partner-onboarding/
 site_description: >-
-  Part 2 of my GPU fleet work. A fictional European GPU cloud partner, EU1, goes
-  from hardware handover to its first production workloads on NVIDIA's open
-  stack, across two sites and two providers, driven by one Git repository.
+  Part 2 of my GPU fleet work. Nordhaven, a fictional European GPU cloud partner,
+  goes from hardware handover to its first production workloads on NVIDIA's open
+  stack, across a Paris site and a Finland site on two providers, driven by one
+  Git repository.
 
 repo_name: yassineteimi/ncp-partner-onboarding
 repo_url: https://github.com/yassineteimi/ncp-partner-onboarding
@@ -70,6 +71,7 @@ plugins:
 nav:
   - Overview: index.md
   - "The story": story.md
+  - Architecture: architecture.md
   - "Day 0: AICR": 10-day0-aicr.md
   - "Day 1: NVCRE": 10-day1-nvcre.md
   - "Day 2: NVSentinel": 10-day2-nvsentinel.md
@@ -80,6 +82,8 @@ nav:
   - "What is simulated": simulated.md
   - Decisions:
       - "All decisions": adr/README.md
+      - "0001: Two sites, two providers": adr/0001-two-sites-two-providers.md
+      - "0002: Driver ownership": adr/0002-driver-ownership.md
       - "0003: Known-good stack": adr/0003-known-good-stack.md
       - "0004: Readiness gate": adr/0004-readiness-gate.md
       - "0005: Fault remediation": adr/0005-fault-remediation.md
