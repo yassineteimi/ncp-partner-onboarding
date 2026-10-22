@@ -69,7 +69,7 @@ spec:
       args:
         - |
           nvidia-mig-parted --version
-          for c in all-disabled h200-split; do
+          for c in all-disabled h200-split rtxpro-split; do
             echo "== \$c"
             nvidia-mig-parted assert --valid-config -f /config/config.yaml -c "\$c" || exit 1
           done
@@ -100,4 +100,4 @@ echo "pod phase: $phase"
 kubectl_cp -n "$NS" get pod mig-config-check \
   -o jsonpath='{.status.containerStatuses[0].state.terminated.message}{"\n"}' 2>/dev/null || true
 [ "$phase" = Succeeded ] || exit 1
-echo "fin's MIG config parses with mig-parted v0.15.1; both configs selectable"
+echo "fin's MIG config parses with mig-parted v0.15.1; every config selectable"

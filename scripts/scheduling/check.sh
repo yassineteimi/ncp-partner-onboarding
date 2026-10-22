@@ -117,7 +117,7 @@ assert cp["migManager"]["config"]["name"] == "mig-parted-eu1"
 env = {e["name"]: e["value"] for e in cp["migManager"].get("env") or []}
 assert env.get("WITH_REBOOT") == "false", env
 configs = yaml.safe_load(cm["data"]["config.yaml"])["mig-configs"]
-assert set(configs) == {"all-disabled", "h200-split"}, configs
+assert set(configs) == {"all-disabled", "h200-split", "rtxpro-split"}, configs
 assert cp["driver"]["enabled"] is False
 print("    ClusterPolicy: mig.strategy=mixed, migManager on with mig-parted-eu1, WITH_REBOOT=false, driver off")
 print("    configs:", ", ".join(sorted(configs)))
