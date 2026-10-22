@@ -121,8 +121,17 @@ fi
 # Leftovers from an earlier window
 ########################################
 
-leftovers="$(jq -n --argjson i "$instances" --argjson v "$volumes" --argjson t "$trash" \
-  '{instances: [$i[] | {id, hostname, status}], volumes: [$v[] | {id, name, status, instance_id}], trash: [$t[] | {id, name}]}')"
+# Before the GPU node, make fin-cp-up has already created this window's control
+# plane. Terraform's state knows it and its OS volume, so they are not
+# leftovers; anything Terraform doesn't know still stops the window.
+known="[]"
+if [ "$CP_ONLY" = false ]; then
+  known="$(terraform -chdir="$TF_DIR" output -json instances 2>/dev/null | jq -c '[.[] | .id, .os_volume_id]' 2>/dev/null || echo "[]")"
+fi
+leftovers="$(jq -n --argjson i "$instances" --argjson v "$volumes" --argjson t "$trash" --argjson k "$known" \
+  '{instances: [$i[] | select(.id as $id | $k | index($id) | not) | {id, hostname, status}],
+    volumes: [$v[] | select(.id as $id | $k | index($id) | not) | {id, name, status, instance_id}],
+    trash: [$t[] | {id, name}]}')"
 if [ "$verdict" = go ] && [ "$(jq '[.instances, .volumes, .trash] | map(length) | add' <<<"$leftovers")" -gt 0 ]; then
   verdict=stop exit_code=4
   reason="something from an earlier window is still at Verda, see leftovers; clean it up before ordering anything"
