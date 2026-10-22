@@ -7,7 +7,7 @@
     L4, with the same training job and the same injected fault, and I compare the two
     timelines phase by phase.
 
-!!! success "Ran in W1, Wednesday 21 October, on par's L4"
+!!! success "Ran on the Paris L4, 21 October 2026"
     Fault to resumed training in 288.8 seconds against Part 1's 360.9, goodput 73.0%
     against 66.4%, and no person involved at any step. The time didn't disappear, though:
     82% of it is now a reboot and a driver rebuild that Part 1 never did.
@@ -63,29 +63,30 @@ the chart at v1.28.0 ([`nvsentinel-par.yaml`](https://github.com/yassineteimi/nc
 | Default | Why it breaks here | Set to |
 |---|---|---|
 | Drain mode `AllowCompletion` for every namespace | Never evicts: a training job would hold the node until it finished, and remediation would never start | `Immediate`, so the trainer gets the same `DisruptionTarget` eviction Part 1's Job expects |
-| Circuit breaker on (50% of GPU nodes in 5 minutes) | With one GPU node the first cordon trips it, and a tripped breaker also blocks the uncordon, with no automatic reset | Off on par. On a fleet I'd keep it, with an absolute cap (`maxCordonedNodes`) as well as the percentage |
+| Circuit breaker on (50% of GPU nodes in 5 minutes) | With one GPU node the first cordon trips it, and a tripped breaker also blocks the uncordon, with no automatic reset | Off in Paris. On a fleet I'd keep it, with an absolute cap (`maxCordonedNodes`) as well as the percentage |
 | `janitor-provider.csp.provider: kind` | Sleeps a few seconds and reports a reboot that never happened | `generic`: a privileged busybox Job that reboots the node |
-| MongoDB through Bitnami | The Bitnami images are amd64 only, so the values I rehearse on an arm64 laptop wouldn't be the values deployed | Percona, one member, on `local-path` |
+| MongoDB through Bitnami | The Bitnami images are amd64 only, so the values I test on an arm64 laptop wouldn't be the values deployed | Percona, one member, on `local-path` |
 
 Part 1's injection needed a change too. Its kernel log line never reaches NVSentinel:
 a line written to `/dev/kmsg` from userspace gets logged at `LOG_USER`, and journald then
 treats `NVRM:` as the syslog identifier and strips it from the message, so the pattern
 can't match. A real XID comes from the kernel and keeps it. I showed this on systemd 255,
-the version par's Ubuntu runs ([fc2-journald](https://github.com/yassineteimi/ncp-partner-onboarding/tree/main/docs/artifacts/readiness)),
+the version the Paris nodes run ([fc2-journald](https://github.com/yassineteimi/ncp-partner-onboarding/tree/main/docs/artifacts/readiness)),
 and the injection now puts the node's uptime in front of `NVRM`, which is also how
 NVSentinel's own tests write it. Same write, same moment in the run, one prefix.
 
-## Rehearsed for free first
+## Checked without a GPU first
 
 | Check | Result |
 |---|---|
-| Every chart rendered as Argo CD will, all three stages on | Every lane pod asks for the CPU pool; no webhook can block core resources while that worker is off; images pinned |
-| Server-side dry run on par | 177 objects accepted |
+| Every chart rendered as Argo CD will, all three stages on | Every NVSentinel control pod asks for the CPU pool; no webhook can block core resources while that worker is off; images pinned |
+| Server-side dry run against the Paris cluster | 177 objects accepted |
 | NVSentinel's own KIND demo, on an arm64 Mac | Fault, cordon, eviction, RebootNode, recovery |
-| par's values in KIND, one stage at a time | Stage 1 a condition only; stage 2 cordon and drain; stage 3 a RebootNode; NVSentinel uncordoned the node itself each time |
+| The Paris values in KIND, one stage at a time | Stage 1 a condition only; stage 2 cordon and drain; stage 3 a RebootNode; NVSentinel uncordoned the node itself each time |
 
 KIND couldn't cover three pieces: the syslog monitor, the labeler and a real reboot.
-W1 ran them for the first time on real hardware, and all three worked on the first try.
+The L4 run on 21 October was their first time on real hardware, and all three worked on
+the first try.
 
 ## How I measure it
 
@@ -131,6 +132,40 @@ the L4's clock was 0.24 s ahead of the laptop's (round trip 0.53 s).
 | 17:08:12.3 | The replacement pod, waiting since 17:03:35, started restoring checkpoint 400 (1.8 s) |
 | 17:22:14 | The Job completed, 3000 steps |
 
+The capture after the Job read the phases back from the recorder:
+
+```{ .sh .terminal }
+$ make uc3-capture
+...
+ "injected": "2026-10-21T17:03:23.443Z",
+ "phases": [
+  {
+   "phase": "detection",
+   "from": "2026-10-21T17:03:23.443Z",
+   "to": "2026-10-21T17:03:24.757Z",
+   "seconds": 1.3
+  },
+  ...
+  {
+   "phase": "reboot",
+   "from": "2026-10-21T17:03:34.924Z",
+   "to": "2026-10-21T17:05:29.736Z",
+   "seconds": 114.8
+  },
+  {
+   "phase": "driver",
+   "from": "2026-10-21T17:05:29.736Z",
+   "to": "2026-10-21T17:07:32.994Z",
+   "seconds": 123.3
+  },
+  ...
+ ],
+ "total_s": 288.8
+}
+```
+
+Full output: [uc3-phases-20261021T172243Z.json](https://github.com/yassineteimi/ncp-partner-onboarding/blob/main/docs/artifacts/readiness/uc3-phases-20261021T172243Z.json).
+
 ### Before and after
 
 | Phase | Part 1 (s) | NVSentinel (s) | What it is now |
@@ -139,31 +174,67 @@ the L4's clock was 0.24 s ahead of the laptop's (round trip 0.53 s).
 | Quarantine and drain | (inside the lookback) | 1.7 | Cordon, then an eviction through the Eviction API |
 | Remediation | about 40 (waiting for a person) | 8.4 | XID 79 maps to `RESTART_BM`, so a `RebootNode`, with no one asked |
 | Reboot | none | 114.8 | Shutdown, the Scaleway VM's boot, kubelet and node Ready |
-| Driver | none | 123.3 | The GPU Operator compiles and loads the driver after every boot on par |
+| Driver | none | 123.3 | The GPU Operator compiles and loads the driver after every boot in Paris |
 | Diagnostic | 6 | none | Not run: post-remediation validation is off ([below](#what-still-isnt-automated)) |
 | Return | 12 | 32.3 | NVSentinel waits for every monitor to report healthy; the last one was DCGM, back once its host engine was |
 | Resume | 3.9 | 7.0 | The pending pod was scheduled at the uncordon, then its container started |
 | **Outage** | **360.9** | **288.8** | |
 
-Goodput went from 66.4% to 73.0%: 925.3 s of useful training in 1267 s, against
-918.2 s in 1383 s. Part 1's analysis, unchanged, counts the outage from the trainer's
-last step, 287.6 s here, and adds 27 steps redone since the checkpoint (8.3 s), the
-checkpoint writes (34.8 s) and the restore (1.8 s).
+Goodput went from 66.4% to 73.0%. Part 1's analysis, unchanged, counts the outage from
+the trainer's last step, so 287.6 s here, and adds the 27 steps redone since the
+checkpoint, the checkpoint writes and the restore:
+
+```{ .sh .terminal }
+$ make uc3-capture
+...
+  "final_step": 3000,
+  "steps_kept": 3000,
+  "steps_redone": 27,
+  "total_s": 1267.0,
+  "useful_s": 925.268,
+  "redone_s": 8.298,
+  "checkpoint_s": 34.791,
+  "restore_s": 1.829,
+  "outage_s": 287.583,
+  "other_s": 9.232,
+  "goodput": 0.7303,
+```
+
+Full output: [uc3-goodput.json](https://github.com/yassineteimi/ncp-partner-onboarding/blob/main/docs/artifacts/readiness/uc3-goodput.json).
 
 ### Why the outage is still almost five minutes
 
 The waiting is gone: no timer, no person. What replaced it is work Part 1 skipped.
 Part 1 treated XID 79 by running a diagnostic and handing the GPU back; NVIDIA's catalog
-says XID 79 ("GPU has fallen off the bus") needs a reboot, so NVSentinel reboots. On
-par that costs 238 s: 115 s for the VM to come back and 123 s for the GPU Operator to
-rebuild the driver, because par's operator compiles it on the node at every boot. A
-precompiled driver would take most of those 123 s away; that's a trade for the driver
-decision (ADR 0002), not for this page. On a fleet the job wouldn't wait for any of it: it would restart on another node
-as soon as the drain finished, about 3 s after the fault.
+says XID 79 ("GPU has fallen off the bus") needs a reboot, so NVSentinel reboots. On the
+Paris L4 that costs 238 s: 115 s for the VM to come back and 123 s for the GPU Operator
+to rebuild the driver, because the operator compiles it on the node at every boot there.
+A precompiled driver would take most of those 123 s away; that's a trade for the driver
+decision (ADR 0002), not for this page. On a fleet the job wouldn't wait for any of it:
+it would restart on another node as soon as the drain finished, about 3 s after the fault.
 
-### The second fault, through DCGM
+The kubelet's own events show the same reboot from the node's side, a few seconds behind
+the API (the cordon was at 17:03:24.8; the kubelet logged it at 17:03:32):
 
-With time left in the window I injected XID 79 a second way, into DCGM's cache, with no
+```{ .sh .terminal }
+$ make uc3-capture
+...
+== events on the node
+TIME                   SOURCE                  REASON                        MESSAGE
+2026-10-21T17:03:32Z   kubelet                 NodeNotSchedulable            Node eu1-par-gpu-01 status is now: NodeNotSchedulable
+2026-10-21T17:04:25Z   node-controller         NodeNotReady                  Node eu1-par-gpu-01 status is now: NodeNotReady
+2026-10-21T17:05:30Z   kubelet                 Starting                      Starting kubelet.
+...
+2026-10-21T17:05:30Z   kubelet                 Rebooted                      Node eu1-par-gpu-01 has been rebooted, boot id: 97af02a0-d89c-4a46-be4e-8f4ff99e515f
+2026-10-21T17:05:30Z   kubelet                 NodeAllocatableEnforced       Updated Node Allocatable limit across pods
+2026-10-21T17:08:13Z   kubelet                 NodeSchedulable               Node eu1-par-gpu-01 status is now: NodeSchedulable
+```
+
+Full output: [uc3-nvsentinel-state-20261021T172243Z.txt](https://github.com/yassineteimi/ncp-partner-onboarding/blob/main/docs/artifacts/readiness/uc3-nvsentinel-state-20261021T172243Z.txt).
+
+### The same fault through DCGM
+
+After the measured run I injected XID 79 a second way, into DCGM's cache, with no
 training running. The DCGM monitor raised `GpuAllWatch` (`DCGM_FR_FALLEN_OFF_BUS`) and
 the node was cordoned 5.7 s after the injection; it was Ready on a new boot 103.8 s
 later, allocatable 121.4 s after that, and uncordoned 52.4 s after that: 283.3 s in all,
@@ -172,22 +243,31 @@ within 6 s of the first run
 Both of NVSentinel's detection paths work on the real L4.
 
 Before the measured run, a SIMULATED XID 13, which the catalog marks as needing no
-action, raised an event 11.8 s after injection and left the node schedulable
-([smoke test](https://github.com/yassineteimi/ncp-partner-onboarding/blob/main/docs/artifacts/readiness/uc3-xid13-smoke-20261021T170027Z.txt)).
+action, raised an event 11.8 s after injection and left the node schedulable:
+
+```{ .sh .terminal }
+$ kubectl get events -A --field-selector involvedObject.name=eu1-par-gpu-01,reason=SysLogsXIDErrorIsNotHealthy \
+    -o custom-columns='TIME:.lastTimestamp,SRC:.source.component,REASON:.reason,MSG:.message'
+TIME                   SRC                     REASON                        MSG
+2026-10-21T17:00:39Z   syslog-health-monitor   SysLogsXIDErrorIsNotHealthy   ErrorCode:13 PCI:0000:01:00 GPU_UUID:GPU-2b3af644-eb7c-0ecd-2a95-1097054adffd MESSAGE=[901.52] NVRM: Xid (PCI:0000:01:00): 13, pid=0, name=inject-xid.sh, SIMULATED by scripts/readiness/inject-xid.sh, not a real fault Recommended Action=NONE;
+```
+
+Full output: [uc3-xid13-smoke-20261021T170027Z.txt](https://github.com/yassineteimi/ncp-partner-onboarding/blob/main/docs/artifacts/readiness/uc3-xid13-smoke-20261021T170027Z.txt).
 
 ### What went well, and what didn't
 
 The first real test of three things KIND couldn't show, the syslog monitor, the labeler
 and a real reboot, passed without a retry, and the `[uptime]` prefix on the injection
-did what the journald analysis said it would. None of the run sheet's abort lines came
-close: the cordon came 1.3 s after the fault, where the first abort was at 2 minutes.
+did what the journald analysis said it would. The cordon came 1.3 s after the fault, so
+the fallback I had ready (injecting through DCGM if nothing happened within 2 minutes)
+was never needed.
 
-Two things nearly got in the way. Scaleway showed no L4 free in either Paris zone just
-before the window; one freed up minutes later. And par's API server had stalled at 12:07
-UTC that day, when Grafana starved etcd's disk, so every controller in this lane carried
-8 to 10 restarts into the window.
-The restart baseline taken before the injection is what shows that the run itself
-caused only two, both on the L4 when it rebooted
+Two things nearly got in the way. Scaleway showed no L4 free in either Paris zone a few
+minutes before the run; one freed up shortly after. And the Paris API server had stalled
+at 12:07 UTC that day, when Grafana starved etcd's disk, so every NVSentinel, NVCRE and
+Trainer controller carried 8 to 10 restarts into the run. The restart counts I took
+before the injection are what show that the run itself caused only two, both on the L4
+when it rebooted
 ([before](https://github.com/yassineteimi/ncp-partner-onboarding/blob/main/docs/artifacts/readiness/uc3-check-20261021T170021Z.txt),
 [after](https://github.com/yassineteimi/ncp-partner-onboarding/blob/main/docs/artifacts/readiness/uc3-nvsentinel-state-20261021T172243Z.txt)).
 
@@ -203,13 +283,22 @@ bad GPU.
 
 Two more gaps, both read in the source and not exercised here. An XID the catalog maps
 to `CONTACT_SUPPORT` leaves the node cordoned until a person acts. And NVSentinel only
-protects the L4 while par's CPU worker is on, since its control pods live there: with
+protects the L4 while the Paris CPU worker is on, since its control pods live there: with
 the worker off, a fault would be logged by the monitors on the L4 and nothing would act
 on it.
+
+## What was simulated
+
+The fault. A healthy GPU can't be made to fall off the bus on request, so every XID on
+this page was written by a script: XID 79 and XID 13 as kernel log lines, prefixed with
+the node's uptime, and XID 79 again into DCGM's field cache. Everything after the
+injection was real: the cordon, the eviction, the reboot of the VM, the driver rebuild,
+the uncordon and the training job resuming from its checkpoint.
+([What is simulated](simulated.md), for the whole project.)
 
 ## What one L4 can't show
 
 The job can only resume on the node that failed, where a fleet would move it elsewhere
-and the reboot would cost the job nothing but the reschedule. And the fault is simulated:
-a real XID 79 usually kills the process mid-step with a CUDA error, where this trainer
-gets a clean SIGTERM from the eviction.
+and the reboot would cost the job nothing but the reschedule. And a real XID 79 usually
+kills the process mid-step with a CUDA error, where this trainer gets a clean SIGTERM
+from the eviction.
