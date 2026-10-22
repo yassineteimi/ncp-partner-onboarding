@@ -1,12 +1,19 @@
 # VM tenants next to the GPU pods, with KubeVirt
 
 !!! abstract "The use case"
-    Some of EU1's tenants can't move to containers yet. They ship a whole operating
-    system image, or a licensed appliance, or software that expects to own a kernel.
-    EU1 wants to sell them capacity from the same fleet, run by the same people and
-    tools. Here a VM runs on par's CPU worker as a Kubernetes object, under a tenant
-    quota, next to the GPU workloads, and the guest itself says it runs on KVM.
-    The choice of KubeVirt over a separate IaaS is in [ADR 0010](adr/0010-vm-tenants.md).
+    Some of Nordhaven's tenants can't move to containers yet. They ship a whole
+    operating system image, or a licensed appliance, or software that expects to own a
+    kernel. Nordhaven wants to sell them capacity from the same fleet, run by the same
+    people and tools. Here a VM runs on the Paris CPU worker as a Kubernetes object,
+    under a tenant quota, next to the GPU workloads, and the guest itself says it runs
+    on KVM. The choice of KubeVirt over a separate IaaS is in
+    [ADR 0010](adr/0010-vm-tenants.md).
+
+!!! note "What ran"
+    On 21 October in Paris: KubeVirt v1.9.1 deployed by ArgoCD, and a VM, `web-01`,
+    booted on KVM under the `tenant-vm` quota. It kept running through the day,
+    including while a training job used the Paris L4 on another node. Nothing in this
+    use case is simulated.
 
 ## What runs where
 
@@ -43,14 +50,41 @@ Each of these comes from reading KubeVirt's source at v1.9.1:
   ([`pin-images.yaml`](https://github.com/yassineteimi/ncp-partner-onboarding/blob/main/gitops/manifests/platform/kubevirt/pin-images.yaml)).
   The first deployment showed two I had missed: the virt-template components. They
   deploy by default, because their gate is Beta and KubeVirt turns Beta gates on, and
-  they follow their own release, v0.2.3. They were running from tags until the fix
+  they follow their own release, v0.2.3. They ran from tags until I pinned them too
   ([before](artifacts/platform/kubevirt-20261021T103649Z.txt),
   [after](artifacts/platform/kubevirt-20261021T114554Z.txt)).
 
 ## First boot, 21 October
 
-From [the capture](artifacts/platform/kubevirt-20261021T103649Z.txt), read through
-par's API server:
+```{ .sh .terminal }
+$ make kubevirt-capture
+# capture-kubevirt.sh, 20261021T103649Z, laptop clock, UTC. git 28f386b
+
+## KubeVirt
+phase: Deployed
+version: v1.9.1
+useEmulation: false
+...
+NAME                                        AGE     PHASE     IP            NODENAME         READY   LIVE-MIGRATABLE   PAUSED
+virtualmachineinstance.kubevirt.io/web-01   5m43s   Running   10.244.1.18   eu1-par-cpu-01   True    True              
+node: eu1-par-cpu-01  phase: Running
+  Pending      2026-10-21T10:31:08Z  +0 s after the VMI was created
+  Scheduling   2026-10-21T10:31:08Z  +0 s after the VMI was created
+  Scheduled    2026-10-21T10:31:31Z  +23 s after the VMI was created
+  Running      2026-10-21T10:31:33Z  +25 s after the VMI was created
+...
+## The guest's own page, through Service tenant-vm/web-01
+hostname: web-01
+hypervisor seen by the guest: kvm
+kernel: 6.8.0-147-generic
+cpu: AMD EPYC-Milan Processor
+vcpus: 1
+memory: 1903 MiB
+boot: Startup finished in 6.302s (kernel) + 13.928s (userspace) = 20.231s 
+...
+```
+
+[Full capture](artifacts/platform/kubevirt-20261021T103649Z.txt)
 
 | What | Measured |
 |---|---|
@@ -60,13 +94,13 @@ par's API server:
 | Guest CPU | AMD EPYC-Milan, 1 vCPU |
 | Guest memory visible inside | 1903 MiB of the 2 GiB given |
 
-The VM has kept running through two disturbances since. On 21 October the virt-template
-pins rolled virt-operator and two Deployments. Then, about 12:05 to 12:10 UTC, the
-control plane's disk saturated and its API server refused connections for about two
-minutes. virt-operator, virt-controller and virt-template-controller crash-looped
-until the API server came back. The VM instance created at 10:31 UTC never stopped:
-the guest runs in its virt-launcher pod and doesn't need the control plane to keep
-running.
+The VM kept running through two disturbances that day. First, pinning the
+virt-template images rolled virt-operator and two Deployments. Then, from about 12:05
+to 12:10 UTC, the control plane's disk saturated and its API server refused
+connections for about two minutes. virt-operator, virt-controller and
+virt-template-controller crash-looped until the API server came back. The VM instance
+created at 10:31 UTC never stopped: the guest runs in its virt-launcher pod and doesn't
+need the control plane to keep running.
 
 ## What a VM costs its tenant
 
@@ -82,12 +116,29 @@ guest gets:
 So a 2 GiB VM costs its tenant about 2.3 GiB: about 15% more than the guest's memory.
 A tenant sizing a quota from the guest's size alone would hit it early.
 
-## Next to the GPU workloads, W1
+## Next to a GPU training job
 
-`make kubevirt-capture` lists every pod holding a GPU at the moment it runs. During
-W1, at 17:01:51 UTC on 21 October and before ws-readiness injected its SIMULATED
-XID 79, [the capture](artifacts/platform/kubevirt-20261021T170151Z.txt) shows both
-kinds of tenant on one cluster:
+`make kubevirt-capture` lists every pod holding a GPU at the moment it runs. I ran it
+at 17:01:51 UTC on 21 October, while a training job used the Paris L4 and before the
+simulated XID 79 fault of [use case 3](10-day2-nvsentinel.md) was injected:
+
+```{ .sh .terminal }
+$ make kubevirt-capture
+...
+## The tenant VM
+NAME                                AGE     STATUS    READY
+virtualmachine.kubevirt.io/web-01   6h30m   Running   True
+
+NAME                                        AGE     PHASE     IP            NODENAME         READY   LIVE-MIGRATABLE   PAUSED
+virtualmachineinstance.kubevirt.io/web-01   6h30m   Running   10.244.1.18   eu1-par-cpu-01   True    True              
+...
+## Pods holding a GPU right now, cluster-wide
+tenant-a         goodput-xq462                                    eu1-par-gpu-01     Running    gpus=1
+
+# written to docs/artifacts/platform/kubevirt-20261021T170151Z.txt
+```
+
+[Full capture](artifacts/platform/kubevirt-20261021T170151Z.txt)
 
 | Tenant | Pod | Node | What it holds |
 |---|---|---|---|
@@ -109,10 +160,9 @@ followed, part of use case 3, didn't touch the VM, which runs on another node.
 ## Reproduce it
 
 ```bash
-make kubevirt-check DRY_RUN=server   # free: digest, fields against KubeVirt's OpenAPI, dry run on par
+make kubevirt-check DRY_RUN=server   # without a GPU: digest, fields against KubeVirt's OpenAPI, dry run in Paris
 make kubevirt-check BREAK=1          # must fail: a tag and two misspelt fields
-make kubevirt-capture                # evidence through par's API server, changes nothing
+make kubevirt-capture                # evidence through the Paris API server, changes nothing
 ```
 
-Free checks: [kubevirt-free-checks-20261021T103727Z.txt](artifacts/platform/kubevirt-free-checks-20261021T103727Z.txt).
-Nothing in this use case is simulated: the VM runs on KVM, not emulation.
+Checks without a GPU: [kubevirt-free-checks-20261021T103727Z.txt](artifacts/platform/kubevirt-free-checks-20261021T103727Z.txt).
