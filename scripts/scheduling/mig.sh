@@ -93,8 +93,8 @@ if [ "${LABEL:-0}" = "1" ]; then
   section "Label $node nvidia.com/mig.config=$MIG_CONFIG"
   kubectl_cp label node "$node" "nvidia.com/mig.config=$MIG_CONFIG" --overwrite
 else
-  section "Waiting for cos to label $node nvidia.com/mig.config=$MIG_CONFIG"
-  echo "cos runs: kubectl label node $node nvidia.com/mig.config=$MIG_CONFIG --overwrite"
+  section "Waiting for the label nvidia.com/mig.config=$MIG_CONFIG on $node"
+  echo "set it with: kubectl label node $node nvidia.com/mig.config=$MIG_CONFIG --overwrite"
   if ! wait_for "node labelled $MIG_CONFIG" 300 mig_config_is; then
     echo "not labelled in 5 min; nothing changed on the node"
     exit 1
@@ -102,7 +102,7 @@ else
 fi
 echo "label nvidia.com/mig.config=$(node_label nvidia.com/mig.config) seen at $(date -u +%H:%M:%SZ)"
 
-section "Wait for the MIG manager (time box ${MIG_TIMEOUT}s)"
+section "Wait for the MIG manager (up to ${MIG_TIMEOUT}s)"
 # Watch the state change, printing each transition. The node already reads
 # success from all-disabled, so success only counts once the MIG manager has
 # set pending for the new config (reconfigure.go:158 at v0.15.1). If the
@@ -134,7 +134,7 @@ if ! mig_state_is success; then
   section "ABORT: MIG not applied (state=${last:-<none>})"
   capture_mig_manager
   show_node
-  echo "Cut per the run sheet; recorded as a finding. No reboot."
+  echo "MIG not applied; the node was not rebooted."
   exit 1
 fi
 
