@@ -160,6 +160,9 @@ case "$MODE" in
       # The same, counted from the raw series at one instant, so it also works
       # on data stored before the rule existed (with AT).
       q "DCGM series per GPU and MIG instance, counted directly (now)" 'count by (site, hostname, gpu, GPU_I_ID, GPU_I_PROFILE) ({__name__=~"DCGM_.+", site="fin"})'
+      # Which fields a MIG instance reports, by name: the MIG utilisation
+      # query above assumes DCGM_FI_PROF_GR_ENGINE_ACTIVE is one of them.
+      q "DCGM metrics reported per MIG instance, by name (now)" 'count by (__name__) ({__name__=~"DCGM_.+", site="fin", GPU_I_ID!=""})'
     fi
     q "DCGM series per GPU, top metrics on fin" 'topk(15, max by (metric) (max_over_time(gpu:dcgm_series_by_metric:count{site="fin"}[3h])))'
     # Each site's own Prometheus reports its head: one series per site. A

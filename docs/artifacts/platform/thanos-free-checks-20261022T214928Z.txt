@@ -1,11 +1,11 @@
 # make thanos-check DRY_RUN=server and make thanos-test-rules (BREAK=0, then BREAK=1)
-# 20261022T214452Z, laptop clock, UTC. git c34ddb7 plus the MIG rule and dashboard working tree
+# 20261022T214928Z, laptop clock, UTC. git 2c15ae3 plus the MIG rule and dashboard working tree
 # thanos, version 0.42.4 (branch: HEAD, revision: 45c4f39487e1653e606307d3952a6259fb96acae)
 # promtool, version 3.14.0 (branch: HEAD, revision: d7598b7141418fa35be2b5ec5d0fefb634199610)
 # kubectl v1.36.5
 
 ./scripts/platform/check-thanos.sh
-==> renders go to $TMPDIR/tmp.THCoGZ6GtO
+==> renders go to $TMPDIR/tmp.5vRAE6JnV7
 ==> kustomize build of thanos and gpu-rules
 ==> dashboard JSON parses
 ==> 37 thanos flags exist in v0.42.4
@@ -64,7 +64,7 @@ application.argoproj.io/thanos configured (server dry run)
 ./scripts/platform/test-rules.sh
 ==> promtool 3.14.0
 ==> checking rule syntax
-Checking $TMPDIR/tmp.bsBqVaky4o/gpu-cardinality.rules.yaml
+Checking $TMPDIR/tmp.ELjK6xGF4H/gpu-cardinality.rules.yaml
   SUCCESS: 3 rules found
 
 ==> running unit tests
@@ -74,7 +74,7 @@ Checking $TMPDIR/tmp.bsBqVaky4o/gpu-cardinality.rules.yaml
 ./scripts/platform/test-rules.sh
 ==> promtool 3.14.0
 ==> checking rule syntax
-Checking $TMPDIR/tmp.VaFH3rLQiT/gpu-cardinality.rules.yaml
+Checking $TMPDIR/tmp.OEWKm02n3l/gpu-cardinality.rules.yaml
   SUCCESS: 3 rules found
 
 ==> running unit tests
