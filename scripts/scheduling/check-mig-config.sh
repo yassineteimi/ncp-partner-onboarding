@@ -27,7 +27,13 @@ GPU_OPERATOR_VERSION=v26.7.2
 MIG_MANAGER_IMAGE="nvcr.io/nvidia/cloud-native/k8s-mig-manager:v0.15.1@sha256:c1674fa2f46012dc425539f7fcac6445dce13bc81a05e4f91e311c7b8c27bcaf"
 NS=team-a
 work="$(mktemp -d)"
-trap 'rm -rf "$work"; kubectl_cp -n "$NS" delete pod mig-config-check configmap mig-config-check --ignore-not-found --wait=false >/dev/null 2>&1 || true' EXIT
+cleanup() {
+  rm -rf "$work"
+  # One kind per delete: "delete pod a configmap b" would read configmap as a pod name.
+  kubectl_cp -n "$NS" delete pod mig-config-check --ignore-not-found --wait=false >/dev/null 2>&1 || true
+  kubectl_cp -n "$NS" delete configmap mig-config-check --ignore-not-found >/dev/null 2>&1 || true
+}
+trap cleanup EXIT
 
 start_capture mig-config
 

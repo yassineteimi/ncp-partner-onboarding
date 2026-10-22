@@ -153,9 +153,18 @@ section "Tenants on their slices"
 echo "each slice pod should see about $MIG_EXPECT_GB GB ($MIG_RESOURCE); the whole-GPU pod sees the full card"
 sed "s#nvidia.com/mig-3g.71gb#$MIG_RESOURCE#" "$TENANTS" | kubectl_cp apply -f -
 pod_running() { [ "$(kubectl_cp -n "$1" get pod "$2" -o jsonpath='{.status.phase}' 2>/dev/null)" = Running ]; }
+not_running=()
 for pod in team-a/mig-a team-b/mig-b team-a/whole-a; do
   ns="${pod%/*}" name="${pod#*/}"
-  wait_for "$pod running" 300 pod_running "$ns" "$name" || true
+  wait_for "$pod running" 300 pod_running "$ns" "$name" || not_running+=("$pod")
+done
+# A pod KAI holds says why on its PodGroup; record it rather than a bare timeout.
+# (bash 3.2 on macOS treats an empty array as unset under set -u.)
+for pod in ${not_running[@]+"${not_running[@]}"}; do
+  ns="${pod%/*}" name="${pod#*/}"
+  pg="$(kubectl_cp -n "$ns" get podgroups.scheduling.run.ai -o name | grep "pg-$name-" | head -n1)"
+  echo "### why KAI holds $pod ($pg)"
+  [ -n "$pg" ] && kubectl_cp -n "$ns" get "$pg" -o jsonpath='{.status.schedulingConditions[*].message}{"\n"}'
 done
 sleep 20
 kubectl_cp get pods -A -l app=mig-tenant -o wide
@@ -172,4 +181,8 @@ if [ "${KEEP:-}" != "1" ]; then
 fi
 
 section "Result"
+if [ "${#not_running[@]}" -gt 0 ]; then
+  echo "MIG $MIG_CONFIG applied on $node; not placed: ${not_running[*]}"
+  exit 1
+fi
 echo "MIG $MIG_CONFIG applied on $node; tenants placed by KAI"
