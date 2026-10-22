@@ -3,7 +3,7 @@
 One of EU1's first customers is a research group that has used Slurm for years. Its people submit with `sbatch` and `srun` and won't rewrite their scripts as Kubernetes Jobs. EU1 doesn't want a second fleet for them. So Slurm runs inside par's Kubernetes cluster through [Slinky](https://github.com/SlinkyProject/slurm-operator), SchedMD's own operator, on the same CPU worker, monitoring and health story as every other tenant. [ADR 0007](adr/0007-hpc-tenants-slurm.md) says why Slinky and not Soperator or a separate Slurm cluster.
 
 !!! note "Status, Wednesday 21 October"
-    Running on par since 21 October. `make slurm-test` passes all four of its steps. Slurm with GPUs on fin is W2 step 7, only if time remains.
+    Running on par since 21 October. `make slurm-test` passes all four of its steps. Slurm with GPUs on fin isn't built in this PoC.
 
 ## What's built
 
@@ -57,7 +57,7 @@ The first sync and the first test run turned up four problems. Each one is now f
 ## What one VM can't show
 
 - **Two machines.** Both Slurm nodes run on one VM (`oversubscribeNode`, which Slinky marks as not for production).
-- **GPUs in Slurm.** par's Slurm is CPU-only. Slurm on fin's H200s is W2 step 7, and only if time remains.
+- **GPUs in Slurm.** par's Slurm is CPU-only, and Slurm on fin's H200s isn't built in this PoC. It would need a Slinky Application on fin, a GPU NodeSet with Slurm's GRES configured for the H200s, and the GPU Operator's container runtime in slurmd. None of it is tested here.
 - **Shared storage.** With no ReadWriteMany volume, a job's output stays on the node that ran it.
 - **Accounting and fair share over time.** No slurmdbd.
 - **Performance next to a bare-metal Slurm.** Not measured.

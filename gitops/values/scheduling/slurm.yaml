@@ -4,8 +4,7 @@
 #
 # Limits stated in docs/21-hpc-slinky.md: one VM carries the whole cluster,
 # so the two Slurm nodes share it (oversubscribeNode); no accounting (it needs
-# a MariaDB); no GPUs on par. The fin stretch (Slurm with the H200s) is
-# W2 step 7, only if time remains.
+# a MariaDB); no GPUs on par. Slurm with fin's H200s isn't built in this PoC.
 
 # The chart would create these two Secrets with randAscii, guarded by a
 # lookup of the existing Secret. ArgoCD renders offline, where lookup returns

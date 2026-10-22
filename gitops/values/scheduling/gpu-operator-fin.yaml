@@ -32,9 +32,12 @@ migManager:
       #
       # h200-split: GPU0 becomes two 3g.71gb instances, one per tenant, each
       # with its own compute and memory slices and its own fault domain; GPU1
-      # stays whole for a full-GPU job. H200 141GB profiles per NVIDIA's MIG
-      # guide: 1g.18gb x7, 1g.35gb x4, 2g.35gb x3, 3g.71gb x2, 4g.71gb x1,
-      # 7g.141gb x1. W2 step 1 captures nvidia-smi mig -lgip to confirm them.
+      # stays whole. W2 showed KAI v0.18.6 places no whole-GPU job on a MIG
+      # node with the mixed strategy, so under KAI GPU1 sits idle (ADR 0008):
+      # a MIG node's layout should slice every GPU. H200 141GB profiles per
+      # NVIDIA's MIG guide: 1g.18gb x7, 1g.35gb x4, 2g.35gb x3, 3g.71gb x2,
+      # 4g.71gb x1, 7g.141gb x1. W2 step 1 captures nvidia-smi mig -lgip to
+      # confirm them.
       #
       # rtxpro-split: the same layout on 2x RTX PRO 6000 Blackwell, a fallback
       # only if Verda has no H200 and Yassine approves it at the time. GPU0

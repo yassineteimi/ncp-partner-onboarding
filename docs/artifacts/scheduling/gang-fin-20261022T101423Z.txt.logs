@@ -1,0 +1,99 @@
+### rank 0 (pod/allreduce-gang-0-62gpk)
+rank 0/2 host allreduce-gang-0 backend nccl device NVIDIA H200 torch 2.11.0+cu128 nccl 2.28.9 CUDA_VISIBLE_DEVICES=None
+rank 0: process group up in 0.4 s
+allreduce-gang-0:1:1 [0] NCCL INFO ENV/Plugin: Could not find: libnccl-env.so
+allreduce-gang-0:1:1 [0] NCCL INFO Bootstrap: Using eth0:10.244.1.21<0>
+allreduce-gang-0:1:1 [0] NCCL INFO cudaDriverVersion 13000
+allreduce-gang-0:1:1 [0] NCCL INFO NCCL version 2.28.9+cuda12.9
+allreduce-gang-0:1:1 [0] NCCL INFO Comm config Blocking set to 1
+allreduce-gang-0:1:1 [0] NCCL INFO NET/Plugin: Could not find: libnccl-net.so
+allreduce-gang-0:1:1 [0] NCCL INFO Failed to open libibverbs.so[.1]
+allreduce-gang-0:1:1 [0] NCCL INFO transport/net_ib.cc:852 -> 3
+allreduce-gang-0:1:1 [0] NCCL INFO Failed to initialize NET plugin IB
+allreduce-gang-0:1:1 [0] NCCL INFO NET/Socket : Using [0]eth0:10.244.1.21<0>
+allreduce-gang-0:1:1 [0] NCCL INFO Initialized NET plugin Socket
+allreduce-gang-0:1:1 [0] NCCL INFO Assigned NET plugin Socket to comm
+allreduce-gang-0:1:1 [0] NCCL INFO Using network Socket
+allreduce-gang-0:1:1 [0] NCCL INFO ncclCommInitRankConfig comm 0x3823ce10 rank 0 nranks 2 cudaDev 0 nvmlDev 0 busId 6000 commId 0xce6438e20a12fd90 - Init START
+allreduce-gang-0:1:1 [0] NCCL INFO RAS client listening socket at ::1<28028>
+allreduce-gang-0:1:1 [0] NCCL INFO Bootstrap timings total 0.011035 (create 0.000035, send 0.000145, recv 0.000235, ring 0.000044, delay 0.000000)
+allreduce-gang-0:1:1 [0] NCCL INFO MNNVL busId 0x6000 fabric UUID 0.0 cliqueId 0x0 state 3 healthMask 0x0
+allreduce-gang-0:1:1 [0] NCCL INFO ncclTopoGetCpuAffinity: Affinity for GPU 0 is empty, ignoring. (GPU affinity =  ; CPU affinity = 0-87).
+allreduce-gang-0:1:1 [0] NCCL INFO comm 0x3823ce10 rank 0 nRanks 2 nNodes 2 localRanks 1 localRank 0 MNNVL 0
+allreduce-gang-0:1:1 [0] NCCL INFO Channel 00/02 : 0 1
+allreduce-gang-0:1:1 [0] NCCL INFO Channel 01/02 : 0 1
+allreduce-gang-0:1:1 [0] NCCL INFO Trees [0] 1/-1/-1->0->-1 [1] -1/-1/-1->0->1
+allreduce-gang-0:1:1 [0] NCCL INFO P2P Chunksize set to 131072
+allreduce-gang-0:1:1 [0] NCCL INFO PROFILER/Plugin: Could not find: libnccl-profiler.so
+allreduce-gang-0:1:1 [0] NCCL INFO Check P2P Type isAllDirectP2p 1 directMode 0 isAllCudaP2p 1
+allreduce-gang-0:1:127 [0] NCCL INFO [Proxy Service] Device 0 CPU core 10
+allreduce-gang-0:1:128 [0] NCCL INFO [Proxy Service UDS] Device 0 CPU core 13
+allreduce-gang-0:1:1 [0] NCCL INFO TUNER/Plugin: Could not find: libnccl-tuner.so
+allreduce-gang-0:1:1 [0] NCCL INFO threadThresholds 8/8/64 | 16/8/64 | 512 | 512
+allreduce-gang-0:1:1 [0] NCCL INFO 2 coll channels, 2 collnet channels, 0 nvls channels, 2 p2p channels, 2 p2p channels per peer
+allreduce-gang-0:1:1 [0] NCCL INFO CC Off, workFifoBytes 1048576
+allreduce-gang-0:1:1 [0] NCCL INFO ncclCommInitRankConfig comm 0x3823ce10 rank 0 nranks 2 cudaDev 0 nvmlDev 0 busId 6000 commId 0xce6438e20a12fd90 - Init COMPLETE
+allreduce-gang-0:1:1 [0] NCCL INFO Init timings - ncclCommInitRankConfig: rank 0 nranks 2 total 0.21 (kernels 0.18, alloc 0.00, bootstrap 0.01, allgathers 0.00, topo 0.01, graphs 0.00, connections 0.00, rest 0.00)
+allreduce-gang-0:1:129 [0] NCCL INFO [Proxy Progress] Device 0 CPU core 14
+allreduce-gang-0:1:1 [0] NCCL INFO Channel 00/0 : 1[0] -> 0[0] [receive] via NET/Socket/0
+allreduce-gang-0:1:1 [0] NCCL INFO Channel 01/0 : 1[0] -> 0[0] [receive] via NET/Socket/0
+allreduce-gang-0:1:1 [0] NCCL INFO Channel 00/0 : 0[0] -> 1[0] [send] via NET/Socket/0
+allreduce-gang-0:1:1 [0] NCCL INFO Channel 01/0 : 0[0] -> 1[0] [send] via NET/Socket/0
+allreduce-gang-0:1:1 [0] NCCL INFO Connected all rings, use ring PXN 0 GDR 0
+/usr/local/lib/python3.12/dist-packages/torch/distributed/c10d_logger.py:83: UserWarning: barrier(): using the device under current context. You can specify `device_id` in `init_process_group` to mute this warning.
+  return func(*args, **kwargs)
+     1048576 B       838.0 us  algbw     1.25 GB/s  busbw     1.25 GB/s
+     2097152 B      1357.6 us  algbw     1.54 GB/s  busbw     1.54 GB/s
+     4194304 B      2411.0 us  algbw     1.74 GB/s  busbw     1.74 GB/s
+     8388608 B      4771.6 us  algbw     1.76 GB/s  busbw     1.76 GB/s
+    16777216 B      8565.8 us  algbw     1.96 GB/s  busbw     1.96 GB/s
+    33554432 B     28104.1 us  algbw     1.19 GB/s  busbw     1.19 GB/s
+    67108864 B     57033.6 us  algbw     1.18 GB/s  busbw     1.18 GB/s
+   134217728 B    113389.2 us  algbw     1.18 GB/s  busbw     1.18 GB/s
+   268435456 B    125233.4 us  algbw     2.14 GB/s  busbw     2.14 GB/s
+   536870912 B    240174.1 us  algbw     2.24 GB/s  busbw     2.24 GB/s
+  1073741824 B    479571.9 us  algbw     2.24 GB/s  busbw     2.24 GB/s
+RESULT {"backend": "nccl", "world_size": 2, "device": "NVIDIA H200", "torch": "2.11.0+cu128", "nccl": "2.28.9", "iters": 20, "peak_busbw_GBps": 2.24, "results": [{"bytes": 1048576, "time_us": 838.0, "algbw_GBps": 1.25, "busbw_GBps": 1.25}, {"bytes": 2097152, "time_us": 1357.6, "algbw_GBps": 1.54, "busbw_GBps": 1.54}, {"bytes": 4194304, "time_us": 2411.0, "algbw_GBps": 1.74, "busbw_GBps": 1.74}, {"bytes": 8388608, "time_us": 4771.6, "algbw_GBps": 1.76, "busbw_GBps": 1.76}, {"bytes": 16777216, "time_us": 8565.8, "algbw_GBps": 1.96, "busbw_GBps": 1.96}, {"bytes": 33554432, "time_us": 28104.1, "algbw_GBps": 1.19, "busbw_GBps": 1.19}, {"bytes": 67108864, "time_us": 57033.6, "algbw_GBps": 1.18, "busbw_GBps": 1.18}, {"bytes": 134217728, "time_us": 113389.2, "algbw_GBps": 1.18, "busbw_GBps": 1.18}, {"bytes": 268435456, "time_us": 125233.4, "algbw_GBps": 2.14, "busbw_GBps": 2.14}, {"bytes": 536870912, "time_us": 240174.1, "algbw_GBps": 2.24, "busbw_GBps": 2.24}, {"bytes": 1073741824, "time_us": 479571.9, "algbw_GBps": 2.24, "busbw_GBps": 2.24}]}
+allreduce-gang-0:1:1 [0] NCCL INFO comm 0x3823ce10 rank 0 nranks 2 cudaDev 0 busId 6000 - Destroy COMPLETE
+allreduce-gang-0:1:1 [0] NCCL INFO ENV/Plugin: Closing env plugin ncclEnvDefault
+### rank 1 (pod/allreduce-gang-1-gc7lh)
+rank 1/2 host allreduce-gang-1 backend nccl device NVIDIA H200 torch 2.11.0+cu128 nccl 2.28.9 CUDA_VISIBLE_DEVICES=None
+rank 1: process group up in 0.4 s
+allreduce-gang-1:1:1 [0] NCCL INFO ENV/Plugin: Could not find: libnccl-env.so
+allreduce-gang-1:1:1 [0] NCCL INFO cudaDriverVersion 13000
+allreduce-gang-1:1:1 [0] NCCL INFO Bootstrap: Using eth0:10.244.1.20<0>
+allreduce-gang-1:1:1 [0] NCCL INFO NCCL version 2.28.9+cuda12.9
+allreduce-gang-1:1:1 [0] NCCL INFO Comm config Blocking set to 1
+allreduce-gang-1:1:1 [0] NCCL INFO NET/Plugin: Could not find: libnccl-net.so
+allreduce-gang-1:1:1 [0] NCCL INFO Failed to open libibverbs.so[.1]
+allreduce-gang-1:1:1 [0] NCCL INFO transport/net_ib.cc:852 -> 3
+allreduce-gang-1:1:1 [0] NCCL INFO Failed to initialize NET plugin IB
+allreduce-gang-1:1:1 [0] NCCL INFO NET/Socket : Using [0]eth0:10.244.1.20<0>
+allreduce-gang-1:1:1 [0] NCCL INFO Initialized NET plugin Socket
+allreduce-gang-1:1:1 [0] NCCL INFO Assigned NET plugin Socket to comm
+allreduce-gang-1:1:1 [0] NCCL INFO Using network Socket
+allreduce-gang-1:1:1 [0] NCCL INFO ncclCommInitRankConfig comm 0xc0a7c00 rank 1 nranks 2 cudaDev 0 nvmlDev 0 busId 5000 commId 0xce6438e20a12fd90 - Init START
+allreduce-gang-1:1:1 [0] NCCL INFO RAS client listening socket at ::1<28028>
+allreduce-gang-1:1:1 [0] NCCL INFO Bootstrap timings total 0.001481 (create 0.000034, send 0.000203, recv 0.000648, ring 0.000045, delay 0.000000)
+allreduce-gang-1:1:1 [0] NCCL INFO MNNVL busId 0x5000 fabric UUID 0.0 cliqueId 0x0 state 3 healthMask 0x0
+allreduce-gang-1:1:1 [0] NCCL INFO ncclTopoGetCpuAffinity: Affinity for GPU 0 is empty, ignoring. (GPU affinity =  ; CPU affinity = 0-87).
+allreduce-gang-1:1:1 [0] NCCL INFO comm 0xc0a7c00 rank 1 nRanks 2 nNodes 2 localRanks 1 localRank 0 MNNVL 0
+allreduce-gang-1:1:1 [0] NCCL INFO Trees [0] -1/-1/-1->1->0 [1] 0/-1/-1->1->-1
+allreduce-gang-1:1:1 [0] NCCL INFO P2P Chunksize set to 131072
+allreduce-gang-1:1:1 [0] NCCL INFO PROFILER/Plugin: Could not find: libnccl-profiler.so
+allreduce-gang-1:1:1 [0] NCCL INFO Check P2P Type isAllDirectP2p 1 directMode 0 isAllCudaP2p 1
+allreduce-gang-1:1:125 [0] NCCL INFO [Proxy Service] Device 0 CPU core 4
+allreduce-gang-1:1:126 [0] NCCL INFO [Proxy Service UDS] Device 0 CPU core 12
+allreduce-gang-1:1:1 [0] NCCL INFO TUNER/Plugin: Could not find: libnccl-tuner.so
+allreduce-gang-1:1:1 [0] NCCL INFO threadThresholds 8/8/64 | 16/8/64 | 512 | 512
+allreduce-gang-1:1:1 [0] NCCL INFO 2 coll channels, 2 collnet channels, 0 nvls channels, 2 p2p channels, 2 p2p channels per peer
+allreduce-gang-1:1:1 [0] NCCL INFO ncclCommInitRankConfig comm 0xc0a7c00 rank 1 nranks 2 cudaDev 0 nvmlDev 0 busId 5000 commId 0xce6438e20a12fd90 - Init COMPLETE
+allreduce-gang-1:1:1 [0] NCCL INFO Init timings - ncclCommInitRankConfig: rank 1 nranks 2 total 0.21 (kernels 0.18, alloc 0.00, bootstrap 0.00, allgathers 0.01, topo 0.01, graphs 0.00, connections 0.00, rest 0.00)
+allreduce-gang-1:1:127 [0] NCCL INFO [Proxy Progress] Device 0 CPU core 15
+allreduce-gang-1:1:1 [0] NCCL INFO Channel 00/0 : 0[0] -> 1[0] [receive] via NET/Socket/0
+allreduce-gang-1:1:1 [0] NCCL INFO Channel 01/0 : 0[0] -> 1[0] [receive] via NET/Socket/0
+allreduce-gang-1:1:1 [0] NCCL INFO Channel 00/0 : 1[0] -> 0[0] [send] via NET/Socket/0
+allreduce-gang-1:1:1 [0] NCCL INFO Channel 01/0 : 1[0] -> 0[0] [send] via NET/Socket/0
+allreduce-gang-1:1:1 [0] NCCL INFO Connected all rings, use ring PXN 0 GDR 0
+allreduce-gang-1:1:1 [0] NCCL INFO comm 0xc0a7c00 rank 1 nranks 2 cudaDev 0 busId 5000 - Destroy COMPLETE
+allreduce-gang-1:1:1 [0] NCCL INFO ENV/Plugin: Closing env plugin ncclEnvDefault
