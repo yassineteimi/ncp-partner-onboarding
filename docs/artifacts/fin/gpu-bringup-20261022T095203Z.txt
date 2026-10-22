@@ -1,0 +1,7 @@
+# gpu-bringup-20261022T095203Z.txt, laptop clock, UTC
+started=2026-10-22T09:52:03Z
+preflight_done=2026-10-22T09:52:06Z
+instance_running=2026-10-22T09:52:55Z
+bootstrap_complete=2026-10-22T09:53:52Z
+node_ready=2026-10-22T09:54:10Z
+gpu_allocatable=2026-10-22T09:55:44Z
