@@ -39,6 +39,7 @@ extra_css:
 
 extra_javascript:
   - javascripts/diagram-zoom.js
+  - javascripts/tab-anchors.js
 
 extra:
   social:
