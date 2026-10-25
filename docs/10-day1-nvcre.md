@@ -111,7 +111,7 @@
 
     ## The gate
 
-    The diagram is in the In short tab.
+    The diagram is in the first tab, "In short".
 
     The taint goes on at join, through the node's kubeadm `JoinConfiguration`, so there's no
     moment when the node is schedulable before it's checked. The GPU Operator's operands and
