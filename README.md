@@ -19,6 +19,8 @@ GPUs that never cover demand. Nordhaven is a fictional European partner going th
 exactly that, with an inference pool in Paris and a training pool in Finland from two
 different providers.
 
+[![From power to inference: who owns what](docs/assets/ownership-map/ownership-map-walkthrough.gif)](https://yassineteimi.github.io/ncp-partner-onboarding/ownership-map/)
+
 This is Part 2 of my GPU fleet work. [Part 1](https://github.com/yassineteimi/nvidia-gpu-fleet-poc)
 built Day 2 operations by hand on one NVIDIA L4. Here NVIDIA's open tools take over
 those jobs on two sites, upstream Kubernetes 1.36 through kubeadm on both, synced by

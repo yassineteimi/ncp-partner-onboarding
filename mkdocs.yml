@@ -71,6 +71,7 @@ plugins:
 
 nav:
   - Overview: index.md
+  - "Ownership map": ownership-map.md
   - "The story": story.md
   - Architecture: architecture.md
   - "Day 0: AICR": 10-day0-aicr.md
