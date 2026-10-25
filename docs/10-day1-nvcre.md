@@ -111,7 +111,15 @@
 
     ## The gate
 
-    The diagram is in the first tab, "In short".
+    ```mermaid
+    flowchart LR
+      join["H200 node joins<br/>taint eu1.io/staging=pending:NoSchedule"] --> cert["NVCRE certification<br/>nccl-all-reduce<br/>nccl-loopback-nvswitch"]
+      join --> diag["ECC mode, then dcgmi diag -r 2<br/>as an NVCRE WorkloadRun"]
+      cert --> gate["promote.py<br/>every check passed?"]
+      diag --> gate
+      gate -->|yes| open["taint removed<br/>tenants can schedule"]
+      gate -->|no| keep["taint kept<br/>cause: hardware, tooling or unclear"]
+    ```
 
     The taint goes on at join, through the node's kubeadm `JoinConfiguration`, so there's no
     moment when the node is schedulable before it's checked. The GPU Operator's operands and
