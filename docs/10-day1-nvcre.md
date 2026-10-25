@@ -14,7 +14,7 @@
     DCGM diagnostic skipped its memory test and still passed. The gate now refuses that
     case. [Results](#results).
 
-=== "Flash card"
+=== "In short"
 
     **The problem.** A new GPU server can arrive broken: a faulty GPU, a slow link between
     GPUs, a bad driver. If customers land on it first, they find the problem for you.
@@ -111,7 +111,7 @@
 
     ## The gate
 
-    The diagram is in the Flash card tab.
+    The diagram is in the In short tab.
 
     The taint goes on at join, through the node's kubeadm `JoinConfiguration`, so there's no
     moment when the node is schedulable before it's checked. The GPU Operator's operands and
