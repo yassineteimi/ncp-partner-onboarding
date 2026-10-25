@@ -1,210 +1,161 @@
-# Use case 5: a Slurm group on the same platform
+# HPC: a Slurm group on the same platform, with Slinky
 
-One of Nordhaven's first customers is a research group that has used Slurm for years. Its people submit with `sbatch` and `srun` and won't rewrite their scripts as Kubernetes Jobs. Nordhaven doesn't want a second fleet for them. So Slurm runs inside the Paris Kubernetes cluster through [Slinky](https://github.com/SlinkyProject/slurm-operator), SchedMD's own operator, on the same CPU worker, monitoring and health story as every other tenant. [ADR 0007](adr/0007-hpc-tenants-slurm.md) says why Slinky and not Soperator or a separate Slurm cluster.
+=== "In short"
 
-!!! note "What ran"
-    Slurm has run at the Paris site since 21 October, and `make slurm-test` passes all four of its checks. Slurm with GPUs at the Finland site is not built: its design is in [its own section](#slurm-with-gpus-at-the-finland-site-designed-not-run).
+    ### The problem
 
-## What's built
+    Many research groups have used **Slurm**, the classic HPC job scheduler, for years. They
+    submit with `sbatch` and `srun` and won't rewrite their scripts for Kubernetes. A
+    partner doesn't want a second, separate cluster just for them.
 
-One Application, `slinky` (`gitops/apps/par/scheduling/slinky.yaml`), with four sources: the slurm-operator chart 1.2.3, the slurm chart 1.2.3, the values in `gitops/values/scheduling/`, and a small bootstrap manifest. Everything runs in the `slurm` namespace on the Paris CPU worker (`eu1.io/pool: cpu`), with Slurm 26.05:
+    ### What I used
 
-| Part | What it is | Notes |
-|---|---|---|
-| `slurm-operator` and its webhook | Reconcile Slinky's `Controller`, `NodeSet`, `LoginSet` and `RestApi` objects | One replica each, leader election off (see below). The webhook's certificate comes from cert-manager |
-| `slurm-controller-0` | slurmctld, the Slurm scheduler | Its save state sits on a 2 GiB `local-path` volume, on the worker's disk, so it survives a power-off |
-| `slurm-worker-cpu-0`, `-1` | slurmd, as Slurm nodes `cpu-0` and `cpu-1` in partition `cpu` | Both on the one VM (`oversubscribeNode`), standing in for two machines |
-| `slurm-login-hpc` | The login pod where users run `sbatch`, `srun` and `squeue` | ClusterIP only |
-| `slurm-restapi` | slurmrestd | The operator talks to Slurm through it |
+    **Slinky**, SchedMD's own operator, runs Slurm *inside* Kubernetes: Slurm's scheduler
+    and its worker daemons are pods, on the same nodes, monitoring and health checks as
+    every other tenant ([ADR 0007](adr/0007-hpc-tenants-slurm.md) explains why not
+    Soperator or a separate Slurm cluster).
 
-No accounting: `sacct` and fair share over time need slurmdbd and a MariaDB, which this PoC doesn't run.
+    ### What happened (Paris CPU worker, 21 October)
 
-**Keys made in the cluster, not in Git.** Slurm needs a shared auth key and a JWT key. The slurm chart can create them, but with `randAscii` and `lookup` on immutable Secrets, which ArgoCD renders differently on every sync (a [finding](findings.md)). So the chart's own key creation is off, and a Job in sync wave -1, `slurm-keys-bootstrap`, creates `slurm-auth-slurm` and `slurm-auth-jwt` once, only if they're missing, as immutable Secrets. At the Paris site it completed at 11:37:32 UTC on 21 October. No key exists in Git or on a laptop, and a sync never rotates one. The namespace's other Secrets are `slurm-login-hpc-ssh-host-keys`, the two webhook CAs from cert-manager, and `slurm-sssd-conf`.
+    | Check | Result |
+    |---|---|
+    | A user's jobs | `srun` across both Slurm nodes and an `sbatch` job completed in 7 s |
+    | A health check before every job | A sick node (simulated fault) was drained by Slurm in 1 s; the job was held, then completed once the node was fixed |
+    | Kubernetes and Slurm agree on maintenance | Cordoning a worker pod in Kubernetes drained the matching Slurm node in 6 s |
 
-**A health check before every job.** A prolog, `00-node-health.sh` in `gitops/values/scheduling/slurm.yaml`, runs on the Slurm node before each job. It fails if `/tmp` isn't writable, if less than 256 MiB of memory is available, or if the marker file `/var/run/eu1-simulated-fault` exists. **SIMULATED:** the marker is the fault the test creates on purpose ([simulated page](simulated.md)); the other two checks are real. When the prolog fails, Slurm drains the node and holds the job. It's the Slurm side of use case 2's readiness gate.
+    One upstream bug: Slinky's default update mode undid that drain one second later. I
+    switched to the mode that holds it, at the price of a manual step per node on upgrades.
 
-**How users get in.** The test runs commands in the login pod with `kubectl exec`. No identity provider is wired in (`slurm-sssd-conf` is empty), so nobody can ssh in. Giving the research group real logins means pointing sssd at their directory and exposing the login Service.
+    ### Slurm with GPUs: designed, not run
 
-## What it shows
+    Running it would have meant untested work on a rented H200, so I wrote the design
+    instead:
 
-`make slurm-test` at the Paris site, 21 October. Times are UTC.
+    - **Whole GPUs work with the standard Slurm image;** MIG slices and a GPU health check
+      need a custom image (built with NVIDIA's NVML library).
+    - **Each GPU server belongs either to Slurm or to KAI,** never shared: a label and a
+      taint keep them apart, and Slurm's pod takes every GPU on its server.
+    - **The same certification gate applies:** Slurm only sees a server after it passed Day 1.
+    - **Tenants bring their own container** (pyxis), so their CUDA version stays their
+      choice, within the driver's limit.
 
-```{ .sh .terminal }
-$ make slurm-test
-...
-## 2. srun across both nodes, then sbatch   [12:16:49Z]
-0: cpu-1
-1: cpu-0
-...
-after 7s: job 5 completed
-...
-## 3. Prolog health check: SIMULATED fault on cpu-0   [12:16:57Z]
-marker /var/run/eu1-simulated-fault created in slurm-worker-cpu-0 at 12:16:58Z
-submitted job 6 to cpu-0
-after 1s: cpu-0 drained by the prolog
-REASON               USER      TIMESTAMP           NODELIST
-Prolog error         slurm     2026-10-21T12:16:59 cpu-0
-...
-after 160s: job 6 completed after the fix
-...
-## 4. Kubernetes to Slurm: nodeset.slinky.slurm.net/pod-cordon=true on slurm-worker-cpu-1   [12:19:42Z]
-...
-after 6s: cpu-1 drained by the operator
-REASON               USER      TIMESTAMP           NODELIST
-slurm-operator: Pod  slurm     2026-10-21T12:19:43 cpu-1
-SlurmNodeStateDrain=True message="slurm-operator: Pod (slurm/slurm-worker-cpu-1) was cordoned" since 2026-10-21T12:19:45Z
-...
-jobs ran from the login pod; prolog and Kubernetes drains both seen from Slurm and Kubernetes
-```
+    ### In one sentence
 
-[Full capture](artifacts/scheduling/slurm-par-20261021T121647Z.txt)
+    Slurm users keep `sbatch` while running on the same Kubernetes platform, maintenance
+    stays in sync both ways, and I designed the GPU version on paper rather than test it
+    untested on rented H200 time.
 
-1. **The cluster from both sides.** The pods and Slinky objects from Kubernetes, then `sinfo`: partition `cpu` with `cpu-0` and `cpu-1` idle, 8 CPUs and about 31 GiB each, both on the same VM.
-2. **A user's jobs.** `srun -N2 -l hostname` ran across both nodes. An `sbatch` job finished `COMPLETED` in 7 seconds.
-3. **The prolog drains a sick node.** The test created the simulated fault marker in `cpu-0` at 12:16:58 and sent a job there. At 12:16:59 Slurm drained `cpu-0` with reason "Prolog error" and held the job (`launch_failed_requeued_held`). The test then removed the marker, resumed the node and released the job, which completed on `cpu-0` with `Restarts=1`. From the release to `COMPLETED` took 160 seconds.
-4. **Kubernetes drains a Slurm node.** The test annotated pod `slurm-worker-cpu-1` with `nodeset.slinky.slurm.net/pod-cordon=true`. Within 6 seconds Slurm showed `cpu-1` drained, with the reason "slurm-operator: Pod (slurm/slurm-worker-cpu-1) was cordoned", and the pod carried the condition `SlurmNodeStateDrain=True`. Removing the annotation brought `cpu-1` back to idle within 6 seconds.
+=== "Run evidence"
 
-The fourth check annotates one pod rather than cordoning the CPU worker, because other workloads share that worker. Cordoning a Kubernetes node goes down the same path in the operator (`syncCordon` in `internal/controller/nodeset/nodeset_sync.go` at 1.2.3), but this test doesn't show it.
+    ### Setup
 
-One gap in the third check: the drain shows in `sinfo` but not as a condition on the pod. The operator writes pod conditions when it reconciles, and the test reads them within a second of the drain.
+    - One Application, `slinky`: slurm-operator and slurm charts 1.2.3, Slurm 26.05, in
+      namespace `slurm` on the Paris CPU worker. Two Slurm nodes (`cpu-0`, `cpu-1`) on one
+      VM (`oversubscribeNode`); slurmctld state on a 2 GiB `local-path` volume.
+    - **Keys made in the cluster, not in Git:** the chart's `randAscii` + `lookup` would
+      change on every Argo CD sync ([finding](findings.md)), so a wave -1 Job creates the
+      auth and JWT keys once, as immutable Secrets.
+    - **Prolog `00-node-health.sh`:** fails if `/tmp` isn't writable, if under 256 MiB of
+      memory is free, or if the SIMULATED marker `/var/run/eu1-simulated-fault` exists.
+    - No accounting (no slurmdbd), no ssh logins (sssd not wired): the test runs commands in
+      the login pod.
 
-## What went wrong first
-
-The first sync and the first test run turned up four problems. Each one is fixed in Git, and they're worth knowing before installing Slinky anywhere else.
-
-- **slurmctld stayed Pending.** The Paris cluster has no default StorageClass, and the slurm chart's `controller.persistence.storageClassName` defaults to null, meaning "use the default". The claim never bound. The values now name `local-path`. A StatefulSet's claim template can't change in place, so the old StatefulSet and its Pending claim had to be deleted for the operator to recreate them. Delete the StatefulSet first, then the claim. In the other order, the old StatefulSet recreates the claim without a class before it goes away, which is what happened here.
-- **ArgoCD said Healthy throughout.** Slinky's `Controller` has no status and the NodeSet's is empty, so ArgoCD calls them healthy as soon as they're applied, and the slurmctld pod belongs to the operator, not to the Application. Healthy on `slinky` means the objects exist. Whether Slurm works is what `make slurm-test` answers.
-- **The pod-cordon drain undid itself.** In the first run, the first three checks passed and the fourth didn't:
+    ### Results, Paris, 21 October (UTC)
 
     ```{ .sh .terminal }
     $ make slurm-test
     ...
-    ## 4. Kubernetes to Slurm: nodeset.slinky.slurm.net/pod-cordon=true on slurm-worker-cpu-1   [11:57:19Z]
-    pod/slurm-worker-cpu-1 annotated
-    timeout after 120s: cpu-1 drained by the operator
-    FAIL: cpu-1 not drained
+    ## 2. srun across both nodes, then sbatch   [12:16:49Z]
+    0: cpu-1
+    1: cpu-0
     ...
-    1 check(s) failed, see above
+    after 7s: job 5 completed
+    ...
+    ## 3. Prolog health check: SIMULATED fault on cpu-0   [12:16:57Z]
+    marker /var/run/eu1-simulated-fault created in slurm-worker-cpu-0 at 12:16:58Z
+    submitted job 6 to cpu-0
+    after 1s: cpu-0 drained by the prolog
+    REASON               USER      TIMESTAMP           NODELIST
+    Prolog error         slurm     2026-10-21T12:16:59 cpu-0
+    ...
+    after 160s: job 6 completed after the fix
+    ...
+    ## 4. Kubernetes to Slurm: nodeset.slinky.slurm.net/pod-cordon=true on slurm-worker-cpu-1   [12:19:42Z]
+    ...
+    after 6s: cpu-1 drained by the operator
+    REASON               USER      TIMESTAMP           NODELIST
+    slurm-operator: Pod  slurm     2026-10-21T12:19:43 cpu-1
+    SlurmNodeStateDrain=True message="slurm-operator: Pod (slurm/slurm-worker-cpu-1) was cordoned" since 2026-10-21T12:19:45Z
+    ...
+    jobs ran from the login pod; prolog and Kubernetes drains both seen from Slurm and Kubernetes
     ```
 
-    [Full capture](artifacts/scheduling/slurm-par-20261021T115447Z.txt)
+    [Full capture](artifacts/scheduling/slurm-par-20261021T121647Z.txt). The held job
+    (`launch_failed_requeued_held`) completed with `Restarts=1`. Removing the annotation
+    returned `cpu-1` to idle within 6 s. The test cordons one pod, not the shared worker;
+    a node cordon takes the same operator path (`syncCordon`) but isn't shown.
 
-    Under the NodeSet's default `RollingUpdate` strategy, Slinky 1.2.3 drains the Slurm node for an annotated pod, then in the same reconcile removes the annotation from every pod it keeps and undrains the node. The operator logged "Uncordon Pod slurm-worker-cpu-1" one second after the annotation. Slinky's upstream pull request 271 (open) describes the same bug. The NodeSet now uses `OnDelete`, under which the cordon holds. The cost: a new slurmd image reaches a node only when its pod is deleted, so an upgrade is a drain and a delete per node.
-- **The operator kept restarting.** It and its webhook exited with "leader election lost" four times in their first 22 minutes, each time a lease renewal took longer than 5 seconds. The cause wasn't Slinky: Grafana on the Paris control plane was page-faulting its own binary under a 384 Mi memory limit, and the reads starved etcd on the same disk. The limit is now higher. Leader election is also off for both. That's a PoC choice: with one replica there's nothing to elect against. A production install running two replicas keeps it on.
+    ### Issues met, all fixed in Git
 
-## Slurm with GPUs at the Finland site: designed, not run
+    | Issue | Cause | Fix |
+    |---|---|---|
+    | slurmctld Pending | No default StorageClass; the chart's class defaults to null | `local-path`; delete the StatefulSet before its claim |
+    | Argo CD shows Healthy while Slurm is down | Slinky's objects have no status | `make slurm-test` is the health check |
+    | Pod-cordon drain undone 1 s later ([first run](artifacts/scheduling/slurm-par-20261021T115447Z.txt)) | Slinky 1.2.3 under `RollingUpdate` (upstream PR 271, open) | NodeSet `OnDelete`; an upgrade becomes a drain and delete per node |
+    | Operator lost leader election 4 times | Grafana page-faulting under 384 Mi starved etcd's disk | Grafana limit raised; leader election off with one replica |
 
-!!! warning "Not built, not run"
-    Nothing in this section was built or run. Running it untested on rented H200 time wasn't worth it, so I wrote down the design instead, from the source at the pinned versions: Slinky slurm-operator and slurm chart 1.2.3, Slurm 26.05.5 (the version inside the pinned slurmd image), GPU Operator v26.7.2, KAI v0.18.6.
+    ### Slurm with GPUs, Finland: designed, not run
 
-### The NodeSet and GRES for 2x H200
+    Written from the source at the pinned versions (slurm-operator and chart 1.2.3, Slurm
+    26.05.5, GPU Operator v26.7.2, KAI v0.18.6); only `helm template` was run.
 
-The Finland site would get its own `slinky` Application, like its own KAI: the operator, slurmctld, the login pod and slurmrestd on the Finland CPU node, with slurmctld's state on that site's `local-path`, and the keys made by the same bootstrap Job. The new piece is one GPU NodeSet, `h200`. These values render with slurm chart 1.2.3 into what I'd expect (checked with `helm template` only):
+    ```yaml
+    nodesets:
+      h200:
+        enabled: true
+        replicas: 1                      # one slurmd pod per GPU node
+        slurmd:
+          resources:
+            limits:
+              nvidia.com/gpu: 2          # every GPU on the node
+        extraConfMap:
+          Gres: ["gpu:2"]                # becomes slurmd -Z --conf "Gres=gpu:2"
+        updateStrategy:
+          type: OnDelete                 # as in Paris, so a pod-cordon drain holds
+        podSpec:
+          nodeSelector:
+            eu1.io/pool: gpu-slurm
+          tolerations:
+            - key: eu1.io/slurm
+              operator: Exists
+              effect: NoSchedule
+    controller:
+      extraConfMap:
+        GresTypes: [gpu]
+    configFiles:
+      gres.conf: |
+        AutoDetect=nvidia
+      cgroup.conf: |
+        CgroupPlugin=cgroup/v2
+        IgnoreSystemd=yes
+        ConstrainDevices=yes             # a job sees only the GPUs Slurm gave it
+    ```
 
-```yaml
-nodesets:
-  h200:
-    enabled: true
-    replicas: 1                      # one slurmd pod per GPU node
-    slurmd:
-      env:
-        - name: NVIDIA_DRIVER_CAPABILITIES
-          value: compute,utility
-      resources:
-        limits:
-          nvidia.com/gpu: 2          # every GPU on the node
-    extraConfMap:
-      Gres: ["gpu:2"]                # becomes slurmd -Z --conf "Gres=gpu:2"
-    updateStrategy:
-      type: OnDelete                 # as in Paris, so a pod-cordon drain holds
-    podSpec:
-      nodeSelector:
-        eu1.io/pool: gpu-slurm
-      tolerations:
-        - key: eu1.io/slurm
-          operator: Exists
-          effect: NoSchedule
-controller:
-  extraConfMap:
-    GresTypes: [gpu]                 # into slurm.conf
-configFiles:
-  gres.conf: |
-    AutoDetect=nvidia
-  cgroup.conf: |
-    CgroupPlugin=cgroup/v2
-    IgnoreSystemd=yes
-    ConstrainDevices=yes             # a job sees only the GPUs Slurm gave it
-```
+    | Topic | Design | From the source |
+    |---|---|---|
+    | GPUs into slurmd | Via the device plugin and NVIDIA runtime; `ConstrainDevices` fences each job | The chart enables DCGM for any NodeSet with an `nvidia.com/gpu` limit |
+    | GRES | On the NodeSet, not a `NodeName=` line | Slinky starts slurmd as a dynamic node, `slurmd -Z --conf` |
+    | Whole GPUs vs MIG | `AutoDetect=nvidia` works for whole GPUs; MIG needs `AutoDetect=nvml`, so an image rebuilt with NVML | The pinned slurmd image has `gpu_nvidia.so`, no `gpu_nvml.so` |
+    | GPU health check | Prolog `dcgmi diag -r 1` via Service `nvidia-dcgm:5555` (node-local); needs `dcgmi` in the image and a UUID map of GPU indices | GPU Operator v26.7.2 `assets/state-dcgm/0500_service.yaml` |
+    | KAI vs Slurm | Per node: label `eu1.io/pool: gpu-slurm`, taint `eu1.io/slurm`; slurmd takes every GPU; the staging taint applies to both | Slinky's workload-isolation guide |
+    | Faults | NVSentinel cordons the node, Slinky drains the Slurm node | `syncCordon` holds under any update strategy |
+    | CUDA | Tenants bring their container through pyxis; the platform publishes the driver ceiling (CUDA 13.0 native on 580) | Slinky's pyxis guide runs the login container privileged |
 
-Three facts from the source decide this shape:
+    Not run because every minute is a rented H200, and no check without a GPU reaches what
+    matters: whether `AutoDetect` finds the GPUs in the pod, whether `ConstrainDevices`
+    fences them, whether the prolog reaches DCGM.
 
-- **The GPUs reach slurmd through the device plugin.** The slurmd pod asks for `nvidia.com/gpu: 2`, and the NVIDIA container runtime injects the driver's libraries and device files. The slurm chart assumes exactly that: its own DCGM integration switches on for any NodeSet with an `nvidia.com/gpu` limit (`templates/vendor/nvidia/dcgm/_helpers.tpl`). Inside the pod, Slurm hands GPUs to jobs and `ConstrainDevices` fences each job to its own.
-- **Slinky's slurmd is a dynamic node.** The operator starts it as `slurmd -Z` with the NodeSet's `extraConf` as `--conf` (`internal/builder/workerbuilder/worker_app.go`). So the node's `Gres=` goes on the NodeSet, not on a `NodeName=` line, and `gres.conf` reaches slurmd configless from slurmctld.
-- **The pinned slurmd image can see whole GPUs, not MIG.** Its layers carry `gpu_nvidia.so`, `gpu_generic.so` and `gpu_nrt.so` under `/usr/lib/x86_64-linux-gnu/slurm/`, but no `gpu_nvml.so`. Slurm's Debian packaging at 26.05.5 has no NVML build dependency. `AutoDetect=nvidia` needs no library, "but doesn't detect MIGs or NVlinks" (`gres.conf(5)` at 26.05.5), and that's enough for two whole H200s.
+    ### Limits
 
-**MIG under Slurm** needs `AutoDetect=nvml` ("To configure MIGs in Slurm, specify AutoDetect=nvml", `doc/html/gres.shtml` at 26.05.5), so a slurmd image rebuilt with NVML. With `h200-split` applied, the NodeSet would then ask for `nvidia.com/mig-3g.71gb: 2` and `nvidia.com/gpu: 1` and declare something like `Gres=gpu:h200:1,gpu:3g.71gb:2`. Slurm wants each type to be a substring of the "MIG Profile" string slurmd logs at `debug2` (its own example is `nvidia_a100_3g.20gb`), so the exact names get read on the node, not guessed. Slurm doesn't partition MIG itself; the GPU Operator's MIG manager would, from the same node label as in use case 4. And Slurm keeps no `gpumem` or `gpuutil` accounting for MIG devices, because NVML has none. Unlike KAI, Slurm would use the whole GPU next to the slices, since slurmd's pod isn't scheduled by KAI.
-
-### A GPU check in the prolog
-
-The prolog in Paris, `00-node-health.sh`, checks `/tmp`, free memory and the simulated fault marker. On a GPU node, a second script would run after it:
-
-```bash
-# 10-gpu-health.sh: DCGM's quickest diagnostic on this job's GPUs, before the job starts.
-[ -n "${SLURM_JOB_GPUS:-}" ] || exit 0          # not a GPU job
-dcgmi diag -r 1 --host nvidia-dcgm.gpu-operator.svc:5555 -i "$DCGM_IDS" \
-  || { echo "GPU health: dcgmi diag -r 1 failed" >&2; exit 1; }
-```
-
-A failure drains the node and holds the job, as the simulated fault did in Paris. The pieces come from the Finland site's existing stack: the base values run the GPU Operator's standalone DCGM (`dcgm.enabled: true`), and at v26.7.2 the operator puts it behind Service `nvidia-dcgm`, port 5555, with `internalTrafficPolicy: Local` (`assets/state-dcgm/0500_service.yaml`). So a prolog on a node always talks to that node's own hostengine. Two things stay open. `dcgmi` isn't in the slurmd image, so it comes with the NVML rebuild. And `$DCGM_IDS` has to map Slurm's GPU indices to DCGM's by UUID, because nothing guarantees the two number the GPUs the same way.
-
-Level 1 is the cheapest check DCGM has, which suits a run before every job. The deeper `dcgmi diag -r 2` that NVCRE runs in the certification gate stays where it is, before a node opens to tenants. Slurm's `HealthCheckProgram` could run something in between on an interval, while the node idles. Node-level faults need no new code at all: NVSentinel already cordons a node on a GPU fault (use case 3), and a cordoned Kubernetes node makes Slinky drain its Slurm node, with the reason "Node (…) was cordoned" (`syncCordon` in `internal/controller/nodeset/nodeset_sync.go`). That path skips pod uncordoning, so it holds under any update strategy.
-
-### How KAI and Slurm split the Finland GPUs
-
-By whole node, never by GPU:
-
-- **A node belongs to one of them.** Slurm's GPU nodes carry `eu1.io/pool: gpu-slurm` and the taint `eu1.io/slurm=true:NoSchedule`. KAI's tenants select `eu1.io/pool: gpu` and tolerate neither. That's the pattern Slinky's own workload-isolation guide uses, a taint the NodeSet tolerates (`docs/usage/workload-isolation.md`).
-- **Never the same GPU.** slurmd's pod takes every GPU on its node through the device plugin. Even a pod that slipped past the label and the taint would find no GPU left to allocate. The device plugin, not a convention, is what keeps the two schedulers apart.
-- **The certification gate applies to both.** A new H200 joins with `eu1.io/staging=pending:NoSchedule`, and the slurmd pod doesn't tolerate it, exactly like KAI's pods. Slurm only ever sees a node after NVCRE has certified it and the gate has opened it.
-- **Moving a node between them** is maintenance: cordon it, which makes Slinky drain its Slurm node, wait for the jobs to finish, delete the slurmd pod, then change the label and taint. The H200 run on 22 October gave one more reason to split per node: KAI v0.18.6 won't place a whole-GPU pod on a node with MIG on ([ADR 0008](adr/0008-gpu-sharing.md)), so the Finland node pools already have to be whole-GPU or MIG, node by node.
-
-KAI could also schedule the slurmd pods themselves, through an `hpc` queue whose quota is the Slurm nodes' GPUs, so one fair-share view covers both. I'd leave that out at first. KAI could then reclaim a slurmd pod like any over-quota workload, and with it every Slurm job on that node.
-
-### The 580 driver and the CUDA in slurmd
-
-The Finland image ships driver 580.178.04. The R580 branch is CUDA 13.0's own; CUDA 13.1 to 13.4 belong to R590 through R615. They run on 580 in two ways. One is minor-version compatibility ("13.x: >= 580" in NVIDIA's CUDA Toolkit release notes, read 22 October), which has limits: anything that needs a newer driver fails, and PTX built by a newer toolkit can't be compiled by the older driver. The other is the forward-compatibility libraries that NGC images carry. The H200 run saw both, in the same CUDA 13.1 image ([NVCRE's NCCL log](artifacts/readiness/nvcre-fin-20261022T100307Z-nccl.log)). The all-reduce job, under MPI, reported `cudaDriverVersion 13010`, so it had loaded the image's forward-compatibility `libcuda`. The single-process loopback job reported `13000`: minor-version compatibility on the host's driver. So jobs at the Finland site get CUDA 13.0 natively, and anything newer only through one of those two routes, each with its own catch.
-
-The pinned slurmd image holds no CUDA at all. Its environment sets none, its layers carry no `libcuda`, and the driver's libraries arrive from the container runtime. So a job's CUDA comes from one of two places:
-
-- **The slurmd image itself**, rebuilt with the tenant's stack, as Slinky's PyTorch tutorial does (`docs/usage/tutorial-pytorch.md`). That puts every tenant on one image, which Nordhaven would have to keep within CUDA 13.0.
-- **The job's own container**, through pyxis and enroot (`docs/usage/pyxis.md`, with Slinky's `slurmd-pyxis` image). Tenants bring their image, and Nordhaven keeps one slurmd. Part 1's trainer image, CUDA 12.8, ran natively on this driver in the H200 run. The cost is that Slinky's pyxis guide runs the login container privileged so enroot works there.
-
-For a group with its own software stack, I'd pick pyxis: it keeps the CUDA choice with the tenant, and the platform's job is only to publish the ceiling.
-
-### Why it wasn't run
-
-- **Cost.** Every minute at the Finland site is a rented H200. Slurm with GPUs needs its own operator and controller there, then the node taken away from KAI, which on 22 October would have meant fewer minutes for the gang and MIG.
-- **No check without a GPU reaches the parts that matter.** I can render the charts, dry-run the objects on a cluster and parse the Slurm config without a GPU. Whether `AutoDetect=nvidia` finds both GPUs inside the pod, whether `ConstrainDevices` fences them per job, and whether a prolog can reach DCGM only show on a GPU node.
-
-## Run it
-
-| Target | What it does | Needs |
-|---|---|---|
-| `make sched-check` | Checks without a GPU: renders of both charts, digests, Slinky's objects against their CRDs; `DRY_RUN=server` adds a dry run at the Paris site | nothing |
-| `make slurm-test` | The four checks above, into `docs/artifacts/scheduling/slurm-par-<stamp>.txt` | the Paris CPU worker, `slinky` synced |
-
-## What one VM can't show
-
-- **Two machines.** Both Slurm nodes run on one VM (`oversubscribeNode`, which Slinky marks as not for production).
-- **GPUs in Slurm.** The Paris Slurm is CPU-only, and Slurm on the Finland H200s isn't built. The design is above.
-- **Shared storage.** With no ReadWriteMany volume, a job's output stays on the node that ran it.
-- **Accounting and fair share over time.** No slurmdbd.
-- **Performance next to a bare-metal Slurm.** Not measured.
-
-## Evidence
-
-- [`make slurm-test`, all four checks passing](artifacts/scheduling/slurm-par-20261021T121647Z.txt), 21 October, with the NodeSet on `OnDelete`.
-- [The first run](artifacts/scheduling/slurm-par-20261021T115447Z.txt), with the fourth check failing under `RollingUpdate`.
-- [Checks without a GPU, 21 October](artifacts/scheduling/free-checks-20261021T065628Z.txt): renders, digests, Slinky's objects against their CRDs, server-side dry run at the Paris site.
-- Source at the pinned versions: slurm-operator 1.2.3 `docs/usage/nodeset-operations.md` ("Cordoning Pods") and `internal/controller/nodeset/nodeset_sync.go`; slurm chart 1.2.3 `values.yaml` (`controller.persistence.storageClassName`) and `templates/secrets/slurmkey.yaml`; Slinky's upstream pull request 271.
-- Sources for the GPU design, at the pinned versions: slurm-operator 1.2.3 `internal/builder/workerbuilder/worker_app.go` (`slurmd -Z`), `docs/usage/workload-isolation.md`, `docs/usage/pyxis.md`, `docs/usage/tutorial-pytorch.md`; slurm chart 1.2.3 `values.yaml` (`configFiles`, `controller.extraConfMap`, `nodesets.*.extraConfMap`) and `templates/vendor/nvidia/dcgm/_helpers.tpl`; Slurm 26.05.5 `doc/man/man5/gres.conf.5` (`AutoDetect`, `MultipleFiles`), `doc/html/gres.shtml` ("MIG Management") and `debian/control`; the layers of the pinned `ghcr.io/slinkyproject/slurmd` image (`gpu_nvidia.so`, no `gpu_nvml.so`; version label 26.05.5); GPU Operator v26.7.2 `assets/state-dcgm/0500_service.yaml`; NVIDIA's CUDA Toolkit release notes, read 22 October (driver branch per toolkit, minor-version compatibility).
+    - Two Slurm nodes on one VM; no shared storage; no accounting or fair share over time.
+    - The Paris Slurm is CPU only. Not compared with a bare-metal Slurm.

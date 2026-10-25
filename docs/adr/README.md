@@ -8,7 +8,7 @@ know why, not what.
 |---|---|---|---|
 | [0001](0001-two-sites-two-providers.md) | Two sites on two providers, one repository (vs one site, vs one stretched cluster) | Both sites, bootstrap and GitOps | accepted |
 | [0002](0002-driver-ownership.md) | Who owns the GPU driver: the GPU Operator or the provider image | Driver lifecycle, both sites | accepted |
-| [0003](0003-known-good-stack.md) | Known-good stack: AICR recipes vs hand-pinned values (and what AICR doesn't cover: L4, kubeadm) | Day 0, both GPU pools | accepted |
+| [0003](0003-known-good-stack.md) | Known-good stack: AICR recipes vs hand-pinned values (and what AICR doesn't cover: L4, kubeadm) | Day 1, both GPU pools | accepted |
 | [0004](0004-readiness-gate.md) | Readiness gate: NVCRE certification and a staging taint vs Part 1's burn-in scripts | Day 1, every new GPU node | accepted |
 | [0005](0005-fault-remediation.md) | Fault remediation: NVSentinel vs Part 1's controller vs node-problem-detector with a generic remediator | Day 2, GPU nodes | accepted |
 | [0006](0006-batch-scheduling.md) | Batch scheduling for many tenants: KAI vs Kueue vs Volcano | Tenancy, both sites | accepted |

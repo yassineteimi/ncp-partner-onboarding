@@ -31,8 +31,8 @@ same GPU model.
 
 | Use case | What happened | NVIDIA piece |
 | --- | --- | --- |
-| [Pin a known-good stack per hardware class](https://yassineteimi.github.io/ncp-partner-onboarding/10-day0-aicr/) | Part 1's hand-pinned versions compared with AICR's locked H200 recipe; AICR refuses the provider's Ubuntu 26.04 | AICR |
-| [Prove a node ready before it takes work](https://yassineteimi.github.io/ncp-partner-onboarding/10-day1-nvcre/) | The H200 node certified at 351 GB/s all-reduce over NVLink, then promoted out of its staging taint | NVCRE |
+| [Pin a known-good stack per hardware class](https://yassineteimi.github.io/ncp-partner-onboarding/10-day1/#aicr-a-known-good-software-stack) | Part 1's hand-pinned versions compared with AICR's locked H200 recipe; AICR refuses the provider's Ubuntu 26.04 | AICR |
+| [Prove a node ready before it takes work](https://yassineteimi.github.io/ncp-partner-onboarding/10-day1/#nvcre-certify-the-node-before-tenants-use-it) | The H200 node certified at 351 GB/s all-reduce over NVLink, then promoted out of its staging taint | NVCRE |
 | [From GPU fault to return to service](https://yassineteimi.github.io/ncp-partner-onboarding/10-day2-nvsentinel/) | XID 79 to training resumed in 288.8 s with no human action, against 360.9 s with Part 1's controller; goodput 73.0% against 66.4% | NVSentinel |
 | [Share scarce GPUs between tenants](https://yassineteimi.github.io/ncp-partner-onboarding/20-tenancy/) | A 2-pod gang bound in 1 s, a 3-pod gang on 2 GPUs never partly bound, two tenants on separate MIG slices of one H200 | KAI Scheduler, MIG |
 | [Run a Slurm group on the same cluster](https://yassineteimi.github.io/ncp-partner-onboarding/21-hpc-slinky/) | `sbatch` jobs, a prolog that drains a sick node, a Kubernetes cordon that drains Slurm | Slinky |

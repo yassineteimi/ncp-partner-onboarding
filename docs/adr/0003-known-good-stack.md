@@ -84,7 +84,7 @@ Applications in Git; AICR's from the `k0s` H200 training recipe):
 
 ## Evidence
 
-- The use case 1 page: [10-day0-aicr.md](../10-day0-aicr.md).
+- The use case 1 page: [Day 1, AICR](../10-day1.md#aicr-a-known-good-software-stack).
 - Recipes, refusals and the summary: `docs/artifacts/readiness/aicr/` (`make aicr-recipe`);
   the Finland snapshot and validation log: `aicr/snapshot-fin-20261022T101356Z.yaml` and
   `aicr/validate-fin-20261022T101408Z.log`.

@@ -1,16 +1,17 @@
 # Nordhaven: a GPU cloud partner from hardware handover to first workloads
 
-Nordhaven is a fictional European GPU cloud partner. It has just taken delivery of two
-pools of rented hardware: an NVIDIA L4 pool in Paris on Scaleway for inference and
-development, and a 2× H200 SXM5 pool in Finland on Verda for training. This project
-takes both from bare nodes to their first tenants with NVIDIA's open stack, driven by
-one Git repository, and records why each piece was chosen over its alternatives.
+Nordhaven is a fictional European NVIDIA Cloud Partner. It has just received two pools
+of rented hardware: NVIDIA L4s in Paris (Scaleway) for inference and development, and a
+2× H200 SXM5 node with NVLink in Finland (Verda) for training. Its first tenants are a
+research group that lives in Slurm, a team running distributed PyTorch, and a customer
+who still ships VMs. This project takes both pools from bare nodes to those tenants with
+NVIDIA's open stack, from one Git repository, and records why each piece won over its
+alternatives.
 
 It's Part 2 of my GPU fleet work. [Part 1](https://github.com/yassineteimi/nvidia-gpu-fleet-poc)
-built Day 2 operations by hand on a single L4: driver lifecycle from Git, DCGM alerting,
-a remediation controller I wrote, goodput measurement and a burn-in. Here NVIDIA's own
-tools take over those jobs, and where Part 1 did the same thing, I compare the two on
-the same GPU.
+built Day 2 operations by hand on one L4; here NVIDIA's tools take over, and where Part 1
+did the same job, I compare the two on the same GPU model. The [AI Factory](ownership-map.md)
+map shows where these layers sit in a partner's stack.
 
 ## Architecture
 
@@ -61,15 +62,15 @@ order.
 
 ## What ran
 
-| # | Use case | NVIDIA piece | Where it ran | Result |
-|---|---|---|---|---|
-| 1 | [Day 0: a known-good stack per hardware class](10-day0-aicr.md) | AICR | Finland H200 | Part 1's hand-pinned versions compared with AICR's locked recipe; AICR refuses the provider's Ubuntu 26.04 |
-| 2 | [Day 1: prove a node ready before it takes work](10-day1-nvcre.md) | NVCRE | Paris L4, Finland H200 | The H200 node certified at 351 GB/s all-reduce over NVLink, then promoted out of staging |
-| 3 | [Day 2: from fault to return to service](10-day2-nvsentinel.md) | NVSentinel | Paris L4 | XID 79 to training resumed in 288.8 s with no human action, against 360.9 s with Part 1's controller |
-| 4 | [Tenancy: fair share, gang scheduling, MIG](20-tenancy.md) | KAI Scheduler, MIG | Paris (simulated GPUs), Finland H200 | A 2-pod gang bound in 1 s, a 3-pod gang on 2 GPUs never partly bound, and two tenants ran on separate MIG slices of one H200 |
-| 5 | [HPC: a Slurm group on the same cluster](21-hpc-slinky.md) | Slurm via Slinky | Paris CPU worker | `sbatch` jobs, a prolog that drains a sick node, and a Kubernetes cordon that drains Slurm; GPUs designed, not run |
-| 6 | [Metrics across sites](30-metrics-across-sites.md) | Thanos | Finland writes, Paris keeps | The H200 series reached Paris about 4 s after Finland's Prometheus started, and stayed after the site was deleted |
-| 7 | [VM tenants next to containers](30-vm-tenants.md) | KubeVirt | Paris CPU worker | A VM booted on KVM in 20.2 s under a tenant quota, and kept running while a GPU training job used the L4 |
+| Question a new partner must answer | NVIDIA piece | Where it ran | Result |
+|---|---|---|---|
+| **Day 1.** [Which versions go together on this hardware?](10-day1.md#aicr-a-known-good-software-stack) | AICR | Finland H200 | Part 1's hand-pinned versions compared with AICR's locked recipe; AICR refuses the provider's Ubuntu 26.04 |
+| **Day 1.** [Is this node ready before tenants land on it?](10-day1.md#nvcre-certify-the-node-before-tenants-use-it) | NVCRE | Paris L4, Finland H200 | Certified at 351 GB/s all-reduce over NVLink, then let in; the gate now also refuses ECC off |
+| **Day 2.** [When a GPU fails, how fast does it come back?](10-day2-nvsentinel.md) | NVSentinel | Paris L4 | XID 79 to training resumed in 288.8 s with no human, against 360.9 s with Part 1's controller |
+| **Day 2.** [How do teams share GPUs that never cover demand?](20-tenancy.md) | KAI Scheduler, MIG | Paris (simulated GPUs), Finland H200 | Borrowing and exact reclaim, gangs that start whole or not at all, two tenants on MIG slices of one H200 |
+| **Day 2.** [Can a Slurm group use the same platform?](21-hpc-slinky.md) | Slurm via Slinky | Paris CPU worker | `sbatch` jobs, a prolog that drains a sick node, a Kubernetes cordon that drains Slurm; GPUs designed, not run |
+| **Day 2.** [Can operators see every GPU, even of a deleted site?](30-metrics-across-sites.md) | Thanos | Finland writes, Paris keeps | Finland's series in Paris 4 s after its Prometheus started, still there after the site was deleted |
+| **Day 2.** [Can a VM tenant run next to the containers?](30-vm-tenants.md) | KubeVirt | Paris CPU worker | A VM booted on KVM in 20.2 s under a tenant quota while a GPU job used the L4 |
 
 The GPU runs took place on 21 October (one L4, about 50 minutes) and 22 October (2× H200,
 about 35 minutes). On the H200, the node went from order to both GPUs schedulable in
@@ -84,7 +85,6 @@ INFO  DCGM exporter image on the node: nvcr.io/nvidia/k8s/dcgm-exporter:4.6.1-4.
 PASS  cuda-vectoradd printed Test PASSED
 PASS  nvidia-smi sees the H200
 PASS  driver in use is 580.178.04, the version reported by the provider image at boot
-==> acceptance PASSED. Evidence: docs/artifacts/fin/acceptance-20261022T100225Z.txt
 ```
 
 Full output: [acceptance-20261022T100225Z.txt](artifacts/fin/acceptance-20261022T100225Z.txt),

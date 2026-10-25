@@ -41,7 +41,7 @@ needed one driver branch across the fleet for a certification or a support contr
 - The acceptance test on Finland checks the driver the image reported at boot, not a
   version in Git. Paris's check compares against Git, as in Part 1.
 - AICR's H200 recipe assumes its own driver and OS choices; the comparison is on the
-  [Day 0 page](../10-day0-aicr.md).
+  [Day 1 page](../10-day1.md#aicr-a-known-good-software-stack).
 - On the H200 node the provider's choices come along with its driver. On 22 October ECC
   was off on both GPUs, which the readiness gate now refuses
   ([ADR 0004](0004-readiness-gate.md)).

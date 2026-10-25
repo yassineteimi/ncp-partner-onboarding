@@ -66,7 +66,7 @@ gate:
 
 ## Evidence
 
-- Use case 2 page: [10-day1-nvcre.md](../10-day1-nvcre.md).
+- Use case 2 page: [Day 1, NVCRE](../10-day1.md#nvcre-certify-the-node-before-tenants-use-it).
 - The H200 run: `nvcre-fin-20261022T100307Z*`, `diag-fin-20261022T101241Z.log`,
   `promote-fin-20261022T101348Z.txt`, and the gate's later refusal of the same inputs,
   `promote-fin-recheck-20261022T212142Z.txt`, in `docs/artifacts/readiness/`; the two
