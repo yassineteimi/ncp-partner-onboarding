@@ -1,0 +1,54 @@
+# team-a's first inference service on the Paris L4: Qwen3-0.6B behind NVIDIA
+# Dynamo v1.5.1, aggregated serving (one vLLM worker does prefill and decode),
+# with Dynamo's OpenAI-compatible frontend in front of it.
+#
+# Adapted from the release's examples/backends/vllm/deploy/agg.yaml at v1.5.1:
+# - no hf-token-secret: Qwen3-0.6B is public, and the example's required
+#   envFrom would stop both pods from starting without that Secret;
+# - both pods on the GPU pool, so the 9.2 GB runtime image is pulled once, on
+#   the L4, not a second time on the CPU worker;
+# - the worker is scheduled by par's KAI in team-a's queue, like every other
+#   GPU tenant (the operator's own KAI integration needs Grove, which is off);
+# - the image pinned by digest.
+#
+# Applied by make dynamo-deploy during a GPU run, removed by make dynamo-delete.
+apiVersion: nvidia.com/v1beta1
+kind: DynamoGraphDeployment
+metadata:
+  name: qwen3-agg
+  namespace: team-a
+spec:
+  components:
+    - name: Frontend
+      type: frontend
+      replicas: 1
+      podTemplate:
+        spec:
+          nodeSelector:
+            eu1.io/pool: gpu
+          containers:
+            - name: main
+              # Index digest from nvcr.io's registry API, 26 October 2026.
+              image: nvcr.io/nvidia/ai-dynamo/vllm-runtime:1.5.1@sha256:2b224a823d52a198ec0eeb0e3e4f5cf26cd8a7fc2e9812ee16204b6b1e974870
+    - name: VllmDecodeWorker
+      type: worker
+      replicas: 1
+      podTemplate:
+        metadata:
+          labels:
+            kai.scheduler/queue: team-a
+        spec:
+          schedulerName: kai-scheduler
+          nodeSelector:
+            eu1.io/pool: gpu
+          containers:
+            - name: main
+              image: nvcr.io/nvidia/ai-dynamo/vllm-runtime:1.5.1@sha256:2b224a823d52a198ec0eeb0e3e4f5cf26cd8a7fc2e9812ee16204b6b1e974870
+              command: ["python3", "-m", "dynamo.vllm"]
+              args: ["--model", "Qwen/Qwen3-0.6B"]
+              workingDir: /workspace/examples/backends/vllm
+              resources:
+                limits:
+                  nvidia.com/gpu: "1"
+                requests:
+                  ephemeral-storage: 2Gi
