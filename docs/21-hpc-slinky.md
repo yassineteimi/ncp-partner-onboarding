@@ -15,6 +15,68 @@
     every other tenant ([ADR 0007](adr/0007-hpc-tenants-slurm.md) explains why not
     Soperator or a separate Slurm cluster).
 
+    ### Architecture
+
+    ```mermaid
+    flowchart LR
+      user["Researcher<br/>sbatch, srun, squeue"] --> login["Login pod"]
+      subgraph k8s["Kubernetes cluster, namespace slurm"]
+        login --> ctld["slurmctld pod<br/>Slurm's scheduler"]
+        ctld --> d0["slurmd pod = Slurm node cpu-0"]
+        ctld --> d1["slurmd pod = Slurm node cpu-1"]
+        op["Slinky operator"] -->|"creates and keeps<br/>the pods"| ctld
+        op --> d0
+        op --> d1
+        op <-->|"keeps states in sync<br/>(via slurmrestd)"| ctld
+      end
+      d0 --- node["Kubernetes node<br/>(the Paris CPU worker)"]
+      d1 --- node
+    ```
+
+    Slurm keeps its own scheduler and its own idea of "nodes", but every Slurm node is a
+    pod that Kubernetes places, restarts and monitors. The operator is the translator:
+    it keeps Slurm's view and Kubernetes's view of the same machine in agreement.
+
+    ### What this shows, beyond "Slurm users can stay"
+
+    Adoption is the obvious part. The less obvious part is **one operations model for two
+    schedulers**:
+
+    - **One maintenance switch.** An operator, or NVSentinel, marks a machine unusable
+      once, in Kubernetes, and Slurm stops sending it jobs. Without that link, a partner
+      runs two maintenance procedures and Slurm keeps scheduling onto a node Kubernetes
+      already took out.
+    - **Health checks flow the other way too.** Slurm's own pre-job check drains a sick
+      node, and the operator writes Slurm's drain onto the pod as a condition, where the
+      platform's tools look (seen for the cordon drain; for the pre-job drain my capture
+      read the pod too early to show it).
+    - **One gate, one fleet** (designed for GPU nodes). Slurm would only ever see nodes that
+      passed the Day 1 gate, and a GPU node would move between Slurm and KAI by changing a
+      label and a taint, with no second cluster to rebuild.
+
+    ### Maintenance: Kubernetes, NVSentinel and Slurm together
+
+    ```mermaid
+    flowchart TB
+      fault["GPU fault (XID)"] --> nvs["NVSentinel<br/>cordons the Kubernetes node"]
+      admin["Planned maintenance<br/>kubectl cordon"] --> cordon["Kubernetes node cordoned"]
+      nvs --> cordon
+      cordon -->|"Slinky: Node was cordoned"| sdrain["Slurm node drained<br/>no new jobs"]
+      podc["Pod-level cordon<br/>annotation on one slurmd pod"] -->|"shown: 6 s"| sdrain
+      nvs --> evict["NVSentinel evicts the pods,<br/>slurmd included"]
+      evict --> reboot["Reboot, health back,<br/>uncordon"]
+      reboot --> resume["slurmd pod returns,<br/>Slurm node back to idle"]
+      prolog["Slurm pre-job check fails"] -->|"shown: 1 s"| sdrain2["Slurm drains the node,<br/>holds the job"]
+      sdrain2 -.->|"operator mirrors it"| podcond["Pod condition<br/>SlurmNodeStateDrain"]
+    ```
+
+    | Link | Status |
+    |---|---|
+    | Pod cordon in Kubernetes drains the Slurm node | **Shown**, 6 s, and undone 6 s after the annotation is removed |
+    | Slurm's pre-job check drains a sick node and holds the job | **Shown**, 1 s; the job completed once the node was fixed. The pod condition for this drain wasn't captured |
+    | Node cordon (by a person or NVSentinel) drains the Slurm node | Same operator code path (`syncCordon`), **not run** here |
+    | NVSentinel on a Slurm GPU node | **Designed, not run**: the Paris Slurm is CPU only. NVSentinel evicts per namespace, here `Immediate` for every tenant, so the slurmd pod goes with the reboot. For a hard fault like XID 79 the job is already dead; for softer faults a partner would let Slurm's drain finish first |
+
     ### What happened (Paris CPU worker, 21 October)
 
     | Check | Result |
@@ -41,9 +103,9 @@
 
     ### In one sentence
 
-    Slurm users keep `sbatch` while running on the same Kubernetes platform, maintenance
-    stays in sync both ways, and I designed the GPU version on paper rather than test it
-    untested on rented H200 time.
+    Slurm users keep `sbatch`, while the partner runs one platform where a single cordon,
+    by a person or by NVSentinel, also drains Slurm, and Slurm's own health checks show up
+    in Kubernetes; the GPU version is designed on paper.
 
 === "Run evidence"
 
