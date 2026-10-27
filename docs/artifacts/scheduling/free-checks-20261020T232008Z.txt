@@ -1,5 +1,5 @@
 # scripts/scheduling/check.sh, 20261020T232008Z, laptop clock, UTC. git d3e595a. DRY_RUN=server
-==> renders go to /Users/yassineteimi/.claude/jobs/b95b4772/tmp/check
+==> renders go to $TMPDIR/check
 ==> KAI chart generates no secret at render time
     every KAI pod template and the Config select eu1.io/pool=cpu; hooks left: kai-scheduler-crd-manager, kai-scheduler-crd-manager, kai-scheduler-crd-manager, crd-upgrader
 ==> KAI renders on par

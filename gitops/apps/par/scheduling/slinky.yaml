@@ -3,7 +3,7 @@
 # The operator chart (with its CRDs) and the slurm chart are one Application:
 # the operator's validating webhook (failurePolicy Fail) checks every Slurm
 # object and runs on the CPU worker, so a separate later-wave cluster
-# Application would depend on the worker, which CLAUDE.md forbids. Both charts
+# Application would depend on the worker, which the project's rules forbid. Both charts
 # render into the slurm namespace. The Controller, NodeSet, LoginSet and
 # RestApi objects are retried until the webhook answers.
 #

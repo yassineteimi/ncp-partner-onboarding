@@ -9,7 +9,7 @@
 # One Application for the chart and the queues, not two in successive waves:
 # Queue writes go through KAI's own admission webhook, which runs on the CPU
 # worker, so a later-wave queues Application would depend on the worker
-# (CLAUDE.md forbids that). Here the queues sync after the chart in the same
+# (the project's rule: no later-wave Application depends on the CPU worker). Here the queues sync after the chart in the same
 # operation, and a refused Queue write is retried until the webhook answers.
 #
 # Everything KAI runs sits on the CPU worker. With the worker off, this

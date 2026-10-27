@@ -1,4 +1,4 @@
-# KAI on par: every KAI pod on the CPU worker (CLAUDE.md, node labels), so
+# KAI on par: every KAI pod on the CPU worker (the node-label convention), so
 # with the worker powered off they wait Pending instead of taking room on the
 # 4 vCPU control plane.
 #

@@ -1,7 +1,7 @@
 [cli] CLI flag overriding config value: flag=fail-on-error config=true override=false
 [cli] validating against the live cluster -- validator Jobs will be deployed to the active kube-context
-[cli] loading recipe: uri=/Users/yassineteimi/Desktop/ncp-partner-onboarding/.claude/worktrees/ws-readiness/docs/artifacts/readiness/aicr/recipe-k0s-h200-training.yaml
-[cli] loading snapshot: uri=/Users/yassineteimi/Desktop/ncp-partner-onboarding/.claude/worktrees/ws-readiness/docs/artifacts/readiness/aicr/snapshot-fin-20261022T101356Z.yaml
+[cli] loading recipe: uri=./docs/artifacts/readiness/aicr/recipe-k0s-h200-training.yaml
+[cli] loading snapshot: uri=./docs/artifacts/readiness/aicr/snapshot-fin-20261022T101356Z.yaml
 [cli] running validation: phases=[deployment]
 [cli] running validation phases: runID=20261022-121408-e98fee231cccba55 phases=[deployment]
 [cli] readiness pre-flight: constraints=3

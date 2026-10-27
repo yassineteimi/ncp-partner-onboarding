@@ -20,10 +20,10 @@ E1021 10:53:01.186491   46741 kernel.go:150] "failed to get builtin kernel modul
 [agent] configmap operation: namespace=aicr-validation name=aicr-agent-snapshot-20261021-125254-665cfea960a7bdbf auth_method=bearer-token format=yaml
 [agent] applying ConfigMap: namespace=aicr-validation name=aicr-agent-snapshot-20261021-125254-665cfea960a7bdbf format=yaml
 [cli] job completed successfully
-[cli] snapshot saved to file: path=/Users/yassineteimi/Desktop/ncp-partner-onboarding/.claude/worktrees/ws-readiness/docs/artifacts/readiness/aicr/snapshot-par-20261021T105254Z.yaml format=yaml
-2026-10-21T10:54:15Z $ kubectl --kubeconfig /Users/yassineteimi/Desktop/ncp-partner-onboarding/.claude/worktrees/ws-readiness/kubeconfig-par -n nvcre set image deploy/nvcre-manager manager=ghcr.io/nvidia/cluster-readiness-engine/manager:v0.7.0
+[cli] snapshot saved to file: path=./docs/artifacts/readiness/aicr/snapshot-par-20261021T105254Z.yaml format=yaml
+2026-10-21T10:54:15Z $ kubectl --kubeconfig ./kubeconfig-par -n nvcre set image deploy/nvcre-manager manager=ghcr.io/nvidia/cluster-readiness-engine/manager:v0.7.0
 deployment.apps/nvcre-manager image updated
-2026-10-21T10:54:15Z $ kubectl --kubeconfig /Users/yassineteimi/Desktop/ncp-partner-onboarding/.claude/worktrees/ws-readiness/kubeconfig-par -n nvcre rollout status deploy/nvcre-manager --timeout=180s
+2026-10-21T10:54:15Z $ kubectl --kubeconfig ./kubeconfig-par -n nvcre rollout status deploy/nvcre-manager --timeout=180s
 Waiting for deployment "nvcre-manager" rollout to finish: 1 old replicas are pending termination...
 error: timed out waiting for the condition
       --zap-devel                                   Development Mode defaults(encoder=consoleEncoder,logLevel=Debug,stackTraceLevel=Warn). Production Mode defaults(encoder=jsonEncoder,logLevel=Info,stackTraceLevel=Error) (default true)
@@ -53,12 +53,12 @@ E1021 10:57:34.612615   51601 kernel.go:150] "failed to get builtin kernel modul
 [agent] configmap operation: namespace=aicr-validation name=aicr-agent-snapshot-20261021-125731-82073d430cf732f0 auth_method=bearer-token format=yaml
 [agent] applying ConfigMap: namespace=aicr-validation name=aicr-agent-snapshot-20261021-125731-82073d430cf732f0 format=yaml
 [cli] job completed successfully
-[cli] snapshot saved to file: path=/Users/yassineteimi/Desktop/ncp-partner-onboarding/.claude/worktrees/ws-readiness/docs/artifacts/readiness/aicr/snapshot-par-20261021T105730Z.yaml format=yaml
+[cli] snapshot saved to file: path=./docs/artifacts/readiness/aicr/snapshot-par-20261021T105730Z.yaml format=yaml
 2026-10-21T10:57:37Z $ make --no-print-directory aicr-drift SITE=par
 SITE=par ./scripts/readiness/aicr.sh diff
 2026-10-21T10:58:00Z v0.7.0 pod nvcre-manager-67bc98d7bf-wx2vs crash reason: Error: unknown flag: --namespace-access-timeout (a v0.8.0 chart flag); the v0.8.0 pod kept running
 2026-10-21T10:58:05Z nvcre-manager image: ghcr.io/nvidia/cluster-readiness-engine/manager@sha256:0ae58498427d1238dc15b6f4c92479a90104a55670b125042ec9dca60e6b5a3b
-2026-10-21T10:58:05Z $ kubectl --kubeconfig /Users/yassineteimi/Desktop/ncp-partner-onboarding/.claude/worktrees/ws-readiness/kubeconfig-par -n nvcre rollout status deploy/nvcre-manager --timeout=180s
+2026-10-21T10:58:05Z $ kubectl --kubeconfig ./kubeconfig-par -n nvcre rollout status deploy/nvcre-manager --timeout=180s
 deployment "nvcre-manager" successfully rolled out
 2026-10-21T10:58:06Z $ make --no-print-directory aicr-snapshot SITE=par
 SITE=par ./scripts/readiness/aicr.sh snapshot
@@ -80,8 +80,8 @@ E1021 10:58:10.163524   52412 kernel.go:150] "failed to get builtin kernel modul
 [agent] configmap operation: namespace=aicr-validation name=aicr-agent-snapshot-20261021-125806-6578c273bb522e67 auth_method=bearer-token format=yaml
 [agent] applying ConfigMap: namespace=aicr-validation name=aicr-agent-snapshot-20261021-125806-6578c273bb522e67 format=yaml
 [cli] job completed successfully
-[cli] snapshot saved to file: path=/Users/yassineteimi/Desktop/ncp-partner-onboarding/.claude/worktrees/ws-readiness/docs/artifacts/readiness/aicr/snapshot-par-20261021T105806Z.yaml format=yaml
+[cli] snapshot saved to file: path=./docs/artifacts/readiness/aicr/snapshot-par-20261021T105806Z.yaml format=yaml
 2026-10-21T10:58:12Z $ make --no-print-directory aicr-drift SITE=par
 SITE=par ./scripts/readiness/aicr.sh diff
-2026-10-21T10:58:28Z $ kubectl --kubeconfig /Users/yassineteimi/Desktop/ncp-partner-onboarding/.claude/worktrees/ws-readiness/kubeconfig-par delete namespace aicr-validation --ignore-not-found --wait=false
+2026-10-21T10:58:28Z $ kubectl --kubeconfig ./kubeconfig-par delete namespace aicr-validation --ignore-not-found --wait=false
 namespace "aicr-validation" deleted

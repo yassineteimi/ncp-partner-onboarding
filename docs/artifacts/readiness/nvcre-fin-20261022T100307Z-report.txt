@@ -94,4 +94,4 @@ Categories:
 │  Result:       PASSED                                          │
 └────────────────────────────────────────────────────────────────┘
 
-Results written to /Users/yassineteimi/Desktop/ncp-partner-onboarding/.claude/worktrees/ws-readiness/docs/artifacts/readiness/nvcre-fin-20261022T100307Z.json
+Results written to ./docs/artifacts/readiness/nvcre-fin-20261022T100307Z.json

@@ -16,4 +16,4 @@ E1021 10:58:10.163524   52412 kernel.go:150] "failed to get builtin kernel modul
 [agent] configmap operation: namespace=aicr-validation name=aicr-agent-snapshot-20261021-125806-6578c273bb522e67 auth_method=bearer-token format=yaml
 [agent] applying ConfigMap: namespace=aicr-validation name=aicr-agent-snapshot-20261021-125806-6578c273bb522e67 format=yaml
 [cli] job completed successfully
-[cli] snapshot saved to file: path=/Users/yassineteimi/Desktop/ncp-partner-onboarding/.claude/worktrees/ws-readiness/docs/artifacts/readiness/aicr/snapshot-par-20261021T105806Z.yaml format=yaml
+[cli] snapshot saved to file: path=./docs/artifacts/readiness/aicr/snapshot-par-20261021T105806Z.yaml format=yaml

@@ -47,4 +47,4 @@ Categories:
 │  Result:       PASSED                                          │
 └────────────────────────────────────────────────────────────────┘
 
-Results written to /Users/yassineteimi/Desktop/ncp-partner-onboarding/.claude/worktrees/ws-readiness/docs/artifacts/readiness/nvcre-par-20261021T172328Z.json
+Results written to ./docs/artifacts/readiness/nvcre-par-20261021T172328Z.json

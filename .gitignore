@@ -33,6 +33,3 @@ site/
 
 # macos
 .DS_Store
-
-# git worktrees for parallel work
-.claude/worktrees/
