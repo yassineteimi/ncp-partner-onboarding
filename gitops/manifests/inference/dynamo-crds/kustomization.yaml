@@ -1,0 +1,16 @@
+# Dynamo v1.5.1's six CRDs, unchanged from the release tag
+# (deploy/operator/config/crd/bases at v1.5.1, fetched 26 October 2026).
+# They sync one wave before the operator in the same Application. The largest,
+# DynamoGraphDeployment, is 1.6 MB of YAML, so the Application applies them
+# server-side.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - nvidia.com_dynamocomponentdeployments.yaml
+  - nvidia.com_dynamographdeploymentrequests.yaml
+  - nvidia.com_dynamographdeployments.yaml
+  - nvidia.com_dynamographdeploymentscalingadapters.yaml
+  - nvidia.com_dynamomodels.yaml
+  - nvidia.com_dynamoworkermetadatas.yaml
+commonAnnotations:
+  argocd.argoproj.io/sync-wave: "-1"

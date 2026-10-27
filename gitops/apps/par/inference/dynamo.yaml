@@ -1,0 +1,57 @@
+# NVIDIA Dynamo v1.5.1 on par: the operator, namespace-scoped to team-a, and
+# its CRDs from Git. Inference serving for Nordhaven's first workloads.
+# Sync wave 10, like the other area Applications.
+#
+# The model itself, a DynamoGraphDeployment, isn't here: it holds a GPU pod
+# that would wait Pending whenever no L4 exists. make dynamo-deploy applies it
+# from workloads/inference/ during a GPU run and make dynamo-delete removes it.
+#
+# The operator runs on the CPU worker. With the worker off this Application
+# reads Progressing or Degraded, and nothing in a later wave depends on it.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: dynamo
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+
+  sources:
+    - repoURL: https://helm.ngc.nvidia.com/nvidia/ai-dynamo
+      chart: dynamo-platform
+      targetRevision: 1.5.1
+      helm:
+        releaseName: dynamo-platform
+        valueFiles:
+          - $values/gitops/values/inference/dynamo-platform-par.yaml
+
+    - repoURL: https://github.com/yassineteimi/ncp-partner-onboarding
+      targetRevision: main
+      ref: values
+
+    - repoURL: https://github.com/yassineteimi/ncp-partner-onboarding
+      targetRevision: main
+      path: gitops/manifests/inference/dynamo-crds
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: dynamo-system
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      # 1.6 MB CRDs don't fit client-side apply's last-applied annotation.
+      - ServerSideApply=true
+    retry:
+      limit: 10
+      backoff:
+        duration: 20s
+        factor: 2
+        maxDuration: 5m

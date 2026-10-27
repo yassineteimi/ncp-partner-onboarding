@@ -1,0 +1,45 @@
+# NVIDIA Dynamo platform v1.5.1 on par: the operator only.
+#
+# At v1.5.1 the chart's defaults already leave out etcd, NATS, Grove, the
+# snapshot service and its own KAI (global.*.install: false), and the operator
+# discovers workers through the Kubernetes API (discoveryBackend: kubernetes).
+# So nothing here installs a second KAI beside par's v0.18.6, and nothing
+# pulls Bitnami's etcd.
+#
+# The operator's CRDs aren't in the chart: by default an init container,
+# crd-apply, applies them from the operator image. A namespace-restricted
+# operator can't (upgradeCRD must be false), so the six CRDs of v1.5.1 are in
+# Git, gitops/manifests/inference/dynamo-crds, applied by the same
+# Application one wave earlier.
+dynamo-operator:
+  # Namespace-scoped: the operator watches only team-a, Nordhaven's inference
+  # tenant, and the chart scopes every webhook to that namespace, including
+  # the one on Pod CREATE (checkpoint restore). Cluster-wide, every pod created
+  # anywhere would call the operator, which sits on the CPU worker and is gone
+  # while the worker is off. The chart refuses a custom namespaceSelector
+  # ("Helm manages admission scope"), so this is its supported way.
+  namespaceRestriction:
+    enabled: true
+    targetNamespace: team-a
+  upgradeCRD: false
+  controllerManager:
+    # The par convention: lane controllers wait Pending on the CPU worker
+    # rather than land on the 4 vCPU control plane.
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: eu1.io/pool
+                  operator: In
+                  values: [cpu]
+    manager:
+      image:
+        repository: nvcr.io/nvidia/ai-dynamo/kubernetes-operator
+        # Index digest from nvcr.io's registry API, 26 October 2026.
+        tag: "1.5.1@sha256:4b8229b913d66fff2111c228e02f65d342b3e136bb1ee2f83892e8a140b96d1d"
+  webhook:
+    # par runs cert-manager (wave 3); without it the operator makes its own
+    # certificate at runtime.
+    certManager:
+      enabled: true
