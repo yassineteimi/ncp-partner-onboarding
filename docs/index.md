@@ -71,6 +71,7 @@ order.
 | **Day 2.** [Can a Slurm group use the same platform?](21-hpc-slinky.md) | Slurm via Slinky | Paris CPU worker | `sbatch` jobs, a prolog that drains a sick node, a Kubernetes cordon that drains Slurm; GPUs designed, not run |
 | **Day 2.** [Can operators see every GPU, even of a deleted site?](30-metrics-across-sites.md) | Thanos | Finland writes, Paris keeps | Finland's series in Paris 4 s after its Prometheus started, still there after the site was deleted |
 | **Day 2.** [Can a VM tenant run next to the containers?](30-vm-tenants.md) | KubeVirt | Paris CPU worker | A VM booted on KVM in 20.2 s under a tenant quota while a GPU job used the L4 |
+| **Day 2.** [Can the partner sell inference, not only GPU hours?](40-inference-dynamo.md) | Dynamo | Paris L4 (prepared) | Work in progress: designed and checked without a GPU, not run yet |
 
 The GPU runs took place on 21 October (one L4, about 50 minutes) and 22 October (2× H200,
 about 35 minutes). On the H200, the node went from order to both GPUs schedulable in

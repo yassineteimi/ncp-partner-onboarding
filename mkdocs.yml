@@ -80,6 +80,7 @@ nav:
       - "HPC: Slurm with Slinky": 21-hpc-slinky.md
       - "Observability with Thanos": 30-metrics-across-sites.md
       - "VM tenants": 30-vm-tenants.md
+      - "Inference with Dynamo (WIP)": 40-inference-dynamo.md
   - "What is simulated": simulated.md
   - Decisions:
       - "All decisions": adr/README.md
