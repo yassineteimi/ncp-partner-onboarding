@@ -1,0 +1,201 @@
+# FC3: NVSentinel demos/local-fault-injection-demo at v1.28.0, on an arm64 Mac (colima, kind v0.32.0, kindest/node v1.36.1)
+# Run 2026-10-20 with NVSENTINEL_CHART_VERSION=v1.28.0 CERT_MANAGER_VERSION=v1.21.2 and a scratch KUBECONFIG.
+# First attempt failed: the worker kubelet never became healthy during kind join; the colima VM had
+# fs.inotify.max_user_instances=128 with another kind cluster running. Raised to 512 (runtime only), then it ran.
+# SIMULATED: XID 95 injected into a fake DCGM 4.2.0 (NVML injection), the demo's own method. The reboot is the kind provider's, faked.
+
+#### scripts/00-setup.sh
+
+=============================================================
+  Preparing the cluster
+=============================================================
+
+[INFO] Resolving the NVSentinel version to install...
+[ OK ] Installing NVSentinel v1.28.0
+
+=============================================================
+  Creating the KIND cluster
+=============================================================
+
+Creating cluster "nvsentinel-demo" ...
+ • Ensuring node image (kindest/node:v1.36.1) 🖼  ...
+ ✓ Ensuring node image (kindest/node:v1.36.1) 🖼
+ • Preparing nodes 📦 📦   ...
+ ✓ Preparing nodes 📦 📦 
+ • Writing configuration 📜  ...
+ ✓ Writing configuration 📜
+ • Starting control-plane 🕹️  ...
+ ✓ Starting control-plane 🕹️
+ • Installing CNI 🔌  ...
+ ✓ Installing CNI 🔌
+ • Installing StorageClass 💾  ...
+ ✓ Installing StorageClass 💾
+ • Joining worker nodes 🚜  ...
+ ✓ Joining worker nodes 🚜
+Set kubectl context to "kind-nvsentinel-demo"
+You can now use your cluster with:
+
+kubectl cluster-info --context kind-nvsentinel-demo
+
+Have a question, bug, or feature request? Let us know! https://kind.sigs.k8s.io/#community 🙂
+[ OK ] Cluster 'nvsentinel-demo' is up
+NAME                            STATUS   ROLES           AGE   VERSION
+nvsentinel-demo-control-plane   Ready    control-plane   26s   v1.36.1
+nvsentinel-demo-worker          Ready    <none>          12s   v1.36.1
+
+=============================================================
+  Installing cert-manager
+=============================================================
+
+[INFO] NVSentinel needs cert-manager for MongoDB mTLS and the janitor webhook.
+[INFO] Version v1.21.2, pinned via CERT_MANAGER_VERSION.
+[ OK ] cert-manager is ready
+
+=============================================================
+  Installing NVSentinel v1.28.0
+=============================================================
+
+[INFO] Chart:     oci://ghcr.io/nvidia/nvsentinel v1.28.0
+[INFO] Values:    config/nvsentinel-values.yaml
+[INFO] Modules:   gpu-health-monitor, platform-connectors, fault-quarantine, node-drainer, fault-remediation, janitor, janitor-provider
+[INFO] Datastore: Percona Server for MongoDB, single member
+
+[INFO] A few minutes: the operator issues certificates and initialises the replica set before MongoDB accepts writes.
+[ OK ] NVSentinel installed
+
+=============================================================
+  Deploying the fake DCGM hostengine
+=============================================================
+
+[INFO] No GPU here, so DCGM is backed by NVML injection: same protocol, same port, same code path in the monitor.
+[INFO] The image carries the NVIDIA stack and runs to a few GB, so the first pull is slow.
+[ OK ] Fake DCGM is listening on port 5555
+
+=============================================================
+  Labelling the worker as a GPU node
+=============================================================
+
+[INFO] Applying what a GPU Operator install leaves behind: gpu.present, driver.installed, dcgm.version.
+[INFO] Labelled nvsentinel-demo-worker
+[INFO] gpu-health-monitor selects on the dcgm.version label, so its pod starts now.
+[ OK ] gpu-health-monitor is running on the GPU node
+
+=============================================================
+  Confirming the monitor can read the GPU
+=============================================================
+
+[INFO] A running pod proves nothing. GpuDcgmConnectivityFailure=False appears only after a successful poll.
+       waiting for gpu-health-monitor to report a healthy DCGM connection ......... done (28s)
+
+  GpuDcgmConnectivityFailure  False  GpuDcgmConnectivityFailureIsHealthy  No Health Failures
+
+[ OK ] gpu-health-monitor is reading the GPU through DCGM
+
+=============================================================
+  Deploying the demo workload
+=============================================================
+
+[INFO] Standing in for a training job, so the drain has something to evict.
+[ OK ] Workload is running on nvsentinel-demo-worker
+[ OK ] Cluster 'nvsentinel-demo' is running NVSentinel v1.28.0, with nvsentinel-demo-worker standing in for a GPU node
+
+=============================================================
+  Next
+=============================================================
+
+  ./scripts/01-show-cluster.sh   look at it before anything is broken
+
+#### scripts/02-inject-fault.sh
+
+=============================================================
+  Injecting XID 95 into the GPU on nvsentinel-demo-worker
+=============================================================
+
+[INFO] Writing it into the hostengine in gpu-operator/nvidia-dcgm-cq8h6. Nothing downstream is told.
+
+Successfully injected field info.
+
+[ OK ] GPU 0 on nvsentinel-demo-worker is now reporting XID 95
+
+=============================================================
+  Next
+=============================================================
+
+  ./scripts/03-watch-remediation.sh   watch NVSentinel handle it
+
+#### scripts/03-watch-remediation.sh
+
+=============================================================
+  Detect
+=============================================================
+
+[INFO] gpu-health-monitor polls DCGM and reports what it finds as a node condition.
+       waiting for a GPU fault condition on nvsentinel-demo-worker .. done (7s)
+
+GpuMemWatch  GpuMemWatchIsNotHealthy  ErrorCode:DCGM_FR_UNCONTAINED_ERROR GPU:0 GPU had an uncontained error (XID 95) Drain the GPU and rese
+
+=============================================================
+  Protect
+=============================================================
+
+[INFO] fault-quarantine cordons the node, then node-drainer evicts what was running on it.
+       waiting for nvsentinel-demo-worker to be cordoned  done (0s)
+       waiting for the workload to be evicted .................... done (61s)
+       waiting for the drain to be reported complete ... done (10s)
+
+NAME                     STATUS                     ROLES    AGE     VERSION
+nvsentinel-demo-worker   Ready,SchedulingDisabled   <none>   6m27s   v1.36.1
+
+NAME                            READY   STATUS    RESTARTS   AGE
+gpu-workload-659776df95-g9t2s   0/1     Pending   0          73s
+
+=============================================================
+  Remediate
+=============================================================
+
+[INFO] fault-remediation requests the repair the fault calls for, and janitor carries it out.
+       waiting for a RebootNode for nvsentinel-demo-worker  done (0s)
+       waiting for janitor to finish the reboot  done (0s)
+
+NAME                                                          NODE                     FORCE   NODEREADY   AGE
+maintenance-nvsentinel-demo-worker-6ad7f23afbe154eacb8f3223   nvsentinel-demo-worker   false               3s
+
+[INFO] The reboot was simulated, so the GPU still reports XID 95 and the node stays out of service.
+
+=============================================================
+  Next
+=============================================================
+
+  ./scripts/04-recover.sh   clear the fault and watch the node come back
+
+#### scripts/04-recover.sh
+
+=============================================================
+  Repairing the GPU
+=============================================================
+
+[INFO] Restarting gpu-operator/nvidia-dcgm-cq8h6, which drops the injected fault as a real reboot would have.
+[ OK ] DCGM is back, reporting a healthy GPU
+
+=============================================================
+  Back in service
+=============================================================
+
+[INFO] The monitor reports the check healthy again, and fault-quarantine uncordons on its own.
+       waiting for the GPU fault condition to clear .............. done (43s)
+       waiting for nvsentinel-demo-worker to be uncordoned  done (0s)
+       waiting for the workload to be rescheduled  done (0s)
+
+NAME                     STATUS   ROLES    AGE     VERSION
+nvsentinel-demo-worker   Ready    <none>   7m36s   v1.36.1
+
+NAME                            READY   STATUS    RESTARTS   AGE     IP           NODE                     NOMINATED NODE   READINESS GATES
+gpu-workload-659776df95-g9t2s   1/1     Running   0          2m22s   10.244.1.7   nvsentinel-demo-worker   <none>           <none>
+
+[ OK ] nvsentinel-demo-worker is schedulable again, with the workload running on it
+
+=============================================================
+  Next
+=============================================================
+
+  ./scripts/99-cleanup.sh   delete the cluster

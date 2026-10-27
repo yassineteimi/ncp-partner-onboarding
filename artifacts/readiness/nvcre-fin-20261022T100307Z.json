@@ -1,0 +1,55 @@
+{
+  "name": "eu1-fin-h200",
+  "platform": "onprem",
+  "gpu": "h200",
+  "totalNodes": 1,
+  "categories": [
+    {
+      "domain": "communication",
+      "variant": "nccl-all-reduce",
+      "status": "Succeeded",
+      "runtime": "4m 31s",
+      "testScale": "intra-node",
+      "nodesPerJob": 1,
+      "jobs": 1,
+      "env": [
+        "NCCL_DEBUG",
+        "NCCL_DEBUG_SUBSYS"
+      ],
+      "bandwidth": [
+        {
+          "size": "16 GB",
+          "algBW": "351.45 GB/s",
+          "busBW": "351.45 GB/s",
+          "samples": 10
+        }
+      ],
+      "transport": [
+        "Socket"
+      ]
+    },
+    {
+      "domain": "communication",
+      "variant": "nccl-loopback-nvswitch",
+      "status": "Succeeded",
+      "runtime": "4m 27s",
+      "testScale": "intra-node",
+      "nodesPerJob": 1,
+      "jobs": 1,
+      "env": [
+        "NCCL_DEBUG",
+        "NCCL_DEBUG_SUBSYS"
+      ],
+      "bandwidth": [
+        {
+          "size": "16 GB",
+          "algBW": "351.87 GB/s",
+          "busBW": "351.87 GB/s",
+          "samples": 10
+        }
+      ]
+    }
+  ],
+  "failedNodes": [],
+  "result": "PASSED"
+}

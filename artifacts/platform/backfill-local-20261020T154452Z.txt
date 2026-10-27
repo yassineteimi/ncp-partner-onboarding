@@ -1,0 +1,26 @@
+# SIMULATED. Local run of the first half of scripts/platform/backfill-downsampling.sh: the synthetic series and promtool's blocks, uploaded nowhere
+# 20261020T154452Z, laptop clock, UTC. git ad74aa0 plus the working tree
+# promtool, version 3.14.0 (branch: HEAD, revision: d7598b7141418fa35be2b5ec5d0fefb634199610)
+# thanos, version 0.42.4 (branch: HEAD, revision: 45c4f39487e1653e606307d3952a6259fb96acae)
+
+## the generator, as written in the script
+1792068296 to 1792500296, 2 series, one sample a minute
+14403 lines of OpenMetrics
+
+## promtool tsdb create-blocks-from openmetrics
+01M5CZSYW7KS2RJWC97R5JWC81  1792483256000  1792490396001  1h59m0.001s  240          2            2            2284
+01M5CZSZ6RXAE9K4GE8M61JJGP  1792490456000  1792497596001  1h59m0.001s  240          2            2            2314
+01M5CZSZGR361NET5NNC7PCHJA  1792497656000  1792500236001  43m0.001s    88           2            2            1273
+61 blocks
+
+## promtool tsdb list (header, first three and last block by min time)
+BLOCK ULID                  MIN TIME       MAX TIME       DURATION     NUM SAMPLES  NUM CHUNKS   NUM SERIES   SIZE
+01M5CZSDT23CABRBMAJ3N8A00N  1792068296000  1792072796001  1h15m0.001s  152          2            2            1708
+01M5CZSE2B77029JJ9TK5V1698  1792072856000  1792079996001  1h59m0.001s  240          2            2            2214
+01M5CZSEAMCE5C8EMJNBBC3C2J  1792080056000  1792087196001  1h59m0.001s  240          2            2            2274
+01M5CZSZGR361NET5NNC7PCHJA  1792497656000  1792500236001  43m0.001s    88           2            2            1273
+
+## the upload command's flags exist in this thanos binary
+      --objstore.config-file=<file-path>  
+      --path="./data"          Path to the directory containing blocks to
+      --label=key="value" ...  External labels to add to the uploaded blocks

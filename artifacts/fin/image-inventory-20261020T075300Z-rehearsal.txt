@@ -1,0 +1,96 @@
+# eu1-fin-gpu-01 (CPU.4V.16G, image 26.04.cuda13.4), captured 2026-10-20T07:53:00Z by scripts/fin/gpu-up.sh
+== os
+Ubuntu 26.04.1 LTS
+7.0.0-38-generic
+== binaries
+nvidia-smi   /usr/bin/nvidia-smi
+nvidia-ctk   absent
+containerd   absent
+runc         absent
+docker       absent
+kubelet      absent
+kubeadm      absent
+== packages
+cuda-command-line-tools-13-4 13.4.3-1
+cuda-compiler-13-4 13.4.3-1
+cuda-crt-13-4 13.4.92-1
+cuda-ctadvisor-13-4 13.4.92-1
+cuda-cudart-13-4 13.4.92-1
+cuda-cudart-dev-13-4 13.4.92-1
+cuda-culibos-dev-13-4 13.4.92-1
+cuda-cuobjdump-13-4 13.4.92-1
+cuda-cupti-13-4 13.4.92-1
+cuda-cupti-dev-13-4 13.4.92-1
+cuda-cuxxfilt-13-4 13.4.92-1
+cuda-documentation-13-4 13.4.92-1
+cuda-driver-dev-13-4 13.4.92-1
+cuda-gdb-13-4 13.4.92-1
+cuda-keyring 1.1-1
+cuda-libraries-13-4 13.4.3-1
+cuda-libraries-dev-13-4 13.4.3-1
+cuda-nsight-compute-13-4 13.4.3-1
+cuda-nsight-systems-13-4 13.4.3-1
+cuda-nvcc-13-4 13.4.92-1
+cuda-nvdisasm-13-4 13.4.92-1
+cuda-nvml-dev-13-4 13.4.92-1
+cuda-nvprune-13-4 13.4.92-1
+cuda-nvrtc-13-4 13.4.92-1
+cuda-nvrtc-dev-13-4 13.4.92-1
+cuda-nvtx-13-4 13.4.92-1
+cuda-opencl-13-4 13.4.92-1
+cuda-opencl-dev-13-4 13.4.92-1
+cuda-profiler-api-13-4 13.4.92-1
+cuda-sandbox-dev-13-4 13.4.92-1
+cuda-sanitizer-13-4 13.4.92-1
+cuda-tileiras-13-4 13.4.92-1
+cuda-toolkit-13-4 13.4.3-1
+cuda-toolkit-13-4-config-common 13.4.92-1
+cuda-toolkit-13-config-common 13.1.80-0ubuntu2
+cuda-toolkit-config-common 13.1.80-0ubuntu2
+cuda-tools-13-4 13.4.3-1
+cuda-visual-tools-13-4 13.4.3-1
+libnvidia-cfg1-580-server 580.178.04-0ubuntu0.26.04.1
+libnvidia-common-580-server 580.178.04-0ubuntu0.26.04.1
+libnvidia-compute-580-server 580.178.04-0ubuntu0.26.04.1
+libnvidia-decode-580-server 580.178.04-0ubuntu0.26.04.1
+libnvidia-egl-wayland1 1:1.1.21-1
+libnvidia-encode-580-server 580.178.04-0ubuntu0.26.04.1
+libnvidia-extra-580-server 580.178.04-0ubuntu0.26.04.1
+libnvidia-fbc1-580-server 580.178.04-0ubuntu0.26.04.1
+libnvidia-gl-580-server 580.178.04-0ubuntu0.26.04.1
+nvidia-compute-utils-580-server 580.178.04-0ubuntu0.26.04.1
+nvidia-dkms-580-server-open 580.178.04-0ubuntu0.26.04.1
+nvidia-driver-580-server-open 580.178.04-0ubuntu0.26.04.1
+nvidia-fabricmanager-580 580.178.04-0ubuntu0.26.04.1
+nvidia-firmware-580-server-580.178.04 580.178.04-0ubuntu0.26.04.1
+nvidia-kernel-common-580-server 580.178.04-0ubuntu0.26.04.1
+nvidia-kernel-source-580-server-open 580.178.04-0ubuntu0.26.04.1
+nvidia-utils-580-server 580.178.04-0ubuntu0.26.04.1
+== units
+nvidia-fabricmanager.service                 enabled         enabled
+nvidia-hibernate.service                     enabled         enabled
+nvidia-persistenced.service                  static          -
+nvidia-powerd.service                        masked          enabled
+nvidia-resume.service                        enabled         enabled
+nvidia-suspend-then-hibernate.service        disabled        enabled
+nvidia-suspend.service                       enabled         enabled
+== kernel modules
+no nvidia or nouveau module loaded
+== nvidia module on disk
+580.178.04
+== driver
+driver_version=580.178.04
+driver_check=rehearsal
+node_name=eu1-fin-gpu-01
+node_ip=
+os=Ubuntu 26.04.1 LTS
+kernel=7.0.0-38-generic
+containerd=containerd containerd v2.3.6 ee2735368117d2eb259779949d5e75cdafec9761
+kubeadm=v1.36.5
+kubelet_package=1.36.5-1.1
+bootstrapped_at=2026-10-20T07:52:39+00:00
+node_ip=86.38.238.80
+public_ip=86.38.238.80
+
+NAME             STATUS   ROLES    AGE   VERSION   INTERNAL-IP    EXTERNAL-IP   OS-IMAGE             KERNEL-VERSION             CONTAINER-RUNTIME
+eu1-fin-gpu-01   Ready    <none>   14s   v1.36.5   86.38.238.80   <none>        Ubuntu 26.04.1 LTS   7.0.0-38-generic (amd64)   containerd://2.3.6

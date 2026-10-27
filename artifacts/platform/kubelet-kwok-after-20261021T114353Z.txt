@@ -1,0 +1,17 @@
+# kubelet targets and alerts on par after PR #14, 20261021T114353Z, laptop clock, UTC
+
+## kubelet ServiceMonitor relabelings as applied
+/metrics ['metrics_path', 'eu1-par-sim-gpu-.*']
+/metrics/cadvisor ['metrics_path', 'eu1-par-sim-gpu-.*']
+/metrics/probes ['metrics_path', 'eu1-par-sim-gpu-.*']
+
+## active kubelet targets
+eu1-par-cp-01    /metrics             up    2026-10-21T11:43:39
+eu1-par-cpu-01   /metrics             up    2026-10-21T11:43:35
+eu1-par-cp-01    /metrics/cadvisor    up    2026-10-21T11:43:48
+eu1-par-cpu-01   /metrics/cadvisor    up    2026-10-21T11:43:49
+eu1-par-cpu-01   /metrics/probes      up    2026-10-21T11:43:29
+eu1-par-cp-01    /metrics/probes      up    2026-10-21T11:43:50
+
+## firing or pending: TargetDown (job kubelet) and KubeletInstanceUnreachable
+(none)

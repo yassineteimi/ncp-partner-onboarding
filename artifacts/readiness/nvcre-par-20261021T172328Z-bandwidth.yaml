@@ -1,0 +1,176 @@
+apiVersion: v1
+items:
+- apiVersion: nvcre.nvidia.com/v1alpha1
+  kind: BandwidthMeasurement
+  metadata:
+    annotations:
+      nvcre.nvidia.com/job-uid: 8aef8e71-e9b1-4131-a48d-4ab09f72e351
+    creationTimestamp: "2026-10-21T17:23:29Z"
+    finalizers:
+    - nvcre.nvidia.com/bandwidthmeasurement-finalizer
+    generation: 1
+    labels:
+      app.kubernetes.io/managed-by: nvcre
+      nvcre.nvidia.com/job: eu1-par-l4-communication-7afe9-job
+      nvcre.nvidia.com/workflow: eu1-par-l4-communication-7afe9
+    name: eu1-par-l4-communication-7afe9-job-bandwidth
+    namespace: readiness-runs
+    ownerReferences:
+    - apiVersion: nvcre.nvidia.com/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Workflow
+      name: eu1-par-l4-communication-7afe9
+      uid: e9337f3f-f47c-4c47-975a-12f2fdd087cc
+    resourceVersion: "451591"
+    uid: 36fc4571-2e07-470f-96a5-7ab3740d30fd
+  spec:
+    jobRef:
+      apiGroup: nvcre.nvidia.com
+      kind: Job
+      name: eu1-par-l4-communication-7afe9-job
+    logProfileRef: nccl-bandwidth
+    sampleInterval: 30s
+    testType: all_reduce
+  status:
+    completionTime: "2026-10-21T17:25:26Z"
+    conditions:
+    - lastTransitionTime: "2026-10-21T17:25:26Z"
+      message: Job succeeded
+      observedGeneration: 1
+      reason: JobSucceeded
+      status: "False"
+      type: Measuring
+    - lastTransitionTime: "2026-10-21T17:25:26Z"
+      message: Job succeeded
+      observedGeneration: 1
+      reason: JobSucceeded
+      status: "True"
+      type: Complete
+    results:
+    - algBW: "0.00"
+      busBW: "0.00"
+      samples: 10
+      sizeBytes: 8
+    - algBW: "0.00"
+      busBW: "0.00"
+      samples: 10
+      sizeBytes: 16
+    - algBW: "0.01"
+      busBW: "0.00"
+      samples: 10
+      sizeBytes: 32
+    - algBW: "0.02"
+      busBW: "0.00"
+      samples: 10
+      sizeBytes: 64
+    - algBW: "0.04"
+      busBW: "0.00"
+      samples: 10
+      sizeBytes: 128
+    - algBW: "0.07"
+      busBW: "0.00"
+      samples: 10
+      sizeBytes: 256
+    - algBW: "0.15"
+      busBW: "0.00"
+      samples: 10
+      sizeBytes: 512
+    - algBW: "0.30"
+      busBW: "0.00"
+      samples: 10
+      sizeBytes: 1024
+    - algBW: "0.61"
+      busBW: "0.00"
+      samples: 10
+      sizeBytes: 2048
+    - algBW: "1.21"
+      busBW: "0.00"
+      samples: 10
+      sizeBytes: 4096
+    - algBW: "2.44"
+      busBW: "0.00"
+      samples: 10
+      sizeBytes: 8192
+    - algBW: "4.77"
+      busBW: "0.00"
+      samples: 10
+      sizeBytes: 16384
+    - algBW: "9.46"
+      busBW: "0.00"
+      samples: 10
+      sizeBytes: 32768
+    - algBW: "18.78"
+      busBW: "0.00"
+      samples: 10
+      sizeBytes: 65536
+    - algBW: "37.76"
+      busBW: "0.00"
+      samples: 10
+      sizeBytes: 131072
+    - algBW: "73.11"
+      busBW: "0.00"
+      samples: 10
+      sizeBytes: 262144
+    - algBW: "101.32"
+      busBW: "0.00"
+      samples: 10
+      sizeBytes: 524288
+    - algBW: "116.72"
+      busBW: "0.00"
+      samples: 10
+      sizeBytes: 1048576
+    - algBW: "125.22"
+      busBW: "0.00"
+      samples: 10
+      sizeBytes: 2097152
+    - algBW: "121.38"
+      busBW: "0.00"
+      samples: 10
+      sizeBytes: 4194304
+    - algBW: "118.47"
+      busBW: "0.00"
+      samples: 10
+      sizeBytes: 8388608
+    - algBW: "116.62"
+      busBW: "0.00"
+      samples: 10
+      sizeBytes: 16777216
+    - algBW: "115.36"
+      busBW: "0.00"
+      samples: 10
+      sizeBytes: 33554432
+    - algBW: "115.17"
+      busBW: "0.00"
+      samples: 10
+      sizeBytes: 67108864
+    - algBW: "115.25"
+      busBW: "0.00"
+      samples: 10
+      sizeBytes: 134217728
+    - algBW: "115.28"
+      busBW: "0.00"
+      samples: 10
+      sizeBytes: 268435456
+    - algBW: "115.28"
+      busBW: "0.00"
+      samples: 10
+      sizeBytes: 536870912
+    - algBW: "115.32"
+      busBW: "0.00"
+      samples: 10
+      sizeBytes: 1073741824
+    - algBW: "115.32"
+      busBW: "0.00"
+      samples: 10
+      sizeBytes: 2147483648
+    - algBW: "115.34"
+      busBW: "0.00"
+      samples: 10
+      sizeBytes: 4294967296
+    startTime: "2026-10-21T17:23:59Z"
+    transport:
+    - Socket
+kind: List
+metadata:
+  resourceVersion: ""

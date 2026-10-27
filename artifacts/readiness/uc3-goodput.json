@@ -1,0 +1,26 @@
+{
+  "attempts": [
+    "goodput-xq462",
+    "goodput-lgzng"
+  ],
+  "final_step": 3000,
+  "steps_kept": 3000,
+  "steps_redone": 27,
+  "total_s": 1267.0,
+  "useful_s": 925.268,
+  "redone_s": 8.298,
+  "checkpoint_s": 34.791,
+  "restore_s": 1.829,
+  "outage_s": 287.583,
+  "other_s": 9.232,
+  "goodput": 0.7303,
+  "outages": [
+    {
+      "after": "goodput-xq462",
+      "before": "goodput-lgzng",
+      "last_event_t": 1792602204.718608,
+      "resume_t": 1792602492.301265,
+      "seconds": 287.583
+    }
+  ]
+}

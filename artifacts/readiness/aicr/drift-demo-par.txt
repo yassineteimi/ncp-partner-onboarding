@@ -1,0 +1,87 @@
+# Drift demo on par, use case 1. Every line starts with the UTC time it ran.
+2026-10-21T10:52:52Z nvcre-manager image: ghcr.io/nvidia/cluster-readiness-engine/manager@sha256:0ae58498427d1238dc15b6f4c92479a90104a55670b125042ec9dca60e6b5a3b
+2026-10-21T10:52:53Z $ make --no-print-directory aicr-snapshot SITE=par
+SITE=par ./scripts/readiness/aicr.sh snapshot
+[cli] snapshot agent run: runID=20261021-125254-665cfea960a7bdbf
+[cli] deploying agent: namespace=aicr-validation
+I1021 12:52:56.275466   14552 request.go:754] "Waited before sending request" delay="1.162760708s" reason="client-side throttling, not priority and fairness" verb="POST" URL="https://51.159.138.62:6443/apis/authorization.k8s.io/v1/selfsubjectaccessreviews"
+[cli] agent deployed successfully
+[cli] waiting for Job completion: job=aicr-20261021-125254-665cfea960a7bdbf timeout=5m0s
+[cli] pod current phase: name=aicr-20261021-125254-665cfea960a7bdbf-vqf48 status=Pending waitingReason=ContainerCreating
+[cli] pod current phase: name=aicr-20261021-125254-665cfea960a7bdbf-vqf48 status=Running
+[agent] collecting OS configuration
+[agent] collecting GPU information
+[agent] collecting Kubernetes cluster information
+[agent] collecting SystemD service configurations
+[agent] collecting node topology information
+E1021 10:53:01.186026   46741 kernel.go:135] "failed to read kconfig" err="failed to read kernel config from [ /proc/config.gz /usr/src/linux-6.8.0-142-generic/.config /usr/src/linux-rt-6.8.0-142-generic/.config /usr/src/linux/.config /usr/lib/modules/6.8.0-142-generic/config /usr/lib/ostree-boot/config-6.8.0-142-generic /usr/lib/kernel/config-6.8.0-142-generic /usr/src/linux-headers-6.8.0-142-generic/.config /lib/modules/6.8.0-142-generic/build/.config /usr/src/linux-rt-headers-6.8.0-142-generic/.config /boot/config-6.8.0-142-generic]"
+E1021 10:53:01.186491   46741 kernel.go:150] "failed to get builtin kernel modules" err="failed to read file /lib/modules/6.8.0-142-generic/modules.builtin: open /lib/modules/6.8.0-142-generic/modules.builtin: no such file or directory"
+[agent] node topology collection complete: nodes=2 taints=0 labels=498
+[agent] configmap operation: namespace=aicr-validation name=aicr-agent-snapshot-20261021-125254-665cfea960a7bdbf auth_method=bearer-token format=yaml
+[agent] applying ConfigMap: namespace=aicr-validation name=aicr-agent-snapshot-20261021-125254-665cfea960a7bdbf format=yaml
+[cli] job completed successfully
+[cli] snapshot saved to file: path=./docs/artifacts/readiness/aicr/snapshot-par-20261021T105254Z.yaml format=yaml
+2026-10-21T10:54:15Z $ kubectl --kubeconfig ./kubeconfig-par -n nvcre set image deploy/nvcre-manager manager=ghcr.io/nvidia/cluster-readiness-engine/manager:v0.7.0
+deployment.apps/nvcre-manager image updated
+2026-10-21T10:54:15Z $ kubectl --kubeconfig ./kubeconfig-par -n nvcre rollout status deploy/nvcre-manager --timeout=180s
+Waiting for deployment "nvcre-manager" rollout to finish: 1 old replicas are pending termination...
+error: timed out waiting for the condition
+      --zap-devel                                   Development Mode defaults(encoder=consoleEncoder,logLevel=Debug,stackTraceLevel=Warn). Production Mode defaults(encoder=jsonEncoder,logLevel=Info,stackTraceLevel=Error) (default true)
+      --zap-encoder encoder                         Zap log encoding (one of 'json' or 'console')
+      --zap-log-level level                         Zap Level to configure the verbosity of logging. Can be one of 'debug', 'info', 'error', 'panic' or any integer value > 0 which corresponds to custom debug levels of increasing verbosity
+      --zap-stacktrace-level level                  Zap Level at and above which stacktraces are captured (one of 'info', 'error', 'panic').
+      --zap-time-encoding time-encoding             Zap time encoding (one of 'epoch', 'millis', 'nano', 'iso8601', 'rfc3339' or 'rfc3339nano'). Defaults to 'epoch'.
+
+2026-10-21T10:57:30Z nvcre-manager image: ghcr.io/nvidia/cluster-readiness-engine/manager:v0.7.0
+2026-10-21T10:57:30Z $ make --no-print-directory aicr-snapshot SITE=par
+SITE=par ./scripts/readiness/aicr.sh snapshot
+[cli] snapshot agent run: runID=20261021-125731-82073d430cf732f0
+[cli] deploying agent: namespace=aicr-validation
+I1021 12:57:32.857641   17231 request.go:754] "Waited before sending request" delay="1.15544975s" reason="client-side throttling, not priority and fairness" verb="POST" URL="https://51.159.138.62:6443/apis/authorization.k8s.io/v1/selfsubjectaccessreviews"
+[cli] agent deployed successfully
+[cli] waiting for Job completion: job=aicr-20261021-125731-82073d430cf732f0 timeout=5m0s
+[cli] pod current phase: name=aicr-20261021-125731-82073d430cf732f0-89m8v status=Pending waitingReason=ContainerCreating
+[cli] pod current phase: name=aicr-20261021-125731-82073d430cf732f0-89m8v status=Running
+[agent] collecting OS configuration
+[agent] collecting GPU information
+E1021 10:57:34.612094   51601 kernel.go:135] "failed to read kconfig" err="failed to read kernel config from [ /proc/config.gz /usr/src/linux-6.8.0-142-generic/.config /usr/src/linux-rt-6.8.0-142-generic/.config /usr/src/linux/.config /usr/lib/modules/6.8.0-142-generic/config /usr/lib/ostree-boot/config-6.8.0-142-generic /usr/lib/kernel/config-6.8.0-142-generic /usr/src/linux-headers-6.8.0-142-generic/.config /lib/modules/6.8.0-142-generic/build/.config /usr/src/linux-rt-headers-6.8.0-142-generic/.config /boot/config-6.8.0-142-generic]"
+[agent] collecting Kubernetes cluster information
+E1021 10:57:34.612615   51601 kernel.go:150] "failed to get builtin kernel modules" err="failed to read file /lib/modules/6.8.0-142-generic/modules.builtin: open /lib/modules/6.8.0-142-generic/modules.builtin: no such file or directory"
+[agent] collecting node topology information
+[agent] collecting SystemD service configurations
+[agent] node topology collection complete: nodes=2 taints=0 labels=498
+[agent] configmap operation: namespace=aicr-validation name=aicr-agent-snapshot-20261021-125731-82073d430cf732f0 auth_method=bearer-token format=yaml
+[agent] applying ConfigMap: namespace=aicr-validation name=aicr-agent-snapshot-20261021-125731-82073d430cf732f0 format=yaml
+[cli] job completed successfully
+[cli] snapshot saved to file: path=./docs/artifacts/readiness/aicr/snapshot-par-20261021T105730Z.yaml format=yaml
+2026-10-21T10:57:37Z $ make --no-print-directory aicr-drift SITE=par
+SITE=par ./scripts/readiness/aicr.sh diff
+2026-10-21T10:58:00Z v0.7.0 pod nvcre-manager-67bc98d7bf-wx2vs crash reason: Error: unknown flag: --namespace-access-timeout (a v0.8.0 chart flag); the v0.8.0 pod kept running
+2026-10-21T10:58:05Z nvcre-manager image: ghcr.io/nvidia/cluster-readiness-engine/manager@sha256:0ae58498427d1238dc15b6f4c92479a90104a55670b125042ec9dca60e6b5a3b
+2026-10-21T10:58:05Z $ kubectl --kubeconfig ./kubeconfig-par -n nvcre rollout status deploy/nvcre-manager --timeout=180s
+deployment "nvcre-manager" successfully rolled out
+2026-10-21T10:58:06Z $ make --no-print-directory aicr-snapshot SITE=par
+SITE=par ./scripts/readiness/aicr.sh snapshot
+[cli] snapshot agent run: runID=20261021-125806-6578c273bb522e67
+[cli] deploying agent: namespace=aicr-validation
+I1021 12:58:08.442027   17712 request.go:754] "Waited before sending request" delay="1.16682825s" reason="client-side throttling, not priority and fairness" verb="POST" URL="https://51.159.138.62:6443/apis/authorization.k8s.io/v1/selfsubjectaccessreviews"
+[cli] agent deployed successfully
+[cli] waiting for Job completion: job=aicr-20261021-125806-6578c273bb522e67 timeout=5m0s
+[cli] pod current phase: name=aicr-20261021-125806-6578c273bb522e67-tzdvb status=Pending waitingReason=ContainerCreating
+[cli] pod current phase: name=aicr-20261021-125806-6578c273bb522e67-tzdvb status=Running
+[agent] collecting GPU information
+[agent] collecting Kubernetes cluster information
+[agent] collecting SystemD service configurations
+E1021 10:58:10.163147   52412 kernel.go:135] "failed to read kconfig" err="failed to read kernel config from [ /proc/config.gz /usr/src/linux-6.8.0-142-generic/.config /usr/src/linux-rt-6.8.0-142-generic/.config /usr/src/linux/.config /usr/lib/modules/6.8.0-142-generic/config /usr/lib/ostree-boot/config-6.8.0-142-generic /usr/lib/kernel/config-6.8.0-142-generic /usr/src/linux-headers-6.8.0-142-generic/.config /lib/modules/6.8.0-142-generic/build/.config /usr/src/linux-rt-headers-6.8.0-142-generic/.config /boot/config-6.8.0-142-generic]"
+E1021 10:58:10.163524   52412 kernel.go:150] "failed to get builtin kernel modules" err="failed to read file /lib/modules/6.8.0-142-generic/modules.builtin: open /lib/modules/6.8.0-142-generic/modules.builtin: no such file or directory"
+[agent] collecting OS configuration
+[agent] collecting node topology information
+[agent] node topology collection complete: nodes=2 taints=0 labels=498
+[agent] configmap operation: namespace=aicr-validation name=aicr-agent-snapshot-20261021-125806-6578c273bb522e67 auth_method=bearer-token format=yaml
+[agent] applying ConfigMap: namespace=aicr-validation name=aicr-agent-snapshot-20261021-125806-6578c273bb522e67 format=yaml
+[cli] job completed successfully
+[cli] snapshot saved to file: path=./docs/artifacts/readiness/aicr/snapshot-par-20261021T105806Z.yaml format=yaml
+2026-10-21T10:58:12Z $ make --no-print-directory aicr-drift SITE=par
+SITE=par ./scripts/readiness/aicr.sh diff
+2026-10-21T10:58:28Z $ kubectl --kubeconfig ./kubeconfig-par delete namespace aicr-validation --ignore-not-found --wait=false
+namespace "aicr-validation" deleted

@@ -1,0 +1,43 @@
+{
+  "checked_at": "2026-10-19T21:57:17Z",
+  "verdict": "stop",
+  "reason": "2H200.141S.88V can't be ordered anywhere, on demand or on spot. 2RTXPRO6000.60V on demand: FIN-02. Switching hardware needs Yassine's approval.",
+  "cp_only": false,
+  "gpu": {
+    "type": "2H200.141S.88V",
+    "location": "",
+    "spot": false,
+    "price_per_hour": "11.32",
+    "orderable_on_demand_in": "",
+    "orderable_on_spot_in": "",
+    "fallback_2RTXPRO6000_on_demand_in": "FIN-02"
+  },
+  "control_plane": {
+    "type": "",
+    "price_per_hour": "0"
+  },
+  "budget": {
+    "hours": 2,
+    "cost": 22.64,
+    "required_balance": 33.96,
+    "balance": {
+      "amount": 50,
+      "currency": "usd"
+    }
+  },
+  "images": {
+    "gpu": {
+      "id": "d42bf255-0547-4aeb-94ac-c5c0138e6bba",
+      "name": "Ubuntu 26.04 + CUDA 13.4 Open",
+      "driver": "unknown until the image's first boot"
+    },
+    "control_plane": {
+      "id": "6c93c8b3-4f48-4252-82b3-f199fb9b701b"
+    }
+  },
+  "leftovers": {
+    "instances": [],
+    "volumes": [],
+    "trash": []
+  }
+}

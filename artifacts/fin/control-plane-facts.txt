@@ -1,0 +1,34 @@
+# eu1-fin-cp-01, captured 2026-10-22T09:50:39Z by scripts/fin/cp-up.sh
+node_name=eu1-fin-cp-01
+node_ip=
+os=Ubuntu 26.04.1 LTS
+kernel=7.0.0-38-generic
+containerd=containerd containerd v2.3.6 ee2735368117d2eb259779949d5e75cdafec9761
+kubeadm=v1.36.5
+kubelet_package=1.36.5-1.1
+bootstrapped_at=2026-10-22T09:48:57+00:00
+node_ip=86.38.238.179
+public_ip=86.38.238.179
+
+== os
+Ubuntu 26.04.1 LTS
+7.0.0-38-generic
+== binaries
+nvidia-smi   absent
+nvidia-ctk   absent
+containerd   absent
+runc         absent
+docker       absent
+kubelet      absent
+kubeadm      absent
+== packages
+none of interest
+== units
+none of interest
+== kernel modules
+no nvidia or nouveau module loaded
+== nvidia module on disk
+no nvidia module for 7.0.0-38-generic
+
+NAME            STATUS   ROLES           AGE   VERSION   INTERNAL-IP     EXTERNAL-IP   OS-IMAGE             KERNEL-VERSION             CONTAINER-RUNTIME
+eu1-fin-cp-01   Ready    control-plane   81s   v1.36.5   86.38.238.179   <none>        Ubuntu 26.04.1 LTS   7.0.0-38-generic (amd64)   containerd://2.3.6

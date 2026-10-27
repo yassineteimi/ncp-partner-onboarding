@@ -1,0 +1,81 @@
+{
+  "read_at": "2026-10-20T07:57:43Z",
+  "source": "GET /instance/v1/zones/<zone>/products/servers, EUR before VAT",
+  "zones": [
+    {
+      "zone": "fr-par-1",
+      "servers": {
+        "L4-1-24G": {
+          "ncpus": 8,
+          "ram_gb": 48,
+          "hourly_price": 0.7875
+        },
+        "PLAY2-MICRO": {
+          "ncpus": 4,
+          "ram_gb": 8,
+          "hourly_price": 0.05508
+        },
+        "POP2-4C-16G": {
+          "ncpus": 4,
+          "ram_gb": 16,
+          "hourly_price": 0.147
+        },
+        "POP2-8C-32G": {
+          "ncpus": 8,
+          "ram_gb": 32,
+          "hourly_price": 0.29
+        },
+        "POP2-HM-4C-32G": {
+          "ncpus": 4,
+          "ram_gb": 32,
+          "hourly_price": 0.206
+        }
+      }
+    },
+    {
+      "zone": "fr-par-2",
+      "servers": {
+        "L4-1-24G": {
+          "ncpus": 8,
+          "ram_gb": 48,
+          "hourly_price": 0.7875
+        },
+        "PLAY2-MICRO": {
+          "ncpus": 4,
+          "ram_gb": 8,
+          "hourly_price": 0.05508
+        },
+        "POP2-4C-16G": {
+          "ncpus": 4,
+          "ram_gb": 16,
+          "hourly_price": 0.147
+        },
+        "POP2-8C-32G": {
+          "ncpus": 8,
+          "ram_gb": 32,
+          "hourly_price": 0.29
+        }
+      }
+    },
+    {
+      "zone": "fr-par-3",
+      "servers": {
+        "POP2-4C-16G": {
+          "ncpus": 4,
+          "ram_gb": 16,
+          "hourly_price": 0.2205
+        },
+        "POP2-8C-32G": {
+          "ncpus": 8,
+          "ram_gb": 32,
+          "hourly_price": 0.435
+        },
+        "POP2-HM-4C-32G": {
+          "ncpus": 4,
+          "ram_gb": 32,
+          "hourly_price": 0.309
+        }
+      }
+    }
+  ]
+}
