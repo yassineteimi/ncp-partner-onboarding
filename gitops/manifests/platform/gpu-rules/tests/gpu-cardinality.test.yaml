@@ -42,19 +42,25 @@ tests:
           - labels: 'gpu:dcgm_series_by_metric:count{hostname="eu1-par-gpu-01", gpu="0", modelName="NVIDIA L4", metric="DCGM_EXP_XID_ERRORS_TOTAL"}'
             value: 2
 
-  - name: MIG instances count against the physical GPU they live on
+  - name: MIG instances count against the physical GPU they live on, and each instance has its own row
     interval: 1m
     input_series:
-      # GPU 0 split into two MIG instances: profiling metrics are per instance.
-      - series: 'DCGM_FI_PROF_SM_ACTIVE{hostname="eu1-fin-gpu-01", gpu="0", UUID="GPU-h200-0", modelName="NVIDIA H200", GPU_I_ID="1", GPU_I_PROFILE="3g.71gb"}'
-        values: '0.5x5'
-      - series: 'DCGM_FI_PROF_SM_ACTIVE{hostname="eu1-fin-gpu-01", gpu="0", UUID="GPU-h200-0", modelName="NVIDIA H200", GPU_I_ID="2", GPU_I_PROFILE="3g.71gb"}'
-        values: '0.4x5'
-      - series: 'DCGM_FI_DEV_GPU_TEMP{hostname="eu1-fin-gpu-01", gpu="0", UUID="GPU-h200-0", modelName="NVIDIA H200"}'
-        values: '40x5'
+      # GPU 0 split into two MIG instances. On the H200 (mig-labels capture,
+      # 22 October) per-instance series carried GPU_I_ID and GPU_I_PROFILE,
+      # and 11 series of the split GPU carried neither. That capture didn't
+      # record which metrics those 11 were; DCGM_EXP_GPU_HEALTH_STATUS stands
+      # in for one of them, because each GPU had 11 health series.
+      - series: 'DCGM_FI_DEV_FB_USED{hostname="eu1-fin-gpu-01", gpu="0", UUID="GPU-h200-0", modelName="NVIDIA H200", GPU_I_ID="1", GPU_I_PROFILE="MIG 3g.71gb", GPU_CI_ID="0"}'
+        values: '43x5'
+      - series: 'DCGM_FI_DEV_FB_USED{hostname="eu1-fin-gpu-01", gpu="0", UUID="GPU-h200-0", modelName="NVIDIA H200", GPU_I_ID="2", GPU_I_PROFILE="MIG 3g.71gb", GPU_CI_ID="0"}'
+        values: '43x5'
+      - series: 'DCGM_FI_DEV_FB_FREE{hostname="eu1-fin-gpu-01", gpu="0", UUID="GPU-h200-0", modelName="NVIDIA H200", GPU_I_ID="2", GPU_I_PROFILE="MIG 3g.71gb", GPU_CI_ID="0"}'
+        values: '70000x5'
+      - series: 'DCGM_EXP_GPU_HEALTH_STATUS{hostname="eu1-fin-gpu-01", gpu="0", UUID="GPU-h200-0", modelName="NVIDIA H200"}'
+        values: '0x5'
       # GPU 1 whole.
-      - series: 'DCGM_FI_PROF_SM_ACTIVE{hostname="eu1-fin-gpu-01", gpu="1", UUID="GPU-h200-1", modelName="NVIDIA H200"}'
-        values: '0.9x5'
+      - series: 'DCGM_FI_DEV_FB_USED{hostname="eu1-fin-gpu-01", gpu="1", UUID="GPU-h200-1", modelName="NVIDIA H200"}'
+        values: '0x5'
       - series: 'DCGM_FI_DEV_GPU_TEMP{hostname="eu1-fin-gpu-01", gpu="1", UUID="GPU-h200-1", modelName="NVIDIA H200"}'
         values: '45x5'
     promql_expr_test:
@@ -62,8 +68,19 @@ tests:
         eval_time: 2m
         exp_samples:
           - labels: 'gpu:dcgm_series:count{hostname="eu1-fin-gpu-01", gpu="0", UUID="GPU-h200-0", modelName="NVIDIA H200"}'
-            value: 3
+            value: 4
           - labels: 'gpu:dcgm_series:count{hostname="eu1-fin-gpu-01", gpu="1", UUID="GPU-h200-1", modelName="NVIDIA H200"}'
+            value: 2
+      - expr: gpu:dcgm_series_by_instance:count
+        eval_time: 2m
+        exp_samples:
+          - labels: 'gpu:dcgm_series_by_instance:count{hostname="eu1-fin-gpu-01", gpu="0", UUID="GPU-h200-0", modelName="NVIDIA H200"}'
+            value: 1
+          - labels: 'gpu:dcgm_series_by_instance:count{hostname="eu1-fin-gpu-01", gpu="0", UUID="GPU-h200-0", modelName="NVIDIA H200", GPU_I_ID="1", GPU_I_PROFILE="MIG 3g.71gb"}'
+            value: 1
+          - labels: 'gpu:dcgm_series_by_instance:count{hostname="eu1-fin-gpu-01", gpu="0", UUID="GPU-h200-0", modelName="NVIDIA H200", GPU_I_ID="2", GPU_I_PROFILE="MIG 3g.71gb"}'
+            value: 2
+          - labels: 'gpu:dcgm_series_by_instance:count{hostname="eu1-fin-gpu-01", gpu="1", UUID="GPU-h200-1", modelName="NVIDIA H200"}'
             value: 2
 
   - name: an exporter restart doubles the series while both pods are scraped
@@ -133,3 +150,133 @@ tests:
             value: 33
           - labels: '{site="fin", modelName="NVIDIA H200"}'
             value: 35
+
+  ##########################################################################
+  # MIG. DCGM_FI_DEV_GPU_UTIL is not reported for MIG instances, and every
+  # instance has series of its own, so the panels that read GPU_UTIL or
+  # count series saw one H200 where there were two.
+  ##########################################################################
+  - name: the dashboard's GPU count, framebuffer and per-instance rule, on the three FB_USED series recorded on the H200
+    # Copied label for label from docs/artifacts/platform/
+    # thanos-fin-mig-labels-20261022T102301Z.txt, read on the Finland
+    # Prometheus at 10:23:01 UTC, five minutes after the MIG split. Values as
+    # recorded: 0 MiB on the whole GPU, 43 MiB on each instance. site="fin"
+    # is added because Thanos adds it from the Finland external labels.
+    interval: 1m
+    input_series:
+      - series: 'DCGM_FI_DEV_FB_USED{site="fin", DCGM_FI_DRIVER_VERSION="580.178.04", UUID="GPU-0557d559-558e-dfb1-ed86-7d0138f9982d", container="nvidia-dcgm-exporter", device="nvidia1", endpoint="gpu-metrics", gpu="1", hostname="eu1-fin-gpu-01", instance="10.244.1.25:9400", job="nvidia-dcgm-exporter", modelName="NVIDIA H200", namespace="gpu-operator", pci_bus_id="00000000:06:00.0", pod="nvidia-dcgm-exporter-82mpj", service="nvidia-dcgm-exporter"}'
+        values: '0x3'
+      - series: 'DCGM_FI_DEV_FB_USED{site="fin", DCGM_FI_DRIVER_VERSION="580.178.04", GPU_CI_ID="0", GPU_I_ID="1", GPU_I_PROFILE="MIG 3g.71gb", UUID="GPU-4d345e6c-2a90-57e7-e5c7-3ffdb67e061d", container="nvidia-dcgm-exporter", device="nvidia0", endpoint="gpu-metrics", exported_container="probe", exported_namespace="team-b", exported_pod="mig-b", gpu="0", hostname="eu1-fin-gpu-01", instance="10.244.1.25:9400", job="nvidia-dcgm-exporter", modelName="NVIDIA H200", namespace="gpu-operator", pci_bus_id="00000000:05:00.0", pod="nvidia-dcgm-exporter-82mpj", service="nvidia-dcgm-exporter"}'
+        values: '43x3'
+      - series: 'DCGM_FI_DEV_FB_USED{site="fin", DCGM_FI_DRIVER_VERSION="580.178.04", GPU_CI_ID="0", GPU_I_ID="2", GPU_I_PROFILE="MIG 3g.71gb", UUID="GPU-4d345e6c-2a90-57e7-e5c7-3ffdb67e061d", container="nvidia-dcgm-exporter", device="nvidia0", endpoint="gpu-metrics", exported_container="probe", exported_namespace="team-a", exported_pod="mig-a", gpu="0", hostname="eu1-fin-gpu-01", instance="10.244.1.25:9400", job="nvidia-dcgm-exporter", modelName="NVIDIA H200", namespace="gpu-operator", pci_bus_id="00000000:05:00.0", pod="nvidia-dcgm-exporter-82mpj", service="nvidia-dcgm-exporter"}'
+        values: '43x3'
+    promql_expr_test:
+      # GPUs per site: 2, where counting GPU_UTIL gave 1.
+      - expr: count by (site, modelName) (max by (site, modelName, hostname, gpu) (last_over_time(DCGM_FI_DEV_FB_USED{site=~"par|fin"}[3h])))
+        eval_time: 2m
+        exp_samples:
+          - labels: '{site="fin", modelName="NVIDIA H200"}'
+            value: 2
+      - expr: sum by (site, modelName, hostname, gpu) (max by (site, modelName, hostname, gpu, GPU_I_ID) (DCGM_FI_DEV_FB_USED{site=~"par|fin"}))
+        eval_time: 2m
+        exp_samples:
+          - labels: '{site="fin", modelName="NVIDIA H200", hostname="eu1-fin-gpu-01", gpu="0"}'
+            value: 86
+          - labels: '{site="fin", modelName="NVIDIA H200", hostname="eu1-fin-gpu-01", gpu="1"}'
+            value: 0
+      # The per-instance rule on these series alone: one row for the whole
+      # GPU, one per instance. The rule keeps only the labels it groups by,
+      # so site is dropped here; on the Finland Prometheus it's added on the
+      # way out, as an external label.
+      - expr: gpu:dcgm_series_by_instance:count
+        eval_time: 2m
+        exp_samples:
+          - labels: 'gpu:dcgm_series_by_instance:count{hostname="eu1-fin-gpu-01", gpu="1", UUID="GPU-0557d559-558e-dfb1-ed86-7d0138f9982d", modelName="NVIDIA H200"}'
+            value: 1
+          - labels: 'gpu:dcgm_series_by_instance:count{hostname="eu1-fin-gpu-01", gpu="0", UUID="GPU-4d345e6c-2a90-57e7-e5c7-3ffdb67e061d", modelName="NVIDIA H200", GPU_I_ID="1", GPU_I_PROFILE="MIG 3g.71gb"}'
+            value: 1
+          - labels: 'gpu:dcgm_series_by_instance:count{hostname="eu1-fin-gpu-01", gpu="0", UUID="GPU-4d345e6c-2a90-57e7-e5c7-3ffdb67e061d", modelName="NVIDIA H200", GPU_I_ID="2", GPU_I_PROFILE="MIG 3g.71gb"}'
+            value: 1
+
+  - name: the utilisation panel's MIG query draws one line per instance, and none for a whole GPU
+    # NOT RECORDED: no capture shows DCGM_FI_PROF_GR_ENGINE_ACTIVE with
+    # GPU_I_ID. The mig-labels capture counted 20 DCGM metrics per MIG
+    # instance but lost their names, so whether this field is one of them
+    # is unknown. The label sets below are the recorded FB_USED ones (same
+    # exporter pod, same instances) with the metric name changed, and the
+    # values are made up. This tests the query's shape, not that the field
+    # exists; `AT=2026-10-22T10:23:00Z make thanos-capture MODE=fin` answers
+    # that from the stored data.
+    interval: 1m
+    input_series:
+      - series: 'DCGM_FI_PROF_GR_ENGINE_ACTIVE{site="fin", DCGM_FI_DRIVER_VERSION="580.178.04", GPU_CI_ID="0", GPU_I_ID="1", GPU_I_PROFILE="MIG 3g.71gb", UUID="GPU-4d345e6c-2a90-57e7-e5c7-3ffdb67e061d", container="nvidia-dcgm-exporter", device="nvidia0", endpoint="gpu-metrics", exported_container="probe", exported_namespace="team-b", exported_pod="mig-b", gpu="0", hostname="eu1-fin-gpu-01", instance="10.244.1.25:9400", job="nvidia-dcgm-exporter", modelName="NVIDIA H200", namespace="gpu-operator", pci_bus_id="00000000:05:00.0", pod="nvidia-dcgm-exporter-82mpj", service="nvidia-dcgm-exporter"}'
+        values: '0.25x3'
+      - series: 'DCGM_FI_PROF_GR_ENGINE_ACTIVE{site="fin", DCGM_FI_DRIVER_VERSION="580.178.04", GPU_CI_ID="0", GPU_I_ID="2", GPU_I_PROFILE="MIG 3g.71gb", UUID="GPU-4d345e6c-2a90-57e7-e5c7-3ffdb67e061d", container="nvidia-dcgm-exporter", device="nvidia0", endpoint="gpu-metrics", exported_container="probe", exported_namespace="team-a", exported_pod="mig-a", gpu="0", hostname="eu1-fin-gpu-01", instance="10.244.1.25:9400", job="nvidia-dcgm-exporter", modelName="NVIDIA H200", namespace="gpu-operator", pci_bus_id="00000000:05:00.0", pod="nvidia-dcgm-exporter-82mpj", service="nvidia-dcgm-exporter"}'
+        values: '0.5x3'
+      # The whole GPU is drawn by the GPU_UTIL query, not this one.
+      - series: 'DCGM_FI_PROF_GR_ENGINE_ACTIVE{site="fin", DCGM_FI_DRIVER_VERSION="580.178.04", UUID="GPU-0557d559-558e-dfb1-ed86-7d0138f9982d", container="nvidia-dcgm-exporter", device="nvidia1", endpoint="gpu-metrics", gpu="1", hostname="eu1-fin-gpu-01", instance="10.244.1.25:9400", job="nvidia-dcgm-exporter", modelName="NVIDIA H200", namespace="gpu-operator", pci_bus_id="00000000:06:00.0", pod="nvidia-dcgm-exporter-82mpj", service="nvidia-dcgm-exporter"}'
+        values: '0.9x3'
+    promql_expr_test:
+      - expr: 100 * max by (site, modelName, hostname, gpu, GPU_I_ID, GPU_I_PROFILE) (DCGM_FI_PROF_GR_ENGINE_ACTIVE{site=~"par|fin", GPU_I_ID!=""})
+        eval_time: 2m
+        exp_samples:
+          - labels: '{site="fin", modelName="NVIDIA H200", hostname="eu1-fin-gpu-01", gpu="0", GPU_I_ID="1", GPU_I_PROFILE="MIG 3g.71gb"}'
+            value: 25
+          - labels: '{site="fin", modelName="NVIDIA H200", hostname="eu1-fin-gpu-01", gpu="0", GPU_I_ID="2", GPU_I_PROFILE="MIG 3g.71gb"}'
+            value: 50
+
+  - name: the framebuffer panel adds a split GPU's instances, and doesn't double a GPU through an exporter restart
+    interval: 1m
+    input_series:
+      - series: 'DCGM_FI_DEV_FB_USED{site="fin", hostname="eu1-fin-gpu-01", gpu="0", UUID="GPU-h200-0", modelName="NVIDIA H200", GPU_I_ID="1", GPU_I_PROFILE="MIG 3g.71gb", pod="nvidia-dcgm-exporter-x"}'
+        values: '43x3'
+      - series: 'DCGM_FI_DEV_FB_USED{site="fin", hostname="eu1-fin-gpu-01", gpu="0", UUID="GPU-h200-0", modelName="NVIDIA H200", GPU_I_ID="2", GPU_I_PROFILE="MIG 3g.71gb", pod="nvidia-dcgm-exporter-x"}'
+        values: '43x3'
+      # GPU 1 whole, scraped from two exporter pods during a restart.
+      - series: 'DCGM_FI_DEV_FB_USED{site="fin", hostname="eu1-fin-gpu-01", gpu="1", UUID="GPU-h200-1", modelName="NVIDIA H200", pod="nvidia-dcgm-exporter-x"}'
+        values: '100x3'
+      - series: 'DCGM_FI_DEV_FB_USED{site="fin", hostname="eu1-fin-gpu-01", gpu="1", UUID="GPU-h200-1", modelName="NVIDIA H200", pod="nvidia-dcgm-exporter-y"}'
+        values: '100x3'
+    promql_expr_test:
+      - expr: sum by (site, modelName, hostname, gpu) (max by (site, modelName, hostname, gpu, GPU_I_ID) (DCGM_FI_DEV_FB_USED{site=~"par|fin"}))
+        eval_time: 2m
+        exp_samples:
+          - labels: '{site="fin", modelName="NVIDIA H200", hostname="eu1-fin-gpu-01", gpu="0"}'
+            value: 86
+          - labels: '{site="fin", modelName="NVIDIA H200", hostname="eu1-fin-gpu-01", gpu="1"}'
+            value: 100
+
+  - name: the GPUs-per-site count stays at 2 through exporter restarts, tenant pods and a MIG split
+    # Counting series instead (count by (site, modelName) of last_over_time)
+    # read 13 for these 2 GPUs after the Finland site was deleted: every
+    # exporter pod and every tenant pod on a GPU leaves series of its own.
+    interval: 1m
+    input_series:
+      # GPU 1, whole: one exporter pod, then another.
+      - series: 'DCGM_FI_DEV_FB_USED{site="fin", hostname="eu1-fin-gpu-01", gpu="1", UUID="GPU-h200-1", modelName="NVIDIA H200", pod="nvidia-dcgm-exporter-x"}'
+        values: '0 0 0 stale'
+      - series: 'DCGM_FI_DEV_FB_USED{site="fin", hostname="eu1-fin-gpu-01", gpu="1", UUID="GPU-h200-1", modelName="NVIDIA H200", pod="nvidia-dcgm-exporter-y"}'
+        values: '_ _ _ 0 0 0'
+      # GPU 0: whole first, then split, each instance with its tenant pod.
+      - series: 'DCGM_FI_DEV_FB_USED{site="fin", hostname="eu1-fin-gpu-01", gpu="0", UUID="GPU-h200-0", modelName="NVIDIA H200", pod="nvidia-dcgm-exporter-x"}'
+        values: '0 0 0 stale'
+      - series: 'DCGM_FI_DEV_FB_USED{site="fin", hostname="eu1-fin-gpu-01", gpu="0", UUID="GPU-h200-0", modelName="NVIDIA H200", GPU_I_ID="1", GPU_I_PROFILE="MIG 3g.71gb", pod="nvidia-dcgm-exporter-y", exported_pod="mig-b"}'
+        values: '_ _ _ 43 43 43'
+      - series: 'DCGM_FI_DEV_FB_USED{site="fin", hostname="eu1-fin-gpu-01", gpu="0", UUID="GPU-h200-0", modelName="NVIDIA H200", GPU_I_ID="2", GPU_I_PROFILE="MIG 3g.71gb", pod="nvidia-dcgm-exporter-y", exported_pod="mig-a"}'
+        values: '_ _ _ 43 43 43'
+      - series: 'DCGM_FI_DEV_FB_USED{site="par", hostname="eu1-par-gpu-01", gpu="0", UUID="GPU-l4", modelName="NVIDIA L4", pod="nvidia-dcgm-exporter-a"}'
+        values: '0x5'
+    promql_expr_test:
+      - expr: count by (site, modelName) (max by (site, modelName, hostname, gpu) (last_over_time(DCGM_FI_DEV_FB_USED{site=~"par|fin"}[3h])))
+        eval_time: 5m
+        exp_samples:
+          - labels: '{site="fin", modelName="NVIDIA H200"}'
+            value: 2
+          - labels: '{site="par", modelName="NVIDIA L4"}'
+            value: 1
+      # The series count the old query made, kept as the reason for the change.
+      - expr: count by (site, modelName) (last_over_time(DCGM_FI_DEV_FB_USED{site="fin"}[3h]))
+        eval_time: 5m
+        exp_samples:
+          - labels: '{site="fin", modelName="NVIDIA H200"}'
+            value: 5
