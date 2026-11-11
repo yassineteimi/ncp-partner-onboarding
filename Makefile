@@ -84,9 +84,9 @@ cost:          ## What every billed node session has cost so far, on both sites
 # Free checks
 ########################################
 
-lint:          ## Fail if an em dash has crept into a tracked file
+lint:          ## Fail if an em dash has crept into a tracked file (vendored upstream CRDs excepted)
 	@dash=$$(printf '\xe2\x80\x94'); \
-	if git ls-files -z | xargs -0 grep -n -I "$$dash" --; then \
+	if git ls-files -z -- . ':!gitops/manifests/inference/dynamo-crds' | xargs -0 grep -n -I "$$dash" --; then \
 	  echo "em dash found, see above"; exit 1; \
 	fi
 	@echo "no em dashes"
