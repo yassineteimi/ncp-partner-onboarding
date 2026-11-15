@@ -4,3 +4,13 @@ prometheus:
   prometheusSpec:
     externalLabels:
       site: par
+
+# Admin credentials from a Secret written once in the cluster
+# (gitops/manifests/base/objstore-credentials/grafana-admin.yaml). Without
+# this, the chart's random password changes checksum/secret on every render
+# and every sync rolls a new Grafana pod.
+grafana:
+  admin:
+    existingSecret: grafana-admin
+    userKey: admin-user
+    passwordKey: admin-password

@@ -12,7 +12,9 @@ require_tools kubectl
 require_kubeconfig
 
 NS="monitoring"
-SECRET="kube-prometheus-stack-grafana"
+# grafana-admin is written once in the cluster; older clusters still have the chart's own.
+SECRET="grafana-admin"
+kubectl_cp -n "$NS" get secret "$SECRET" >/dev/null 2>&1 || SECRET="kube-prometheus-stack-grafana"
 PORT="${GRAFANA_LOCAL_PORT:-3000}"
 
 user="$(kubectl_cp -n "$NS" get secret "$SECRET" -o go-template='{{index .data "admin-user" | base64decode}}' 2>/dev/null || true)"

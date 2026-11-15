@@ -1,0 +1,75 @@
+# Grafana's admin credentials, written once in the cluster, never in Git.
+#
+# kube-prometheus-stack's Grafana generates a random admin password on every
+# render when it owns the Secret. Its checksum/secret annotation then changes
+# on every ArgoCD sync, and each sync rolls a new, cold Grafana pod on par's
+# control plane (findings). With grafana.admin.existingSecret pointing here,
+# the chart renders no Secret and no changing checksum.
+#
+# On a cluster where the chart already made one, the Job adopts its user and
+# password, so the login doesn't change. Same Application and wave as the
+# object-store credentials: written before kube-prometheus-stack (wave 0).
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: grafana-admin
+  namespace: monitoring
+  annotations:
+    argocd.argoproj.io/sync-wave: "-2"
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    resourceNames: ["grafana-admin", "kube-prometheus-stack-grafana"]
+    verbs: ["get"]
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: grafana-admin
+  namespace: monitoring
+  annotations:
+    argocd.argoproj.io/sync-wave: "-2"
+roleRef: {apiGroup: rbac.authorization.k8s.io, kind: Role, name: grafana-admin}
+subjects: [{kind: ServiceAccount, name: objstore-credentials, namespace: thanos}]
+---
+# A Sync hook, like the object-store Job: it checks before it writes.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: grafana-admin
+  namespace: thanos
+  annotations:
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+spec:
+  backoffLimit: 3
+  template:
+    spec:
+      serviceAccountName: objstore-credentials
+      restartPolicy: Never
+      nodeSelector:
+        node-role.kubernetes.io/control-plane: ""
+      containers:
+        - name: credentials
+          image: alpine/k8s:1.36.5@sha256:094adf64cdc4827377cdbe7ea5747472ce115f9fbc64a4e35970ec66777f9a00
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -eu
+              if kubectl -n monitoring get secret grafana-admin >/dev/null 2>&1; then
+                echo "grafana-admin exists, keeping it"; exit 0
+              fi
+              get() { kubectl -n monitoring get secret kube-prometheus-stack-grafana -o jsonpath="{.data.$1}" 2>/dev/null | base64 -d || true; }
+              user="$(get admin-user)"; pass="$(get admin-password)"
+              if [ -n "$pass" ]; then
+                echo "adopting the chart's admin credentials"
+              else
+                user=admin; pass="$(head -c 24 /dev/urandom | od -An -tx1 | tr -d ' \n')"
+                echo "generated new admin credentials"
+              fi
+              kubectl -n monitoring create secret generic grafana-admin \
+                --from-literal=admin-user="${user:-admin}" --from-literal=admin-password="$pass"
+              echo "grafana-admin created"
