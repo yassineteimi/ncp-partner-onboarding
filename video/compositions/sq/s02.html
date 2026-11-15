@@ -1,0 +1,96 @@
+<!doctype html>
+<!-- Generated from compositions/s02-partner.html by scripts/make-square.py. Edit the master, not this file. -->
+<html>
+  <head>
+    <meta charset="UTF-8" />
+  </head>
+  <body>
+    <template>
+      <style>
+        #s02-root {
+          position: absolute;
+          inset: 0;
+        }
+        #s02-name {
+          position: absolute;
+          left: 120px;
+          bottom: 250px;
+          font-weight: 900;
+          font-size: 150px;
+          line-height: 1;
+          letter-spacing: -0.045em;
+        }
+        #s02-sub {
+          position: absolute;
+          left: 124px;
+          bottom: 180px;
+        }
+        #s02-sites {
+          position: absolute;
+          right: 120px;
+          top: 300px;
+          display: flex;
+          flex-direction: column;
+          gap: 28px;
+          width: 620px;
+        }
+        .s02-site {
+          padding: 28px 32px;
+        }
+        .s02-site .city {
+          font-weight: 900;
+          font-size: 48px;
+          letter-spacing: -0.02em;
+        }
+        .s02-site .role {
+          margin-top: 6px;
+          font-weight: 700;
+          font-size: 30px;
+          color: var(--muted);
+        }
+        .s02-site .hw {
+          margin-top: 14px;
+          font-family: var(--mono);
+          font-size: 28px;
+          color: var(--green);
+        }
+        /* square layout (scripts/make-square.py) */
+        #s02-root #s02-name { left: 64px; bottom: 580px; font-size: 130px; }
+        #s02-root #s02-sub { left: 68px; bottom: 520px; }
+        #s02-root #s02-sites { right: auto; left: 64px; top: auto; bottom: 236px; width: 952px; flex-direction: row; gap: 20px; }
+        #s02-root .s02-site { flex: 1 1 0; padding: 22px 24px; }
+        #s02-root .s02-site .city { font-size: 42px; }
+        #s02-root .s02-site .role { font-size: 28px; }
+      </style>
+      <div id="s02-root" data-composition-id="s02" data-width="1080" data-height="1080">
+        <div class="stage" id="s02-stage">
+          <div id="s02-name">Nordhaven</div>
+          <div id="s02-sub" class="second">a fictional NVIDIA Cloud Partner</div>
+          <div id="s02-sites">
+            <div class="s02-site glass" id="s02-par">
+              <div class="city">Paris</div>
+              <div class="role">inference and development</div>
+              <div class="hw">NVIDIA L4 · Scaleway</div>
+            </div>
+            <div class="s02-site glass" id="s02-fin">
+              <div class="city">Finland</div>
+              <div class="role">training</div>
+              <div class="hw">2× H200 SXM5, NVLink · Verda</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <script>
+        (function () {
+          const tl = gsap.timeline({ paused: true });
+          HF.rise(tl, "#s02-name", 0.5, { y: 40 });
+          HF.rise(tl, "#s02-sub", 2.0);
+          HF.rise(tl, "#s02-par", 5.2, { y: 24 });
+          HF.rise(tl, "#s02-fin", 6.8, { y: 24 });
+          HF.exit(tl, "#s02-stage", 8.7);
+          window.__timelines["s02"] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>

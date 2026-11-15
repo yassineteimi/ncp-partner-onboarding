@@ -1,0 +1,121 @@
+<!doctype html>
+<!-- Generated from compositions/s06-day1.html by scripts/make-square.py. Edit the master, not this file. -->
+<html>
+  <head>
+    <meta charset="UTF-8" />
+  </head>
+  <body>
+    <template>
+      <style>
+        #s06-root {
+          position: absolute;
+          inset: 0;
+        }
+        #s06-kicker {
+          color: var(--green);
+        }
+        .s06-block {
+          position: absolute;
+          left: 120px;
+          width: 1000px;
+        }
+        .s06-block .name {
+          font-weight: 900;
+          font-size: 84px;
+          line-height: 1;
+          letter-spacing: -0.035em;
+        }
+        .s06-block .what {
+          margin-top: 10px;
+          font-weight: 700;
+          font-size: 40px;
+          color: var(--muted);
+        }
+        #s06-aicr {
+          top: 220px;
+        }
+        #s06-pins {
+          margin-top: 22px;
+          display: flex;
+          gap: 18px;
+          font-family: var(--mono);
+          font-size: 28px;
+        }
+        #s06-pins span {
+          padding: 8px 14px;
+          border-radius: 10px;
+          background: rgba(255, 255, 255, 0.07);
+          color: var(--fg);
+        }
+        #s06-nvcre {
+          top: 560px;
+        }
+        #s06-gate {
+          margin-top: 26px;
+          display: flex;
+          align-items: center;
+          gap: 18px;
+          font-family: var(--mono);
+          font-weight: 700;
+          font-size: 28px;
+        }
+        #s06-gate .step {
+          padding: 12px 18px;
+          border-radius: 12px;
+          border: 2px solid rgba(255, 255, 255, 0.25);
+          color: var(--muted);
+        }
+        #s06-gate .arrow {
+          color: var(--faint);
+        }
+        #s06-tag {
+          margin-top: 26px;
+        }
+        /* square layout (scripts/make-square.py) */
+        #s06-root .s06-block { left: 64px; width: 952px; }
+        #s06-root .s06-block .name { font-size: 72px; }
+        #s06-root #s06-aicr { top: 150px; }
+        #s06-root #s06-pins { flex-wrap: wrap; gap: 12px; }
+        #s06-root #s06-nvcre { top: 470px; }
+        #s06-root #s06-gate { flex-wrap: wrap; gap: 12px; }
+      </style>
+      <div id="s06-root" data-composition-id="s06" data-width="1080" data-height="1080">
+        <div class="stage" id="s06-stage">
+          <div class="kicker" id="s06-kicker"><i class="dot"></i>Day 1 · before any tenant</div>
+          <div class="s06-block" id="s06-aicr">
+            <div class="name">AICR</div>
+            <div class="what">pins the versions that go together</div>
+            <div id="s06-pins">
+              <span>Kubernetes 1.36</span><span>GPU Operator v26.7.2</span><span>driver 580.178.04</span>
+            </div>
+          </div>
+          <div class="s06-block" id="s06-nvcre">
+            <div class="name">NVCRE</div>
+            <div class="what">certifies each node, then lets it in</div>
+            <div id="s06-gate">
+              <span class="step" id="s06-g1">staging taint</span><span class="arrow">→</span>
+              <span class="step" id="s06-g2">certified</span><span class="arrow">→</span>
+              <span class="step" id="s06-g3">promoted</span>
+            </div>
+            <div id="s06-tag"><span class="tag ran">Ran it · Finland H200, 22 Oct</span></div>
+          </div>
+        </div>
+      </div>
+      <script>
+        (function () {
+          const tl = gsap.timeline({ paused: true });
+          HF.rise(tl, "#s06-kicker", 0.6, { y: 16 });
+          HF.rise(tl, "#s06-aicr", 0.6);
+          HF.rise(tl, "#s06-pins span", 2.4, { y: 12, stagger: 0.15 });
+          HF.rise(tl, "#s06-nvcre", 4.5);
+          tl.to("#s06-g1", { borderColor: "#f6b26b", color: "#f6b26b", duration: 0.3 }, 5.6);
+          tl.to("#s06-g2", { borderColor: "#76b900", color: "#f2f5ee", duration: 0.3 }, 6.6);
+          tl.to("#s06-g3", { borderColor: "#76b900", color: "#f2f5ee", backgroundColor: "rgba(118,185,0,0.22)", duration: 0.3 }, 8.4);
+          HF.rise(tl, "#s06-tag", 8.6, { y: 12 });
+          HF.exit(tl, "#s06-stage", 10.5);
+          window.__timelines["s06"] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>

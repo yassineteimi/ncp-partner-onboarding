@@ -1,0 +1,71 @@
+{
+ "text": "Between handover and the first tenant, every partner asks the same four questions.",
+ "duration": 6.896326530612245,
+ "words": [
+  {
+   "end": 0.56,
+   "start": 0.18,
+   "word": "Between"
+  },
+  {
+   "end": 1.22,
+   "start": 0.62,
+   "word": "handover"
+  },
+  {
+   "end": 1.7,
+   "start": 1.58,
+   "word": "and"
+  },
+  {
+   "end": 1.84,
+   "start": 1.74,
+   "word": "the"
+  },
+  {
+   "end": 2.1,
+   "start": 1.92,
+   "word": "first"
+  },
+  {
+   "end": 2.6,
+   "start": 2.2,
+   "word": "tenant,"
+  },
+  {
+   "end": 3.44,
+   "start": 3.22,
+   "word": "every"
+  },
+  {
+   "end": 3.94,
+   "start": 3.58,
+   "word": "partner"
+  },
+  {
+   "end": 4.74,
+   "start": 4.42,
+   "word": "asks"
+  },
+  {
+   "end": 5.06,
+   "start": 4.94,
+   "word": "the"
+  },
+  {
+   "end": 5.46,
+   "start": 5.18,
+   "word": "same"
+  },
+  {
+   "end": 5.82,
+   "start": 5.64,
+   "word": "four"
+  },
+  {
+   "end": 6.48,
+   "start": 5.96,
+   "word": "questions."
+  }
+ ]
+}

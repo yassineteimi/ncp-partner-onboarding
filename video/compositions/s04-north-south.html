@@ -1,0 +1,130 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+  </head>
+  <body>
+    <template>
+      <style>
+        #s04-root {
+          position: absolute;
+          inset: 0;
+        }
+        #s04-kicker {
+          color: var(--blue);
+        }
+        #s04-st {
+          width: 820px;
+        }
+        #s04-st .out {
+          color: var(--blue);
+        }
+        /* Dynamo's serving path, as designed: one request travels top to bottom. */
+        #s04-card {
+          position: absolute;
+          right: 120px;
+          top: 150px;
+          width: 760px;
+          padding: 34px 40px 36px;
+        }
+        #s04-card .title {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          font-weight: 900;
+          font-size: 44px;
+          letter-spacing: -0.02em;
+        }
+        #s04-path {
+          position: relative;
+          margin-top: 28px;
+          height: 510px;
+        }
+        .s04-box {
+          position: absolute;
+          left: 0;
+          width: 680px;
+          padding: 18px 26px;
+          border-radius: 16px;
+          border: 2px solid rgba(111, 168, 220, 0.7);
+          background: rgba(111, 168, 220, 0.1);
+        }
+        .s04-box .n {
+          font-weight: 900;
+          font-size: 34px;
+          letter-spacing: -0.01em;
+        }
+        .s04-box .d {
+          margin-top: 4px;
+          font-family: var(--mono);
+          font-size: 28px;
+          color: var(--muted);
+        }
+        #s04-req {
+          top: 0;
+          border-style: dashed;
+        }
+        #s04-router {
+          top: 110px;
+        }
+        #s04-pre {
+          top: 220px;
+          width: 320px;
+        }
+        #s04-dec {
+          top: 220px;
+          left: 360px;
+          width: 320px;
+        }
+        #s04-kv {
+          position: absolute;
+          top: 380px;
+          left: 0;
+          width: 680px;
+          text-align: center;
+          font-family: var(--mono);
+          font-weight: 700;
+          font-size: 28px;
+          color: var(--blue);
+        }
+        #s04-tag {
+          position: absolute;
+          left: 0;
+          top: 450px;
+        }
+      </style>
+      <div id="s04-root" data-composition-id="s04" data-width="1920" data-height="1080">
+        <div class="stage" id="s04-stage">
+          <div class="kicker" id="s04-kicker"><i class="dot"></i>North-south · inference</div>
+          <div class="statement" id="s04-st">Requests in. <span class="out">Tokens out.</span></div>
+          <div class="glass" id="s04-card">
+            <div class="title">NVIDIA Dynamo</div>
+            <div id="s04-path">
+              <div class="s04-box" id="s04-req"><div class="n">User request</div></div>
+              <div class="s04-box" id="s04-router"><div class="n">KV-aware router</div></div>
+              <div class="s04-box" id="s04-pre"><div class="n">Prefill</div><div class="d">reads the prompt</div></div>
+              <div class="s04-box" id="s04-dec"><div class="n">Decode</div><div class="d">writes tokens</div></div>
+              <div id="s04-kv">KV cache via NIXL →</div>
+              <span class="tag designed" id="s04-tag">Designed · running next</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <script>
+        (function () {
+          const tl = gsap.timeline({ paused: true });
+          HF.rise(tl, "#s04-kicker", 0.6, { y: 16 });
+          HF.rise(tl, "#s04-st", 3.6);
+          HF.rise(tl, "#s04-card", 4.6, { y: 30 });
+          HF.rise(tl, "#s04-req", 5.0, { y: 18 });
+          HF.rise(tl, "#s04-router", 5.6, { y: 18 });
+          HF.rise(tl, ["#s04-pre", "#s04-dec"], 6.4, { y: 18, stagger: 0.25 });
+          HF.rise(tl, "#s04-kv", 7.6, { y: 12 });
+          HF.rise(tl, "#s04-tag", 10.2, { y: 12 });
+          HF.exit(tl, "#s04-stage", 12.0);
+          window.__timelines["s04"] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>

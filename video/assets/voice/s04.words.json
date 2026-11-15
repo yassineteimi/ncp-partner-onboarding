@@ -1,0 +1,106 @@
+{
+ "text": "Inference runs north-south. Requests come in, tokens go out. I designed that layer with NVIDIA Dynamo, and it runs next.",
+ "duration": 11.415510204081633,
+ "words": [
+  {
+   "end": 0.76,
+   "start": 0.22,
+   "word": "Inference"
+  },
+  {
+   "end": 1.46,
+   "start": 1.12,
+   "word": "runs"
+  },
+  {
+   "end": 2.86,
+   "start": 1.82,
+   "word": "north-south."
+  },
+  {
+   "end": 3.74,
+   "start": 3.24,
+   "word": "Requests"
+  },
+  {
+   "end": 4.1,
+   "start": 3.94,
+   "word": "come"
+  },
+  {
+   "end": 4.34,
+   "start": 4.18,
+   "word": "in,"
+  },
+  {
+   "end": 5.22,
+   "start": 4.72,
+   "word": "tokens"
+  },
+  {
+   "end": 5.62,
+   "start": 5.5,
+   "word": "go"
+  },
+  {
+   "end": 5.96,
+   "start": 5.7,
+   "word": "out."
+  },
+  {
+   "end": 6.9,
+   "start": 6.84,
+   "word": "I"
+  },
+  {
+   "end": 7.32,
+   "start": 6.94,
+   "word": "designed"
+  },
+  {
+   "end": 7.5,
+   "start": 7.36,
+   "word": "that"
+  },
+  {
+   "end": 7.94,
+   "start": 7.56,
+   "word": "layer"
+  },
+  {
+   "end": 8.16,
+   "start": 8,
+   "word": "with"
+  },
+  {
+   "end": 8.64,
+   "start": 8.24,
+   "word": "NVIDIA"
+  },
+  {
+   "end": 9.16,
+   "start": 8.7,
+   "word": "Dynamo,"
+  },
+  {
+   "end": 9.78,
+   "start": 9.68,
+   "word": "and"
+  },
+  {
+   "end": 9.98,
+   "start": 9.84,
+   "word": "it"
+  },
+  {
+   "end": 10.38,
+   "start": 10.06,
+   "word": "runs"
+  },
+  {
+   "end": 11.12,
+   "start": 10.7,
+   "word": "next."
+  }
+ ]
+}

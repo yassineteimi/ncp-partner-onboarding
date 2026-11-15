@@ -1,0 +1,111 @@
+{
+ "text": "Inside, training and post-training run east-west, GPU to GPU. On the Finland node, I measured 351 gigabytes per second over NVLink.",
+ "duration": 12.591020408163265,
+ "words": [
+  {
+   "end": 0.8,
+   "start": 0.16,
+   "word": "Inside,"
+  },
+  {
+   "end": 1.68,
+   "start": 1.22,
+   "word": "training"
+  },
+  {
+   "end": 2,
+   "start": 1.86,
+   "word": "and"
+  },
+  {
+   "end": 2.82,
+   "start": 2.1,
+   "word": "post-training"
+  },
+  {
+   "end": 3.4,
+   "start": 3.16,
+   "word": "run"
+  },
+  {
+   "end": 4.24,
+   "start": 3.56,
+   "word": "east-west,"
+  },
+  {
+   "end": 5.3,
+   "start": 4.84,
+   "word": "GPU"
+  },
+  {
+   "end": 5.44,
+   "start": 5.38,
+   "word": "to"
+  },
+  {
+   "end": 5.98,
+   "start": 5.52,
+   "word": "GPU."
+  },
+  {
+   "end": 6.6,
+   "start": 6.54,
+   "word": "On"
+  },
+  {
+   "end": 6.68,
+   "start": 6.64,
+   "word": "the"
+  },
+  {
+   "end": 7.08,
+   "start": 6.8,
+   "word": "Finland"
+  },
+  {
+   "end": 7.46,
+   "start": 7.14,
+   "word": "node,"
+  },
+  {
+   "end": 8.08,
+   "start": 8.02,
+   "word": "I"
+  },
+  {
+   "end": 8.58,
+   "start": 8.14,
+   "word": "measured"
+  },
+  {
+   "end": 10.14,
+   "start": 8.88,
+   "word": "351"
+  },
+  {
+   "end": 10.66,
+   "start": 10.18,
+   "word": "gigabytes"
+  },
+  {
+   "end": 10.82,
+   "start": 10.74,
+   "word": "per"
+  },
+  {
+   "end": 11.34,
+   "start": 10.92,
+   "word": "second"
+  },
+  {
+   "end": 11.74,
+   "start": 11.52,
+   "word": "over"
+  },
+  {
+   "end": 12.34,
+   "start": 11.82,
+   "word": "NVLink."
+  }
+ ]
+}

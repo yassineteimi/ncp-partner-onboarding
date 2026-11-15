@@ -1,0 +1,131 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+  </head>
+  <body>
+    <template>
+      <style>
+        #s07-root {
+          position: absolute;
+          inset: 0;
+        }
+        #s07-kicker {
+          color: var(--red);
+        }
+        #s07-xid {
+          position: absolute;
+          left: 120px;
+          top: 170px;
+        }
+        #s07-race {
+          position: absolute;
+          left: 120px;
+          top: 300px;
+          width: 1400px;
+          display: flex;
+          flex-direction: column;
+          gap: 46px;
+        }
+        .s07-row .who {
+          font-weight: 700;
+          font-size: 38px;
+          color: var(--muted);
+        }
+        .s07-row .who b {
+          color: var(--fg);
+          font-weight: 900;
+        }
+        .s07-row .bar {
+          position: relative;
+          margin-top: 14px;
+          height: 30px;
+          border-radius: 8px;
+          background: rgba(255, 255, 255, 0.08);
+        }
+        .s07-row .fill {
+          position: absolute;
+          left: 0;
+          top: 0;
+          bottom: 0;
+          border-radius: 8px;
+          transform-origin: 0 50%;
+        }
+        #s07-f1 {
+          width: 1120px; /* 288.8 / 360.9 of the track */
+          background: var(--green);
+        }
+        #s07-f2 {
+          width: 1400px;
+          background: rgba(163, 171, 159, 0.6);
+        }
+        .s07-row .v {
+          margin-top: 12px;
+          font-weight: 900;
+          font-size: 92px;
+          line-height: 1;
+          letter-spacing: -0.04em;
+        }
+        .s07-row .v .u {
+          font-size: 48px;
+          color: var(--muted);
+        }
+        #s07-r1 .v .u {
+          color: var(--green);
+        }
+        #s07-foot {
+          position: absolute;
+          left: 120px;
+          bottom: 110px;
+          display: flex;
+          align-items: center;
+          gap: 30px;
+        }
+        #s07-foot .second {
+          color: var(--fg);
+        }
+        #s07-foot .second b {
+          color: var(--green);
+        }
+      </style>
+      <div id="s07-root" data-composition-id="s07" data-width="1920" data-height="1080">
+        <div class="stage" id="s07-stage">
+          <div class="kicker" id="s07-kicker"><i class="dot"></i>Day 2 · a GPU fails</div>
+          <span class="tag injected" id="s07-xid">XID 79 · injected fault</span>
+          <div id="s07-race">
+            <div class="s07-row" id="s07-r1">
+              <div class="who"><b>NVSentinel</b> · fault to training resumed, no human</div>
+              <div class="bar"><div class="fill" id="s07-f1"></div></div>
+              <div class="v num"><span id="s07-n1">0.0</span><span class="u"> s</span></div>
+            </div>
+            <div class="s07-row" id="s07-r2">
+              <div class="who"><b>My Part 1 controller</b> · one person to approve</div>
+              <div class="bar"><div class="fill" id="s07-f2"></div></div>
+              <div class="v num"><span id="s07-n2">0.0</span><span class="u"> s</span></div>
+            </div>
+          </div>
+          <div id="s07-foot">
+            <div class="second">Goodput <b>73.0%</b> vs 66.4%</div>
+            <span class="tag ran">Ran it · Paris L4, 21 Oct</span>
+          </div>
+        </div>
+      </div>
+      <script>
+        (function () {
+          const tl = gsap.timeline({ paused: true });
+          HF.rise(tl, "#s07-kicker", 0.6, { y: 16 });
+          HF.rise(tl, "#s07-xid", 1.2, { y: 12 });
+          HF.rise(tl, ["#s07-r1", "#s07-r2"], 2.0, { y: 24, stagger: 0.2 });
+          // Both clocks start together; NVSentinel's stops first. 1 s on screen = 100 s real.
+          tl.fromTo("#s07-f1", { scaleX: 0 }, { scaleX: 1, duration: 2.89, ease: "none" }, 4.3);
+          HF.count(tl, document.getElementById("s07-n1"), 0, 288.8, 4.3, 2.89, { decimals: 1, ease: "none" });
+          tl.fromTo("#s07-f2", { scaleX: 0 }, { scaleX: 1, duration: 3.61, ease: "none" }, 4.3);
+          HF.count(tl, document.getElementById("s07-n2"), 0, 360.9, 4.3, 3.61, { decimals: 1, ease: "none" });
+          HF.rise(tl, "#s07-foot", 8.6, { y: 18 });
+          HF.exit(tl, "#s07-stage", 12.7);
+          window.__timelines["s07"] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>

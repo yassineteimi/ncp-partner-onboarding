@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1080" />
+    <script src="assets/vendor/gsap.min.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        width: 1080px;
+        height: 1080px;
+        background: #0b0e0c;
+        overflow: hidden;
+      }
+      :root {
+        --bg: #0b0e0c;
+        --fg: #f2f5ee;
+        --muted: #a3ab9f;
+        --faint: #7d8679;
+        --green: #76b900;
+        --blue: #6fa8dc;
+        --orange: #f6b26b;
+        --purple: #b4a7d6;
+        --red: #ff6f61;
+        --glass: rgba(14, 18, 15, 0.66);
+        --edge: rgba(255, 255, 255, 0.1);
+        --sans: Inter, "Helvetica Neue", sans-serif;
+        --mono: "JetBrains Mono", monospace;
+      }
+      #root {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        font-family: var(--sans);
+        color: var(--fg);
+      }
+      #ground {
+        position: absolute;
+        inset: 0;
+        background: var(--bg);
+      }
+      [data-composition-id="main"] > div[data-composition-src] {
+        position: absolute;
+        inset: 0;
+      }
+
+      /* Footage plates: one per scene, each in an untimed wrapper the root timeline zooms. */
+      .plate {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+      }
+      .plate .cam {
+        position: absolute;
+        inset: 0;
+        will-change: transform;
+      }
+      .plate video {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      #scrim-left {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(11, 14, 12, 0.78) 0%, rgba(11, 14, 12, 0.4) 40%, rgba(11, 14, 12, 0.4) 62%, rgba(11, 14, 12, 0.88) 100%);
+      }
+            #scrim-full {
+        position: absolute;
+        inset: 0;
+        background: rgba(11, 14, 12, 0.78);
+        opacity: 0;
+      }
+
+      /* Shared scene vocabulary, used by every sub-composition. */
+      .stage {
+        position: absolute;
+        inset: 0;
+        will-change: transform, opacity, filter;
+      }
+      .kicker {
+        position: absolute;
+        left: 64px;
+        top: 64px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        font-family: var(--mono);
+        font-weight: 700;
+        font-size: 28px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--fg);
+      }
+      .kicker .dot {
+        display: block;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: currentColor;
+      }
+      .tag {
+        display: inline-block;
+        font-family: var(--mono);
+        font-weight: 700;
+        font-size: 28px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        padding: 8px 16px;
+        border-radius: 10px;
+        border: 2px solid currentColor;
+      }
+      .tag.ran {
+        color: var(--green);
+      }
+      .tag.designed {
+        color: var(--orange);
+        border-style: dashed;
+      }
+      .tag.injected {
+        color: var(--red);
+      }
+      .statement {
+        position: absolute;
+        left: 64px;
+        bottom: 250px;
+        width: 952px;
+        font-weight: 900;
+        font-size: 80px;
+        line-height: 1;
+        letter-spacing: -0.035em;
+        color: var(--fg);
+        text-wrap: balance;
+      }
+      .statement .w {
+        display: inline-block;
+      }
+      .second {
+        font-weight: 700;
+        font-size: 42px;
+        line-height: 1.12;
+        letter-spacing: -0.02em;
+        color: var(--muted);
+        text-wrap: balance;
+      }
+      .source {
+        font-family: var(--mono);
+        font-size: 28px;
+        letter-spacing: 0.01em;
+        color: var(--faint);
+      }
+      .glass {
+        background: var(--glass);
+        backdrop-filter: blur(28px) saturate(140%);
+        border: 2px solid var(--edge);
+        border-top-color: rgba(255, 255, 255, 0.2);
+        border-radius: 28px;
+        box-shadow:
+          0 30px 80px rgba(0, 0, 0, 0.45),
+          inset 0 1px 0 rgba(255, 255, 255, 0.06);
+      }
+      .num {
+        font-variant-numeric: tabular-nums;
+      }
+    </style>
+    <script>
+      // Motion helpers shared by every scene, carried over from Part 1's video:
+      // critically damped springs expressed as GSAP eases so they stay seekable.
+      (function () {
+        function critical(w) {
+          var end = 1 - (1 + w) * Math.exp(-w);
+          return function (t) {
+            if (t >= 1) return 1;
+            return (1 - (1 + w * t) * Math.exp(-w * t)) / end;
+          };
+        }
+        var smooth = critical(8);
+        window.HF = {
+          smooth: smooth,
+          enter: function (tl, target, at) {
+            tl.fromTo(
+              target,
+              { opacity: 0, scale: 1.03, filter: "blur(10px)" },
+              { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.55, ease: smooth },
+              at || 0,
+            );
+          },
+          exit: function (tl, target, at) {
+            tl.to(target, { opacity: 0, scale: 0.97, filter: "blur(10px)", duration: 0.4, ease: "power2.in" }, at);
+          },
+          rise: function (tl, target, at, o) {
+            o = o || {};
+            tl.fromTo(
+              target,
+              { opacity: 0, y: o.y || 28, filter: "blur(6px)" },
+              { opacity: 1, y: 0, filter: "blur(0px)", duration: o.duration || 0.55, ease: smooth, stagger: o.stagger || 0 },
+              at,
+            );
+          },
+          count: function (tl, el, from, to, at, dur, o) {
+            o = o || {};
+            var p = { v: from };
+            var d = o.decimals || 0;
+            var fmt = function (v) {
+              var s = v.toFixed(d);
+              if (o.group) s = Number(s).toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d });
+              return s + (o.suffix || "");
+            };
+            el.textContent = fmt(from);
+            tl.fromTo(
+              p,
+              { v: from },
+              { v: to, duration: dur, ease: o.ease || smooth, onUpdate: function () { el.textContent = fmt(p.v); } },
+              at,
+            );
+          },
+        };
+      })();
+    </script>
+  </head>
+  <!-- 1:1 LinkedIn cut. Scenes are generated from the master's by scripts/make-square.py;
+     captions by scripts/make-captions.py; timings by scripts/retime.py. -->
+<body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="92.4"
+      data-width="1080"
+      data-height="1080"
+    >
+      <div id="ground"></div>
+
+      <!-- Plates: the master's scene plates, centre-cropped to the square. -->
+      <div class="plate" id="p01"><div class="cam" data-layout-allow-overflow id="cam01"><video id="v01" class="clip" src="assets/plates/p01.mp4" muted data-start="0.0" data-duration="5.4" data-track-index="0" data-playback-rate="1"></video></div></div>
+      <div class="plate" id="p02"><div class="cam" data-layout-allow-overflow id="cam02"><video id="v02" class="clip" src="assets/plates/p02.mp4" muted data-start="5.4" data-duration="9.0" data-track-index="0" data-playback-rate="1"></video></div></div>
+      <div class="plate" id="p03"><div class="cam" data-layout-allow-overflow id="cam03"><video id="v03" class="clip" src="assets/plates/p03.mp4" muted data-start="14.4" data-duration="13.5" data-track-index="0" data-playback-rate="1"></video></div></div>
+      <div class="plate" id="p04"><div class="cam" data-layout-allow-overflow id="cam04"><video id="v04" class="clip" src="assets/plates/p04.mp4" muted data-start="27.9" data-duration="12.3" data-track-index="0" data-playback-rate="1"></video></div></div>
+      <div class="plate" id="p06"><div class="cam" data-layout-allow-overflow id="cam06"><video id="v06" class="clip" src="assets/plates/p06.mp4" muted data-start="40.2" data-duration="10.6" data-track-index="0" data-playback-rate="1"></video></div></div>
+      <div class="plate" id="p07"><div class="cam" data-layout-allow-overflow id="cam07"><video id="v07" class="clip" src="assets/plates/p07.mp4" muted data-start="50.8" data-duration="13.1" data-track-index="0" data-playback-rate="1"></video></div></div>
+      <div class="plate" id="p08"><div class="cam" data-layout-allow-overflow id="cam08"><video id="v08" class="clip" src="assets/plates/p08.mp4" muted data-start="63.9" data-duration="9.9" data-track-index="0" data-playback-rate="1"></video></div></div>
+      <div class="plate" id="p09"><div class="cam" data-layout-allow-overflow id="cam09"><video id="v09" class="clip" src="assets/plates/p09.mp4" muted data-start="73.8" data-duration="7.6" data-track-index="0" data-playback-rate="1"></video></div></div>
+      <div class="plate" id="p11"><div class="cam" data-layout-allow-overflow id="cam11"><video id="v11" class="clip" src="assets/plates/p11.mp4" muted data-start="81.4" data-duration="11.0" data-track-index="0" data-playback-rate="1"></video></div></div>
+
+      <!-- narration:start (scripts/retime.py) -->
+      <audio id="vo-s01" class="clip" src="assets/voice/s01.mp3" data-start="0.4" data-duration="4.49" data-volume="2.0" data-track-index="2"></audio>
+      <audio id="vo-s02" class="clip" src="assets/voice/s02.mp3" data-start="5.8" data-duration="8.12" data-volume="2.0" data-track-index="2"></audio>
+      <audio id="vo-s03" class="clip" src="assets/voice/s03.mp3" data-start="14.8" data-duration="12.59" data-volume="2.0" data-track-index="2"></audio>
+      <audio id="vo-s04" class="clip" src="assets/voice/s04.mp3" data-start="28.3" data-duration="11.42" data-volume="2.0" data-track-index="2"></audio>
+      <audio id="vo-s06" class="clip" src="assets/voice/s06.mp3" data-start="40.6" data-duration="9.01" data-volume="2.0" data-track-index="2"></audio>
+      <audio id="vo-s07" class="clip" src="assets/voice/s07.mp3" data-start="51.2" data-duration="12.15" data-volume="2.0" data-track-index="2"></audio>
+      <audio id="vo-s08" class="clip" src="assets/voice/s08.mp3" data-start="64.3" data-duration="8.99" data-volume="2.0" data-track-index="2"></audio>
+      <audio id="vo-s09" class="clip" src="assets/voice/s09.mp3" data-start="74.2" data-duration="5.17" data-volume="2.0" data-track-index="2"></audio>
+      <audio id="vo-s11" class="clip" src="assets/voice/s11.mp3" data-start="81.8" data-duration="7.26" data-volume="2.0" data-track-index="2"></audio>
+      <audio id="sfx-s02" class="clip" src="assets/sfx/whoosh.mp3" data-start="2.9" data-duration="5.54" data-volume="0.35" data-track-index="3"></audio>
+      <audio id="sfx-s03" class="clip" src="assets/sfx/whoosh.mp3" data-start="11.9" data-duration="5.54" data-volume="0.35" data-track-index="3"></audio>
+      <audio id="sfx-s11" class="clip" src="assets/sfx/whoosh.mp3" data-start="78.9" data-duration="5.54" data-volume="0.35" data-track-index="3"></audio>
+      <audio id="bed" class="clip" src="assets/music/bed.mp3" data-start="0" data-duration="92.4" data-volume="0.08" data-fade-out="2.5" data-track-index="4"></audio>
+      <!-- narration:end -->
+
+      <div id="scrim-left"></div>
+      <div id="scrim-full"></div>
+
+      <div id="el-s01" data-composition-id="s01" data-composition-src="compositions/sq/s01.html" data-start="0.0" data-duration="5.4" data-track-index="1" data-track-kind="graphics" data-width="1080" data-height="1080"></div>
+      <div id="el-s02" data-composition-id="s02" data-composition-src="compositions/sq/s02.html" data-start="5.4" data-duration="9.0" data-track-index="1" data-track-kind="graphics" data-width="1080" data-height="1080"></div>
+      <div id="el-s03" data-composition-id="s03" data-composition-src="compositions/sq/s03.html" data-start="14.4" data-duration="13.5" data-track-index="1" data-track-kind="graphics" data-width="1080" data-height="1080"></div>
+      <div id="el-s04" data-composition-id="s04" data-composition-src="compositions/sq/s04.html" data-start="27.9" data-duration="12.3" data-track-index="1" data-track-kind="graphics" data-width="1080" data-height="1080"></div>
+      <div id="el-s06" data-composition-id="s06" data-composition-src="compositions/sq/s06.html" data-start="40.2" data-duration="10.6" data-track-index="1" data-track-kind="graphics" data-width="1080" data-height="1080"></div>
+      <div id="el-s07" data-composition-id="s07" data-composition-src="compositions/sq/s07.html" data-start="50.8" data-duration="13.1" data-track-index="1" data-track-kind="graphics" data-width="1080" data-height="1080"></div>
+      <div id="el-s08" data-composition-id="s08" data-composition-src="compositions/sq/s08.html" data-start="63.9" data-duration="9.9" data-track-index="1" data-track-kind="graphics" data-width="1080" data-height="1080"></div>
+      <div id="el-s09" data-composition-id="s09" data-composition-src="compositions/sq/s09.html" data-start="73.8" data-duration="7.6" data-track-index="1" data-track-kind="graphics" data-width="1080" data-height="1080"></div>
+      <div id="el-s11" data-composition-id="s11" data-composition-src="compositions/sq/s11.html" data-start="81.4" data-duration="11.0" data-track-index="1" data-track-kind="graphics" data-width="1080" data-height="1080"></div>
+      <div id="el-captions" data-composition-id="captions" data-composition-src="compositions/sq/captions.html" data-start="0" data-duration="92.4" data-track-index="5" data-track-kind="captions" data-width="1080" data-height="1080"></div>
+    </div>
+
+    <script>
+      const tl = gsap.timeline({ paused: true });
+      const IN = { from: 1.0, to: 1.07 };
+      const OUT = { from: 1.1, to: 1.0 };
+      // timing:start (scripts/retime.py)
+      const AT = {"s01": 0.0, "s02": 5.4, "s03": 14.4, "s04": 27.9, "s06": 40.2, "s07": 50.8, "s08": 63.9, "s09": 73.8, "s11": 81.4};
+      const SLOT = {"s01": 5.4, "s02": 9.0, "s03": 13.5, "s04": 12.3, "s06": 10.6, "s07": 13.1, "s08": 9.9, "s09": 7.6, "s11": 11.0};
+      // timing:end
+      const MOVE = { s01: OUT, s02: OUT, s03: IN, s04: IN, s06: IN, s07: IN, s08: OUT, s09: IN, s11: IN };
+      Object.keys(AT).forEach((sid) => {
+        const m = MOVE[sid];
+        tl.fromTo("#cam" + sid.slice(1), { scale: m.from }, { scale: m.to, duration: SLOT[sid], ease: "sine.inOut" }, AT[sid]);
+      });
+      // The end card sits on a darker plate.
+      tl.fromTo("#scrim-full", { opacity: 0 }, { opacity: 0.55, duration: 0.8, ease: "power1.inOut" }, AT.s11);
+      tl.to("#scrim-full", { opacity: 0.85, duration: 1.0, ease: "power1.inOut" }, AT.s11 + 7.0);
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>

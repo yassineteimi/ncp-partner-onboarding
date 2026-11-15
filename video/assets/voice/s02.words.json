@@ -1,0 +1,71 @@
+{
+ "text": "Nordhaven is a fictional NVIDIA Cloud Partner: inference in Paris, training in Finland.",
+ "duration": 8.124081632653061,
+ "words": [
+  {
+   "end": 0.94,
+   "start": 0.24,
+   "word": "Nordhaven"
+  },
+  {
+   "end": 1.38,
+   "start": 1.26,
+   "word": "is"
+  },
+  {
+   "end": 1.52,
+   "start": 1.44,
+   "word": "a"
+  },
+  {
+   "end": 2.1,
+   "start": 1.58,
+   "word": "fictional"
+  },
+  {
+   "end": 2.96,
+   "start": 2.4,
+   "word": "NVIDIA"
+  },
+  {
+   "end": 3.4,
+   "start": 3.18,
+   "word": "Cloud"
+  },
+  {
+   "end": 3.98,
+   "start": 3.52,
+   "word": "Partner:"
+  },
+  {
+   "end": 5.28,
+   "start": 4.78,
+   "word": "inference"
+  },
+  {
+   "end": 5.54,
+   "start": 5.42,
+   "word": "in"
+  },
+  {
+   "end": 6.08,
+   "start": 5.64,
+   "word": "Paris,"
+  },
+  {
+   "end": 6.84,
+   "start": 6.4,
+   "word": "training"
+  },
+  {
+   "end": 7.14,
+   "start": 7.04,
+   "word": "in"
+  },
+  {
+   "end": 7.76,
+   "start": 7.24,
+   "word": "Finland."
+  }
+ ]
+}

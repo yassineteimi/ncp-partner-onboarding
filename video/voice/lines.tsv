@@ -1,0 +1,11 @@
+s01	A GPU cloud gets its hardware months before its first customer.
+s02	Nordhaven is a fictional NVIDIA Cloud Partner: inference in Paris, training in Finland.
+s03	Inside, training and post-training run east-west, GPU to GPU. On the Finland node, I measured 351 gigabytes per second over NVLink.
+s04	Inference runs north-south. Requests come in, tokens go out. I designed that layer with NVIDIA Dynamo, and it runs next.
+s05	Between handover and the first tenant, every partner asks the same four questions.
+s06	AICR pins the versions that go together. NVCRE certifies each node before any tenant lands on it.
+s07	When a GPU fails, NVSentinel had training back in 288.8 seconds, with nobody involved. My own controller from Part 1 took 360.9.
+s08	KAI and MIG share scarce GPUs between teams. Slurm users and VM customers run on the same platform.
+s09	Thanos gives one view of both sites, even after one of them is gone.
+s10	All of it runs on upstream Kubernetes, from one Git repository, across two providers.
+s11	From hardware handover to first tenants, on NVIDIA's open stack. That's the work I can do for a partner.

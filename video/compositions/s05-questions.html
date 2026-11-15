@@ -1,0 +1,67 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+  </head>
+  <body>
+    <template>
+      <style>
+        #s05-root {
+          position: absolute;
+          inset: 0;
+        }
+        #s05-kicker {
+          color: var(--muted);
+        }
+        #s05-list {
+          position: absolute;
+          left: 120px;
+          top: 250px;
+          display: flex;
+          flex-direction: column;
+          gap: 34px;
+        }
+        .s05-q {
+          display: flex;
+          align-items: baseline;
+          gap: 28px;
+          font-weight: 900;
+          font-size: 76px;
+          line-height: 1;
+          letter-spacing: -0.035em;
+        }
+        .s05-q .k {
+          width: 200px;
+          font-family: var(--mono);
+          font-weight: 700;
+          font-size: 28px;
+          letter-spacing: 0.08em;
+          color: var(--faint);
+        }
+        #s05-q3 {
+          color: var(--red);
+        }
+      </style>
+      <div id="s05-root" data-composition-id="s05" data-width="1920" data-height="1080">
+        <div class="stage" id="s05-stage">
+          <div class="kicker" id="s05-kicker"><i class="dot"></i>Between handover and the first tenant</div>
+          <div id="s05-list">
+            <div class="s05-q" id="s05-q1"><span class="k">DAY 1</span>Which versions go together?</div>
+            <div class="s05-q" id="s05-q2"><span class="k">DAY 1</span>Is this node ready?</div>
+            <div class="s05-q" id="s05-q3"><span class="k">DAY 2</span>What if a GPU fails?</div>
+            <div class="s05-q" id="s05-q4"><span class="k">DAY 2</span>Who gets the GPUs?</div>
+          </div>
+        </div>
+      </div>
+      <script>
+        (function () {
+          const tl = gsap.timeline({ paused: true });
+          HF.rise(tl, "#s05-kicker", 0.6, { y: 16 });
+          HF.rise(tl, ["#s05-q1", "#s05-q2", "#s05-q3", "#s05-q4"], 2.2, { y: 30, stagger: 0.5 });
+          HF.exit(tl, "#s05-stage", 7.9);
+          window.__timelines["s05"] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>

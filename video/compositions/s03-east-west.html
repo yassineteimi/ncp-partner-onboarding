@@ -1,0 +1,122 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+  </head>
+  <body>
+    <template>
+      <style>
+        #s03-root {
+          position: absolute;
+          inset: 0;
+        }
+        #s03-kicker {
+          color: var(--green);
+        }
+        /* East-west: four GPUs exchanging data sideways, drawn over the aisle. */
+        #s03-flow {
+          position: absolute;
+          left: 120px;
+          top: 210px;
+          width: 980px;
+          height: 150px;
+        }
+        #s03-flow .gpu {
+          position: absolute;
+          top: 30px;
+          width: 150px;
+          height: 90px;
+          border-radius: 14px;
+          border: 2px solid rgba(118, 185, 0, 0.8);
+          background: rgba(118, 185, 0, 0.12);
+          font-family: var(--mono);
+          font-weight: 700;
+          font-size: 28px;
+          color: var(--fg);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        #s03-flow svg {
+          position: absolute;
+          inset: 0;
+        }
+        #s03-flow .link {
+          stroke: var(--green);
+          stroke-width: 4;
+          stroke-dasharray: 10 14;
+          fill: none;
+        }
+        #s03-st {
+          width: 900px;
+        }
+        #s03-card {
+          position: absolute;
+          right: 120px;
+          bottom: 120px;
+          width: 640px;
+          padding: 36px 40px 32px;
+        }
+        #s03-card .v {
+          margin-top: 22px;
+          font-weight: 900;
+          font-size: 150px;
+          line-height: 1;
+          letter-spacing: -0.05em;
+        }
+        #s03-card .u {
+          font-size: 64px;
+          color: var(--green);
+          letter-spacing: -0.02em;
+        }
+        #s03-card .l {
+          margin-top: 14px;
+          font-weight: 700;
+          font-size: 32px;
+          line-height: 1.2;
+          color: var(--fg);
+        }
+        #s03-card .source {
+          margin-top: 18px;
+        }
+      </style>
+      <div id="s03-root" data-composition-id="s03" data-width="1920" data-height="1080">
+        <div class="stage" id="s03-stage">
+          <div class="kicker" id="s03-kicker"><i class="dot"></i>East-west · training and post-training</div>
+          <div id="s03-flow">
+            <svg viewBox="0 0 980 150" width="980" height="150">
+              <path class="link" id="s03-l1" d="M150 75 H 277" />
+              <path class="link" id="s03-l2" d="M427 75 H 554" />
+              <path class="link" id="s03-l3" d="M704 75 H 831" />
+            </svg>
+            <div class="gpu" id="s03-g1" style="left: 0">GPU</div>
+            <div class="gpu" id="s03-g2" style="left: 277px">GPU</div>
+            <div class="gpu" id="s03-g3" style="left: 554px">GPU</div>
+            <div class="gpu" id="s03-g4" style="left: 831px">GPU</div>
+          </div>
+          <div class="statement" id="s03-st">GPU to GPU, all day long.</div>
+          <div class="glass" id="s03-card">
+            <span class="tag ran">Ran it · Finland, 22 Oct</span>
+            <div class="v num"><span id="s03-n">0</span><span class="u"> GB/s</span></div>
+            <div class="l">all-reduce over NVLink, 2× H200 SXM5</div>
+          </div>
+        </div>
+      </div>
+      <script>
+        (function () {
+          const tl = gsap.timeline({ paused: true });
+          HF.rise(tl, "#s03-kicker", 1.6, { y: 16 });
+          HF.rise(tl, ["#s03-g1", "#s03-g2", "#s03-g3", "#s03-g4"], 4.0, { y: 20, stagger: 0.12 });
+          tl.fromTo(["#s03-l1", "#s03-l2", "#s03-l3"], { opacity: 0 }, { opacity: 1, duration: 0.4, stagger: 0.1 }, 4.5);
+          // Data keeps flowing sideways for the whole scene at a constant speed.
+          tl.fromTo(["#s03-l1", "#s03-l2", "#s03-l3"], { strokeDashoffset: 0 }, { strokeDashoffset: -220, duration: 8.6, ease: "none" }, 4.5);
+          HF.rise(tl, "#s03-st", 5.2);
+          HF.rise(tl, "#s03-card", 7.2, { y: 36 });
+          HF.count(tl, document.getElementById("s03-n"), 0, 351, 9.2, 1.4);
+          HF.exit(tl, "#s03-stage", 13.1);
+          window.__timelines["s03"] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>

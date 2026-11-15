@@ -1,0 +1,76 @@
+{
+ "text": "Thanos gives one view of both sites, even after one of them is gone.",
+ "duration": 5.1722448979591835,
+ "words": [
+  {
+   "end": 0.52,
+   "start": 0.2,
+   "word": "Thanos"
+  },
+  {
+   "end": 0.82,
+   "start": 0.6,
+   "word": "gives"
+  },
+  {
+   "end": 1.22,
+   "start": 0.98,
+   "word": "one"
+  },
+  {
+   "end": 1.7,
+   "start": 1.36,
+   "word": "view"
+  },
+  {
+   "end": 1.86,
+   "start": 1.78,
+   "word": "of"
+  },
+  {
+   "end": 2.18,
+   "start": 1.96,
+   "word": "both"
+  },
+  {
+   "end": 2.58,
+   "start": 2.26,
+   "word": "sites,"
+  },
+  {
+   "end": 3.44,
+   "start": 3.12,
+   "word": "even"
+  },
+  {
+   "end": 3.84,
+   "start": 3.56,
+   "word": "after"
+  },
+  {
+   "end": 4.14,
+   "start": 3.98,
+   "word": "one"
+  },
+  {
+   "end": 4.28,
+   "start": 4.18,
+   "word": "of"
+  },
+  {
+   "end": 4.44,
+   "start": 4.32,
+   "word": "them"
+  },
+  {
+   "end": 4.6,
+   "start": 4.48,
+   "word": "is"
+  },
+  {
+   "end": 4.92,
+   "start": 4.66,
+   "word": "gone."
+  }
+ ]
+}

@@ -1,0 +1,73 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+  </head>
+  <body>
+    <template>
+      <style>
+        #s09-root {
+          position: absolute;
+          inset: 0;
+        }
+        #s09-kicker {
+          color: var(--green);
+        }
+        #s09-big {
+          position: absolute;
+          left: 120px;
+          top: 240px;
+          font-weight: 900;
+          font-size: 260px;
+          line-height: 1;
+          letter-spacing: -0.06em;
+        }
+        #s09-big .u {
+          font-size: 120px;
+          color: var(--green);
+        }
+        #s09-l1 {
+          position: absolute;
+          left: 128px;
+          top: 520px;
+          width: 1000px;
+          color: var(--fg);
+        }
+        #s09-l2 {
+          position: absolute;
+          left: 128px;
+          top: 680px;
+          width: 1000px;
+        }
+        #s09-tag {
+          position: absolute;
+          left: 128px;
+          bottom: 110px;
+        }
+      </style>
+      <div id="s09-root" data-composition-id="s09" data-width="1920" data-height="1080">
+        <div class="stage" id="s09-stage">
+          <div class="kicker" id="s09-kicker"><i class="dot"></i>Day 2 · one view of both sites</div>
+          <div id="s09-big" class="num"><span id="s09-n">0</span><span class="u"> s</span></div>
+          <div id="s09-l1" class="second">from Finland's Prometheus starting to its GPU metrics in Paris, through Thanos</div>
+          <div id="s09-l2" class="second"><span class="num" id="s09-s">0</span> samples sent, 0 lost, kept after the site was deleted.</div>
+          <div id="s09-tag"><span class="tag ran">Ran it · 22 Oct</span></div>
+        </div>
+      </div>
+      <script>
+        (function () {
+          const tl = gsap.timeline({ paused: true });
+          HF.rise(tl, "#s09-kicker", 0.6, { y: 16 });
+          HF.rise(tl, "#s09-big", 0.8, { y: 40 });
+          HF.count(tl, document.getElementById("s09-n"), 0, 4, 1.0, 1.2);
+          HF.rise(tl, "#s09-l1", 1.8);
+          HF.rise(tl, "#s09-l2", 3.5);
+          HF.count(tl, document.getElementById("s09-s"), 0, 4676183, 3.7, 1.5, { group: true });
+          HF.rise(tl, "#s09-tag", 4.6, { y: 12 });
+          HF.exit(tl, "#s09-stage", 7.1);
+          window.__timelines["s09"] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>

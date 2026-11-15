@@ -1,0 +1,97 @@
+{
+  "_note": "Every number the video may show. Each one is copied from a file committed during a run; 'source' is the path and 'evidence' the exact line or value. Do not put a number on screen that isn't here.",
+  "context": {
+    "sites": {
+      "on_screen": "Paris: L4 inference and dev pool (Scaleway). Finland: 2x H200 SXM5 training pool (Verda)",
+      "source": "docs/index.md",
+      "evidence": "NVIDIA L4s in Paris (Scaleway) for inference and development, and a 2x H200 SXM5 node with NVLink in Finland (Verda) for training"
+    },
+    "kubernetes": {
+      "on_screen": "Upstream Kubernetes 1.36, kubeadm, ArgoCD, one Git repository",
+      "source": "docs/index.md",
+      "evidence": "Both sites run upstream Kubernetes 1.36 through kubeadm, built by the same bootstrap scripts and synced by ArgoCD from the same repository"
+    }
+  },
+  "day1": {
+    "nvlink_busbw": {
+      "value": 351,
+      "on_screen": "351 GB/s all-reduce over NVLink, 2x H200",
+      "source": "docs/artifacts/readiness/nvcre-fin-20261022T100307Z.json",
+      "evidence": "communication/nccl-all-reduce busBW 351.45 GB/s; nccl-loopback-nvswitch busBW 351.87 GB/s; promote-fin-20261022T101348Z.txt: PASS NCCL channels over NVLink: 104 lines"
+    },
+    "promoted": {
+      "on_screen": "Staging taint removed after certification",
+      "source": "docs/artifacts/readiness/promote-fin-20261022T101348Z.txt",
+      "evidence": "taints before: eu1.io/staging=pending:NoSchedule / PROMOTE eu1-fin-gpu-01 / node/eu1-fin-gpu-01 untainted"
+    },
+    "aicr": {
+      "on_screen": "AICR locked recipe for H200; refuses the provider's Ubuntu 26.04",
+      "source": "docs/10-day1.md",
+      "evidence": "AICR refuses the provider's Ubuntu 26.04"
+    },
+    "versions": {
+      "on_screen": "Kubernetes 1.36 · GPU Operator v26.7.2 · driver 580.178.04 (provider image)",
+      "source": "docs/artifacts/fin/acceptance-20261022T100225Z.txt",
+      "evidence": "nvcr.io/nvidia/gpu-operator:v26.7.2 / Driver Version: 580.178.04; Kubernetes 1.36 per docs/index.md"
+    }
+  },
+  "day2": {
+    "fault_to_resume_s": {
+      "value": 288.8,
+      "on_screen": "XID 79 (injected) to training resumed: 288.8 s, no human",
+      "source": "docs/artifacts/readiness/uc3-phases-20261021T172243Z.json",
+      "evidence": "injected 2026-10-21T17:03:23.443Z, resume to 17:08:12.301Z, total_s 288.8",
+      "must_label": "injected fault"
+    },
+    "part1_fault_to_resume_s": {
+      "value": 360.9,
+      "on_screen": "Part 1's controller: 360.9 s, one person to approve",
+      "source": "docs/10-day2-nvsentinel.md",
+      "evidence": "| Fault to training resumed | 360.9 s | 288.8 s |"
+    },
+    "goodput": {
+      "value": 73.0,
+      "part1_value": 66.4,
+      "on_screen": "Goodput 73.0% vs 66.4%",
+      "source": "docs/artifacts/readiness/uc3-goodput.json",
+      "evidence": "\"goodput\": 0.7303; Part 1 66.4% per docs/10-day2-nvsentinel.md"
+    },
+    "gang_bind_s": {
+      "value": 1,
+      "on_screen": "2-pod gang bound in 1 s; 3-pod gang on 2 GPUs never partly bound",
+      "source": "docs/artifacts/scheduling/gang-fin-20261022T101423Z.txt",
+      "evidence": "Both pods scheduled at 10:14:27, 1 s after the Job / Gang of 3 on 2 GPUs: none bound after 60 s"
+    },
+    "mig": {
+      "on_screen": "Two tenants on separate MIG slices of one H200",
+      "source": "docs/20-tenancy.md",
+      "evidence": "two tenants on separate MIG slices of one H200"
+    },
+    "thanos_first_series_s": {
+      "value": 4,
+      "on_screen": "Finland's series in Paris 4 s after its Prometheus was ready; still there after the site was deleted",
+      "source": "docs/30-metrics-across-sites.md, docs/artifacts/platform/thanos-fin-20261022T095130Z.txt",
+      "evidence": "Its series appeared in Paris 4 s after its Prometheus was ready (H200 run, 22 Oct; not the 19 s CPU-only test of 21 Oct)"
+    },
+    "thanos_samples": {
+      "value": 4676183,
+      "on_screen": "4,676,183 samples sent, 0 lost",
+      "source": "docs/30-metrics-across-sites.md",
+      "evidence": "4,676,183 samples sent over the run, 0 lost"
+    },
+    "vm_boot_s": {
+      "value": 20.2,
+      "on_screen": "VM booted on KVM in 20.2 s beside a GPU job",
+      "source": "docs/30-vm-tenants.md",
+      "evidence": "Startup finished in 6.302s (kernel) + 13.928s (userspace) = 20.231s"
+    }
+  },
+  "inference": {
+    "dynamo": {
+      "on_screen": "Dynamo: KV-aware router, prefill and decode pools, KV cache over NIXL. Designed, running next",
+      "source": "docs/40-inference-dynamo.md",
+      "evidence": "Work in progress: designed and checked without a GPU; not run yet",
+      "must_label": "designed, running next"
+    }
+  }
+}

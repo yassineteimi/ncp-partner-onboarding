@@ -33,3 +33,14 @@ site/
 
 # macos
 .DS_Store
+
+# video build (raw Higgsfield shots, HyperFrames caches, renders, review stills)
+video/assets/shots/
+video/assets/plates/
+video/.hyperframes/
+video/renders/
+video/review/
+video/node_modules/
+video/.media/
+video/assets/music/
+video/assets/sfx/

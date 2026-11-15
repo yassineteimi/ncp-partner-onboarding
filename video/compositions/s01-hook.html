@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+  </head>
+  <body>
+    <template>
+      <style>
+        #s01-root {
+          position: absolute;
+          inset: 0;
+        }
+        #s01-a {
+          bottom: 350px;
+          color: var(--muted);
+          font-size: 72px;
+        }
+        #s01-b {
+          width: 1300px;
+        }
+        #s01-b em {
+          font-style: normal;
+          color: var(--green);
+        }
+      </style>
+      <div id="s01-root" data-composition-id="s01" data-width="1920" data-height="1080">
+        <div class="stage" id="s01-stage">
+          <div class="statement" id="s01-a">The hardware arrives.</div>
+          <div class="statement" id="s01-b">The first tenant comes <em>months</em> later.</div>
+        </div>
+      </div>
+      <script>
+        (function () {
+          const tl = gsap.timeline({ paused: true });
+          HF.rise(tl, "#s01-a", 0.6);
+          HF.rise(tl, "#s01-b", 2.8);
+          HF.exit(tl, "#s01-stage", 5.0);
+          window.__timelines["s01"] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>

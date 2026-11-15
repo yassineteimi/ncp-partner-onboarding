@@ -1,0 +1,91 @@
+{
+ "text": "AICR pins the versions that go together. NVCRE certifies each node before any tenant lands on it.",
+ "duration": 9.012244897959183,
+ "words": [
+  {
+   "end": 1.04,
+   "start": 0.24,
+   "word": "AICR"
+  },
+  {
+   "end": 1.78,
+   "start": 1.4,
+   "word": "pins"
+  },
+  {
+   "end": 1.92,
+   "start": 1.82,
+   "word": "the"
+  },
+  {
+   "end": 2.48,
+   "start": 1.96,
+   "word": "versions"
+  },
+  {
+   "end": 2.72,
+   "start": 2.56,
+   "word": "that"
+  },
+  {
+   "end": 2.94,
+   "start": 2.76,
+   "word": "go"
+  },
+  {
+   "end": 3.36,
+   "start": 2.96,
+   "word": "together."
+  },
+  {
+   "end": 4.88,
+   "start": 4.08,
+   "word": "NVCRE"
+  },
+  {
+   "end": 5.9,
+   "start": 5.28,
+   "word": "certifies"
+  },
+  {
+   "end": 6.28,
+   "start": 6.06,
+   "word": "each"
+  },
+  {
+   "end": 6.7,
+   "start": 6.34,
+   "word": "node"
+  },
+  {
+   "end": 7.06,
+   "start": 6.74,
+   "word": "before"
+  },
+  {
+   "end": 7.28,
+   "start": 7.14,
+   "word": "any"
+  },
+  {
+   "end": 7.74,
+   "start": 7.38,
+   "word": "tenant"
+  },
+  {
+   "end": 8.26,
+   "start": 7.98,
+   "word": "lands"
+  },
+  {
+   "end": 8.42,
+   "start": 8.32,
+   "word": "on"
+  },
+  {
+   "end": 8.64,
+   "start": 8.48,
+   "word": "it."
+  }
+ ]
+}

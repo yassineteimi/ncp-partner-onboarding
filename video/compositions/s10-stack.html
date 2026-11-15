@@ -1,0 +1,108 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+  </head>
+  <body>
+    <template>
+      <style>
+        #s10-root {
+          position: absolute;
+          inset: 0;
+        }
+        #s10-kicker {
+          color: var(--green);
+        }
+        /* The stack builds from the hardware up, one layer per spoken phrase. */
+        #s10-stack {
+          position: absolute;
+          left: 120px;
+          bottom: 120px;
+          width: 1240px;
+          display: flex;
+          flex-direction: column-reverse;
+          gap: 14px;
+        }
+        .s10-layer {
+          display: flex;
+          align-items: center;
+          gap: 30px;
+          padding: 22px 30px;
+          border-radius: 16px;
+          border: 2px solid rgba(255, 255, 255, 0.14);
+          background: rgba(255, 255, 255, 0.06);
+        }
+        .s10-layer .k {
+          flex: 0 0 230px;
+          font-family: var(--mono);
+          font-weight: 700;
+          font-size: 28px;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          color: var(--faint);
+        }
+        .s10-layer .v {
+          font-weight: 900;
+          font-size: 38px;
+          letter-spacing: -0.02em;
+        }
+        #s10-hw {
+          border-color: rgba(118, 185, 0, 0.7);
+          background: rgba(118, 185, 0, 0.14);
+        }
+        #s10-inf {
+          border-style: dashed;
+          border-color: rgba(246, 178, 107, 0.7);
+        }
+        #s10-inf .v {
+          color: var(--orange);
+        }
+        #s10-side {
+          position: absolute;
+          left: 120px;
+          top: 190px;
+          display: flex;
+          gap: 36px;
+        }
+        #s10-side .big {
+          font-weight: 900;
+          font-size: 64px;
+          line-height: 1.05;
+          letter-spacing: -0.03em;
+        }
+        #s10-side #s10-prov {
+          color: var(--green);
+        }
+      </style>
+      <div id="s10-root" data-composition-id="s10" data-width="1920" data-height="1080">
+        <div class="stage" id="s10-stage">
+          <div class="kicker" id="s10-kicker"><i class="dot"></i>The stack</div>
+          <div id="s10-stack">
+            <div class="s10-layer" id="s10-hw"><span class="k">GPUs</span><span class="v">L4 in Paris · 2× H200 in Finland</span></div>
+            <div class="s10-layer" id="s10-k8s"><span class="k">Platform</span><span class="v">Kubernetes 1.36 · GPU Operator · ArgoCD</span></div>
+            <div class="s10-layer" id="s10-d1"><span class="k">Day 1</span><span class="v">AICR · NVCRE</span></div>
+            <div class="s10-layer" id="s10-d2"><span class="k">Day 2</span><span class="v">NVSentinel · KAI · MIG · Slinky · KubeVirt · Thanos</span></div>
+            <div class="s10-layer" id="s10-inf"><span class="k">Inference</span><span class="v">Dynamo · designed</span></div>
+          </div>
+          <div id="s10-side">
+            <div class="big" id="s10-repo">One Git repository.</div>
+            <div class="big" id="s10-prov">Two providers.</div>
+          </div>
+        </div>
+      </div>
+      <script>
+        (function () {
+          const tl = gsap.timeline({ paused: true });
+          HF.rise(tl, "#s10-kicker", 0.6, { y: 16 });
+          HF.rise(tl, "#s10-hw", 0.6, { y: 24 });
+          HF.rise(tl, "#s10-k8s", 2.0, { y: 24 });
+          HF.rise(tl, ["#s10-d1", "#s10-d2", "#s10-inf"], 2.6, { y: 24, stagger: 0.4 });
+          HF.rise(tl, "#s10-repo", 3.9);
+          HF.rise(tl, "#s10-prov", 6.3);
+          HF.exit(tl, "#s10-stage", 7.4);
+          window.__timelines["s10"] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>

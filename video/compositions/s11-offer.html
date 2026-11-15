@@ -1,0 +1,80 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+  </head>
+  <body>
+    <template>
+      <style>
+        #s11-root {
+          position: absolute;
+          inset: 0;
+        }
+        #s11-line {
+          position: absolute;
+          left: 120px;
+          top: 190px;
+          width: 1500px;
+          font-weight: 900;
+          font-size: 100px;
+          line-height: 1;
+          letter-spacing: -0.04em;
+          text-wrap: balance;
+        }
+        #s11-line em {
+          font-style: normal;
+          color: var(--green);
+        }
+        #s11-offer {
+          position: absolute;
+          left: 124px;
+          top: 560px;
+          color: var(--fg);
+        }
+        #s11-card {
+          position: absolute;
+          left: 120px;
+          bottom: 120px;
+        }
+        #s11-card .name {
+          font-weight: 900;
+          font-size: 64px;
+          letter-spacing: -0.03em;
+        }
+        #s11-card .url {
+          margin-top: 12px;
+          font-family: var(--mono);
+          font-weight: 700;
+          font-size: 32px;
+          color: var(--green);
+        }
+        #s11-card .part1 {
+          margin-top: 10px;
+          font-family: var(--mono);
+          font-size: 28px;
+          color: var(--muted);
+        }
+      </style>
+      <div id="s11-root" data-composition-id="s11" data-width="1920" data-height="1080">
+        <div class="stage" id="s11-stage">
+          <div id="s11-line">From hardware handover to first tenants, on NVIDIA's <em>open stack</em>.</div>
+          <div id="s11-offer" class="second">That's the work I can do for a partner.</div>
+          <div id="s11-card">
+            <div class="name">Yassine Teimi</div>
+            <div class="url">yassineteimi.github.io/ncp-partner-onboarding</div>
+            <div class="part1">Part 1: github.com/yassineteimi/nvidia-gpu-fleet-poc</div>
+          </div>
+        </div>
+      </div>
+      <script>
+        (function () {
+          const tl = gsap.timeline({ paused: true });
+          HF.rise(tl, "#s11-line", 0.5, { y: 40 });
+          HF.rise(tl, "#s11-offer", 5.7);
+          HF.rise(tl, "#s11-card", 7.4, { y: 24 });
+          window.__timelines["s11"] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>

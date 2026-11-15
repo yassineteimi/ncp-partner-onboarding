@@ -1,0 +1,86 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+  </head>
+  <body>
+    <template>
+      <style>
+        #s08-root {
+          position: absolute;
+          inset: 0;
+        }
+        #s08-kicker {
+          color: var(--fg);
+        }
+        #s08-list {
+          position: absolute;
+          left: 120px;
+          top: 230px;
+          display: flex;
+          flex-direction: column;
+          gap: 46px;
+          width: 1150px;
+        }
+        .s08-item {
+          display: flex;
+          gap: 30px;
+        }
+        .s08-item .bar {
+          flex: 0 0 10px;
+          border-radius: 5px;
+        }
+        .s08-item .name {
+          font-weight: 900;
+          font-size: 64px;
+          line-height: 1;
+          letter-spacing: -0.03em;
+        }
+        .s08-item .what {
+          margin-top: 10px;
+          font-weight: 700;
+          font-size: 34px;
+          line-height: 1.2;
+          color: var(--muted);
+        }
+        #s08-tag {
+          position: absolute;
+          left: 160px;
+          bottom: 110px;
+        }
+      </style>
+      <div id="s08-root" data-composition-id="s08" data-width="1920" data-height="1080">
+        <div class="stage" id="s08-stage">
+          <div class="kicker" id="s08-kicker"><i class="dot"></i>Day 2 · sharing scarce GPUs</div>
+          <div id="s08-list">
+            <div class="s08-item" id="s08-kai">
+              <div class="bar" style="background: #6fa8dc"></div>
+              <div><div class="name">KAI Scheduler</div><div class="what">a 3-pod gang on 2 GPUs never partly bound</div></div>
+            </div>
+            <div class="s08-item" id="s08-mig">
+              <div class="bar" style="background: #f6b26b"></div>
+              <div><div class="name">MIG</div><div class="what">two tenants on separate slices of one H200</div></div>
+            </div>
+            <div class="s08-item" id="s08-hpc">
+              <div class="bar" style="background: #b4a7d6"></div>
+              <div><div class="name">Slinky and KubeVirt</div><div class="what">Slurm jobs and a VM tenant on the same cluster</div></div>
+            </div>
+          </div>
+          <div id="s08-tag"><span class="tag ran">Ran it · Paris and Finland</span></div>
+        </div>
+      </div>
+      <script>
+        (function () {
+          const tl = gsap.timeline({ paused: true });
+          HF.rise(tl, "#s08-kicker", 0.6, { y: 16 });
+          HF.rise(tl, "#s08-kai", 0.6);
+          HF.rise(tl, "#s08-mig", 1.5);
+          HF.rise(tl, "#s08-hpc", 5.0);
+          HF.rise(tl, "#s08-tag", 6.6, { y: 12 });
+          HF.exit(tl, "#s08-stage", 9.5);
+          window.__timelines["s08"] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>

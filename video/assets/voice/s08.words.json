@@ -1,0 +1,96 @@
+{
+ "text": "KAI and MIG share scarce GPUs between teams. Slurm users and VM customers run on the same platform.",
+ "duration": 8.986122448979591,
+ "words": [
+  {
+   "end": 0.58,
+   "start": 0.2,
+   "word": "KAI"
+  },
+  {
+   "end": 1.06,
+   "start": 0.92,
+   "word": "and"
+  },
+  {
+   "end": 1.38,
+   "start": 1.12,
+   "word": "MIG"
+  },
+  {
+   "end": 1.94,
+   "start": 1.72,
+   "word": "share"
+  },
+  {
+   "end": 2.46,
+   "start": 2.06,
+   "word": "scarce"
+  },
+  {
+   "end": 3.1,
+   "start": 2.56,
+   "word": "GPUs"
+  },
+  {
+   "end": 3.42,
+   "start": 3.14,
+   "word": "between"
+  },
+  {
+   "end": 3.88,
+   "start": 3.52,
+   "word": "teams."
+  },
+  {
+   "end": 4.96,
+   "start": 4.62,
+   "word": "Slurm"
+  },
+  {
+   "end": 5.56,
+   "start": 5.1,
+   "word": "users"
+  },
+  {
+   "end": 6.04,
+   "start": 5.92,
+   "word": "and"
+  },
+  {
+   "end": 6.44,
+   "start": 6.14,
+   "word": "VM"
+  },
+  {
+   "end": 7.06,
+   "start": 6.48,
+   "word": "customers"
+  },
+  {
+   "end": 7.62,
+   "start": 7.32,
+   "word": "run"
+  },
+  {
+   "end": 7.76,
+   "start": 7.68,
+   "word": "on"
+  },
+  {
+   "end": 7.92,
+   "start": 7.82,
+   "word": "the"
+  },
+  {
+   "end": 8.16,
+   "start": 7.96,
+   "word": "same"
+  },
+  {
+   "end": 8.76,
+   "start": 8.24,
+   "word": "platform."
+  }
+ ]
+}

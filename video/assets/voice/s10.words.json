@@ -1,0 +1,76 @@
+{
+ "text": "All of it runs on upstream Kubernetes, from one Git repository, across two providers.",
+ "duration": 6.896326530612245,
+ "words": [
+  {
+   "end": 0.28,
+   "start": 0.18,
+   "word": "All"
+  },
+  {
+   "end": 0.38,
+   "start": 0.32,
+   "word": "of"
+  },
+  {
+   "end": 0.54,
+   "start": 0.42,
+   "word": "it"
+  },
+  {
+   "end": 0.98,
+   "start": 0.7,
+   "word": "runs"
+  },
+  {
+   "end": 1.26,
+   "start": 1.14,
+   "word": "on"
+  },
+  {
+   "end": 1.98,
+   "start": 1.58,
+   "word": "upstream"
+  },
+  {
+   "end": 2.72,
+   "start": 2.06,
+   "word": "Kubernetes,"
+  },
+  {
+   "end": 3.44,
+   "start": 3.28,
+   "word": "from"
+  },
+  {
+   "end": 3.68,
+   "start": 3.54,
+   "word": "one"
+  },
+  {
+   "end": 3.9,
+   "start": 3.76,
+   "word": "Git"
+  },
+  {
+   "end": 4.56,
+   "start": 3.94,
+   "word": "repository,"
+  },
+  {
+   "end": 5.5,
+   "start": 5.14,
+   "word": "across"
+  },
+  {
+   "end": 5.98,
+   "start": 5.88,
+   "word": "two"
+  },
+  {
+   "end": 6.62,
+   "start": 6.04,
+   "word": "providers."
+  }
+ ]
+}

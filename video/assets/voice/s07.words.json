@@ -1,0 +1,116 @@
+{
+ "text": "When a GPU fails, NVSentinel had training back in 288.8 seconds, with nobody involved. My own controller from Part 1 took 360.9.",
+ "duration": 12.146938775510204,
+ "words": [
+  {
+   "end": 0.28,
+   "start": 0.18,
+   "word": "When"
+  },
+  {
+   "end": 0.38,
+   "start": 0.3,
+   "word": "a"
+  },
+  {
+   "end": 0.78,
+   "start": 0.44,
+   "word": "GPU"
+  },
+  {
+   "end": 1.3,
+   "start": 0.92,
+   "word": "fails,"
+  },
+  {
+   "end": 2.48,
+   "start": 1.64,
+   "word": "NVSentinel"
+  },
+  {
+   "end": 2.86,
+   "start": 2.62,
+   "word": "had"
+  },
+  {
+   "end": 3.2,
+   "start": 2.92,
+   "word": "training"
+  },
+  {
+   "end": 3.52,
+   "start": 3.3,
+   "word": "back"
+  },
+  {
+   "end": 3.7,
+   "start": 3.56,
+   "word": "in"
+  },
+  {
+   "end": 5.32,
+   "start": 3.88,
+   "word": "288.8"
+  },
+  {
+   "end": 5.9,
+   "start": 5.44,
+   "word": "seconds,"
+  },
+  {
+   "end": 6.6,
+   "start": 6.42,
+   "word": "with"
+  },
+  {
+   "end": 7.14,
+   "start": 6.68,
+   "word": "nobody"
+  },
+  {
+   "end": 7.72,
+   "start": 7.18,
+   "word": "involved."
+  },
+  {
+   "end": 8.4,
+   "start": 8.28,
+   "word": "My"
+  },
+  {
+   "end": 8.58,
+   "start": 8.44,
+   "word": "own"
+  },
+  {
+   "end": 9.1,
+   "start": 8.6,
+   "word": "controller"
+  },
+  {
+   "end": 9.3,
+   "start": 9.14,
+   "word": "from"
+  },
+  {
+   "end": 9.48,
+   "start": 9.34,
+   "word": "Part"
+  },
+  {
+   "end": 9.84,
+   "start": 9.76,
+   "word": "1"
+  },
+  {
+   "end": 10.04,
+   "start": 9.88,
+   "word": "took"
+  },
+  {
+   "end": 11.82,
+   "start": 10.28,
+   "word": "360.9."
+  }
+ ]
+}
