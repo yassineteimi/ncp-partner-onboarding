@@ -1,0 +1,127 @@
+apiVersion: nvcre.nvidia.com/v1alpha1
+kind: Workflow
+metadata:
+  annotations:
+    nvcrectl.nvidia.com/detected-gpu-architecture: h200
+    nvcrectl.nvidia.com/detected-platform: onprem
+  labels:
+    app.kubernetes.io/managed-by: nvcre
+    nvcre.nvidia.com/workload-run: eu1-fin-h200-diag-r2
+  name: eu1-fin-h200-diag-r2
+spec:
+  dependencies:
+  - apiVersion: trainer.kubeflow.org/v1alpha1
+    kind: TrainingRuntime
+    metadata:
+      labels:
+        app: eu1-fin-h200-diag-r2
+        trainer.kubeflow.org/framework: torch
+      name: eu1-fin-h200-diag-r2-runtime
+    spec:
+      mlPolicy:
+        numNodes: 1
+        torch:
+          numProcPerNode: 2
+      template:
+        spec:
+          replicatedJobs:
+          - name: node
+            template:
+              metadata:
+                labels:
+                  app: eu1-fin-h200-diag-r2
+                  trainer.kubeflow.org/trainjob-ancestor-step: trainer
+              spec:
+                template:
+                  spec:
+                    containers:
+                    - env:
+                      - name: NCCL_DEBUG
+                        value: INFO
+                      - name: NCCL_CUMEM_ENABLE
+                        value: "1"
+                      - name: NCCL_NET_GDR_C2C
+                        value: "1"
+                      - name: NCCL_NET_GDR_LEVEL
+                        value: PHB
+                      - name: NCCL_P2P_NET_CHUNKSIZE
+                        value: "2097152"
+                      - name: NCCL_SHM_DISABLE
+                        value: "1"
+                      - name: NCCL_MNNVL_ENABLE
+                        value: "0"
+                      - name: NCCL_SOCKET_IFNAME
+                        value: eth0
+                      image: nvcr.io/nvidia/cloud-native/dcgm:4.6.1-1-ubuntu24.04@sha256:48464e50aa76671f5b204264cb4999739591112bf74330a727523f5655c6d7f2
+                      name: node
+                      resources:
+                        limits:
+                          nvidia.com/gpu: "2"
+                        requests:
+                          nvidia.com/gpu: "2"
+                      volumeMounts:
+                      - mountPath: /dev/shm
+                        name: dshm
+                      - mountPath: /config
+                        name: config-volume
+                    securityContext:
+                      seccompProfile:
+                        type: RuntimeDefault
+                    terminationGracePeriodSeconds: 30
+                    volumes:
+                    - emptyDir:
+                        medium: Memory
+                      name: dshm
+                    - configMap:
+                        defaultMode: 493
+                        name: eu1-fin-h200-diag-r2-config
+                      name: config-volume
+  - apiVersion: v1
+    data:
+      diag.sh: |
+        #!/bin/bash
+        # Ask the node's host engine for a level 2 diagnostic, keep the JSON in
+        # the pod log for the evidence, and fail the pod if any test failed.
+        set -o pipefail
+        dcgmi diag --host nvidia-dcgm.gpu-operator.svc:5555 -r 2 -j | tee /tmp/diag.json
+        rc=$?
+        echo "dcgmi_exit=$rc"
+        [ "$rc" = 0 ] || exit "$rc"
+        if grep -Eq '"(status|result)"[[:space:]]*:[[:space:]]*"Fail' /tmp/diag.json; then
+          echo "diag_result=FAIL"
+          exit 1
+        fi
+        echo "diag_result=PASS"
+    kind: ConfigMap
+    metadata:
+      labels:
+        app: eu1-fin-h200-diag-r2
+      name: eu1-fin-h200-diag-r2-config
+  jobTemplate:
+    spec:
+      nodeHealthMonitor:
+        cel:
+          expression: node.spec.unschedulable == true
+      workload:
+        trainJob:
+          runtimeRef:
+            kind: TrainingRuntime
+            name: eu1-fin-h200-diag-r2-runtime
+          trainer:
+            command:
+            - /bin/bash
+            - /config/diag.sh
+            image: nvcr.io/nvidia/cloud-native/dcgm:4.6.1-1-ubuntu24.04@sha256:48464e50aa76671f5b204264cb4999739591112bf74330a727523f5655c6d7f2
+            numNodes: 1
+            numProcPerNode: 2
+  orchestration:
+    execution:
+      timeoutPerJob: 24h0m0s
+    iterations: 1
+    target:
+      nodeSelector:
+        eu1.io/pool: gpu
+        eu1.io/site: fin
+      taintSelectors:
+      - effect: NoSchedule
+        key: eu1.io/staging

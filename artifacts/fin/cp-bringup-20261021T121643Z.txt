@@ -1,0 +1,9 @@
+# cp-bringup-20261021T121643Z.txt, laptop clock, UTC
+started=2026-10-21T12:16:43Z
+preflight_done=2026-10-21T12:16:47Z
+terraform_apply_failed: instance 6e8f4745-9cf2-4cd7-b214-f9d065ecd76d (eu1-fin-cp-01, CPU.8V.32G, FIN-01) created 2026-10-21T12:16:49Z, entered status "error" with no address; provider 1.1.4: "Provider returned invalid result object after apply" for every computed field, then "Instance not ready"
+# Added by cos at 2026-10-21T15:2xZ from the Verda API:
+verda_status_later=discontinued ip=null; /v1/instances lists nothing; no volume and nothing in the volume trash (sweep 15:11Z)
+verda_balance_before=49.97142 verda_balance_after=49.97142 (no charge)
+terraform_state: verda_instance.cp[0] removed by hand with terraform state rm after the API check; SSH key and startup script kept
+rehearsal_R: stopped at step 1; fin's metrics path not exercised

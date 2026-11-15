@@ -1,0 +1,17 @@
+captured_at=2026-10-21T17:22:50Z run_id=1ccba561-e34e-4fac-916a-60cbff01a15e
+job_start=2026-10-21T17:01:07Z job_completion=2026-10-21T17:22:14Z
+succeeded=1 failed=0
+== Job conditions
+2026-10-21T17:22:14Z SuccessCriteriaMet=True CompletionsReached Reached expected number of succeeded pods
+2026-10-21T17:22:14Z Complete=True CompletionsReached Reached expected number of succeeded pods
+== Job events
+LAST                   REASON             MESSAGE
+2026-10-21T17:01:07Z   SuccessfulCreate   Created pod: goodput-xq462
+2026-10-21T17:03:35Z   SuccessfulCreate   Created pod: goodput-lgzng
+2026-10-21T17:22:14Z   Completed          Job completed
+== pods of the Job still in the API
+NAME            READY   STATUS      RESTARTS   AGE   IP            NODE             NOMINATED NODE   READINESS GATES
+goodput-lgzng   0/1     Completed   0          19m   10.244.4.33   eu1-par-gpu-01   <none>           <none>
+== attempts in the bucket
+goodput-lgzng.jsonl
+goodput-xq462.jsonl

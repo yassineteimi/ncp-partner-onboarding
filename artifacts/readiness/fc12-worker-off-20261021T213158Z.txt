@@ -1,0 +1,77 @@
+# FC12 worker-off on par, 2026-10-21T21:31:58Z, git main at 5f854c4
+== Applications
+cert-manager      wave  3   Synced  Healthy      v1.21.2
+kubeflow-trainer  wave  10  Synced  Progressing  2.2.1
+nvcre             wave  10  Synced  Progressing  v0.8.0
+nvsentinel        wave  11  Synced  Progressing  v1.28.0
+== Nodes
+NAME                 STATUS     ROLES           AGE   VERSION   POOL
+eu1-par-cp-01        Ready      control-plane   47h   v1.36.5   control
+eu1-par-sim-gpu-01   NotReady   <none>          10h             sim-gpu
+eu1-par-sim-gpu-02   NotReady   <none>          10h             sim-gpu
+== Lane pods, and where they run
+nvsentinel       fault-quarantine-86b76dd6c7-gl4kg                     Pending  restarts=0  -
+nvsentinel       fault-remediation-7d45c77bc6-ms4b5                    Pending  restarts=0  -
+nvsentinel       janitor-7b8dff5787-rt5zc                              Pending  restarts=0  -
+nvsentinel       janitor-provider-fdd66464d-5cchf                      Pending  restarts=0  -
+nvsentinel       labeler-5688d97cc6-hgfrh                              Pending  restarts=0  -
+nvsentinel       mongodb-rs0-0                                         Pending  restarts=0  -
+nvsentinel       node-drainer-67f4ff998d-t9l7t                         Pending  restarts=0  -
+nvsentinel       nvsentinel-psmdb-operator-565bd99d6f-75m29            Pending  restarts=0  -
+nvsentinel       platform-connectors-c8xjn                             Running  restarts=0  eu1-par-cp-01
+nvcre            nvcre-manager-d6c6cc8c7-d67sm                         Pending  restarts=0  -
+kubeflow-system  jobset-controller-5999749d98-qsp7p                    Pending  restarts=0  -
+kubeflow-system  kubeflow-trainer-controller-manager-6b54cc4fc7-bv748  Pending  restarts=0  -
+pods running off the CPU worker (should be none): none
+== NVSentinel Deployments and DaemonSets
+NAME                                          READY    UP-TO-DATE  AVAILABLE
+deployment.apps/fault-quarantine              0/1      1           0
+deployment.apps/fault-remediation             0/1      1           0
+deployment.apps/janitor                       0/1      1           0
+deployment.apps/janitor-provider              0/1      1           0
+deployment.apps/labeler                       0/1      1           0
+deployment.apps/node-drainer                  0/1      1           0
+deployment.apps/nvsentinel-psmdb-operator     0/1      1           0
+NAME                                          DESIRED  CURRENT     READY
+daemonset.apps/gpu-health-monitor-dcgm-3.x    0        0           0
+daemonset.apps/gpu-health-monitor-dcgm-4.x    0        0           0
+daemonset.apps/metadata-collector             0        0           0
+daemonset.apps/platform-connectors            1        1           1
+daemonset.apps/syslog-health-monitor-kata     0        0           0
+daemonset.apps/syslog-health-monitor-regular  0        0           0
+== MongoDB
+NAME      STATE
+mongodb   ready
+PVC                         STATUS   CLASS        SIZE
+mongod-data-mongodb-rs0-0   Bound    local-path   3Gi
+== circuit breaker
+no circuit-breaker ConfigMap
+== admission webhooks from the lane
+Validating  vrebootnode-v1alpha1.kb.io                             Fail  rebootnodes
+Validating  vterminatenode-v1alpha1.kb.io                          Fail  terminatenodes
+Validating  vgpureset-v1alpha1.kb.io                               Fail  gpuresets
+Validating  vextrr-v1.kb.io                                        Fail  externalremediationrequests
+Validating  validate-jobset-x-k8s-io-v1alpha2-jobset.x-k8s.io      Fail  jobsets
+Validating  validate--v1-pod.x-k8s.io                              Fail  pods
+Validating  validator.clustertrainingruntime.trainer.kubeflow.org  Fail  clustertrainingruntimes
+Validating  validator.trainingruntime.trainer.kubeflow.org         Fail  trainingruntimes
+Validating  validator.trainjob.trainer.kubeflow.org                Fail  trainjobs
+Mutating    defaulter.trainjob.trainer.kubeflow.org                Fail  trainjobs
+Mutating    mutate-jobset-x-k8s-io-v1alpha2-jobset.x-k8s.io        Fail  jobsets
+Mutating    mutate--v1-pod.x-k8s.io                                Fail  pods
+== nvcrectl setup status (its em dashes written as --, which this repository's lint requires)
+Component                       Status
+─────────────────────────       ──────────
+NVCRE CRDs                      ✓ installed
+NVCRE Controller                ✗ not found
+Kubeflow Trainer                ✓ installed (v2.2.1)
+Log Profiles                    ✓ installed
+GPU Operator                    ✗ not found
+DCGM (optional)                 ✓ installed
+Helm release nvcre              ✓ not installed
+Helm release kubeflow-trainer   ✓ not installed
+
+Status: not ready -- run 'nvcrectl setup init' to install missing components
+  GPU Operator must be installed by your cluster administrator
+== with the CPU worker off: does the API still admit an ordinary pod?
+pod/fc12-probe

@@ -1,0 +1,48 @@
+# make kubevirt-check DRY_RUN=server, then BREAK=1 (must fail on virt-launcher by tag and on two misspelt fields)
+# 20261020T155148Z, laptop clock, UTC. git 34696a8 plus the KubeVirt working tree
+# kubectl v1.36.5, par API server v1.36.5
+
+## make kubevirt-check DRY_RUN=server
+==> 1. vendored operator manifest
+./gitops/manifests/platform/kubevirt/upstream/kubevirt-operator-v1.9.1.yaml: OK
+==> 2. kustomize build
+ok   virt-operator: 1 replica, eu1.io/pool=cpu, no control-plane affinity
+     kinds: ClusterRole, ClusterRoleBinding, CustomResourceDefinition, Deployment, Job, KubeVirt, Namespace, PriorityClass, ResourceQuota, Role, RoleBinding, Service, ServiceAccount, VirtualMachine
+ok   14 image references, all by digest, and 11 component images set on virt-operator
+==> 3. KubeVirt and VirtualMachine fields against KubeVirt's OpenAPI spec at v1.9.1
+ok   2 objects, every field known to KubeVirt swagger.json
+==> 4. server-side dry run on par, without the objects whose CRDs the operator creates
+resourcequota/tenant-vm serverside-applied (server dry run)
+customresourcedefinition.apiextensions.k8s.io/kubevirts.kubevirt.io serverside-applied (server dry run)
+serviceaccount/kubevirt-operator serverside-applied (server dry run)
+serviceaccount/kubevirt-wait serverside-applied (server dry run)
+role.rbac.authorization.k8s.io/kubevirt-operator serverside-applied (server dry run)
+role.rbac.authorization.k8s.io/kubevirt-wait serverside-applied (server dry run)
+clusterrole.rbac.authorization.k8s.io/kubevirt-operator serverside-applied (server dry run)
+clusterrole.rbac.authorization.k8s.io/kubevirt.io:operator serverside-applied (server dry run)
+rolebinding.rbac.authorization.k8s.io/kubevirt-operator-rolebinding serverside-applied (server dry run)
+rolebinding.rbac.authorization.k8s.io/kubevirt-wait serverside-applied (server dry run)
+clusterrolebinding.rbac.authorization.k8s.io/kubevirt-operator serverside-applied (server dry run)
+service/web-01 serverside-applied (server dry run)
+priorityclass.scheduling.k8s.io/kubevirt-cluster-critical serverside-applied (server dry run)
+deployment.apps/virt-operator serverside-applied (server dry run)
+job.batch/kubevirt-wait-available serverside-applied (server dry run)
+Warning: metadata.finalizers: "resources-finalizer.argocd.argoproj.io": prefer a domain-qualified finalizer name including a path (/) to avoid accidental conflicts with other finalizer writers
+application.argoproj.io/kubevirt created (server dry run)
+==> all KubeVirt checks passed
+
+## make kubevirt-check BREAK=1
+==> 1. vendored operator manifest
+./gitops/manifests/platform/kubevirt/upstream/kubevirt-operator-v1.9.1.yaml: OK
+==> 2. kustomize build
+ok   virt-operator: 1 replica, eu1.io/pool=cpu, no control-plane affinity
+     kinds: ClusterRole, ClusterRoleBinding, CustomResourceDefinition, Deployment, Job, KubeVirt, Namespace, PriorityClass, ResourceQuota, Role, RoleBinding, Service, ServiceAccount, VirtualMachine
+ok   14 image references, all by digest, and 11 component images set on virt-operator
+==> 3. KubeVirt and VirtualMachine fields against KubeVirt's OpenAPI spec at v1.9.1
+FAIL Deployment/virt-operator.spec.template.spec.containers[0].env[4].value: quay.io/kubevirt/virt-launcher:v1.9.1 has no digest
+FAIL virt-operator env VIRT_LAUNCHER_IMAGE: missing or not a digest
+==> virt-launcher by tag was caught, as it should be
+FAIL KubeVirt/kubevirt.spec.configuration.developerConfiguration.useEmulaton: no such field
+FAIL VirtualMachine/web-01.spec.template.spec.evictionStrateg: no such field
+2 unknown fields, 2 objects checked
+==> the misspelt fields were caught, as they should be

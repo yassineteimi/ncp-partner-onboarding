@@ -1,0 +1,34 @@
+Discovered 1 GPU nodes with product: NVIDIA-H200
+WorkloadRun eu1-fin-diag-101242 created in namespace readiness-runs.
+
+Waiting for completion (timeout: 10m0s)...
+[watch] eu1-fin-diag-101242: InProgress (0s) -- Workflow eu1-fin-diag-101242 created
+[watch] WorkloadRun succeeded. (10s)
+
+╔════════════════════════════════════════════════════════════════╗
+║                       WorkloadRun Report                       ║
+╚════════════════════════════════════════════════════════════════╝
+
+  Name:      eu1-fin-diag-101242
+  Platform:  onprem
+  GPU:       h200
+  Nodes:     1
+
+┌────────────────────────────────────────────────────────────────┐
+│  workloadrun/eu1-fin-diag-101242                               │
+├────────────────────────────────────────────────────────────────┤
+│  Status:    Succeeded                                          │
+│  Runtime:   9s                                                 │
+│  Scale:     intra-node                                         │
+│  Nodes/Job: 1                                                  │
+│  Jobs:      1                                                  │
+└────────────────────────────────────────────────────────────────┘
+
+┌────────────────────────────────────────────────────────────────┐
+│  Summary                                                       │
+├────────────────────────────────────────────────────────────────┤
+│  Categories:   1/1 passed                                      │
+│  Failed Nodes: none                                            │
+│  Result:       PASSED                                          │
+└────────────────────────────────────────────────────────────────┘
+

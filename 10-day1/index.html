@@ -1,0 +1,1785 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Part 2 of my GPU fleet work. Nordhaven, a fictional European GPU cloud partner, goes from hardware handover to its first production workloads on NVIDIA's open stack, across a Paris site and a Finland site on two providers, driven by one Git repository.">
+      
+      
+        <meta name="author" content="Yassine TEIMI">
+      
+      
+        <link rel="canonical" href="https://yassineteimi.github.io/ncp-partner-onboarding/10-day1/">
+      
+      
+        <link rel="prev" href="../architecture/">
+      
+      
+        <link rel="next" href="../10-day2-nvsentinel/">
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.49">
+    
+    
+      
+        <title>Day 1 - Nordhaven: a GPU cloud partner from handover to first workloads</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.6f8fc17f.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../stylesheets/terminal.css">
+    
+      <link rel="stylesheet" href="../stylesheets/diagram-zoom.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="teal" data-md-color-accent="lime">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#day-1-bring-a-node-into-service" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Nordhaven: a GPU cloud partner from handover to first workloads" class="md-header__button md-logo" aria-label="Nordhaven: a GPU cloud partner from handover to first workloads" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Nordhaven: a GPU cloud partner from handover to first workloads
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Day 1
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="teal" data-md-color-accent="lime"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="purple"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 6H7c-3.31 0-6 2.69-6 6s2.69 6 6 6h10c3.31 0 6-2.69 6-6s-2.69-6-6-6m0 10H7c-2.21 0-4-1.79-4-4s1.79-4 4-4h10c2.21 0 4 1.79 4 4s-1.79 4-4 4M7 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/yassineteimi/ncp-partner-onboarding" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    yassineteimi/ncp-partner-onboarding
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../ownership-map/" class="md-tabs__link">
+        
+  
+    
+  
+  AI Factory
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+    
+  
+  PoC Overview
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../architecture/" class="md-tabs__link">
+        
+  
+    
+  
+  Architecture
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+    
+  
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
+        
+  
+    
+  
+  Day 1
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../10-day2-nvsentinel/" class="md-tabs__link">
+          
+  
+  Day 2
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../simulated/" class="md-tabs__link">
+        
+  
+    
+  
+  What is simulated
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../adr/" class="md-tabs__link">
+          
+  
+  Decisions
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../findings/" class="md-tabs__link">
+        
+  
+    
+  
+  Findings
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Nordhaven: a GPU cloud partner from handover to first workloads" class="md-nav__button md-logo" aria-label="Nordhaven: a GPU cloud partner from handover to first workloads" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Nordhaven: a GPU cloud partner from handover to first workloads
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/yassineteimi/ncp-partner-onboarding" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    yassineteimi/ncp-partner-onboarding
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ownership-map/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AI Factory
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    PoC Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Architecture
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Day 1
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Day 1
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#aicr-a-known-good-software-stack" class="md-nav__link">
+    <span class="md-ellipsis">
+      AICR: a known-good software stack
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="AICR: a known-good software stack">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-problem" class="md-nav__link">
+    <span class="md-ellipsis">
+      The problem
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#two-ways-to-answer-which-versions-go-together" class="md-nav__link">
+    <span class="md-ellipsis">
+      Two ways to answer "which versions go together?"
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-happened" class="md-nav__link">
+    <span class="md-ellipsis">
+      What happened
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-i-decided" class="md-nav__link">
+    <span class="md-ellipsis">
+      What I decided
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#in-one-sentence" class="md-nav__link">
+    <span class="md-ellipsis">
+      In one sentence
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      Setup
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#results" class="md-nav__link">
+    <span class="md-ellipsis">
+      Results
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-the-drift-check-missed-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      Why the drift check missed it
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#limits" class="md-nav__link">
+    <span class="md-ellipsis">
+      Limits
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#nvcre-certify-the-node-before-tenants-use-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      NVCRE: certify the node before tenants use it
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="NVCRE: certify the node before tenants use it">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#making-nvcre-work-on-this-hardware" class="md-nav__link">
+    <span class="md-ellipsis">
+      Making NVCRE work on this hardware
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-i-test-and-how" class="md-nav__link">
+    <span class="md-ellipsis">
+      What I test, and how
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-happened-on-the-h200" class="md-nav__link">
+    <span class="md-ellipsis">
+      What happened on the H200
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#in-one-sentence_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      In one sentence
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setup_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Setup
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#results-finland-h200-22-october-utc" class="md-nav__link">
+    <span class="md-ellipsis">
+      Results, Finland H200, 22 October (UTC)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-gap-the-run-exposed-and-the-fix" class="md-nav__link">
+    <span class="md-ellipsis">
+      The gap the run exposed, and the fix
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#paris-l4-21-october" class="md-nav__link">
+    <span class="md-ellipsis">
+      Paris L4, 21 October
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#limits_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Limits
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Day 2
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Day 2
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../10-day2-nvsentinel/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    NVSentinel
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../20-tenancy/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Tenancy: KAI and MIG
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../21-hpc-slinky/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    HPC: Slurm with Slinky
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../30-metrics-across-sites/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Observability with Thanos
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../30-vm-tenants/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    VM tenants
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../40-inference-dynamo/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Inference with Dynamo (WIP)
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../simulated/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    What is simulated
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Decisions
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            Decisions
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    All decisions
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0001-two-sites-two-providers/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    0001: Two sites, two providers
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0002-driver-ownership/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    0002: Driver ownership
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0003-known-good-stack/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    0003: Known-good stack
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0004-readiness-gate/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    0004: Readiness gate
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0005-fault-remediation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    0005: Fault remediation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0006-batch-scheduling/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    0006: Batch scheduling
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0007-hpc-tenants-slurm/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    0007: HPC tenants
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0008-gpu-sharing/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    0008: GPU sharing
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0009-metrics-across-sites/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    0009: Metrics across sites
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0010-vm-tenants/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    0010: VM tenants
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../findings/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Findings
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="day-1-bring-a-node-into-service">Day 1: bring a node into service</h1>
+<p>A new GPU node has two questions to answer before a tenant touches it: is it running the
+right software, and does it actually work? AICR answers the first, NVCRE the second.
+Both ran on the Paris L4 (21 October 2026) and the Finland 2× H200 node (22 October).</p>
+<h2 id="aicr-a-known-good-software-stack">AICR: a known-good software stack</h2>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">In short</label><label for="__tabbed_1_2">Run evidence</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<h3 id="the-problem">The problem</h3>
+<p>A GPU server runs a stack of software on top of the hardware: the driver, the GPU
+Operator that installs and manages it, monitoring, a scheduler. Each piece has many
+versions, and not every combination works. A wrong one shows up as GPUs the cluster
+can't see, or crashes after an upgrade.</p>
+<h3 id="two-ways-to-answer-which-versions-go-together">Two ways to answer "which versions go together?"</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Part 1: hand-pinned</th>
+<th>AICR: locked recipes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>How</td>
+<td>I picked each version and checked it against its release notes</td>
+<td>NVIDIA publishes tested combinations per hardware, OS and platform</td>
+</tr>
+<tr>
+<td>Output</td>
+<td>Versions pinned in Git</td>
+<td>A recipe, rendered as Argo CD apps, plus a validator for a live cluster</td>
+</tr>
+<tr>
+<td>Trust</td>
+<td>My reading of the notes</td>
+<td>NVIDIA's testing</td>
+</tr>
+</tbody>
+</table>
+<p>I asked AICR (AI Cluster Runtime, v1.1.0) for both pools and set its answer beside what
+they run.</p>
+<h3 id="what-happened">What happened</h3>
+<ul>
+<li><strong>No recipe fits either pool as built.</strong> AICR doesn't know the L4 or kubeadm. For
+  the H200 it has recipes, but all of them require Ubuntu 24.04, and the provider's
+  image is 26.04.</li>
+<li><strong>Its validator refused the H200 node</strong> before checking a single component, on the
+  OS release alone.</li>
+<li><strong>Most versions still match.</strong> GPU Operator, NFD and NVSentinel are the same as AICR's.
+  In two places AICR is behind what I need: cert-manager and Kubeflow Trainer.</li>
+<li><strong>Its drift check missed a change I made by hand,</strong> a controller set back one version.
+  Argo CD reverted the same change in 11 seconds.</li>
+</ul>
+<h3 id="what-i-decided">What I decided</h3>
+<p>AICR is the <strong>reference</strong> for the H200 pool: the checklist I compare against. It isn't
+the <strong>installer</strong>: its bundle would put a second GPU Operator, NFD and Prometheus beside
+the ones already running. The L4 keeps Part 1's hand-pinned versions, since AICR has
+nothing for it. Drift detection stays with Argo CD (<a href="../adr/0003-known-good-stack/">ADR 0003</a>).</p>
+<h3 id="in-one-sentence">In one sentence</h3>
+<p>I compared Part 1's hand-pinned stack with AICR's locked recipes: AICR is the right
+reference for a standard H200 pool, but it can't install or validate a cluster that
+strays from its tested OS, so I use it as a checklist and keep Git as the source of truth.</p>
+</div>
+<div class="tabbed-block">
+<h3 id="setup">Setup</h3>
+<p>AICR v1.1.0, run from the laptop against both clusters on 20 to 22 October 2026.
+Recipes requested for H200 training on Ubuntu, and for the L4.</p>
+<h3 id="results">Results</h3>
+<table>
+<thead>
+<tr>
+<th>Check</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Recipes</td>
+<td>3 resolve for H200: <code>eks</code>, <code>eks</code> + Kubeflow, <code>k0s</code>. <code>kubeadm</code>, <code>generic</code> and <code>l4</code> refused</td>
+</tr>
+<tr>
+<td>Closest recipe</td>
+<td><code>k0s</code>: the only one that leaves the driver to the host, as the provider's image does</td>
+</tr>
+<tr>
+<td>Bundle</td>
+<td><code>aicr bundle --deployer argocd</code> gives 11 Argo CD apps; kept as evidence, none synced</td>
+</tr>
+<tr>
+<td>Validation, Finland H200</td>
+<td>Refused at pre-flight: Ubuntu 26.04, recipe wants 24.04</td>
+</tr>
+<tr>
+<td>Drift, Paris</td>
+<td><code>aicr diff</code> reported 16 changes, all runtime counters; the image change wasn't one of them</td>
+</tr>
+</tbody>
+</table>
+<div class="terminal highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>$<span class="w"> </span>make<span class="w"> </span>aicr-recipe
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>...
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>eks-h200-training<span class="w">      </span><span class="nv">exit</span><span class="o">=</span><span class="m">0</span><span class="w">  </span>aicr<span class="w"> </span>recipe<span class="w"> </span>--service<span class="w"> </span>eks<span class="w"> </span>--accelerator<span class="w"> </span>h200<span class="w"> </span>--os<span class="w"> </span>ubuntu<span class="w"> </span>--intent<span class="w"> </span>training
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>eks-h200-kubeflow<span class="w">      </span><span class="nv">exit</span><span class="o">=</span><span class="m">0</span><span class="w">  </span>aicr<span class="w"> </span>recipe<span class="w"> </span>--service<span class="w"> </span>eks<span class="w"> </span>--accelerator<span class="w"> </span>h200<span class="w"> </span>--os<span class="w"> </span>ubuntu<span class="w"> </span>--intent<span class="w"> </span>training<span class="w"> </span>--platform<span class="w"> </span>kubeflow
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>k0s-h200-training<span class="w">      </span><span class="nv">exit</span><span class="o">=</span><span class="m">0</span><span class="w">  </span>aicr<span class="w"> </span>recipe<span class="w"> </span>--service<span class="w"> </span>k0s<span class="w"> </span>--accelerator<span class="w"> </span>h200<span class="w"> </span>--os<span class="w"> </span>ubuntu<span class="w"> </span>--intent<span class="w"> </span>training
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="c1"># What we run, or the closest names to it, refused:</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>kubeadm-h200<span class="w">           </span><span class="nv">exit</span><span class="o">=</span><span class="m">2</span><span class="w">  </span>aicr<span class="w"> </span>recipe<span class="w"> </span>--service<span class="w"> </span>kubeadm<span class="w"> </span>--accelerator<span class="w"> </span>h200<span class="w"> </span>--os<span class="w"> </span>ubuntu<span class="w"> </span>--intent<span class="w"> </span>training
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">    </span><span class="o">[</span>cli<span class="o">]</span><span class="w"> </span><span class="nb">command</span><span class="w"> </span>failed:<span class="w"> </span><span class="nv">error</span><span class="o">=[</span>INVALID_REQUEST<span class="o">]</span><span class="w"> </span>error<span class="w"> </span>parsing<span class="w"> </span>criteria:<span class="w"> </span><span class="o">[</span>INVALID_REQUEST<span class="o">]</span><span class="w"> </span>invalid<span class="w"> </span>service<span class="w"> </span>type:<span class="w"> </span>kubeadm<span class="w"> </span><span class="nv">exitCode</span><span class="o">=</span><span class="m">2</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>...
+</code></pre></div>
+<p>Full output: <a href="https://github.com/yassineteimi/ncp-partner-onboarding/blob/main/docs/artifacts/readiness/aicr/recipes-summary.txt">recipes-summary.txt</a>.</p>
+<p><strong>Versions against the <code>k0s</code> H200 recipe:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Same as AICR</th>
+<th>Newer than AICR</th>
+<th>AICR behind what I need</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GPU Operator v26.7.2, NFD 0.19.0, NVSentinel v1.28.0</td>
+<td>kube-prometheus-stack 91.4.1, driver 580.178.04, KAI v0.18.6</td>
+<td>cert-manager 1.20.2 (NVSentinel asks for 1.21), Kubeflow Trainer 2.2.0 (NVCRE needs 2.2.1)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Validation of the Finland H200 node:</strong></p>
+<div class="terminal highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>$<span class="w"> </span>make<span class="w"> </span>aicr-validate<span class="w"> </span><span class="nv">SITE</span><span class="o">=</span>fin
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>...
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="o">[</span>cli<span class="o">]</span><span class="w"> </span>readiness<span class="w"> </span>pre-flight:<span class="w"> </span><span class="nv">constraints</span><span class="o">=</span><span class="m">3</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="o">[</span>cli<span class="o">]</span><span class="w"> </span>readiness<span class="w"> </span>constraint<span class="w"> </span>passed:<span class="w"> </span><span class="nv">name</span><span class="o">=</span>K8s.server.version<span class="w"> </span><span class="nv">expected</span><span class="o">=</span>&gt;<span class="o">=</span><span class="w"> </span><span class="m">1</span>.34<span class="w"> </span><span class="nv">actual</span><span class="o">=</span>v1.36.5
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="o">[</span>cli<span class="o">]</span><span class="w"> </span>readiness<span class="w"> </span>constraint<span class="w"> </span>passed:<span class="w"> </span><span class="nv">name</span><span class="o">=</span>OS.release.ID<span class="w"> </span><span class="nv">expected</span><span class="o">=</span>ubuntu<span class="w"> </span><span class="nv">actual</span><span class="o">=</span>ubuntu
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="o">[</span>cli<span class="o">]</span><span class="w"> </span><span class="nb">command</span><span class="w"> </span>failed:<span class="w"> </span><span class="nv">error</span><span class="o">=[</span>INVALID_REQUEST<span class="o">]</span><span class="w"> </span>readiness<span class="w"> </span>check<span class="w"> </span>failed:<span class="w"> </span>OS.release.VERSION_ID<span class="w"> </span>expected<span class="w"> </span><span class="m">24</span>.04,<span class="w"> </span>got<span class="w"> </span><span class="m">26</span>.04<span class="w"> </span><span class="nv">exitCode</span><span class="o">=</span><span class="m">2</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>aicr<span class="w"> </span>validate<span class="w"> </span><span class="nv">exit</span><span class="o">=</span><span class="m">2</span><span class="w"> </span><span class="o">(</span><span class="nv">2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>readiness<span class="w"> </span>pre-flight<span class="w"> </span>failed<span class="o">)</span>
+</code></pre></div>
+<p>Full output: <a href="https://github.com/yassineteimi/ncp-partner-onboarding/blob/main/docs/artifacts/readiness/aicr/validate-fin-20261022T101408Z.log">validate-fin-20261022T101408Z.log</a>.</p>
+<p><strong>Drift test, Paris, 21 October (UTC):</strong> Argo CD paused for <code>nvcre</code> at 10:54:02, the
+controller image set from v0.8.0 to v0.7.0 by hand at 10:54:15, <code>aicr diff</code> at 10:57:37
+found no image change, Argo CD resumed at 10:57:54 and restored v0.8.0 at 10:58:05
+(<a href="https://github.com/yassineteimi/ncp-partner-onboarding/blob/main/docs/artifacts/readiness/aicr/drift-demo-par.txt">every command with its time</a>).</p>
+<h3 id="why-the-drift-check-missed-it">Why the drift check missed it</h3>
+<p>AICR's snapshot keeps one <code>name: tag</code> per image's last path segment. A digest-pinned
+image has no tag and reads <code>latest</code>, and both pods were named <code>manager</code>, so they merged
+into one entry. On a GitOps cluster, Argo CD is the drift detector; <code>aicr diff</code> is
+useful only for what Git doesn't own (OS, kernel, services), once the counters are
+filtered out.</p>
+<h3 id="limits">Limits</h3>
+<ul>
+<li>Nothing was installed from a recipe, so AICR building a cluster isn't shown.</li>
+<li>The snapshot couldn't read the kernel configuration on either site: neither image ships <code>/boot/config-*</code>.</li>
+<li>One H200 node is one data point for a recipe meant for fleets. Nothing here was simulated.</li>
+</ul>
+</div>
+</div>
+</div>
+<h2 id="nvcre-certify-the-node-before-tenants-use-it">NVCRE: certify the node before tenants use it</h2>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">In short</label><label for="__tabbed_2_2">Run evidence</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p><strong>The problem.</strong> A new GPU server can arrive broken: a faulty GPU, a slow link between
+GPUs, a bad driver. If customers land on it first, they find the problem for you.</p>
+<p><strong>The idea.</strong> Every new server is guilty until proven innocent. It joins the cluster
+with a "do not enter" sign (a Kubernetes <em>taint</em>, <code>eu1.io/staging</code>), tests run on it,
+and the sign comes off only if everything passes. That's the <em>gate</em>.</p>
+<pre class="mermaid"><code>flowchart LR
+  join["H200 node joins&lt;br/&gt;taint eu1.io/staging=pending:NoSchedule"] --&gt; cert["NVCRE certification&lt;br/&gt;nccl-all-reduce&lt;br/&gt;nccl-loopback-nvswitch"]
+  join --&gt; diag["ECC mode, then dcgmi diag -r 2&lt;br/&gt;as an NVCRE WorkloadRun"]
+  cert --&gt; gate["promote.py&lt;br/&gt;every check passed?"]
+  diag --&gt; gate
+  gate --&gt;|yes| open["taint removed&lt;br/&gt;tenants can schedule"]
+  gate --&gt;|no| keep["taint kept&lt;br/&gt;cause: hardware, tooling or unclear"]</code></pre>
+<h3 id="making-nvcre-work-on-this-hardware">Making NVCRE work on this hardware</h3>
+<p>NVCRE is built for NVIDIA's standard large servers. Mine are smaller and different, so I
+changed six things:</p>
+<table>
+<thead>
+<tr>
+<th>NVCRE assumes</th>
+<th>My reality</th>
+<th>What I set</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>An H200 server has 8 GPUs</td>
+<td>Mine is a 2-GPU slice of one</td>
+<td><code>gpusPerNode: 2</code> (1 on the L4)</td>
+</tr>
+<tr>
+<td>No speed limit: "passed" only means "it ran"</td>
+<td>I need proof of NVLink</td>
+<td>A 64 GB/s floor</td>
+</tr>
+<tr>
+<td><code>nccl-loopback</code> is the NVLink test</td>
+<td>That variant switches the GPU-to-GPU path off</td>
+<td><code>nccl-loopback-nvswitch</code>, which keeps it on</td>
+</tr>
+<tr>
+<td>Its hardware test is DCGM level 4</td>
+<td>About 90 minutes, on a server billed at $11.66 an hour</td>
+<td>My own level 2 test, a few minutes</td>
+</tr>
+<tr>
+<td>Its controller runs away from GPU nodes</td>
+<td>The docs say so, nothing enforces it</td>
+<td>A rule that keeps it off GPU nodes</td>
+</tr>
+<tr>
+<td>Its test pods can enter any node</td>
+<td>My node carries the "do not enter" sign</td>
+<td><code>taintSelectors</code>, so only test pods get in</td>
+</tr>
+</tbody>
+</table>
+<p>NVCRE also relies on two things underneath: Kubeflow Trainer, because it launches each
+test as a training job (a <em>TrainJob</em>), and the DCGM service the GPU Operator runs on
+every GPU node, which performs the hardware diagnostic.</p>
+<p><strong>Why a PyTorch image.</strong> The speed test needs NCCL (NVIDIA's library for GPUs exchanging
+data), CUDA, MPI to launch it across GPUs, and NVIDIA's test program
+<code>all_reduce_perf_mpi</code>. NVIDIA's PyTorch container ships all of them, tested together.
+It's also what real training jobs use, so the test exercises the same communication
+stack customers will.</p>
+<p><strong>Driver compatibility.</strong> The image (<code>pytorch:26.01</code>) is built for driver 590, and the
+Finland server runs driver 580. It ran anyway: CUDA 13 programs can run on an older
+13.x driver, within limits, and the image also carries its own compatibility libraries.
+The main test used those; the smaller one used the server's driver directly. I kept
+<code>pytorch:25.11</code>, built for 580, as a backup. It wasn't needed.</p>
+<h3 id="what-i-test-and-how">What I test, and how</h3>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Plain English</th>
+<th>Tool and category</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Can the GPUs exchange data fast?</td>
+<td>Training splits work across GPUs, which combine their results after every step (<em>all-reduce</em>). A slow exchange means slow training</td>
+<td>NVCRE, <code>communication/nccl-all-reduce</code></td>
+</tr>
+<tr>
+<td>Are they on the fast road?</td>
+<td><strong>NVLink</strong> is a private bridge, about 450 GB/s each way. <strong>PCIe</strong> is the shared main road, about 64 GB/s each way</td>
+<td>NVCRE, <code>communication/nccl-loopback-nvswitch</code>; pass only above 64 GB/s, which only NVLink reaches</td>
+</tr>
+<tr>
+<td>Is the hardware healthy?</td>
+<td>Each GPU checks its software, its memory and its PCIe link</td>
+<td><code>dcgmi diag -r 2</code> (DCGM level 2), run as an NVCRE <em>WorkloadRun</em></td>
+</tr>
+<tr>
+<td>Is memory protection on?</td>
+<td><strong>ECC</strong> catches and fixes memory errors. With it off, the memory test can't run</td>
+<td>DCGM field 300 (current ECC mode), read just before the diagnostic</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Why the diagnostic runs as a WorkloadRun.</strong> A small pod lands on the staged node and
+asks the node's DCGM service to run the diagnostic. DCGM does the work; the pod is only
+the messenger, so it needs no special privileges, and it reserves both GPUs so nothing
+else runs on them meanwhile. I use a WorkloadRun because NVCRE's built-in DCGM test is
+fixed at level 4, about 90 minutes, and a WorkloadRun is NVCRE's way to run my own test
+instead. The whole certification stays in NVCRE, with the same entry pass and the same
+records, rather than me logging into the server.</p>
+<p><strong>NVCRE and the gate.</strong> NVCRE runs the tests and reports; it never touches the node. My
+small script, <code>promote.py</code>, reads every result and removes the sign only if everything
+passed. When it refuses, it says why:</p>
+<ul>
+<li><strong>Hardware:</strong> the node stays out.</li>
+<li><strong>Tooling:</strong> the test itself broke; a person may override, and the override is recorded.</li>
+<li><strong>Unclear:</strong> a person decides. ECC off falls here.</li>
+</ul>
+<h3 id="what-happened-on-the-h200">What happened on the H200</h3>
+<ul>
+<li>The GPUs exchanged data at <strong>351 GB/s</strong>: NVLink proven.</li>
+<li>The diagnostic passed but <strong>skipped its memory test</strong>, because ECC was off at the provider.</li>
+<li>The gate let the node in anyway. That was a gap; it now refuses a skipped test and checks ECC first.</li>
+<li><strong>19 min 39 s</strong> from server ready to open for customers. Part 1's burn-in took 3 hours and ended with a person running a checklist.</li>
+</ul>
+<p><strong>Why I didn't turn ECC on.</strong> ECC only switches on after a GPU reset or a reboot, and on a
+rented virtual server the GPUs might not come back. It's also the provider's setting:
+the fix belongs in the handover spec ("deliver with ECC on"), and my gate's job is to
+catch it, not to patch the node quietly. So the gate refuses the node as "unclear" and
+I ask the provider.</p>
+<h3 id="in-one-sentence_1">In one sentence</h3>
+<p>No node takes customer work until it proves its GPUs talk at NVLink speed and pass
+NVIDIA's diagnostic, enforced by an automatic gate that says why it refuses. I adapted
+NVCRE to a 2-GPU server, and the H200 run exposed a blind spot that I then closed.</p>
+</div>
+<div class="tabbed-block">
+<pre class="mermaid"><code>flowchart LR
+  join["H200 node joins&lt;br/&gt;taint eu1.io/staging=pending:NoSchedule"] --&gt; cert["NVCRE certification&lt;br/&gt;nccl-all-reduce&lt;br/&gt;nccl-loopback-nvswitch"]
+  join --&gt; diag["ECC mode, then dcgmi diag -r 2&lt;br/&gt;as an NVCRE WorkloadRun"]
+  cert --&gt; gate["promote.py&lt;br/&gt;every check passed?"]
+  diag --&gt; gate
+  gate --&gt;|yes| open["taint removed&lt;br/&gt;tenants can schedule"]
+  gate --&gt;|no| keep["taint kept&lt;br/&gt;cause: hardware, tooling or unclear"]</code></pre>
+<h3 id="setup_1">Setup</h3>
+<ul>
+<li>NVCRE v0.8.0 and Kubeflow Trainer 2.2.1 on the Finland control plane; the six
+  adaptations are in the "In short" tab.</li>
+<li>The taint goes on at join, through the node's kubeadm <code>JoinConfiguration</code>, so the node
+  is never schedulable before it's checked. NVCRE never taints, cordons or labels a node;
+  <code>promote.py</code> reads its results file, the diagnostic log and the raw NCCL log.</li>
+<li><strong>Floor: 64 GB/s bus bandwidth.</strong> No published figure exists for two H200s in one node.
+  PCIe Gen5 carries 64 GB/s each way and NVLink about 450 (NVIDIA's H200 page), so above
+  64 the traffic can only have crossed NVLink. It proves the path, not the performance.</li>
+<li>Test image <code>nvcr.io/nvidia/pytorch:26.01-py3</code> (built for driver 590), fallback
+  <code>pytorch:25.11-py3</code> (built for 580), both pinned by digest.</li>
+</ul>
+<h3 id="results-finland-h200-22-october-utc">Results, Finland H200, 22 October (UTC)</h3>
+<table>
+<thead>
+<tr>
+<th>Time</th>
+<th>Step</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>09:54:10</td>
+<td>Node Ready, tainted</td>
+</tr>
+<tr>
+<td>09:55:44</td>
+<td>2 GPUs allocatable</td>
+</tr>
+<tr>
+<td>09:56:33 to 10:02:07</td>
+<td>Test image pulled (9.1 GB, 3 min 7 s once its turn came)</td>
+</tr>
+<tr>
+<td>10:02:42</td>
+<td>Acceptance passed (cuda-vectoradd, <code>nvidia-smi</code>)</td>
+</tr>
+<tr>
+<td>10:03:07 to 10:12:08</td>
+<td>NVCRE certification, both categories</td>
+</tr>
+<tr>
+<td>10:12:41 to 10:12:54</td>
+<td><code>dcgmi diag -r 2</code>, as a <code>WorkloadRun</code></td>
+</tr>
+<tr>
+<td>10:13:49</td>
+<td>Gate passed 7 checks, taint removed: <strong>19 min 39 s from Ready</strong></td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Runtime</th>
+<th>Bus bandwidth (16 GB)</th>
+<th>vs 64 GB/s floor</th>
+<th>vs NVLink ~450 GB/s</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>communication/nccl-all-reduce</code></td>
+<td>4 min 31 s</td>
+<td>351.45 GB/s</td>
+<td>5.5×</td>
+<td>78%</td>
+</tr>
+<tr>
+<td><code>communication/nccl-loopback-nvswitch</code></td>
+<td>4 min 27 s</td>
+<td>351.87 GB/s</td>
+<td>5.5×</td>
+<td>78%</td>
+</tr>
+</tbody>
+</table>
+<div class="terminal highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>$<span class="w"> </span>make<span class="w"> </span>nvcre-certify<span class="w"> </span><span class="nv">SITE</span><span class="o">=</span>fin
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>...
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>│<span class="w">  </span>communication/nccl-all-reduce<span class="w">                                 </span>│
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>├────────────────────────────────────────────────────────────────┤
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>│<span class="w">  </span>Status:<span class="w">    </span>Succeeded<span class="w">                                          </span>│
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>│<span class="w">  </span>Runtime:<span class="w">   </span>4m<span class="w"> </span>31s<span class="w">                                             </span>│
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>...
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>│<span class="w">  </span>Transport:<span class="w"> </span>Socket<span class="w">                                             </span>│
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>│<span class="w">  </span>Bandwidth:<span class="w">                                                    </span>│
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>│<span class="w">    </span>Size<span class="w">       </span>AlgBW<span class="w">        </span>BusBW<span class="w">        </span>Samples<span class="w">                </span>│
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>│<span class="w">    </span><span class="m">16</span><span class="w"> </span>GB<span class="w">      </span><span class="m">351</span>.45<span class="w"> </span>GB/s<span class="w">  </span><span class="m">351</span>.45<span class="w"> </span>GB/s<span class="w">  </span><span class="m">10</span><span class="w">                     </span>│
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>...
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>│<span class="w">  </span>Categories:<span class="w">   </span><span class="m">2</span>/2<span class="w"> </span>passed<span class="w">                                      </span>│
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>│<span class="w">  </span>Failed<span class="w"> </span>Nodes:<span class="w"> </span>none<span class="w">                                            </span>│
+<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>│<span class="w">  </span>Result:<span class="w">       </span>PASSED<span class="w">                                          </span>│
+</code></pre></div>
+<p>Full output: <a href="https://github.com/yassineteimi/ncp-partner-onboarding/blob/main/docs/artifacts/readiness/nvcre-fin-20261022T100307Z-report.txt">nvcre-fin-20261022T100307Z-report.txt</a>.</p>
+<p><strong>NVLink, proven from the raw log.</strong> The summary's <code>Transport: Socket</code> is wrong: Socket
+is NCCL's plugin for traffic between nodes. The raw log shows graph type <code>NVL/PIX</code> and
+48 channel paths per run over P2P, none over the network. DCGM's own PCIe test measured
+53 to 57 GB/s each way, so the floor sat just above PCIe and far below NVLink.</p>
+<div class="terminal highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>$<span class="w"> </span>grep<span class="w"> </span>-E<span class="w"> </span><span class="s2">"type NVL/PIX|via P2P"</span><span class="w"> </span>nvcre-fin-20261022T100307Z-nccl.log
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>...
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="m">2026</span>-10-22T10:07:42.577449869Z<span class="w"> </span>eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75<span class="w"> </span><span class="o">[</span><span class="m">0</span><span class="o">]</span><span class="w"> </span>NCCL<span class="w"> </span>INFO<span class="w"> </span>Pattern<span class="w"> </span><span class="m">1</span>,<span class="w"> </span>crossNic<span class="w"> </span><span class="m">0</span>,<span class="w"> </span>nChannels<span class="w"> </span><span class="m">12</span>,<span class="w"> </span>bw<span class="w"> </span><span class="m">60</span>.000000/60.000000,<span class="w"> </span><span class="nb">type</span><span class="w"> </span>NVL/PIX,<span class="w"> </span>sameChannels<span class="w"> </span><span class="m">0</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>...
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="m">2026</span>-10-22T10:07:42.817807006Z<span class="w"> </span>eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:83<span class="w"> </span><span class="o">[</span><span class="m">0</span><span class="o">]</span><span class="w"> </span>NCCL<span class="w"> </span>INFO<span class="w"> </span>Channel<span class="w"> </span><span class="m">00</span>/0<span class="w"> </span>:<span class="w"> </span><span class="m">0</span><span class="o">[</span><span class="m">0</span><span class="o">]</span><span class="w"> </span>-&gt;<span class="w"> </span><span class="m">1</span><span class="o">[</span><span class="m">1</span><span class="o">]</span><span class="w"> </span>via<span class="w"> </span>P2P/direct<span class="w"> </span>pointer
+</code></pre></div>
+<p>Full output: <a href="https://github.com/yassineteimi/ncp-partner-onboarding/blob/main/docs/artifacts/readiness/nvcre-fin-20261022T100307Z-nccl.log">nvcre-fin-20261022T100307Z-nccl.log</a>.</p>
+<p><strong>Driver 580 vs an image built for 590.</strong> The MPI all-reduce loaded the image's
+forward-compatibility libraries (<code>cudaDriverVersion 13010</code>); the single-process loopback
+used the host's driver through CUDA minor-version compatibility (<code>13000</code>). The fallback
+image stayed unused.</p>
+<h3 id="the-gap-the-run-exposed-and-the-fix">The gap the run exposed, and the fix</h3>
+<p><code>dcgmi diag -r 2</code> passed in 13 s, but skipped its memory test on both GPUs because ECC
+is off on the provider's H200s. DCGM counts a skip as a pass, and so did my gate:</p>
+<div class="terminal highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>$<span class="w"> </span>make<span class="w"> </span>nvcre-promote<span class="w"> </span><span class="nv">SITE</span><span class="o">=</span>fin
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>taints<span class="w"> </span>before:
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>eu1.io/staging<span class="o">=</span>pending:NoSchedule
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>PASS<span class="w"> </span>certification<span class="w"> </span>result<span class="w"> </span>is<span class="w"> </span><span class="s1">'PASSED'</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>PASS<span class="w"> </span>eu1-fin-gpu-01<span class="w"> </span>not<span class="w"> </span>excluded
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>PASS<span class="w"> </span>communication/nccl-all-reduce<span class="w"> </span>Succeeded,<span class="w"> </span>max<span class="w"> </span>busBW<span class="w"> </span><span class="m">351</span>.45<span class="w"> </span>GB/s
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>PASS<span class="w"> </span>communication/nccl-loopback-nvswitch<span class="w"> </span>Succeeded,<span class="w"> </span>max<span class="w"> </span>busBW<span class="w"> </span><span class="m">351</span>.87<span class="w"> </span>GB/s
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>PASS<span class="w"> </span>dcgmi<span class="w"> </span>diag<span class="w"> </span>passed
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>PASS<span class="w"> </span>NCCL<span class="w"> </span>channels<span class="w"> </span>over<span class="w"> </span>NVLink:<span class="w"> </span><span class="m">104</span><span class="w"> </span>lines
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>PASS<span class="w"> </span>NCCL<span class="w"> </span>channels<span class="w"> </span>over<span class="w"> </span>the<span class="w"> </span>network:<span class="w"> </span><span class="m">0</span><span class="w"> </span>lines
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>PROMOTE<span class="w"> </span>eu1-fin-gpu-01
+<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>node/eu1-fin-gpu-01<span class="w"> </span>untainted
+<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>taints<span class="w"> </span>after:
+</code></pre></div>
+<p>Full output: <a href="https://github.com/yassineteimi/ncp-partner-onboarding/blob/main/docs/artifacts/readiness/promote-fin-20261022T101348Z.txt">promote-fin-20261022T101348Z.txt</a>, and the <a href="https://github.com/yassineteimi/ncp-partner-onboarding/blob/main/docs/artifacts/readiness/diag-fin-20261022T101241Z.log">diagnostic log</a>.</p>
+<p>The gate now records each GPU's ECC mode before the diagnostic and refuses with cause
+"unclear" when ECC is off or any test is skipped (<a href="../adr/0004-readiness-gate/">ADR 0004</a>).
+Fed the same files, it refuses the node:</p>
+<div class="terminal highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>$<span class="w"> </span>python<span class="w"> </span>scripts/readiness/promote.py<span class="w"> </span>--node<span class="w"> </span>eu1-fin-gpu-01<span class="w"> </span>--results<span class="w"> </span>nvcre-fin-20261022T100307Z.json<span class="w"> </span>--require<span class="w"> </span>communication/nccl-all-reduce<span class="w"> </span>communication/nccl-loopback-nvswitch<span class="w"> </span>--diag<span class="w"> </span>diag-fin-20261022T101241Z.log<span class="w"> </span>--nccl-log<span class="w"> </span>nvcre-fin-20261022T100307Z-nccl.log
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>...
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>FAIL<span class="w"> </span><span class="o">[</span>tooling<span class="o">]</span><span class="w"> </span>no<span class="w"> </span>ECC<span class="w"> </span>mode<span class="w"> </span>recorded<span class="w"> </span>before<span class="w"> </span>the<span class="w"> </span>diagnostic
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>FAIL<span class="w"> </span><span class="o">[</span>unclear<span class="o">]</span><span class="w"> </span>dcgmi<span class="w"> </span>diag<span class="w"> </span>skipped<span class="w"> </span>memory<span class="w"> </span>on<span class="w"> </span>GPU<span class="w"> </span><span class="m">0</span>:<span class="w"> </span>Skipping<span class="w"> </span><span class="nb">test</span><span class="w"> </span>Memory<span class="w"> </span>because<span class="w"> </span>ECC<span class="w"> </span>is<span class="w"> </span>not<span class="w"> </span>enabled<span class="w"> </span>on<span class="w"> </span>GPU<span class="w"> </span><span class="m">0</span><span class="w"> </span>Enable<span class="w"> </span>ECC<span class="w"> </span>memory<span class="w"> </span>by<span class="w"> </span>running<span class="w"> </span><span class="s2">"nvidia-smi -i &lt;gpuId&gt; -e 1"</span><span class="w"> </span>to<span class="w"> </span>enable.<span class="w"> </span>This<span class="w"> </span>may<span class="w"> </span>require<span class="w"> </span>a<span class="w"> </span>GPU<span class="w"> </span>reset<span class="w"> </span>or<span class="w"> </span>reboot<span class="w"> </span>to<span class="w"> </span>take<span class="w"> </span>effect.
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>...
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>REFUSE<span class="w"> </span>eu1-fin-gpu-01<span class="w"> </span><span class="nv">cause</span><span class="o">=</span>unclear
+</code></pre></div>
+<p>Full output: <a href="https://github.com/yassineteimi/ncp-partner-onboarding/blob/main/docs/artifacts/readiness/promote-fin-recheck-20261022T212142Z.txt">promote-fin-recheck-20261022T212142Z.txt</a>.
+The ECC read (<code>dcgmi dmon</code>, field 300) was added after the run and hasn't run on a GPU
+yet; if it prints nothing, the gate refuses.</p>
+<h3 id="paris-l4-21-october">Paris L4, 21 October</h3>
+<p>The same gate with <code>gpusPerNode: 1</code>: certified in 1 min 57 s, diagnostic passed in 11 s
+(memory included, ECC on), promoted at 17:25:54 UTC. Bus bandwidth is 0 with one rank,
+so this proved the plumbing, not the L4
+(<a href="https://github.com/yassineteimi/ncp-partner-onboarding/blob/main/docs/artifacts/readiness/nvcre-par-20261021T172328Z-report.txt">report</a>,
+<a href="https://github.com/yassineteimi/ncp-partner-onboarding/blob/main/docs/artifacts/readiness/promote-par-20261021T172554Z.txt">gate</a>).</p>
+<h3 id="limits_1">Limits</h3>
+<ul>
+<li>Level 2 isn't level 4: no targeted power or stress tests, no nvbandwidth, and on the H200 no memory test.</li>
+<li>One node: no InfiniBand, RoCE, cross-node NVLink or rack-scale NVSwitch, and no training categories (they need 4 or 32 GPUs).</li>
+<li>Nothing was simulated; only the Paris L4's taint was added by hand, since that node joins without one.</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      &copy; 2026 <a href="https://github.com/yassineteimi" target="_blank" rel="noopener">Yassine TEIMI</a>
+
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/yassineteimi" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 512"><!--! Font Awesome Free 6.7.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M186.1 328.7c0 20.9-10.9 55.1-36.7 55.1s-36.7-34.2-36.7-55.1 10.9-55.1 36.7-55.1 36.7 34.2 36.7 55.1M480 278.2c0 31.9-3.2 65.7-17.5 95-37.9 76.6-142.1 74.8-216.7 74.8-75.8 0-186.2 2.7-225.6-74.8-14.6-29-20.2-63.1-20.2-95 0-41.9 13.9-81.5 41.5-113.6-5.2-15.8-7.7-32.4-7.7-48.8 0-21.5 4.9-32.3 14.6-51.8 45.3 0 74.3 9 108.8 36 29-6.9 58.8-10 88.7-10 27 0 54.2 2.9 80.4 9.2 34-26.7 63-35.2 107.8-35.2 9.8 19.5 14.6 30.3 14.6 51.8 0 16.4-2.6 32.7-7.7 48.2 27.5 32.4 39 72.3 39 114.2m-64.3 50.5c0-43.9-26.7-82.6-73.5-82.6-18.9 0-37 3.4-56 6-14.9 2.3-29.8 3.2-45.1 3.2-15.2 0-30.1-.9-45.1-3.2-18.7-2.6-37-6-56-6-46.8 0-73.5 38.7-73.5 82.6 0 87.8 80.4 101.3 150.4 101.3h48.2c70.3 0 150.6-13.4 150.6-101.3m-82.6-55.1c-25.8 0-36.7 34.2-36.7 55.1s10.9 55.1 36.7 55.1 36.7-34.2 36.7-55.1-10.9-55.1-36.7-55.1"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://linkedin.com/in/yassine-teimi" target="_blank" rel="noopener" title="linkedin.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3M135.4 416H69V202.2h66.5V416zm-33.2-243c-21.3 0-38.5-17.3-38.5-38.5S80.9 96 102.2 96c21.2 0 38.5 17.3 38.5 38.5 0 21.3-17.2 38.5-38.5 38.5m282.1 243h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.tabs", "navigation.sections", "toc.integrate", "navigation.top", "search.suggest", "search.highlight", "content.tabs.link", "content.code.annotation", "content.code.copy"], "search": "../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.88dd0f4e.min.js"></script>
+      
+        <script src="../javascripts/diagram-zoom.js"></script>
+      
+        <script src="../javascripts/tab-anchors.js"></script>
+      
+    
+  </body>
+</html>

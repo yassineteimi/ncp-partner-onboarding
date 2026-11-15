@@ -1,0 +1,719 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ownership map</title>
+<meta name="description" content="Who owns what in an NVIDIA Cloud Partner AI factory, from power to inference: the layers, the boundary, the handovers, and what my PoCs tested.">
+<script>
+/* Pick the theme before first paint: the docs site's toggle when framed, otherwise a saved choice or the OS setting. */
+(function () {
+  var q = new URLSearchParams(location.search), t = q.get('theme');
+  if (!t) { try { var b = window.frameElement && parent.document.body; if (b) t = b.getAttribute('data-md-color-scheme') === 'slate' ? 'dark' : 'light'; } catch (e) {} }
+  if (!t) { try { t = localStorage.getItem('om-theme'); } catch (e) {} }
+  if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', t);
+})();
+</script>
+<style>
+@font-face{font-family:"Overpass";font-weight:400;font-display:swap;src:url("fonts/overpass-latin-400-normal.woff2") format("woff2")}
+@font-face{font-family:"Overpass";font-weight:500;font-display:swap;src:url("fonts/overpass-latin-500-normal.woff2") format("woff2")}
+@font-face{font-family:"Overpass";font-weight:600;font-display:swap;src:url("fonts/overpass-latin-600-normal.woff2") format("woff2")}
+@font-face{font-family:"Overpass";font-weight:700;font-display:swap;src:url("fonts/overpass-latin-700-normal.woff2") format("woff2")}
+@font-face{font-family:"Overpass";font-weight:800;font-display:swap;src:url("fonts/overpass-latin-800-normal.woff2") format("woff2")}
+
+:root{
+  --paper:#ffffff; --ink:#18222d; --muted:#5a6774; --rule:#d6dde3;
+  --own:#00728a; --own-soft:#e2f2f5; --own-chip:#bfdde4; --on-own:#ffffff;
+  --loop:#6e3a96; --loop-soft:#f1eaf7; --on-loop:#ffffff;
+  --prov:#8a97a3; --prog:#c98a00;
+  --across-bg:#f6f9fa; --know-bg:#f1f3f5; --chip-bg:#ffffff;
+  --bar:#18222d; --on-bar:#ffffff; --bar-sub:#c4ced7;
+  --focus:#00728a;
+}
+:root[data-theme="dark"]{
+  --paper:#1e212a; --ink:#e4e9ee; --muted:#9ba8b5; --rule:#353b47;
+  --own:#45c2d6; --own-soft:rgba(69,194,214,.10); --own-chip:rgba(69,194,214,.28); --on-own:#0c1a1f;
+  --loop:#b48be0; --loop-soft:rgba(180,139,224,.13); --on-loop:#170f20;
+  --prov:#7f8b97; --prog:#e3a92b;
+  --across-bg:rgba(255,255,255,.025); --know-bg:rgba(255,255,255,.045); --chip-bg:rgba(255,255,255,.04);
+  --bar:#dde4ea; --on-bar:#151a21; --bar-sub:#4b5662;
+  --focus:#45c2d6;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--paper);color:var(--ink)}
+body{font-family:"Overpass",system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px;border-radius:4px}
+
+/* ---------- frame ---------- */
+.viewport{margin:0 auto;position:relative}
+.stage{width:1600px;padding:28px 26px 26px;transform-origin:0 0;position:relative}
+
+/* ---------- header ---------- */
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:24px}
+h1{font-weight:800;font-size:33px;line-height:1.08;letter-spacing:-.012em}
+.sub{font-size:16.5px;line-height:1.5;color:var(--muted);margin-top:9px;max-width:68ch}
+.tools{display:flex;gap:8px;align-items:center;flex:none;margin-top:4px}
+.btn{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 13px;border-radius:7px;border:1px solid var(--rule);font-size:14px;font-weight:600;line-height:1;color:var(--ink);background:var(--paper)}
+.btn:hover{border-color:var(--own)}
+.btn[aria-pressed="true"]{background:var(--own);border-color:var(--own);color:var(--on-own)}
+.btn.icon{width:34px;padding:0;justify-content:center}
+.btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.walk{display:inline-flex;align-items:center;border:1px solid var(--rule);border-radius:7px;height:34px;overflow:hidden}
+.walk button{height:32px;padding:0 10px;font-size:14px;font-weight:600;display:inline-flex;align-items:center}
+.walk button:hover{background:var(--own-soft)}
+.walk .count{min-width:112px;justify-content:center;border-left:1px solid var(--rule);border-right:1px solid var(--rule)}
+.walk svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.framed .theme-btn{display:none}
+
+.meta{display:flex;justify-content:space-between;align-items:center;margin:16px 0 18px;gap:20px}
+.legend{display:flex;gap:16px;align-items:center;font-size:13.5px;color:var(--muted);flex-wrap:wrap}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+.legend .gap{width:8px}
+.sw{width:22px;height:14px;border-radius:3px;display:inline-block}
+.sw.o{background:var(--own-soft);border:1.5px solid var(--own)}
+.sw.a{background:var(--across-bg);border:1.5px dashed var(--own)}
+.sw.k{background:var(--know-bg);border:1px solid var(--rule)}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block;flex:none}
+.dot.t{background:var(--own)} .dot.p{background:var(--prov)} .dot.g{background:var(--prog)} .dot.n{border:1.6px solid var(--muted)}
+.hint{font-size:13.5px;color:var(--muted);text-align:right}
+.hint kbd{font:inherit;font-weight:700;color:var(--ink);border:1px solid var(--rule);border-bottom-width:2px;border-radius:4px;padding:0 5px}
+.export .tools,.export .hint{display:none}
+
+/* ---------- body grid ---------- */
+.body{display:grid;grid-template-columns:992px 206px 350px;column-gap:0;align-items:start}
+.body .panel{grid-column:3;margin-left:0}
+.body .spacer{grid-column:2}
+.map{grid-column:1;position:relative}
+
+.row{display:flex;align-items:flex-start;margin-bottom:8px}
+.stake{width:200px;flex:none;height:0;overflow:visible;display:flex;flex-direction:column;gap:6px;opacity:0;visibility:hidden;transition:opacity .3s ease,visibility 0s linear .3s}
+.row.open .stake{opacity:1;visibility:visible;transition:opacity .35s ease .12s,visibility 0s}
+.gutter{width:72px;flex:none}
+.person{font-size:13.5px;font-weight:600;line-height:1.28;padding:8px 10px;border-radius:7px;background:var(--chip-bg);border:1px solid var(--rule);transition:box-shadow .2s,border-color .2s}
+.person.me{background:var(--own);border-color:var(--own);color:var(--on-own)}
+.person.hit{border-color:var(--own);box-shadow:0 0 0 3px var(--own-soft)}
+#r-plat.open ~ #r-val .person.me{display:none}
+
+.band{width:720px;flex:none;border-radius:8px;position:relative}
+.band.own{background:var(--own-soft);border:1.5px solid var(--own)}
+.band.across{background:var(--across-bg);border:1.5px dashed var(--own)}
+.band.know{background:var(--know-bg);border:1px solid var(--rule)}
+.hd{width:100%;height:54px;padding:0 16px 0 17px;display:flex;align-items:center;gap:12px;text-align:left;border-radius:8px}
+.hd .name{font-size:18px;font-weight:700;letter-spacing:-.004em;flex:1;padding-top:2px}
+.hd .tag{font-size:13.5px;font-weight:500;color:var(--muted);padding-top:2px}
+.chev{width:16px;height:16px;stroke:var(--muted);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .3s ease;flex:none}
+.open .chev, .step.open .chev{transform:rotate(180deg)}
+.hd:hover .name{color:var(--own)}
+.body-c{display:grid;grid-template-rows:0fr;transition:grid-template-rows .34s ease}
+.row.open .body-c{grid-template-rows:1fr}
+.body-c > .in{overflow:hidden;min-height:0}
+.in-pad{padding:0 17px 15px}
+.desc{font-size:14.5px;line-height:1.45;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{display:inline-flex;align-items:center;gap:7px;font-size:13.5px;font-weight:500;line-height:1;padding:7px 10px 6px;border-radius:5px;background:var(--chip-bg);border:1px solid var(--rule);white-space:nowrap}
+.own .chip{border-color:var(--own-chip)}
+.ownline{font-size:14px;line-height:1.45;margin-top:11px;padding-top:10px;border-top:1px solid var(--rule)}
+.own .ownline{border-top-color:var(--own-chip)}
+.ownline b{font-weight:700;color:var(--own)}
+
+.line{width:720px;flex:none;height:46px;border-radius:8px;background:var(--bar);color:var(--on-bar);display:flex;align-items:center;justify-content:space-between;padding:2px 18px 0}
+.line b{font-size:16.5px;font-weight:800;letter-spacing:-.003em}
+.line span{font-size:13.5px;color:var(--bar-sub);font-weight:500}
+
+/* ---------- brackets ---------- */
+.br{position:absolute;left:220px;width:18px;border:2.5px solid var(--own);border-right:0;border-radius:7px 0 0 7px;opacity:0;transition:opacity .4s ease .5s}
+.br.dash{border-style:dashed}
+.br.grey{border-color:var(--prov)}
+.brl{position:absolute;left:201px;writing-mode:vertical-rl;transform:rotate(180deg);font-size:13px;font-weight:800;color:var(--own);white-space:nowrap;background:var(--paper);padding:4px 0;opacity:0;transition:opacity .4s ease .5s}
+.brl.grey{color:var(--prov)}
+.stub{fill:none;stroke:var(--muted);stroke-width:1.4;stroke-dasharray:2 4;opacity:0;transition:opacity .35s ease .7s}
+.ready .stub{opacity:.7}
+.ready .br,.ready .brl{opacity:1}
+
+/* ---------- lanes and pins ---------- */
+#lanes{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
+.seg{fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1 2;stroke-dashoffset:1;opacity:0}
+.seg.on{opacity:1;stroke-dashoffset:0;transition:stroke-dashoffset .62s ease-in-out}
+.seg.t{stroke:var(--own)} .seg.v{stroke:var(--loop)}
+.head{opacity:0;transition:opacity .15s ease}
+.head.on{opacity:1;transition-delay:.55s}
+.head.t{fill:var(--own)} .head.v{fill:var(--loop)}
+.src{opacity:0}.src.on{opacity:1}
+.src.v{fill:var(--loop)}
+.lbl{font-family:"Overpass",sans-serif;font-weight:700;font-size:13px;fill:var(--loop);opacity:0;transition:opacity .35s ease}
+.lbl.on{opacity:1}
+.ext{stroke:var(--bar);stroke-width:2;stroke-dasharray:3 5;opacity:.85}
+.instant,.instant.on{transition:none!important}
+
+.pin{position:absolute;width:26px;height:26px;margin:-13px 0 0 -13px;border-radius:50%;background:var(--own);color:var(--on-own);font-size:13px;font-weight:800;line-height:27px;text-align:center;border:2px solid var(--paper);box-shadow:0 0 0 1.5px var(--own);opacity:0;transition:opacity .35s ease .7s,transform .15s ease 0s,box-shadow .2s ease 0s;z-index:3}
+.pin.v{background:var(--loop);color:var(--on-loop);box-shadow:0 0 0 1.5px var(--loop)}
+.ready .pin{opacity:1}
+.pin:hover{transform:scale(1.14)}
+.pin.cur{box-shadow:0 0 0 1.5px var(--own),0 0 0 6px var(--own-soft)}
+.pin.v.cur{box-shadow:0 0 0 1.5px var(--loop),0 0 0 6px var(--loop-soft)}
+.pin.pulse{animation:pulse 1.2s ease-out 2}
+@keyframes pulse{0%{box-shadow:0 0 0 1.5px var(--own),0 0 0 0 var(--own)}100%{box-shadow:0 0 0 1.5px var(--own),0 0 0 14px transparent}}
+
+/* ---------- handovers panel ---------- */
+.panel h2{font-size:18.5px;font-weight:800;letter-spacing:-.006em}
+.panel .lead{font-size:13.8px;line-height:1.45;color:var(--muted);margin:5px 0 12px}
+.step{border-top:1px solid var(--rule)}
+.step:last-child{border-bottom:1px solid var(--rule)}
+.sh{width:100%;display:flex;align-items:center;gap:9px;padding:10px 0 9px;text-align:left}
+.sh .st{flex:1;font-size:15px;font-weight:700;padding-top:2px}
+.sh:hover .st{color:var(--own)}
+.badge{width:22px;height:22px;border-radius:50%;background:var(--own);color:var(--on-own);font-size:12px;font-weight:800;line-height:23px;text-align:center;flex:none}
+.badge.v{background:var(--loop);color:var(--on-loop)}
+.badges{display:flex;gap:3px}
+.sb{display:grid;grid-template-rows:0fr;transition:grid-template-rows .34s ease}
+.step.open .sb{grid-template-rows:1fr}
+.sb > .in{overflow:hidden;min-height:0}
+.sb .in-pad{padding:0 2px 13px 31px}
+.sb p{font-size:14px;line-height:1.5}
+.ev{font-size:13px!important;color:var(--muted);margin-top:7px}
+.ev b{color:var(--ink);font-weight:700}
+.loopbox{background:var(--loop-soft);border-left:3px solid var(--loop);border-radius:0 7px 7px 0;padding:9px 10px 10px;margin-left:-31px;padding-left:12px}
+.trig{display:grid;grid-template-columns:20px 1fr;gap:8px;font-size:14px;line-height:1.42;margin-bottom:5px;padding:3px 4px;border-radius:5px;transition:background .25s}
+.trig .badge{width:19px;height:19px;font-size:11px;line-height:20px}
+.trig.cur{background:var(--paper)}
+.trig .tst{display:block;font-size:12.5px;color:var(--muted)}
+.then{margin-top:7px}
+.then b{color:var(--loop)}
+
+.foot{margin-top:18px;padding-top:13px;border-top:1px solid var(--rule);font-size:13.5px;color:var(--muted)}
+.foot b{color:var(--ink);font-weight:700}
+
+/* ---------- load moment: the stack builds from power up ---------- */
+.map .row{opacity:0;transform:translateY(10px)}
+.ready .map .row{opacity:1;transform:none;transition:opacity .45s ease calc(var(--i) * 75ms),transform .45s ease calc(var(--i) * 75ms)}
+.nomotion *, .nomotion *::before, .nomotion *::after{transition:none!important;animation:none!important}
+
+/* ---------- small screens ---------- */
+.fallback{display:none;padding:20px 16px}
+.fallback h1{font-size:24px}
+.fallback p{font-size:15px;line-height:1.5;color:var(--muted);margin:10px 0 14px}
+.fallback img{width:100%;height:auto;border:1px solid var(--rule);border-radius:8px;display:block}
+:root[data-theme="dark"] .fb-light,:root[data-theme="light"] .fb-dark{display:none}
+@media (max-width:759px){.viewport{display:none}.fallback{display:block}}
+</style>
+</head>
+<body>
+
+<div class="fallback">
+  <h1>From power to inference: who owns what</h1>
+  <p>The interactive map needs a wider screen. Here is the full picture.</p>
+  <a class="fb-light" href="ownership-map-light.png"><img src="ownership-map-light.png" alt="Layer map from facility and power up to AI services, with the boundary at hardware validation and the eight handovers I own." loading="lazy"></a>
+  <a class="fb-dark" href="ownership-map-dark.png"><img src="ownership-map-dark.png" alt="Layer map from facility and power up to AI services, with the boundary at hardware validation and the eight handovers I own." loading="lazy"></a>
+</div>
+
+<div class="viewport" id="viewport">
+<div class="stage" id="stage">
+
+  <header class="top">
+    <div>
+      <h1>From power to inference: who owns what</h1>
+      <p class="sub">Here is my humble reading of the NCP Cloud Infrastructure SA role: I own the layer above hardware validation, and the handovers across its edges.</p>
+    </div>
+    <div class="tools">
+      <div class="walk" role="group" aria-label="Walk through the handovers">
+        <button id="prev" aria-label="Previous step"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <button id="count" class="count">Walk through</button>
+        <button id="next" aria-label="Next step"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></button>
+      </div>
+      <button class="btn" id="all" aria-pressed="false">Show all</button>
+      <button class="btn" id="reset">Reset</button>
+      <button class="btn icon theme-btn" id="theme" aria-label="Switch theme"><svg viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
+    </div>
+  </header>
+
+  <div class="meta">
+    <div class="legend">
+      <span><i class="sw o"></i>I own</span>
+      <span><i class="sw a"></i>I work across or enable</span>
+      <span><i class="sw k"></i>I need to know</span>
+      <i class="gap"></i>
+      <span><i class="dot t"></i>Tested in my PoCs</span>
+      <span><i class="dot p"></i>Handled by the cloud provider</span>
+      <span><i class="dot g"></i>In progress</span>
+      <span><i class="dot n"></i>Not yet</span>
+    </div>
+    <p class="hint">Open a layer, or click a numbered dot to follow a handover. <kbd>&larr;</kbd> <kbd>&rarr;</kbd> walk through all eight.</p>
+  </div>
+
+  <div class="body">
+    <div class="map" id="map">
+
+      <div class="row" id="r-ai" style="--i:6">
+        <div class="stake"><div class="person">Tenants and ISVs</div><div class="person">Partner product team</div></div>
+        <div class="gutter"></div>
+        <section class="band across" id="b-ai">
+          <button class="hd" data-layer="ai" aria-expanded="false"><span class="name">AI services: training, post-training, inference</span><span class="tag">Workloads</span><svg class="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
+          <div class="body-c"><div class="in"><div class="in-pad">
+            <p class="desc">Serving frameworks run on the platform, so keeping them healthy is Day 2 work.</p>
+            <div class="chips">
+              <span class="chip"><i class="dot t"></i>PyTorch training, goodput measured</span>
+              <span class="chip"><i class="dot n"></i>Fine-tuning jobs</span>
+              <span class="chip"><i class="dot g"></i>Dynamo serving</span>
+              <span class="chip"><i class="dot g"></i>Grove</span>
+              <span class="chip"><i class="dot g"></i>NVIDIA Cloud Functions</span>
+              <span class="chip"><i class="dot n"></i>ISV software</span>
+            </div>
+            <p class="ownline"><b>I enable it.</b> The models, endpoints and pricing are the partner's product.</p>
+          </div></div></div>
+        </section>
+      </div>
+
+      <div class="row" id="r-plat" style="--i:5">
+        <div class="stake"><div class="person me">Me, with the partner platform team</div><div class="person" id="s-ops">Partner operations and SRE</div></div>
+        <div class="gutter"></div>
+        <section class="band own" id="b-plat">
+          <button class="hd" data-layer="plat" aria-expanded="false"><span class="name">Platform and Day 2 operations</span><span class="tag">Day 2</span><svg class="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
+          <div class="body-c"><div class="in"><div class="in-pad">
+            <p class="desc">Keep the fleet at maximum goodput: schedule, observe, detect, drain, remediate, return.</p>
+            <div class="chips">
+              <span class="chip"><i class="dot t"></i>Upstream Kubernetes</span>
+              <span class="chip"><i class="dot t"></i>KubeVirt VM tenants</span>
+              <span class="chip"><i class="dot t"></i>Slurm via Slinky</span>
+              <span class="chip"><i class="dot t"></i>KAI Scheduler, MIG</span>
+              <span class="chip"><i class="dot t"></i>NVSentinel</span>
+              <span class="chip"><i class="dot t"></i>Prometheus, Thanos, Grafana</span>
+              <span class="chip"><i class="dot t"></i>Runbooks</span>
+              <span class="chip"><i class="dot n"></i>Firmware campaigns</span>
+            </div>
+            <p class="ownline"><b>I own it</b> with the partner's platform team, until their operations team runs it alone.</p>
+          </div></div></div>
+        </section>
+      </div>
+
+      <div class="row" id="r-val" style="--i:4">
+        <div class="stake"><div class="person me">Me, with the partner platform team</div><div class="person" id="s-nv">NVIDIA product teams</div></div>
+        <div class="gutter"></div>
+        <section class="band own" id="b-val">
+          <button class="hd" data-layer="val" aria-expanded="false"><span class="name">Software stack validation</span><span class="tag">Day 1</span><svg class="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
+          <div class="body-c"><div class="in"><div class="in-pad">
+            <p class="desc">The layer above hardware validation: prove the whole stack before a tenant lands on it.</p>
+            <div class="chips">
+              <span class="chip"><i class="dot t"></i>AICR recipe</span>
+              <span class="chip"><i class="dot t"></i>GPU Operator</span>
+              <span class="chip"><i class="dot n"></i>Network Operator</span>
+              <span class="chip"><i class="dot t"></i>NVCRE certification</span>
+              <span class="chip"><i class="dot t"></i>NCCL over NVLink</span>
+              <span class="chip"><i class="dot t"></i>Workload acceptance</span>
+              <span class="chip"><i class="dot t"></i>Burn-in, scaled down</span>
+              <span class="chip"><i class="dot t"></i>Staging taint, promotion</span>
+            </div>
+            <p class="ownline"><b>I own it.</b> I set the acceptance bar against MTBI and goodput targets, and decide promotion.</p>
+          </div></div></div>
+        </section>
+      </div>
+
+      <div class="row" id="r-line" style="--i:3">
+        <div class="stake"></div>
+        <div class="gutter"></div>
+        <div class="line" id="b-line"><b>The line: hardware validated and handed over</b><span>Below: bring-up and NICo. Above: me.</span></div>
+      </div>
+
+      <div class="row" id="r-fab" style="--i:2">
+        <div class="stake"><div class="person">Fabric and network team</div></div>
+        <div class="gutter"></div>
+        <section class="band across" id="b-fab">
+          <button class="hd" data-layer="fab" aria-expanded="false"><span class="name">Fabric</span><span class="tag">East-west and isolation</span><svg class="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
+          <div class="body-c"><div class="in"><div class="in-pad">
+            <p class="desc">GPU-to-GPU traffic between nodes, and tenant isolation on the wire.</p>
+            <div class="chips">
+              <span class="chip"><i class="dot n"></i>Spectrum-X, InfiniBand</span>
+              <span class="chip"><i class="dot n"></i>Cumulus, SONiC</span>
+              <span class="chip"><i class="dot n"></i>NVLink partitions, NMX</span>
+              <span class="chip"><i class="dot n"></i>BlueField DPU isolation</span>
+            </div>
+            <p class="ownline"><b>I work across it.</b> I test the fabric from the workload side and bring the evidence to the fabric team.</p>
+          </div></div></div>
+        </section>
+      </div>
+
+      <div class="row" id="r-hw" style="--i:1">
+        <div class="stake"><div class="person">NVIDIA and OEM bring-up</div><div class="person">Partner infrastructure team</div></div>
+        <div class="gutter"></div>
+        <section class="band across" id="b-hw">
+          <button class="hd" data-layer="hw" aria-expanded="false"><span class="name">Hardware and bare-metal lifecycle</span><span class="tag">Day 0</span><svg class="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
+          <div class="body-c"><div class="in"><div class="in-pad">
+            <p class="desc">NICo or BCM: discover, validate, provision, isolate, and wipe between tenants.</p>
+            <div class="chips">
+              <span class="chip"><i class="dot p"></i>Redfish, BMC</span>
+              <span class="chip"><i class="dot p"></i>Firmware baseline</span>
+              <span class="chip"><i class="dot p"></i>SKU and machine validation</span>
+              <span class="chip"><i class="dot p"></i>OS image provisioning</span>
+              <span class="chip"><i class="dot n"></i>DPU provisioning</span>
+              <span class="chip"><i class="dot p"></i>Tenant wipe</span>
+            </div>
+            <p class="ownline"><b>I work across it.</b> I agree the handover contract, then hand nodes to NICo for resets, reflashes and wipes.</p>
+          </div></div></div>
+        </section>
+      </div>
+
+      <div class="row" id="r-fac" style="--i:0">
+        <div class="stake"><div class="person">Partner facilities team</div></div>
+        <div class="gutter"></div>
+        <section class="band know" id="b-fac">
+          <button class="hd" data-layer="fac" aria-expanded="false"><span class="name">Facility and power</span><span class="tag">Megawatts to gigawatts</span><svg class="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
+          <div class="body-c"><div class="in"><div class="in-pad">
+            <p class="desc">Power, cooling and racks: the limits every layer above inherits.</p>
+            <div class="chips">
+              <span class="chip">Power and liquid cooling</span>
+              <span class="chip">DSX MaxLPS</span>
+              <span class="chip">DSX Flex</span>
+              <span class="chip">Rack Management Service</span>
+            </div>
+            <p class="ownline"><b>I need to know it.</b> Power and cooling shape rack density, burn-in plans and how fast a site grows.</p>
+          </div></div></div>
+        </section>
+      </div>
+
+      <div class="br dash" id="br-en"></div><div class="brl" id="br-en-l">I enable</div>
+      <div class="br" id="br-own"></div><div class="brl" id="br-own-l">I own</div>
+      <div class="br dash" id="br-ac"></div><div class="brl" id="br-ac-l">I work across</div>
+      <div class="br grey" id="br-kn"></div><div class="brl grey" id="br-kn-l">I know</div>
+    </div>
+
+    <div class="spacer"></div>
+
+    <aside class="panel" id="panel">
+      <h2>The handovers I own</h2>
+      <p class="lead">Owning a layer means owning what crosses its edges, even when another team does the work.</p>
+
+      <section class="step" data-steps="1">
+        <button class="sh" data-go="1" aria-expanded="false"><span class="badge">1</span><span class="st">Handover contract</span><svg class="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
+        <div class="sb"><div class="in"><div class="in-pad">
+          <p>Bring-up hands over inventory, firmware baseline, measured boot, DPU and network config, and machine-validation results. I agree that contract up front, so nothing gets tested twice.</p>
+          <p class="ev"><b>In my PoC:</b> Verda handed over H200s with ECC off, so the DCGM diagnostic skipped its memory test. A contract catches that on day one.</p>
+        </div></div></div>
+      </section>
+
+      <section class="step" data-steps="2">
+        <button class="sh" data-go="2" aria-expanded="false"><span class="badge">2</span><span class="st">Promotion gate</span><svg class="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
+        <div class="sb"><div class="in"><div class="in-pad">
+          <p>NVCRE certification passes, the staging taint comes off, and the node joins the production pool.</p>
+          <p class="ev"><b>In my PoC:</b> NVCRE certified the 2× H200 node at 351 GB/s all-reduce bus bandwidth over NVLink, then the node left staging.</p>
+        </div></div></div>
+      </section>
+
+      <section class="step" data-steps="3,4,5">
+        <button class="sh" data-go="3" aria-expanded="false"><span class="badges"><span class="badge v">3</span><span class="badge v">4</span><span class="badge v">5</span></span><span class="st">One loop, three triggers</span><svg class="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
+        <div class="sb"><div class="in"><div class="in-pad">
+          <div class="loopbox">
+            <div class="trig" data-t="3"><span class="badge v">3</span><span>A fault: NVSentinel detects it and drains the node.<span class="tst">Tested on the L4</span></span></div>
+            <div class="trig" data-t="4"><span class="badge v">4</span><span>A firmware or field notice: I plan the rings, gates and rollback.<span class="tst">Not yet</span></span></div>
+            <div class="trig" data-t="5"><span class="badge v">5</span><span>A tenant change: tenant A gives the node back.<span class="tst">Not yet</span></span></div>
+            <p class="then"><b>Then NICo takes over</b> below the line: reset, reflash, or wipe and re-isolate. The node comes back, I re-certify it, and gate 2 promotes it.</p>
+          </div>
+          <p class="ev"><b>In my PoC:</b> NVSentinel cut the outage from 360.9 s to 288.8 s and lifted goodput from 66.4% to 73.0%. Reboot and driver rebuild made up 82% of what was left.</p>
+        </div></div></div>
+      </section>
+
+      <section class="step" data-steps="6">
+        <button class="sh" data-go="6" aria-expanded="false"><span class="badge">6</span><span class="st">Fabric escalation</span><svg class="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
+        <div class="sb"><div class="in"><div class="in-pad">
+          <p>NCCL bandwidth drops or links flap. I bring the evidence, the fabric team fixes it.</p>
+          <p class="ev"><b>Not yet:</b> one node in my PoC, so no east-west fabric to test.</p>
+        </div></div></div>
+      </section>
+
+      <section class="step" data-steps="7">
+        <button class="sh" data-go="7" aria-expanded="false"><span class="badge">7</span><span class="st">Enablement</span><svg class="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
+        <div class="sb"><div class="in"><div class="in-pad">
+          <p>Runbooks and knowledge transfer, so the partner's operations team runs it alone.</p>
+          <p class="ev"><b>In my PoCs:</b> the acceptance and burn-in runbooks from Part 1.</p>
+        </div></div></div>
+      </section>
+
+      <section class="step" data-steps="8">
+        <button class="sh" data-go="8" aria-expanded="false"><span class="badge">8</span><span class="st">Field feedback</span><svg class="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
+        <div class="sb"><div class="in"><div class="in-pad">
+          <p>What breaks at partners goes back to NVIDIA product teams as a reproducible issue.</p>
+          <p class="ev"><b>In my PoC:</b> four NVSentinel v1.28.0 defaults blocked the fault use case, such as a drain mode that never evicts. Each one is written up as a finding.</p>
+        </div></div></div>
+      </section>
+    </aside>
+  </div>
+
+  <p class="foot"><b>Tested in Part 1</b> (one L4) <b>and Part 2</b> (Paris L4, Finland 2× H200). Below the line, Scaleway and Verda played the bring-up role.</p>
+
+  <svg id="lanes" aria-hidden="true">
+    <line class="ext" id="ext"/>
+    <path class="stub" id="stubs"/>
+    <path class="seg t" id="s2" pathLength="1"/><path class="head t" id="s2-h"/>
+    <path class="seg t" id="s6" pathLength="1"/><path class="head t" id="s6-h"/>
+    <path class="seg t" id="s1" pathLength="1"/><path class="head t" id="s1-h"/>
+    <path class="seg v" id="sdown" pathLength="1"/><path class="head v" id="sdown-h"/>
+    <path class="seg v" id="sup" pathLength="1"/><path class="head v" id="sup-h"/><circle class="src v" id="sup-s" r="4.5"/>
+    <path class="seg t" id="s7" pathLength="1"/><path class="head t" id="s7-h"/>
+    <path class="seg t" id="s8" pathLength="1"/><path class="head t" id="s8-h"/>
+    <text class="lbl" id="nico">NICo takes over</text>
+    <text class="lbl" id="recert">I re-certify</text>
+  </svg>
+
+  <div id="pins">
+    <button class="pin" data-step="1" aria-label="Step 1: handover contract">1</button>
+    <button class="pin" data-step="2" aria-label="Step 2: promotion gate">2</button>
+    <button class="pin v" data-step="3" aria-label="Step 3: a fault, then NICo takes over">3</button>
+    <button class="pin v" data-step="4" aria-label="Step 4: a firmware or field notice, then NICo takes over">4</button>
+    <button class="pin v" data-step="5" aria-label="Step 5: a tenant change, then NICo takes over">5</button>
+    <button class="pin" data-step="6" aria-label="Step 6: fabric escalation">6</button>
+    <button class="pin" data-step="7" aria-label="Step 7: enablement">7</button>
+    <button class="pin" data-step="8" aria-label="Step 8: field feedback">8</button>
+  </div>
+
+</div>
+</div>
+
+<script>
+(function () {
+  const $ = id => document.getElementById(id);
+  const stage = $('stage'), vp = $('viewport'), root = document.documentElement;
+  const W = 1600, LAYERS = ['ai', 'plat', 'val', 'fab', 'hw', 'fac'];
+  const q = new URLSearchParams(location.search);
+  const EXPORT = q.get('export');
+  const NO_MOTION = !!EXPORT || matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (NO_MOTION) stage.classList.add('nomotion');
+  if (EXPORT) stage.classList.add('export');
+
+  let framed = false;
+  try { framed = !!(window.frameElement && parent.document.body); } catch (e) {}
+  if (framed) document.body.classList.add('framed');
+
+  /* ---------- theme ---------- */
+  function setTheme(t) { root.setAttribute('data-theme', t); }
+  if (framed && !q.get('theme')) {
+    const pb = parent.document.body;
+    const sync = () => {
+      setTheme(pb.getAttribute('data-md-color-scheme') === 'slate' ? 'dark' : 'light');
+      try {
+        const bg = getComputedStyle(pb).backgroundColor;
+        if (bg && bg !== 'rgba(0, 0, 0, 0)' && bg !== 'transparent') root.style.setProperty('--paper', bg);
+        else root.style.removeProperty('--paper');
+      } catch (e) {}
+    };
+    sync();
+    new MutationObserver(sync).observe(pb, { attributes: true, attributeFilter: ['data-md-color-scheme'] });
+  }
+  $('theme').addEventListener('click', () => {
+    const t = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    setTheme(t);
+    try { localStorage.setItem('om-theme', t); } catch (e) {}
+  });
+
+  /* ---------- state ---------- */
+  const S = { open: new Set(), step: null, all: false };
+  let token = 0, scale = 1;
+  const wait = ms => new Promise(r => setTimeout(r, NO_MOTION ? 0 : ms));
+
+  /* ---------- geometry ---------- */
+  function rel(el) {
+    const s = stage.getBoundingClientRect(), r = el.getBoundingClientRect();
+    return { left: (r.left - s.left) / scale, top: (r.top - s.top) / scale, right: (r.right - s.left) / scale,
+             bottom: (r.bottom - s.top) / scale, width: r.width / scale, height: r.height / scale };
+  }
+  function lanePath(x0, y0, cx, ty, ex) {
+    const r = 9, dir = ty < y0 ? -1 : 1;
+    let d = `M${x0} ${y0}`;
+    if (Math.abs(cx - x0) > 1) { const sx = Math.sign(cx - x0); d += ` H${cx - sx * r} Q${cx} ${y0} ${cx} ${y0 + dir * r}`; }
+    else d += ` V${y0 + dir * r}`;
+    d += ` V${ty - dir * r} Q${cx} ${ty} ${cx - r} ${ty} H${ex}`;
+    return d;
+  }
+  const headLeft = (x, y) => `M${x} ${y} L${x + 11} ${y - 6} L${x + 11} ${y + 6} Z`;
+  function placePin(n, x, y) { const p = document.querySelector(`.pin[data-step="${n}"]`); p.style.left = x + 'px'; p.style.top = y + 'px'; }
+  function bracket(id, top, bottom, center) {
+    const m = rel($('map')), el = $(id), lab = $(id + '-l');
+    el.style.top = (top - m.top + 5) + 'px'; el.style.height = (bottom - top - 10) + 'px';
+    const h = lab.offsetHeight, c = center == null ? (top + bottom) / 2 : center;
+    lab.style.top = (c - m.top - h / 2) + 'px';
+  }
+
+  function layout() {
+    const B = {};
+    LAYERS.forEach(k => B[k] = rel($('b-' + k)));
+    const L = rel($('b-line'));
+    const E = B.val.right;
+    const isOpen = k => S.all || S.open.has(k);
+
+    /* lane columns, counted from the bands' right edge */
+    const C2 = E + 26, C6 = E + 56, C1 = E + 86, CUP = E + 126, CDN = E + 166;
+    const P = {
+      1: [C1, B.hw.top + 27],
+      2: [C2, B.val.top + 14],
+      3: [E + 110, B.plat.top + 27],
+      4: [E + 138, B.plat.top + 27],
+      5: [CDN, B.plat.top + 27],
+      6: [C6, B.val.bottom - 14]
+    };
+    const ops = rel($('s-ops')), nv = rel($('s-nv'));
+    const gx = B.plat.left - 17;
+    P[7] = [gx, isOpen('plat') ? (ops.top + ops.bottom) / 2 : B.plat.top + 27];
+    P[8] = [gx, isOpen('val') ? (nv.top + nv.bottom) / 2 : B.val.top + 27];
+    Object.keys(P).forEach(n => placePin(n, P[n][0], P[n][1]));
+
+    bracket('br-en', B.ai.top, B.ai.bottom);
+    bracket('br-own', B.plat.top, B.val.bottom, (P[7][1] + P[8][1]) / 2);
+    bracket('br-ac', B.fab.top, B.hw.bottom);
+    bracket('br-kn', B.fac.top, B.fac.bottom);
+
+    $('stubs').setAttribute('d', [1, 2, 3, 6].map(n => `M${E + 2} ${P[n][1]} H${P[n][0] - 13}`).join(' '));
+
+    const set = (id, d, h) => { $(id).setAttribute('d', d); $(id + '-h').setAttribute('d', h); };
+    const yIn = (b, want, pad) => b.top + Math.min(want, b.height - pad);
+
+    let ty = B.plat.bottom - 27;               set('s2', lanePath(P[2][0], P[2][1], P[2][0], ty, E + 12), headLeft(E + 1, ty));
+    ty = yIn(B.fab, 60, 16);                    set('s6', lanePath(P[6][0], P[6][1], P[6][0], ty, E + 12), headLeft(E + 1, ty));
+    ty = yIn(B.val, 76, 14);                    set('s1', lanePath(P[1][0], P[1][1], P[1][0], ty, E + 12), headLeft(E + 1, ty));
+    const trig = (S.step >= 3 && S.step <= 5) ? S.step : 5;
+    ty = yIn(B.hw, 112, 12);                    set('sdown', lanePath(P[trig][0], P[trig][1], CDN, ty, E + 12), headLeft(E + 1, ty));
+    const uy = yIn(B.hw, 80, 14), uty = yIn(B.val, 52, 14);
+    set('sup', lanePath(E + 4, uy, CUP, uty, E + 12), headLeft(E + 1, uty));
+    $('sup-s').setAttribute('cx', E + 4); $('sup-s').setAttribute('cy', uy);
+    set('s7', `M${gx - 13} ${P[7][1]} H${ops.right + 12}`, headLeft(ops.right + 1, P[7][1]));
+    set('s8', `M${gx - 13} ${P[8][1]} H${nv.right + 12}`, headLeft(nv.right + 1, P[8][1]));
+
+    $('nico').setAttribute('transform', `translate(${CDN + 12} ${B.hw.top - 2}) rotate(90)`);
+    $('recert').setAttribute('transform', `translate(${CUP - 7} ${B.val.bottom - 10}) rotate(-90)`);
+    const ly = L.top + L.height / 2, ext = $('ext');
+    ext.setAttribute('x1', E); ext.setAttribute('x2', E + 196); ext.setAttribute('y1', ly); ext.setAttribute('y2', ly);
+
+    const svg = $('lanes');
+    svg.setAttribute('width', W); svg.setAttribute('height', stage.offsetHeight);
+  }
+
+  function fit() {
+    const avail = document.documentElement.clientWidth;
+    scale = Math.min(1, avail / W);
+    stage.style.transform = scale < 1 ? `scale(${scale})` : '';
+    vp.style.width = (W * scale) + 'px';
+    vp.style.height = (stage.offsetHeight * scale) + 'px';
+    if (framed) { try { window.frameElement.style.height = Math.ceil(document.body.scrollHeight) + 'px'; } catch (e) {} }
+  }
+  function settle(ms) {
+    const end = performance.now() + (NO_MOTION ? 0 : ms);
+    (function f() { fit(); layout(); if (performance.now() < end) requestAnimationFrame(f); })();
+  }
+
+  /* ---------- rendering state ---------- */
+  function apply() {
+    LAYERS.forEach(k => {
+      const open = S.all || S.open.has(k);
+      $('r-' + k).classList.toggle('open', open);
+      $('b-' + k).querySelector('.hd').setAttribute('aria-expanded', open);
+    });
+    document.querySelectorAll('.step').forEach(el => {
+      const ids = el.dataset.steps.split(',').map(Number);
+      const open = S.all || ids.includes(S.step);
+      el.classList.toggle('open', open);
+      el.querySelector('.sh').setAttribute('aria-expanded', open);
+    });
+    document.querySelectorAll('.trig').forEach(el => el.classList.toggle('cur', !S.all && Number(el.dataset.t) === S.step));
+    document.querySelectorAll('.pin').forEach(p => p.classList.toggle('cur', Number(p.dataset.step) === S.step));
+    $('s-ops').classList.toggle('hit', S.step === 7);
+    $('s-nv').classList.toggle('hit', S.step === 8);
+    $('count').textContent = S.step ? `Step ${S.step} of 8` : 'Walk through';
+    $('all').setAttribute('aria-pressed', S.all);
+    settle(520);
+  }
+  const DRAWN = ['s1', 's2', 's6', 's7', 's8', 'sdown', 'sup', 'nico', 'recert'];
+  function hideLanes() {
+    DRAWN.forEach(id => [id, id + '-h', id + '-s'].forEach(x => { const e = $(x); if (e) e.classList.remove('on', 'instant'); }));
+  }
+  function draw(id, instant) {
+    layout();
+    [id, id + '-h', id + '-s'].forEach(x => {
+      const e = $(x); if (!e) return;
+      e.classList.toggle('instant', !!instant || NO_MOTION);
+      e.classList.add('on');
+    });
+  }
+  function pulse(n) {
+    const p = document.querySelector(`.pin[data-step="${n}"]`);
+    p.classList.remove('pulse'); void p.offsetWidth; p.classList.add('pulse');
+    setTimeout(() => p.classList.remove('pulse'), 2600);
+  }
+
+  /* ---------- actions ---------- */
+  async function play(n) {
+    const t = ++token, live = () => t === token;
+    S.all = false; S.step = n; hideLanes();
+    const go = async (layers, id, settleMs = 430) => {
+      S.open = new Set(layers); apply();
+      await wait(settleMs); if (!live()) return false;
+      draw(id); return true;
+    };
+    if (n === 1) await go(['hw', 'val'], 's1');
+    else if (n === 2) await go(['val', 'plat'], 's2');
+    else if (n === 6) await go(['val', 'fab'], 's6');
+    else if (n === 7) await go(['plat'], 's7');
+    else if (n === 8) await go(['val'], 's8');
+    else {
+      if (!await go(['plat', 'hw'], 'sdown')) return;
+      await wait(720); if (!live()) return;
+      draw('nico');
+      S.open.add('val'); apply();
+      await wait(460); if (!live()) return;
+      draw('sup');
+      await wait(700); if (!live()) return;
+      draw('recert'); pulse(2);
+    }
+  }
+  function reset() { token++; S.open = new Set(); S.step = null; S.all = false; hideLanes(); apply(); }
+  async function showAll(on) {
+    const t = ++token;
+    S.step = null; S.all = on; S.open = new Set(on ? LAYERS : []); hideLanes(); apply();
+    if (!on) return;
+    await wait(460); if (t !== token) return;
+    DRAWN.forEach(id => draw(id, true));
+  }
+  function toggleLayer(k) {
+    token++; S.all = false; S.step = null; hideLanes();
+    const only = S.open.size === 1 && S.open.has(k);
+    S.open = only ? new Set() : new Set([k]);
+    apply();
+  }
+  const next = () => { if (!S.step) play(1); else if (S.step < 8) play(S.step + 1); };
+  const prev = () => { if (S.step > 1) play(S.step - 1); else reset(); };
+
+  document.querySelectorAll('.hd').forEach(b => b.addEventListener('click', () => toggleLayer(b.dataset.layer)));
+  document.querySelectorAll('.pin').forEach(p => p.addEventListener('click', () => {
+    const n = Number(p.dataset.step); (S.step === n && !S.all) ? reset() : play(n);
+  }));
+  document.querySelectorAll('.sh').forEach(b => b.addEventListener('click', () => {
+    const ids = b.closest('.step').dataset.steps.split(',').map(Number);
+    (ids.includes(S.step) && !S.all) ? reset() : play(Number(b.dataset.go));
+  }));
+  $('next').addEventListener('click', next);
+  $('prev').addEventListener('click', prev);
+  $('count').addEventListener('click', () => S.step ? null : play(1));
+  $('all').addEventListener('click', () => showAll(!S.all));
+  $('reset').addEventListener('click', reset);
+  addEventListener('keydown', e => {
+    if (e.altKey || e.ctrlKey || e.metaKey) return;
+    if (e.key === 'ArrowRight') { e.preventDefault(); next(); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+    else if (e.key === 'Escape') reset();
+  });
+  addEventListener('resize', () => settle(0));
+  if ('ResizeObserver' in window) new ResizeObserver(() => { fit(); layout(); }).observe(stage);
+
+  /* expose for tests and recordings */
+  window.om = { play, reset, showAll, next, prev, state: S };
+
+  /* ---------- start: build the stack from power up ---------- */
+  document.fonts.ready.then(async () => {
+    fit(); layout();
+    await new Promise(r => requestAnimationFrame(r));
+    stage.classList.add('ready');
+    settle(1300);
+    if (EXPORT === 'all') { await showAll(true); await new Promise(r => setTimeout(r, 50)); layout(); }
+    window.__omReady = true;
+  });
+})();
+</script>
+</body>
+</html>

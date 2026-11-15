@@ -1,0 +1,386 @@
+{
+  "verda_instance": {
+    "version": 0,
+    "block": {
+      "attributes": {
+        "contract": {
+          "type": "string",
+          "description": "Contract type for the instance",
+          "description_kind": "markdown",
+          "optional": true,
+          "computed": true
+        },
+        "cpu": {
+          "nested_type": {
+            "attributes": {
+              "description": {
+                "type": "string",
+                "description_kind": "plain",
+                "computed": true
+              },
+              "number_of_cores": {
+                "type": "number",
+                "description_kind": "plain",
+                "computed": true
+              }
+            },
+            "nesting_mode": "single"
+          },
+          "description": "CPU information",
+          "description_kind": "markdown",
+          "computed": true
+        },
+        "created_at": {
+          "type": "string",
+          "description": "Creation timestamp",
+          "description_kind": "markdown",
+          "computed": true
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the instance",
+          "description_kind": "markdown",
+          "required": true
+        },
+        "existing_volumes": {
+          "type": [
+            "list",
+            "string"
+          ],
+          "description": "IDs of existing volumes to attach to the instance",
+          "description_kind": "markdown",
+          "optional": true
+        },
+        "gpu": {
+          "nested_type": {
+            "attributes": {
+              "description": {
+                "type": "string",
+                "description_kind": "plain",
+                "computed": true
+              },
+              "number_of_gpus": {
+                "type": "number",
+                "description_kind": "plain",
+                "computed": true
+              }
+            },
+            "nesting_mode": "single"
+          },
+          "description": "GPU information",
+          "description_kind": "markdown",
+          "computed": true
+        },
+        "gpu_memory": {
+          "nested_type": {
+            "attributes": {
+              "description": {
+                "type": "string",
+                "description_kind": "plain",
+                "computed": true
+              },
+              "size_in_gigabytes": {
+                "type": "number",
+                "description_kind": "plain",
+                "computed": true
+              }
+            },
+            "nesting_mode": "single"
+          },
+          "description": "GPU memory information",
+          "description_kind": "markdown",
+          "computed": true
+        },
+        "hostname": {
+          "type": "string",
+          "description": "Hostname for the instance",
+          "description_kind": "markdown",
+          "required": true
+        },
+        "id": {
+          "type": "string",
+          "description": "Instance identifier",
+          "description_kind": "markdown",
+          "computed": true
+        },
+        "image": {
+          "type": "string",
+          "description": "Image to use for the instance",
+          "description_kind": "markdown",
+          "required": true
+        },
+        "instance_type": {
+          "type": "string",
+          "description": "Type of the instance (e.g., '1B200.30V')",
+          "description_kind": "markdown",
+          "required": true
+        },
+        "ip": {
+          "type": "string",
+          "description": "IP address of the instance",
+          "description_kind": "markdown",
+          "computed": true
+        },
+        "is_spot": {
+          "type": "bool",
+          "description": "Whether this is a spot instance",
+          "description_kind": "markdown",
+          "optional": true,
+          "computed": true
+        },
+        "location": {
+          "type": "string",
+          "description": "Location code for the instance (defaults to FIN-01)",
+          "description_kind": "markdown",
+          "optional": true,
+          "computed": true
+        },
+        "memory": {
+          "nested_type": {
+            "attributes": {
+              "description": {
+                "type": "string",
+                "description_kind": "plain",
+                "computed": true
+              },
+              "size_in_gigabytes": {
+                "type": "number",
+                "description_kind": "plain",
+                "computed": true
+              }
+            },
+            "nesting_mode": "single"
+          },
+          "description": "Memory information",
+          "description_kind": "markdown",
+          "computed": true
+        },
+        "os_name": {
+          "type": "string",
+          "description": "Operating system name",
+          "description_kind": "markdown",
+          "computed": true
+        },
+        "os_volume": {
+          "nested_type": {
+            "attributes": {
+              "name": {
+                "type": "string",
+                "description_kind": "plain",
+                "required": true
+              },
+              "on_destroy": {
+                "type": "string",
+                "description": "What happens to the OS volume when the instance is destroyed: 'delete_permanently' (default), 'move_to_trash', or 'keep_detached'",
+                "description_kind": "markdown",
+                "optional": true,
+                "computed": true
+              },
+              "on_spot_discontinue": {
+                "type": "string",
+                "description": "Action to take on spot instance discontinuation: 'keep_detached', 'move_to_trash', or 'delete_permanently'",
+                "description_kind": "markdown",
+                "optional": true
+              },
+              "size": {
+                "type": "number",
+                "description_kind": "plain",
+                "required": true
+              },
+              "type": {
+                "type": "string",
+                "description_kind": "plain",
+                "required": true
+              }
+            },
+            "nesting_mode": "single"
+          },
+          "description": "OS volume configuration",
+          "description_kind": "markdown",
+          "optional": true
+        },
+        "os_volume_id": {
+          "type": "string",
+          "description": "ID of the OS volume",
+          "description_kind": "markdown",
+          "computed": true
+        },
+        "price_per_hour": {
+          "type": "number",
+          "description": "Price per hour for the instance",
+          "description_kind": "markdown",
+          "computed": true
+        },
+        "pricing": {
+          "type": "string",
+          "description": "Pricing model for the instance",
+          "description_kind": "markdown",
+          "optional": true,
+          "computed": true
+        },
+        "ssh_key_ids": {
+          "type": [
+            "set",
+            "string"
+          ],
+          "description": "List of SSH key IDs to add to the instance",
+          "description_kind": "markdown",
+          "optional": true,
+          "computed": true
+        },
+        "startup_script_id": {
+          "type": "string",
+          "description": "ID of the startup script to run on instance creation",
+          "description_kind": "markdown",
+          "optional": true
+        },
+        "status": {
+          "type": "string",
+          "description": "Current status of the instance",
+          "description_kind": "markdown",
+          "computed": true
+        },
+        "storage": {
+          "nested_type": {
+            "attributes": {
+              "description": {
+                "type": "string",
+                "description_kind": "plain",
+                "computed": true
+              }
+            },
+            "nesting_mode": "single"
+          },
+          "description": "Storage information",
+          "description_kind": "markdown",
+          "computed": true
+        },
+        "timeouts": {
+          "nested_type": {
+            "attributes": {
+              "create": {
+                "type": "string",
+                "description": "A string that can be [parsed as a duration](https://pkg.go.dev/time#ParseDuration) consisting of numbers and unit suffixes, such as \"30s\" or \"2h45m\". Valid time units are \"s\" (seconds), \"m\" (minutes), \"h\" (hours).",
+                "description_kind": "plain",
+                "optional": true
+              }
+            },
+            "nesting_mode": "single"
+          },
+          "description_kind": "plain",
+          "optional": true
+        },
+        "volumes": {
+          "nested_type": {
+            "attributes": {
+              "location": {
+                "type": "string",
+                "description_kind": "plain",
+                "optional": true
+              },
+              "name": {
+                "type": "string",
+                "description_kind": "plain",
+                "required": true
+              },
+              "on_spot_discontinue": {
+                "type": "string",
+                "description": "Action to take on spot instance discontinuation: 'keep_detached', 'move_to_trash', or 'delete_permanently'",
+                "description_kind": "markdown",
+                "optional": true
+              },
+              "size": {
+                "type": "number",
+                "description_kind": "plain",
+                "required": true
+              },
+              "type": {
+                "type": "string",
+                "description_kind": "plain",
+                "required": true
+              }
+            },
+            "nesting_mode": "list"
+          },
+          "description": "Volumes to create and attach to the instance",
+          "description_kind": "markdown",
+          "optional": true
+        }
+      },
+      "description": "Manages a Verda compute instance",
+      "description_kind": "markdown"
+    }
+  },
+  "verda_ssh_key": {
+    "version": 0,
+    "block": {
+      "attributes": {
+        "created_at": {
+          "type": "string",
+          "description": "Creation timestamp",
+          "description_kind": "markdown",
+          "computed": true
+        },
+        "fingerprint": {
+          "type": "string",
+          "description": "SSH key fingerprint",
+          "description_kind": "markdown",
+          "computed": true
+        },
+        "id": {
+          "type": "string",
+          "description": "SSH key identifier",
+          "description_kind": "markdown",
+          "computed": true
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the SSH key",
+          "description_kind": "markdown",
+          "required": true
+        },
+        "public_key": {
+          "type": "string",
+          "description": "Public key content",
+          "description_kind": "markdown",
+          "required": true
+        }
+      },
+      "description": "Manages a Verda SSH key",
+      "description_kind": "markdown"
+    }
+  },
+  "verda_startup_script": {
+    "version": 0,
+    "block": {
+      "attributes": {
+        "created_at": {
+          "type": "string",
+          "description": "Creation timestamp",
+          "description_kind": "markdown",
+          "computed": true
+        },
+        "id": {
+          "type": "string",
+          "description": "Startup script identifier",
+          "description_kind": "markdown",
+          "computed": true
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the startup script",
+          "description_kind": "markdown",
+          "required": true
+        },
+        "script": {
+          "type": "string",
+          "description": "Script content to execute on instance startup",
+          "description_kind": "markdown",
+          "required": true
+        }
+      },
+      "description": "Manages a Verda startup script",
+      "description_kind": "markdown"
+    }
+  }
+}

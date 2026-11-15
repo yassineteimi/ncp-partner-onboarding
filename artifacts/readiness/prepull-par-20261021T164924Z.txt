@@ -1,0 +1,5 @@
+# pre-pull on eu1-par-gpu-01, started 2026-10-21T16:49:24Z, ended 2026-10-21T16:55:25Z
+TIME                   POD         MESSAGE
+2026-10-21T16:52:00Z   prepull-1   Successfully pulled image "nvcr.io/nvidia/pytorch:26.01-py3@sha256:38ed2ecb2c16d10677006d73fb0a150855d6ec81db8fc66e800b5ae92741007e" in 2m35.969s (2m36.16s including waiting). Image size: 9108129521 bytes.
+2026-10-21T16:55:21Z   prepull-2   Successfully pulled image "ghcr.io/yassineteimi/goodput-trainer@sha256:feda704575fb07b7cfbb56e567bc76d22779fd8481e5ff72c632f0677860f945" in 3m21.394s (5m57.501s including waiting). Image size: 4276969107 bytes.
+2026-10-21T16:55:23Z   prepull-3   Successfully pulled image "public.ecr.aws/docker/library/busybox:1.37.0" in 1.542s (5m58.662s including waiting). Image size: 2222118 bytes.

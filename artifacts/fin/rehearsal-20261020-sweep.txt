@@ -1,0 +1,2 @@
+# make fin-sweep after the rehearsal teardown, 2026-10-20T07:57:08Z
+==> Verda shows no instance, no volume and nothing in the volume trash

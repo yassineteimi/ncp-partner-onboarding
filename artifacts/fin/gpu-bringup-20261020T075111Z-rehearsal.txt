@@ -1,0 +1,6 @@
+# gpu-bringup-20261020T075111Z-rehearsal.txt, laptop clock, UTC
+started=2026-10-20T07:51:12Z
+preflight_done=2026-10-20T07:51:13Z
+instance_running=2026-10-20T07:51:49Z
+bootstrap_complete=2026-10-20T07:52:41Z
+node_ready=2026-10-20T07:52:59Z

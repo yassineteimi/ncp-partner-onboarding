@@ -1,0 +1,25 @@
+# FC2: how journald stores a userspace write to /dev/kmsg, captured 2026-10-20T10:26:42Z
+# Where: the colima VM on the laptop, free. Ubuntu 24.04.4 LTS, systemd 255 (255.4-1ubuntu8.15),
+# kernel 6.8.0-117-generic: the same family as par's nodes (Ubuntu 24.04.5, 6.8.0).
+#
+# Two SIMULATED lines, written with: echo '<3>...' > /dev/kmsg
+#   FC2-A = Part 1's line exactly, as scripts/readiness/inject-xid.sh writes it today
+#   FC2-B = the same line with a fake [uptime] timestamp in front, as NVSentinel's own UAT
+#           writes it (tests/uat/tests.sh at v1.28.0)
+#
+# NVSentinel's syslog monitor reads journald (_TRANSPORT=kernel) and matches MESSAGE against
+#   NVRM: Xid \(PCI:([0-9a-fA-F:.]+)(?: GPU-I:\d+)?(?: GPU-CI:\d+)?\): (\d+)...
+# (health-monitors/syslog-health-monitor/pkg/patterns/xid.go at v1.28.0)
+#
+# Fields journald stored (journalctl -o json):
+{"_TRANSPORT": "kernel", "SYSLOG_IDENTIFIER": "NVRM", "SYSLOG_FACILITY": "1", "PRIORITY": "3", "MESSAGE": "Xid (PCI:0000:01:00): 79, pid=0, name=inject-xid.sh, SIMULATED by scripts/inject-xid.sh, not a real fault FC2-A"}
+{"_TRANSPORT": "kernel", "SYSLOG_IDENTIFIER": null, "SYSLOG_FACILITY": "1", "PRIORITY": "3", "MESSAGE": "[12345.678901] NVRM: Xid (PCI:0000:01:00): 79, pid=0, name=inject-xid.sh, SIMULATED by scripts/inject-xid.sh, not a real fault FC2-B"}
+#
+# Result: A loses "NVRM:" to SYSLOG_IDENTIFIER (a userspace write is facility 1, LOG_USER, so
+# journald parses an identifier), and the regex can't match it. B keeps "NVRM: Xid" in MESSAGE
+# and matches. A real driver XID is printed at kernel facility, so this concerns the simulation only.
+#
+# Then, 2026-10-20T15:42:58.951Z on the same VM: the script that scripts/readiness/inject-xid.sh
+# now sends to the node (PRINT_ONLY=1 prints it), run as root. What journald stored:
+{"_TRANSPORT": "kernel", "SYSLOG_IDENTIFIER": null, "SYSLOG_FACILITY": "1", "PRIORITY": "3", "MESSAGE": "[19046.50] NVRM: Xid (PCI:0000:01:00): 79, pid=0, name=inject-xid.sh, SIMULATED by scripts/readiness/inject-xid.sh, not a real fault"}
+# It matches. scripts/readiness/tests/test_xid_line.py checks all three records against the pattern.

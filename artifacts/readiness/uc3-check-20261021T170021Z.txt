@@ -1,0 +1,59 @@
+# NVSentinel on eu1-par-gpu-01 before injection, 2026-10-21T17:00:21Z
+== NVSentinel labels on the node
+nvsentinel.dgxc.nvidia.com/dcgm.version=4.x
+nvsentinel.dgxc.nvidia.com/driver.installed=true
+nvsentinel.dgxc.nvidia.com/gpu.count.current=1
+nvsentinel.dgxc.nvidia.com/gpu.count.expected=1
+nvsentinel.dgxc.nvidia.com/kata.enabled=false
+== NVSentinel pods
+NAME                                             READY   STATUS      RESTARTS        AGE     IP             NODE             NOMINATED NODE   READINESS GATES
+create-mongodb-database-2592000-c9dfbc49-g7wx5   0/1     Completed   0               5h16m   10.244.1.68    eu1-par-cpu-01   <none>           <none>
+fault-quarantine-86b76dd6c7-8hj6n                1/1     Running     0               6h13m   10.244.1.28    eu1-par-cpu-01   <none>           <none>
+fault-remediation-7d45c77bc6-h4fgj               1/1     Running     8 (4h54m ago)   6h8m    10.244.1.40    eu1-par-cpu-01   <none>           <none>
+gpu-health-monitor-dcgm-4.x-b5ffp                1/1     Running     0               3m31s   10.244.4.16    eu1-par-gpu-01   <none>           <none>
+janitor-7b8dff5787-77688                         1/1     Running     0               6h8m    10.244.1.43    eu1-par-cpu-01   <none>           <none>
+janitor-provider-fdd66464d-4jlbj                 1/1     Running     0               6h8m    10.244.1.42    eu1-par-cpu-01   <none>           <none>
+labeler-5688d97cc6-dw62h                         1/1     Running     0               6h23m   10.244.1.23    eu1-par-cpu-01   <none>           <none>
+metadata-collector-h8gp6                         1/1     Running     0               11m     172.16.32.20   eu1-par-gpu-01   <none>           <none>
+mongodb-rs0-0                                    1/1     Running     0               6h22m   10.244.1.27    eu1-par-cpu-01   <none>           <none>
+node-drainer-67f4ff998d-6lnbv                    1/1     Running     0               6h13m   10.244.1.29    eu1-par-cpu-01   <none>           <none>
+nvsentinel-psmdb-operator-565bd99d6f-rhmr9       1/1     Running     9 (4h51m ago)   6h23m   10.244.1.24    eu1-par-cpu-01   <none>           <none>
+platform-connectors-c8xjn                        1/1     Running     0               5h16m   10.244.0.123   eu1-par-cp-01    <none>           <none>
+platform-connectors-gk76c                        1/1     Running     0               12m     10.244.4.2     eu1-par-gpu-01   <none>           <none>
+platform-connectors-vvv48                        1/1     Running     0               5h16m   10.244.1.69    eu1-par-cpu-01   <none>           <none>
+syslog-health-monitor-regular-nvvq7              1/1     Running     0               11m     10.244.4.6     eu1-par-gpu-01   <none>           <none>
+== restarts so far (the baseline for capture)
+nvsentinel/fault-remediation-7d45c77bc6-h4fgj fault-remediation restarts=8 last_exit=2026-10-21T12:06:07Z Error
+nvsentinel/nvsentinel-psmdb-operator-565bd99d6f-rhmr9 psmdb-operator restarts=9 last_exit=2026-10-21T12:08:51Z Error
+nvcre/nvcre-manager-d6c6cc8c7-cfl2r manager restarts=9 last_exit=2026-10-21T12:09:13Z Error
+kubeflow-system/jobset-controller-5999749d98-ws522 controller restarts=9 last_exit=2026-10-21T12:06:07Z Error
+kubeflow-system/kubeflow-trainer-controller-manager-6b54cc4fc7-hlhcl manager restarts=10 last_exit=2026-10-21T12:09:13Z Error
+== node conditions
+NetworkUnavailable=False FlannelIsUp 2026-10-21T16:47:34Z
+MemoryPressure=False KubeletHasSufficientMemory 2026-10-21T16:47:23Z
+DiskPressure=False KubeletHasNoDiskPressure 2026-10-21T16:47:23Z
+PIDPressure=False KubeletHasSufficientPID 2026-10-21T16:47:23Z
+Ready=True KubeletReady 2026-10-21T16:47:33Z
+SysLogsXIDError=False SysLogsXIDErrorIsHealthy 2026-10-21T16:49:24Z
+SysLogsSXIDError=False SysLogsSXIDErrorIsHealthy 2026-10-21T16:49:24Z
+SysLogsGPUFallenOff=False SysLogsGPUFallenOffIsHealthy 2026-10-21T16:49:24Z
+GpuDcgmConnectivityFailure=False GpuDcgmConnectivityFailureIsHealthy 2026-10-21T16:59:19Z
+GpuNvswitchFatalWatch=False GpuNvswitchFatalWatchIsHealthy 2026-10-21T16:59:19Z
+GpuPowerWatch=False GpuPowerWatchIsHealthy 2026-10-21T16:59:19Z
+GpuSmWatch=False GpuSmWatchIsHealthy 2026-10-21T16:59:19Z
+GpuThermalWatch=False GpuThermalWatchIsHealthy 2026-10-21T16:59:19Z
+GpuInforomWatch=False GpuInforomWatchIsHealthy 2026-10-21T16:59:19Z
+GpuMcuWatch=False GpuMcuWatchIsHealthy 2026-10-21T16:59:19Z
+GpuNvswitchNonfatalWatch=False GpuNvswitchNonfatalWatchIsHealthy 2026-10-21T16:59:19Z
+GpuPcieWatch=False GpuPcieWatchIsHealthy 2026-10-21T16:59:19Z
+GpuPmuWatch=False GpuPmuWatchIsHealthy 2026-10-21T16:59:19Z
+GpuAllWatch=False GpuAllWatchIsHealthy 2026-10-21T16:59:19Z
+GpuDriverWatch=False GpuDriverWatchIsHealthy 2026-10-21T16:59:19Z
+GpuMemWatch=False GpuMemWatchIsHealthy 2026-10-21T16:59:19Z
+GpuNvlinkWatch=False GpuNvlinkWatchIsHealthy 2026-10-21T16:59:19Z
+== circuit breaker
+--circuit-breaker-enabled=false
+== persistent journal on the node
+[33m==>[0m ignoring SCW_DEFAULT_ZONE and SCW_DEFAULT_REGION from .env; placement comes from terraform/par
+drwxr-sr-x+ 3 root systemd-journal 4096 Oct 21 16:45 /var/log/journal
+File path: /var/log/journal/e683e1e08d8dbfd164df47936ad747f6/system.journal

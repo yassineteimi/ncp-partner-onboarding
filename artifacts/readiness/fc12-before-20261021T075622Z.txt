@@ -1,0 +1,29 @@
+# FC12 before on par, 2026-10-21T07:56:22Z, git main at 9c5e1c8
+== Applications
+cert-manager  wave  3  Synced  Healthy  v1.21.2
+== Nodes
+NAME            STATUS   ROLES           AGE   VERSION   POOL
+eu1-par-cp-01   Ready    control-plane   34h   v1.36.5   control
+== Lane pods, and where they run
+pods running off the CPU worker (should be none): none
+== NVSentinel Deployments and DaemonSets
+== MongoDB
+no PerconaServerMongoDB
+PVC   STATUS   CLASS   SIZE
+== circuit breaker
+no circuit-breaker ConfigMap
+== admission webhooks from the lane
+== nvcrectl setup status (its em dashes written as --, which this repository's lint requires)
+Component                       Status
+─────────────────────────       ──────────
+NVCRE CRDs                      ✗ not found
+NVCRE Controller                ✗ not found
+Kubeflow Trainer                ✗ not found
+Log Profiles                    ✗ not found
+GPU Operator                    ✗ not found
+DCGM (optional)                 ✓ installed
+Helm release nvcre              ✓ not installed
+Helm release kubeflow-trainer   ✓ not installed
+
+Status: not ready -- run 'nvcrectl setup init' to install missing components
+  GPU Operator must be installed by your cluster administrator

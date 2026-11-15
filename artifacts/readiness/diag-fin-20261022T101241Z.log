@@ -1,0 +1,145 @@
+{
+	"DCGM Diagnostic" : 
+	{
+		"test_categories" : 
+		[
+			{
+				"category" : "Deployment",
+				"tests" : 
+				[
+					{
+						"name" : "software",
+						"results" : 
+						[
+							{
+								"entity_group" : "GPU",
+								"entity_group_id" : 1,
+								"entity_id" : 0,
+								"status" : "Pass"
+							},
+							{
+								"entity_group" : "GPU",
+								"entity_group_id" : 1,
+								"entity_id" : 1,
+								"status" : "Pass"
+							}
+						],
+						"test_summary" : 
+						{
+							"status" : "Pass"
+						}
+					}
+				]
+			},
+			{
+				"category" : "Hardware",
+				"tests" : 
+				[
+					{
+						"name" : "memory",
+						"results" : 
+						[
+							{
+								"entity_group" : "GPU",
+								"entity_group_id" : 1,
+								"entity_id" : 0,
+								"info" : 
+								[
+									"Skipping test Memory because ECC is not enabled on GPU 0 Enable ECC memory by running \"nvidia-smi -i <gpuId> -e 1\" to enable. This may require a GPU reset or reboot to take effect."
+								],
+								"status" : "Skip"
+							},
+							{
+								"entity_group" : "GPU",
+								"entity_group_id" : 1,
+								"entity_id" : 1,
+								"info" : 
+								[
+									"Skipping test Memory because ECC is not enabled on GPU 1 Enable ECC memory by running \"nvidia-smi -i <gpuId> -e 1\" to enable. This may require a GPU reset or reboot to take effect."
+								],
+								"status" : "Skip"
+							}
+						],
+						"test_summary" : 
+						{
+							"status" : "Skip"
+						}
+					}
+				]
+			},
+			{
+				"category" : "Integration",
+				"tests" : 
+				[
+					{
+						"name" : "pcie",
+						"results" : 
+						[
+							{
+								"entity_group" : "GPU",
+								"entity_group_id" : 1,
+								"entity_id" : 0,
+								"info" : 
+								[
+									"GPU to Host bandwidth:\t\t53.29 GB/s",
+									"Host to GPU bandwidth:\t\t57.44 GB/s",
+									"bidirectional bandwidth:\t83.66 GB/s",
+									"GPU to Host latency:\t\t1.784 us",
+									"Host to GPU latency:\t\t2.222 us",
+									"bidirectional latency:\t\t3.195 us"
+								],
+								"status" : "Pass"
+							},
+							{
+								"entity_group" : "GPU",
+								"entity_group_id" : 1,
+								"entity_id" : 1,
+								"info" : 
+								[
+									"GPU to Host bandwidth:\t\t53.66 GB/s",
+									"Host to GPU bandwidth:\t\t57.43 GB/s",
+									"bidirectional bandwidth:\t83.67 GB/s",
+									"GPU to Host latency:\t\t1.749 us",
+									"Host to GPU latency:\t\t2.153 us",
+									"bidirectional latency:\t\t3.026 us"
+								],
+								"status" : "Pass"
+							}
+						],
+						"test_summary" : 
+						{
+							"status" : "Pass"
+						}
+					}
+				]
+			}
+		]
+	},
+	"entity_groups" : 
+	[
+		{
+			"entities" : 
+			[
+				{
+					"device_id" : "2335",
+					"entity_id" : 0,
+					"serial_num" : "1753724032409"
+				},
+				{
+					"device_id" : "2335",
+					"entity_id" : 1,
+					"serial_num" : "1753724031638"
+				}
+			],
+			"entity_group" : "GPU",
+			"entity_group_id" : 1
+		}
+	],
+	"metadata" : 
+	{
+		"Driver Version Detected" : "580.178.04",
+		"version" : "4.6.1"
+	}
+}
+dcgmi_exit=0
+diag_result=PASS

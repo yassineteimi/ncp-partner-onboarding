@@ -1,0 +1,8 @@
+[cli] generating recipe offline -- reads inputs only; does not deploy to or modify any cluster
+[cli] CLI flag overriding snapshot-detected value: field=service detected=any override=k0s
+[cli] CLI flag overriding snapshot-detected value: field=accelerator detected=any override=h200
+[cli] CLI flag overriding snapshot-detected value: field=intent detected=any override=training
+[cli] CLI flag overriding snapshot-detected value: field=os detected=any override=ubuntu
+[cli] CLI flag overriding snapshot-detected value: field=platform detected=any override=kubeflow
+[cli] building recipe from criteria: criteria=criteria(service=k0s, accelerator=h200, intent=training, os=ubuntu, platform=kubeflow)
+[cli] command failed: error=[INVALID_REQUEST] no recipe provides platform 'kubeflow' for criteria(service=k0s, accelerator=h200, intent=training, os=ubuntu, platform=kubeflow) exitCode=2

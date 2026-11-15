@@ -1,0 +1,7 @@
+# kube-prometheus-stack 91.4.1 rendered with par's three value files: the kubelet ServiceMonitor's relabelings, then a server dry run on par
+# 20261021T113853Z, laptop clock, UTC. git 4089d42 plus the working tree. v4.2.2+gb05881c
+
+None                   relabelings as wanted, metricRelabelings 1 rules
+/metrics/cadvisor      relabelings as wanted, metricRelabelings 8 rules
+/metrics/probes        relabelings as wanted, metricRelabelings 0 rules
+servicemonitor.monitoring.coreos.com/kube-prometheus-stack-kubelet serverside-applied (server dry run)

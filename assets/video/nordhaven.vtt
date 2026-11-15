@@ -1,0 +1,201 @@
+WEBVTT
+
+1
+00:00:00.650 --> 00:00:02.050
+A GPU cloud gets
+
+2
+00:00:02.070 --> 00:00:03.570
+its hardware months before
+
+3
+00:00:03.590 --> 00:00:04.750
+its first customer.
+
+4
+00:00:06.090 --> 00:00:08.150
+Nordhaven is a fictional
+
+5
+00:00:08.250 --> 00:00:10.030
+NVIDIA Cloud Partner:
+
+6
+00:00:10.630 --> 00:00:12.130
+inference in Paris,
+
+7
+00:00:12.250 --> 00:00:13.810
+training in Finland.
+
+8
+00:00:15.210 --> 00:00:16.050
+Inside,
+
+9
+00:00:16.270 --> 00:00:19.490
+training and post-training run east-west,
+
+10
+00:00:19.890 --> 00:00:21.230
+GPU to GPU.
+
+11
+00:00:21.590 --> 00:00:22.710
+On the Finland node,
+
+12
+00:00:23.070 --> 00:00:25.770
+I measured 351 gigabytes
+
+13
+00:00:25.790 --> 00:00:27.590
+per second over NVLink.
+
+14
+00:00:28.870 --> 00:00:31.710
+Inference runs north-south.
+
+15
+00:00:31.890 --> 00:00:33.190
+Requests come in,
+
+16
+00:00:33.370 --> 00:00:34.810
+tokens go out.
+
+17
+00:00:35.490 --> 00:00:36.630
+I designed that layer
+
+18
+00:00:36.650 --> 00:00:38.010
+with NVIDIA Dynamo,
+
+19
+00:00:38.330 --> 00:00:39.970
+and it runs next.
+
+20
+00:00:41.330 --> 00:00:42.870
+Between handover and
+
+21
+00:00:42.890 --> 00:00:43.950
+the first tenant,
+
+22
+00:00:44.370 --> 00:00:46.310
+every partner asks the
+
+23
+00:00:46.330 --> 00:00:47.830
+same four questions.
+
+24
+00:00:49.790 --> 00:00:52.090
+AICR pins the versions
+
+25
+00:00:52.110 --> 00:00:53.110
+that go together.
+
+26
+00:00:53.630 --> 00:00:56.670
+NVCRE certifies each node before
+
+27
+00:00:56.690 --> 00:00:58.390
+any tenant lands on it.
+
+28
+00:01:00.730 --> 00:01:02.050
+When a GPU fails,
+
+29
+00:01:02.190 --> 00:01:04.090
+NVSentinel had training back
+
+30
+00:01:04.110 --> 00:01:06.650
+in 288.8 seconds,
+
+31
+00:01:06.970 --> 00:01:08.470
+with nobody involved.
+
+32
+00:01:08.830 --> 00:01:09.870
+My own controller from
+
+33
+00:01:09.890 --> 00:01:12.570
+Part 1 took 360.9.
+
+34
+00:01:13.950 --> 00:01:15.790
+KAI and MIG share
+
+35
+00:01:15.810 --> 00:01:17.830
+scarce GPUs between teams.
+
+36
+00:01:18.370 --> 00:01:21.010
+Slurm users and VM customers
+
+37
+00:01:21.070 --> 00:01:22.710
+run on the same platform.
+
+38
+00:01:23.950 --> 00:01:25.510
+Thanos gives one view
+
+39
+00:01:25.530 --> 00:01:26.530
+of both sites,
+
+40
+00:01:26.870 --> 00:01:28.050
+even after one of
+
+41
+00:01:28.070 --> 00:01:28.870
+them is gone.
+
+42
+00:01:31.530 --> 00:01:32.470
+All of it runs
+
+43
+00:01:32.490 --> 00:01:34.270
+on upstream Kubernetes,
+
+44
+00:01:34.630 --> 00:01:36.110
+from one Git repository,
+
+45
+00:01:36.490 --> 00:01:38.170
+across two providers.
+
+46
+00:01:39.370 --> 00:01:40.870
+From hardware handover
+
+47
+00:01:41.130 --> 00:01:42.310
+to first tenants,
+
+48
+00:01:42.670 --> 00:01:44.430
+on NVIDIA's open stack.
+
+49
+00:01:44.550 --> 00:01:45.470
+That's the work I can
+
+50
+00:01:45.490 --> 00:01:46.450
+do for a partner.

@@ -1,0 +1,70 @@
+# Site fin rehearsal on CPU instances, captured 2026-10-20T07:56:11Z
+# REHEARSAL: eu1-fin-gpu-01 is a CPU.4V.16G booting the GPU image 26.04.cuda13.4. It has no GPU.
+# git main at fd2455d
+
+## Bring-up timelines (laptop clock, UTC)
+# cp-bringup-20261020T074646Z.txt, laptop clock, UTC
+started=2026-10-20T07:46:46Z
+preflight_done=2026-10-20T07:46:50Z
+instance_running=2026-10-20T07:47:25Z
+bootstrap_complete=2026-10-20T07:49:17Z
+kubeadm_ready=2026-10-20T07:49:44Z
+argocd_installed=2026-10-20T07:50:44Z
+# gpu-bringup-20261020T075111Z-rehearsal.txt, laptop clock, UTC
+started=2026-10-20T07:51:12Z
+preflight_done=2026-10-20T07:51:13Z
+instance_running=2026-10-20T07:51:49Z
+bootstrap_complete=2026-10-20T07:52:41Z
+node_ready=2026-10-20T07:52:59Z
+
+## ArgoCD Applications
+NAME                     WAVE     SYNC        HEALTH
+gpu-operator             1        Synced      Healthy
+kube-prometheus-stack    0        Synced      Healthy
+local-path-provisioner   -1       Synced      Healthy
+node-feature-discovery   0        Synced      Healthy
+root                     <none>   OutOfSync   Healthy
+
+## Nodes
+NAME             STATUS   ROLES           AGE     VERSION   INTERNAL-IP     EXTERNAL-IP   OS-IMAGE             KERNEL-VERSION             CONTAINER-RUNTIME    SITE   POOL
+eu1-fin-cp-01    Ready    control-plane   6m48s   v1.36.5   217.177.40.32   <none>        Ubuntu 26.04.1 LTS   7.0.0-38-generic (amd64)   containerd://2.3.6   fin    control
+eu1-fin-gpu-01   Ready    <none>          3m25s   v1.36.5   86.38.238.80    <none>        Ubuntu 26.04.1 LTS   7.0.0-38-generic (amd64)   containerd://2.3.6   fin    gpu
+
+## Pods
+NAMESPACE                NAME                                                        STATUS    NODE
+argocd                   argocd-application-controller-0                             Running   eu1-fin-cp-01
+argocd                   argocd-applicationset-controller-5899cbd7-2mqqg             Running   eu1-fin-cp-01
+argocd                   argocd-redis-c4fdd947-ctbtd                                 Running   eu1-fin-cp-01
+argocd                   argocd-repo-server-67db9f49bd-bk5wk                         Running   eu1-fin-cp-01
+argocd                   argocd-server-795bb669dc-m64b9                              Running   eu1-fin-cp-01
+gpu-operator             gpu-operator-8469d9bdd-9sqrq                                Running   eu1-fin-cp-01
+kube-flannel             kube-flannel-ds-5stb8                                       Running   eu1-fin-cp-01
+kube-flannel             kube-flannel-ds-lxsbk                                       Running   eu1-fin-gpu-01
+kube-system              coredns-589f44dc88-d8ngw                                    Running   eu1-fin-cp-01
+kube-system              coredns-589f44dc88-ltvfz                                    Running   eu1-fin-cp-01
+kube-system              etcd-eu1-fin-cp-01                                          Running   eu1-fin-cp-01
+kube-system              kube-apiserver-eu1-fin-cp-01                                Running   eu1-fin-cp-01
+kube-system              kube-controller-manager-eu1-fin-cp-01                       Running   eu1-fin-cp-01
+kube-system              kube-proxy-bgj8p                                            Running   eu1-fin-gpu-01
+kube-system              kube-proxy-c8dzs                                            Running   eu1-fin-cp-01
+kube-system              kube-scheduler-eu1-fin-cp-01                                Running   eu1-fin-cp-01
+local-path-storage       local-path-provisioner-84c5dd95f5-r5zfk                     Running   eu1-fin-cp-01
+monitoring               kube-prometheus-stack-kube-state-metrics-84f8496f5c-72dq6   Running   eu1-fin-cp-01
+monitoring               kube-prometheus-stack-operator-5b5dcc8f66-tvzrk             Running   eu1-fin-cp-01
+monitoring               kube-prometheus-stack-prometheus-node-exporter-475gf        Running   eu1-fin-cp-01
+monitoring               kube-prometheus-stack-prometheus-node-exporter-57kpw        Running   eu1-fin-gpu-01
+monitoring               prometheus-kube-prometheus-stack-prometheus-0               Running   eu1-fin-cp-01
+node-feature-discovery   node-feature-discovery-gc-7774bfb87f-s8vrj                  Running   eu1-fin-cp-01
+node-feature-discovery   node-feature-discovery-master-7d4f8679f8-qqdfq              Running   eu1-fin-cp-01
+node-feature-discovery   node-feature-discovery-worker-4hm6s                         Running   eu1-fin-cp-01
+node-feature-discovery   node-feature-discovery-worker-5whvx                         Running   eu1-fin-gpu-01
+
+## Host firewall, probed from the laptop (bash, nc -z, 3 s timeout)
+open    217.177.40.32:22
+open    217.177.40.32:6443
+closed  217.177.40.32:10250
+closed  217.177.40.32:2379
+open    86.38.238.80:22
+closed  86.38.238.80:6443
+closed  86.38.238.80:10250
+closed  86.38.238.80:30080

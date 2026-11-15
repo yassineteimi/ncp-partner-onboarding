@@ -1,0 +1,3 @@
+# pre-pull on eu1-fin-gpu-01, started 2026-10-22T09:56:33Z, ended 2026-10-22T10:02:07Z
+TIME                   POD         MESSAGE
+2026-10-22T10:02:02Z   prepull-1   Successfully pulled image "nvcr.io/nvidia/pytorch:26.01-py3@sha256:38ed2ecb2c16d10677006d73fb0a150855d6ec81db8fc66e800b5ae92741007e" in 3m6.612s (5m27.78s including waiting). Image size: 9108129521 bytes.

@@ -1,0 +1,5 @@
+# cp-bringup-20261021T153200Z.txt, laptop clock, UTC
+started=2026-10-21T15:32:01Z
+preflight_done=2026-10-21T15:32:01Z
+refused: cp-up read cp_enabled=true from a stale Terraform output (left by the 12:16Z failure), took its converge path, and the guard refused a plan that would destroy the SSH key and startup script. Nothing ordered.
+# Added by cos: cleared with make fin-down at ~15:32Z (key and script only), then the real retry is cp-bringup-20261021T153321Z.txt

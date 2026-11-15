@@ -1,0 +1,86 @@
+# W2 final state of eu1-fin-gpu-01 before fin-down, 2026-10-22T10:27:19Z, laptop clock, UTC
+== nvidia-smi -L
+GPU 0: NVIDIA H200 (UUID: GPU-4d345e6c-2a90-57e7-e5c7-3ffdb67e061d)
+  MIG 3g.71gb     Device  0: (UUID: MIG-f8bb95eb-0760-582a-9634-f1f65e797a9f)
+  MIG 3g.71gb     Device  1: (UUID: MIG-82b6aa84-3e05-59bd-a396-690e13953fd3)
+GPU 1: NVIDIA H200 (UUID: GPU-0557d559-558e-dfb1-ed86-7d0138f9982d)
+== nvidia-smi mig -lgip (GPU instance profiles on GPU0)
++-------------------------------------------------------------------------------+
+| GPU instance profiles:                                                        |
+| GPU   Name               ID    Instances   Memory     P2P    SM    DEC   ENC  |
+|                                Free/Total   GiB              CE    JPEG  OFA  |
+|===============================================================================|
+|   0  MIG 1g.18gb         19     0/7        16.00      No     16     1     0   |
+|                                                               1     1     0   |
++-------------------------------------------------------------------------------+
+|   0  MIG 1g.18gb+me      20     0/1        16.00      No     16     1     0   |
+|                                                               1     1     1   |
++-------------------------------------------------------------------------------+
+|   0  MIG 1g.35gb         15     0/4        32.50      No     26     1     0   |
+|                                                               1     1     0   |
++-------------------------------------------------------------------------------+
+|   0  MIG 2g.35gb         14     0/3        32.50      No     32     2     0   |
+|                                                               2     2     0   |
++-------------------------------------------------------------------------------+
+|   0  MIG 3g.71gb          9     0/2        69.75      No     60     3     0   |
+|                                                               3     3     0   |
++-------------------------------------------------------------------------------+
+|   0  MIG 4g.71gb          5     0/1        69.75      No     64     4     0   |
+|                                                               4     4     0   |
++-------------------------------------------------------------------------------+
+|   0  MIG 7g.141gb         0     0/1        140.00     No     132    7     0   |
+|                                                               8     7     1   |
++-------------------------------------------------------------------------------+
+== nvidia-smi mig -lgi
++---------------------------------------------------------+
+| GPU instances:                                          |
+| GPU   Name               Profile  Instance   Placement  |
+|                            ID       ID       Start:Size |
+|=========================================================|
+|   0  MIG 3g.71gb            9        1          0:4     |
++---------------------------------------------------------+
+|   0  MIG 3g.71gb            9        2          4:4     |
++---------------------------------------------------------+
+== ECC mode
+index, ecc.mode.current, ecc.mode.pending
+0, Disabled, Disabled
+1, Disabled, Disabled
+== node labels (nvidia, eu1)
+eu1.io/pool=gpu
+eu1.io/site=fin
+nvidia.com/gpu.count=2
+nvidia.com/gpu.product=NVIDIA-H200
+nvidia.com/mig-3g.71gb.count=2
+nvidia.com/mig-3g.71gb.engines.copy=3
+nvidia.com/mig-3g.71gb.engines.decoder=3
+nvidia.com/mig-3g.71gb.engines.encoder=0
+nvidia.com/mig-3g.71gb.engines.jpeg=3
+nvidia.com/mig-3g.71gb.engines.ofa=0
+nvidia.com/mig-3g.71gb.memory=71424
+nvidia.com/mig-3g.71gb.multiprocessors=60
+nvidia.com/mig-3g.71gb.product=NVIDIA-H200-MIG-3g.71gb
+nvidia.com/mig-3g.71gb.replicas=1
+nvidia.com/mig-3g.71gb.sharing-strategy=none
+nvidia.com/mig-3g.71gb.slices.ci=3
+nvidia.com/mig-3g.71gb.slices.gi=3
+nvidia.com/mig.capable=true
+nvidia.com/mig.config=h200-split
+nvidia.com/mig.config.state=success
+nvidia.com/mig.strategy=mixed
+== taints
+
+== allocatable
+{"cpu":"88","ephemeral-storage":"186364668825","hugepages-1Gi":"0","hugepages-2Mi":"0","memory":"350471908Ki","nvidia.com/gpu":"1","nvidia.com/mig-3g.71gb":"2","pods":"110"}
+== ArgoCD apps
+NAME                     SYNC STATUS   HEALTH STATUS
+gpu-operator             Synced        Healthy
+gpu-rules                Synced        Healthy
+kai-scheduler            Synced        Healthy
+kube-prometheus-stack    Synced        Healthy
+kubeflow-trainer         Synced        Healthy
+local-path-provisioner   Synced        Healthy
+node-feature-discovery   Synced        Healthy
+nvcre                    Synced        Healthy
+root                     OutOfSync     Healthy
+== Verda balance before fin-down
+{"amount":41.96547,"currency":"usd"}

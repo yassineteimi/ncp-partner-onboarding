@@ -1,0 +1,78 @@
+# capture-kubevirt.sh, 20261021T103649Z, laptop clock, UTC. git 28f386b
+
+## KubeVirt
+phase: Deployed
+version: v1.9.1
+useEmulation: false
+NAME                                       READY   STATUS      RESTARTS   AGE     IP            NODE             NOMINATED NODE   READINESS GATES
+kubevirt-wait-available-f7cfs              0/1     Completed   0          7m41s   10.244.1.10   eu1-par-cpu-01   <none>           <none>
+virt-api-6cb8cf67f7-g9v29                  1/1     Running     0          7m20s   10.244.1.12   eu1-par-cpu-01   <none>           <none>
+virt-controller-7f5c9bf4db-sln48           1/1     Running     0          6m54s   10.244.1.13   eu1-par-cpu-01   <none>           <none>
+virt-exportproxy-6946d6469b-6wv4n          1/1     Running     0          6m53s   10.244.1.14   eu1-par-cpu-01   <none>           <none>
+virt-handler-2z5nt                         1/1     Running     0          6m53s   10.244.1.16   eu1-par-cpu-01   <none>           <none>
+virt-operator-6cf6b9b55d-txj97             1/1     Running     0          7m58s   10.244.1.9    eu1-par-cpu-01   <none>           <none>
+virt-template-apiserver-6c54f9c9d8-2jd9d   1/1     Running     0          6m53s   10.244.1.15   eu1-par-cpu-01   <none>           <none>
+virt-template-controller-b76d4c48c-7pfnw   1/1     Running     0          6m53s   10.244.1.17   eu1-par-cpu-01   <none>           <none>
+
+## What each KubeVirt pod runs: the reference it was given, and the digest the node pulled
+kubevirt-wait-available-f7cfs                by digest alpine/k8s:1.36.5@sha256:094adf64cdc4827377cdbe7ea5747472ce115f9fbc64a4e35970ec66777f9a00
+                                                       pulled docker.io/alpine/k8s@sha256:094adf64cdc4827377cdbe7ea5747472ce115f9fbc64a4e35970ec66777f9a00
+virt-api-6cb8cf67f7-g9v29                    by digest quay.io/kubevirt/virt-api@sha256:d341c751dbe632d183989cce78203a888293e0e2a32719f32461bd6273322485
+                                                       pulled quay.io/kubevirt/virt-api@sha256:d341c751dbe632d183989cce78203a888293e0e2a32719f32461bd6273322485
+virt-controller-7f5c9bf4db-sln48             by digest quay.io/kubevirt/virt-controller@sha256:75c94c787eec15458729848e00fe0b421ca8998c6219de8c2d3cae72ff0bd287
+                                                       pulled quay.io/kubevirt/virt-controller@sha256:75c94c787eec15458729848e00fe0b421ca8998c6219de8c2d3cae72ff0bd287
+virt-exportproxy-6946d6469b-6wv4n            by digest quay.io/kubevirt/virt-exportproxy@sha256:fe9a0a297e7b407c3a322c6f5fccba5313c668907c30cb0b80b8c51bcdea640a
+                                                       pulled quay.io/kubevirt/virt-exportproxy@sha256:fe9a0a297e7b407c3a322c6f5fccba5313c668907c30cb0b80b8c51bcdea640a
+virt-handler-2z5nt                           by digest quay.io/kubevirt/virt-handler@sha256:c23b635ea4aff7f0779c6c061c431da0469c7796255e6de90a5970236b5ea61b
+                                                       pulled quay.io/kubevirt/virt-handler@sha256:c23b635ea4aff7f0779c6c061c431da0469c7796255e6de90a5970236b5ea61b
+virt-operator-6cf6b9b55d-txj97               by digest quay.io/kubevirt/virt-operator@sha256:a8adf7b772e9ce0bf7e2ce889910fc41ebadf552c9dbe843e9b86641e34f5df9
+                                                       pulled quay.io/kubevirt/virt-operator@sha256:a8adf7b772e9ce0bf7e2ce889910fc41ebadf552c9dbe843e9b86641e34f5df9
+virt-template-apiserver-6c54f9c9d8-2jd9d     BY TAG    quay.io/kubevirt/virt-template-apiserver:v0.2.3
+                                                       pulled quay.io/kubevirt/virt-template-apiserver@sha256:27defde24b4a4705d6096a86d134df0dc324243b56be8f0c057e1882c6da338b
+virt-template-controller-b76d4c48c-7pfnw     BY TAG    quay.io/kubevirt/virt-template-controller:v0.2.3
+                                                       pulled quay.io/kubevirt/virt-template-controller@sha256:b45ac55de5fc9dbbee14974b45718c41eaed4d4979f92677dab3500598e33d22
+
+## Nodes
+NAME             STATUS   ROLES           AGE   VERSION   INTERNAL-IP    EXTERNAL-IP   OS-IMAGE             KERNEL-VERSION              CONTAINER-RUNTIME    SITE   POOL
+eu1-par-cp-01    Ready    control-plane   36h   v1.36.5   172.16.32.10   <none>        Ubuntu 24.04.5 LTS   6.8.0-142-generic (amd64)   containerd://2.3.6   par    control
+eu1-par-cpu-01   Ready    <none>          18m   v1.36.5   172.16.32.30   <none>        Ubuntu 24.04.5 LTS   6.8.0-142-generic (amd64)   containerd://2.3.6   par    cpu
+
+## The tenant VM
+NAME                                AGE     STATUS    READY
+virtualmachine.kubevirt.io/web-01   5m43s   Running   True
+
+NAME                                        AGE     PHASE     IP            NODENAME         READY   LIVE-MIGRATABLE   PAUSED
+virtualmachineinstance.kubevirt.io/web-01   5m43s   Running   10.244.1.18   eu1-par-cpu-01   True    True              
+node: eu1-par-cpu-01  phase: Running
+  Pending      2026-10-21T10:31:08Z  +0 s after the VMI was created
+  Scheduling   2026-10-21T10:31:08Z  +0 s after the VMI was created
+  Scheduled    2026-10-21T10:31:31Z  +23 s after the VMI was created
+  Running      2026-10-21T10:31:33Z  +25 s after the VMI was created
+  condition Ready=True 
+  condition LiveMigratable=True 
+  condition StorageLiveMigratable=True 
+
+## What the VM costs the cluster: virt-launcher's requests against the quota
+pod virt-launcher-web-01-v8tzt on eu1-par-cpu-01
+  compute              requests {'cpu': '1', 'devices.kubevirt.io/kvm': '1', 'devices.kubevirt.io/tun': '1', 'devices.kubevirt.io/vhost-net': '1', 'ephemeral-storage': '50M', 'memory': '2316Mi'}  limits {'devices.kubevirt.io/kvm': '1', 'devices.kubevirt.io/tun': '1', 'devices.kubevirt.io/vhost-net': '1'}
+Resource                           Used        Hard
+--------                           ----        ----
+count/virtualmachines.kubevirt.io  1           2
+requests.cpu                       1005m       2
+requests.memory                    2463502016  4Gi
+requests.nvidia.com/gpu            0           0
+
+## The guest's own page, through Service tenant-vm/web-01
+hostname: web-01
+hypervisor seen by the guest: kvm
+kernel: 6.8.0-147-generic
+cpu: AMD EPYC-Milan Processor
+vcpus: 1
+memory: 1903 MiB
+boot: Startup finished in 6.302s (kernel) + 13.928s (userspace) = 20.231s 
+written: 2026-10-21T10:33:46Z
+
+## Pods holding a GPU right now, cluster-wide
+(none: no GPU workload is running at this moment)
+
+# written to docs/artifacts/platform/kubevirt-20261021T103649Z.txt

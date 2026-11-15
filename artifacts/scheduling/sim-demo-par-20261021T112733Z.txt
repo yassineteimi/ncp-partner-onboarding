@@ -1,0 +1,160 @@
+# sim-demo on par, 20261021T112733Z, laptop clock, UTC. git bc2e858
+
+## Before: simulated nodes, KAI, queues   [11:27:34Z]
+SIMULATED: the eu1-par-sim-gpu-* nodes are KWOK nodes; their GPUs come from the fake GPU operator.
+NODE                 READY   POOL      GPU
+eu1-par-cp-01        True    control   <none>
+eu1-par-cpu-01       True    cpu       <none>
+eu1-par-sim-gpu-01   True    sim-gpu   4
+eu1-par-sim-gpu-02   True    sim-gpu   4
+NAME                                     READY   STATUS    RESTARTS   AGE   IP            NODE             NOMINATED NODE   READINESS GATES
+admission-6bfd74594f-jcgw2               1/1     Running   0          28m   10.244.1.55   eu1-par-cpu-01   <none>           <none>
+binder-bc79dcb4c-rh2lc                   1/1     Running   0          28m   10.244.1.53   eu1-par-cpu-01   <none>           <none>
+kai-operator-69f5995df5-7pc8x            1/1     Running   0          28m   10.244.1.50   eu1-par-cpu-01   <none>           <none>
+kai-scheduler-default-7d9b744b8b-w8222   1/1     Running   0          28m   10.244.1.51   eu1-par-cpu-01   <none>           <none>
+pod-grouper-56ff76cb96-7g87q             1/1     Running   0          28m   10.244.1.52   eu1-par-cpu-01   <none>           <none>
+podgroup-controller-6796d84896-b47d6     1/1     Running   0          28m   10.244.1.56   eu1-par-cpu-01   <none>           <none>
+queue-controller-74b78c45f8-2jg5q        1/1     Running   0          28m   10.244.1.54   eu1-par-cpu-01   <none>           <none>
+PASS: simulated GPUs allocatable (8)
+after 0s: no demo pods left in team-a
+after 0s: no demo pods left in team-b
+### queues (GPUs allocated, requested)
+QUEUE                  PARENT                 GPU_QUOTA   GPU_ALLOCATED   GPU_REQUESTED   NONPREEMPTIBLE
+default-parent-queue   <none>                 0           <none>          <none>          <none>
+default-queue          default-parent-queue   0           <none>          <none>          <none>
+eu1                    <none>                 8           <none>          <none>          <none>
+team-a                 eu1                    4           <none>          <none>          <none>
+team-b                 eu1                    4           <none>          <none>          <none>
+### podgroups in team-a
+PODGROUP   QUEUE   MIN_MEMBER   STATE   PRIORITY
+### podgroups in team-b
+PODGROUP   QUEUE   MIN_MEMBER   STATE   PRIORITY
+
+## 1. team-a bursts to 8 GPUs while team-b is idle   [11:27:36Z]
+job.batch/a-burst created
+after 5s: 8 team-a pods bound
+NAME            READY   STATUS    RESTARTS   AGE   IP           NODE                 NOMINATED NODE   READINESS GATES
+a-burst-5d7xt   1/1     Running   0          5s    10.244.3.6   eu1-par-sim-gpu-02   <none>           <none>
+a-burst-9lxbz   1/1     Running   0          5s    10.244.2.5   eu1-par-sim-gpu-01   <none>           <none>
+a-burst-9zdgr   1/1     Running   0          5s    10.244.2.6   eu1-par-sim-gpu-01   <none>           <none>
+a-burst-ntsp2   1/1     Running   0          5s    10.244.2.4   eu1-par-sim-gpu-01   <none>           <none>
+a-burst-rs5p6   1/1     Running   0          5s    10.244.2.3   eu1-par-sim-gpu-01   <none>           <none>
+a-burst-s2zx7   1/1     Running   0          5s    10.244.3.4   eu1-par-sim-gpu-02   <none>           <none>
+a-burst-vjl2h   1/1     Running   0          5s    10.244.3.5   eu1-par-sim-gpu-02   <none>           <none>
+a-burst-wqrqn   1/1     Running   0          5s    10.244.3.3   eu1-par-sim-gpu-02   <none>           <none>
+PASS: team-a pods bound, 4 of them over quota (8)
+### queues (GPUs allocated, requested)
+QUEUE                  PARENT                 GPU_QUOTA   GPU_ALLOCATED   GPU_REQUESTED   NONPREEMPTIBLE
+default-parent-queue   <none>                 0           <none>          <none>          <none>
+default-queue          default-parent-queue   0           <none>          <none>          <none>
+eu1                    <none>                 8           8               8               <none>
+team-a                 eu1                    4           8               8               <none>
+team-b                 eu1                    4           <none>          <none>          <none>
+### podgroups in team-a
+PODGROUP                                          QUEUE    MIN_MEMBER   STATE    PRIORITY
+pg-a-burst-c38ddc41-e531-4050-b545-d057c38e6af5   team-a   1            <none>   train
+
+## 2. team-b submits a gang of 4; KAI reclaims team-a's borrowed GPUs   [11:27:43Z]
+job.batch/b-gang created
+after 5s: team-b's 4 gang pods bound
+submitted at 11:27:43Z; PodScheduled per team-b pod (API server time):
+b-gang-8djmp  eu1-par-sim-gpu-02  2026-10-21T11:27:48Z
+b-gang-jtrtn  eu1-par-sim-gpu-01  2026-10-21T11:27:48Z
+b-gang-pwsvk  eu1-par-sim-gpu-02  2026-10-21T11:27:48Z
+b-gang-xtdfz  eu1-par-sim-gpu-02  2026-10-21T11:27:48Z
+NAME           READY   STATUS    RESTARTS   AGE   IP           NODE                 NOMINATED NODE   READINESS GATES
+b-gang-8djmp   1/1     Running   0          16s   10.244.3.6   eu1-par-sim-gpu-02   <none>           <none>
+b-gang-jtrtn   1/1     Running   0          16s   10.244.2.4   eu1-par-sim-gpu-01   <none>           <none>
+b-gang-pwsvk   1/1     Running   0          16s   10.244.3.3   eu1-par-sim-gpu-02   <none>           <none>
+b-gang-xtdfz   1/1     Running   0          16s   10.244.3.5   eu1-par-sim-gpu-02   <none>           <none>
+NAME            READY   STATUS    RESTARTS   AGE   IP           NODE                 NOMINATED NODE   READINESS GATES
+a-burst-9lxbz   1/1     Running   0          23s   10.244.2.5   eu1-par-sim-gpu-01   <none>           <none>
+a-burst-9zdgr   1/1     Running   0          23s   10.244.2.6   eu1-par-sim-gpu-01   <none>           <none>
+a-burst-rs5p6   1/1     Running   0          23s   10.244.2.3   eu1-par-sim-gpu-01   <none>           <none>
+a-burst-s2zx7   1/1     Running   0          23s   10.244.3.4   eu1-par-sim-gpu-02   <none>           <none>
+PASS: team-b gang pods bound (4)
+PASS: team-a pods still Running (its quota) (4)
+### queues (GPUs allocated, requested)
+QUEUE                  PARENT                 GPU_QUOTA   GPU_ALLOCATED   GPU_REQUESTED   NONPREEMPTIBLE
+default-parent-queue   <none>                 0           <none>          <none>          <none>
+default-queue          default-parent-queue   0           <none>          <none>          <none>
+eu1                    <none>                 8           8               8               <none>
+team-a                 eu1                    4           4               4               <none>
+team-b                 eu1                    4           4               4               <none>
+### podgroups in team-a
+PODGROUP                                          QUEUE    MIN_MEMBER   STATE    PRIORITY
+pg-a-burst-c38ddc41-e531-4050-b545-d057c38e6af5   team-a   1            <none>   train
+### podgroups in team-b
+PODGROUP                                         QUEUE    MIN_MEMBER   STATE    PRIORITY
+pg-b-gang-1f237bdd-7efd-4b18-86bb-b1db02b9060b   team-b   4            <none>   train
+2026-10-21T11:27:38Z   2026-10-21T11:27:38Z   1       Normal    Scheduled           a-burst-9zdgr                                     kai-scheduler    Successfully assigned pod team-a/a-burst-9zdgr to node eu1-par-sim-gpu-01 at node-pool default
+2026-10-21T11:27:38Z   2026-10-21T11:27:38Z   1       Normal    Scheduled           a-burst-9lxbz                                     kai-scheduler    Successfully assigned pod team-a/a-burst-9lxbz to node eu1-par-sim-gpu-01 at node-pool default
+2026-10-21T11:27:38Z   2026-10-21T11:27:38Z   1       Normal    Scheduled           a-burst-ntsp2                                     kai-scheduler    Successfully assigned pod team-a/a-burst-ntsp2 to node eu1-par-sim-gpu-01 at node-pool default
+2026-10-21T11:27:38Z   2026-10-21T11:27:38Z   1       Normal    Scheduled           a-burst-wqrqn                                     kai-scheduler    Successfully assigned pod team-a/a-burst-wqrqn to node eu1-par-sim-gpu-02 at node-pool default
+2026-10-21T11:27:38Z   2026-10-21T11:27:38Z   1       Normal    Scheduled           a-burst-rs5p6                                     kai-scheduler    Successfully assigned pod team-a/a-burst-rs5p6 to node eu1-par-sim-gpu-01 at node-pool default
+2026-10-21T11:27:39Z   2026-10-21T11:27:39Z   1       Normal    Scheduled           a-burst-5d7xt                                     kai-scheduler    Successfully assigned pod team-a/a-burst-5d7xt to node eu1-par-sim-gpu-02 at node-pool default
+2026-10-21T11:27:39Z   2026-10-21T11:27:39Z   1       Normal    Scheduled           a-burst-s2zx7                                     kai-scheduler    Successfully assigned pod team-a/a-burst-s2zx7 to node eu1-par-sim-gpu-02 at node-pool default
+2026-10-21T11:27:39Z   2026-10-21T11:27:39Z   1       Normal    Scheduled           a-burst-vjl2h                                     kai-scheduler    Successfully assigned pod team-a/a-burst-vjl2h to node eu1-par-sim-gpu-02 at node-pool default
+2026-10-21T11:27:46Z   2026-10-21T11:27:46Z   1       Normal    Evict               pg-a-burst-c38ddc41-e531-4050-b545-d057c38e6af5   kai-scheduler    Pod team-a/a-burst-vjl2h was preempted by workload team-b/pg-b-gang-1f237bdd-7efd-4b18-86bb-b1db02b9060b.
+2026-10-21T11:27:46Z   2026-10-21T11:27:46Z   1       Normal    Evict               pg-a-burst-c38ddc41-e531-4050-b545-d057c38e6af5   kai-scheduler    Pod team-a/a-burst-wqrqn was preempted by workload team-b/pg-b-gang-1f237bdd-7efd-4b18-86bb-b1db02b9060b.
+2026-10-21T11:27:46Z   2026-10-21T11:27:46Z   1       Normal    Evict               pg-a-burst-c38ddc41-e531-4050-b545-d057c38e6af5   kai-scheduler    Pod team-a/a-burst-5d7xt was preempted by workload team-b/pg-b-gang-1f237bdd-7efd-4b18-86bb-b1db02b9060b.
+2026-10-21T11:27:46Z   2026-10-21T11:27:46Z   1       Normal    Evict               pg-a-burst-c38ddc41-e531-4050-b545-d057c38e6af5   kai-scheduler    Pod team-a/a-burst-ntsp2 was preempted by workload team-b/pg-b-gang-1f237bdd-7efd-4b18-86bb-b1db02b9060b.
+2026-10-21T11:27:45Z   2026-10-21T11:27:45Z   1       Normal    NotReady            pg-b-gang-1f237bdd-7efd-4b18-86bb-b1db02b9060b   kai-scheduler    Job is not ready for scheduling. Waiting for 4 pods, currently 3 exist, 0 are gated
+2026-10-21T11:27:48Z   2026-10-21T11:27:48Z   1       Normal    Scheduled           b-gang-pwsvk                                     kai-scheduler    Successfully assigned pod team-b/b-gang-pwsvk to node eu1-par-sim-gpu-02 at node-pool default
+2026-10-21T11:27:48Z   2026-10-21T11:27:48Z   1       Normal    Scheduled           b-gang-xtdfz                                     kai-scheduler    Successfully assigned pod team-b/b-gang-xtdfz to node eu1-par-sim-gpu-02 at node-pool default
+2026-10-21T11:27:48Z   2026-10-21T11:27:48Z   1       Normal    Scheduled           b-gang-jtrtn                                     kai-scheduler    Successfully assigned pod team-b/b-gang-jtrtn to node eu1-par-sim-gpu-01 at node-pool default
+2026-10-21T11:27:48Z   2026-10-21T11:27:48Z   1       Normal    Scheduled           b-gang-8djmp                                     kai-scheduler    Successfully assigned pod team-b/b-gang-8djmp to node eu1-par-sim-gpu-02 at node-pool default
+
+## 3. team-a done; team-b asks for a gang of 6 with 4 GPUs free   [11:28:02Z]
+job.batch "a-burst" deleted
+after 0s: team-a's pods gone
+job.batch/b-gang-too-big created
+waiting 90 s: none of the 6 pods may bind
+timeout after 90s: a b-gang-too-big pod bound
+NAME                   READY   STATUS    RESTARTS   AGE   IP       NODE     NOMINATED NODE   READINESS GATES
+b-gang-too-big-2p7ct   0/1     Pending   0          91s   <none>   <none>   <none>           <none>
+b-gang-too-big-6rp4z   0/1     Pending   0          91s   <none>   <none>   <none>           <none>
+b-gang-too-big-8hz5w   0/1     Pending   0          91s   <none>   <none>   <none>           <none>
+b-gang-too-big-clr5v   0/1     Pending   0          91s   <none>   <none>   <none>           <none>
+b-gang-too-big-klsxg   0/1     Pending   0          91s   <none>   <none>   <none>           <none>
+b-gang-too-big-x4ttf   0/1     Pending   0          91s   <none>   <none>   <none>           <none>
+PASS: gang of 6: pods bound (0)
+PASS: gang of 6: pods Pending (6)
+### queues (GPUs allocated, requested)
+QUEUE                  PARENT                 GPU_QUOTA   GPU_ALLOCATED   GPU_REQUESTED   NONPREEMPTIBLE
+default-parent-queue   <none>                 0           <none>          <none>          <none>
+default-queue          default-parent-queue   0           <none>          <none>          <none>
+eu1                    <none>                 8           4               10              <none>
+team-a                 eu1                    4           <none>          <none>          <none>
+team-b                 eu1                    4           4               10              <none>
+### podgroups in team-b
+PODGROUP                                                 QUEUE    MIN_MEMBER   STATE    PRIORITY
+pg-b-gang-1f237bdd-7efd-4b18-86bb-b1db02b9060b           team-b   4            <none>   train
+pg-b-gang-too-big-81dbe0b9-0a4f-4301-ae18-e777bc102212   team-b   6            <none>   train
+### why KAI holds the gang (podgroup.scheduling.run.ai/pg-b-gang-too-big-81dbe0b9-0a4f-4301-ae18-e777bc102212)
+[{"lastTransitionTime":"2026-10-21T11:28:05Z"
+"message":"PodSchedulingErrors: Resources were found for 4 pods while 6 are required for gang scheduling. Additional pods cannot be scheduled due to: no nodes with enough resources were found: 2 node(s) didn't have enough resources: CPU cores. \n2 node(s) didn't have enough resources: memory. \n4 node(s) didn't have enough resources: GPUs.."
+"nodePool":"default"
+"reason":"Unschedulable"
+"reasons":[{"message":"Resources were found for 4 pods while 6 are required for gang scheduling. Additional pods cannot be scheduled due to: no nodes with enough resources were found: 2 node(s) didn't have enough resources: CPU cores. \n2 node(s) didn't have enough resources: memory. \n4 node(s) didn't have enough resources: GPUs."
+"reason":"PodSchedulingErrors"}]
+"status":"True"
+"transitionID":"1"
+"type":"UnschedulableOnNodePool"}]
+2026-10-21T11:28:03Z   2026-10-21T11:28:03Z   1       Normal    SuccessfulCreate    b-gang-too-big                                           job-controller   Created pod: b-gang-too-big-6rp4z
+2026-10-21T11:28:03Z   2026-10-21T11:28:03Z   1       Normal    SuccessfulCreate    b-gang-too-big                                           job-controller   Created pod: b-gang-too-big-klsxg
+2026-10-21T11:28:04Z   2026-10-21T11:28:04Z   1       Normal    NotReady            pg-b-gang-too-big-81dbe0b9-0a4f-4301-ae18-e777bc102212   kai-scheduler    Job is not ready for scheduling. Waiting for 6 pods, currently 4 exist, 0 are gated
+2026-10-21T11:28:29Z   2026-10-21T11:28:05Z   25      Warning   Unschedulable       b-gang-too-big-2p7ct                                     kai-scheduler    PodSchedulingErrors: Resources were found for 4 pods while 6 are required for gang scheduling. Additional pods cannot be scheduled due to: no nodes with enough resources were found: 2 node(s) didn't have enough resources: CPU cores. 
+2026-10-21T11:28:29Z   2026-10-21T11:28:05Z   25      Warning   Unschedulable       b-gang-too-big-x4ttf                                     kai-scheduler    no nodes with enough resources were found: 2 node(s) didn't have enough resources: CPU cores. 
+2026-10-21T11:28:29Z   2026-10-21T11:28:05Z   25      Warning   Unschedulable       b-gang-too-big-klsxg                                     kai-scheduler    PodSchedulingErrors: Resources were found for 4 pods while 6 are required for gang scheduling. Additional pods cannot be scheduled due to: no nodes with enough resources were found: 2 node(s) didn't have enough resources: CPU cores. 
+2026-10-21T11:28:29Z   2026-10-21T11:28:05Z   25      Warning   Unschedulable       b-gang-too-big-6rp4z                                     kai-scheduler    PodSchedulingErrors: Resources were found for 4 pods while 6 are required for gang scheduling. Additional pods cannot be scheduled due to: no nodes with enough resources were found: 2 node(s) didn't have enough resources: CPU cores. 
+2026-10-21T11:28:29Z   2026-10-21T11:28:05Z   25      Warning   Unschedulable       b-gang-too-big-clr5v                                     kai-scheduler    PodSchedulingErrors: Resources were found for 4 pods while 6 are required for gang scheduling. Additional pods cannot be scheduled due to: no nodes with enough resources were found: 2 node(s) didn't have enough resources: CPU cores. 
+2026-10-21T11:28:29Z   2026-10-21T11:28:05Z   25      Warning   Unschedulable       b-gang-too-big-8hz5w                                     kai-scheduler    PodSchedulingErrors: Resources were found for 4 pods while 6 are required for gang scheduling. Additional pods cannot be scheduled due to: no nodes with enough resources were found: 2 node(s) didn't have enough resources: CPU cores. 
+2026-10-21T11:28:29Z   2026-10-21T11:28:05Z   25      Normal    Unschedulable       pg-b-gang-too-big-81dbe0b9-0a4f-4301-ae18-e777bc102212   kai-scheduler    PodSchedulingErrors: Resources were found for 4 pods while 6 are required for gang scheduling. Additional pods cannot be scheduled due to: no nodes with enough resources were found: 2 node(s) didn't have enough resources: CPU cores. 
+
+## Cleanup   [11:29:36Z]
+after 0s: no demo pods left in team-a
+after 1s: no demo pods left in team-b
+
+## Result   [11:29:38Z]
+all checks passed

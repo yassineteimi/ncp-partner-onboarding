@@ -1,0 +1,21 @@
+[cli] snapshot diff complete: added=0 removed=0 modified=15
+CHANGES (0 added, 0 removed, 15 modified)
+KIND      PATH                                        BASELINE                              TARGET
+----      ----                                        --------                              ------
+MODIFIED  OS.sysctl./proc/sys/fs/dentry-state         186331                                168958  45                   0     52684  0  186011  168766  45  0  52701  0
+MODIFIED  OS.sysctl./proc/sys/fs/file-nr              3136                                  0       9223372036854775807  3072  0      9223372036854775807
+MODIFIED  OS.sysctl./proc/sys/fs/inode-nr             132268                                353     131920               353
+MODIFIED  OS.sysctl./proc/sys/fs/inode-state          132268                                353     0                    0  0  0  0  131920  353  0  0  0  0  0
+MODIFIED  OS.sysctl./proc/sys/fs/quota/syncs          216                                   222
+MODIFIED  OS.sysctl./proc/sys/kernel/ns_last_pid      51647                                 52429
+MODIFIED  OS.sysctl./proc/sys/kernel/random/uuid      15a9f270-204f-40c3-a2ae-da8657512bd6  a7dc48c6-e363-46db-b093-1a597b4e1bca
+MODIFIED  SystemD.containerd.service.CPUUsageNSec     183748188000                          186898116000
+MODIFIED  SystemD.containerd.service.MemoryAvailable  30462521344                           30471385088
+MODIFIED  SystemD.containerd.service.MemoryCurrent    8326635520                            8323137536
+MODIFIED  SystemD.containerd.service.MemoryPeak       8335384576                            8336515072
+MODIFIED  SystemD.containerd.service.TasksCurrent     366                                   355
+MODIFIED  SystemD.kubelet.service.CPUUsageNSec        66248703000                           67866207000
+MODIFIED  SystemD.kubelet.service.MemoryAvailable     30460456960                           30471385088
+MODIFIED  SystemD.kubelet.service.MemoryCurrent       81620992                              89362432
+
+DRIFT DETECTED

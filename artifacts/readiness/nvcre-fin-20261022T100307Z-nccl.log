@@ -1,0 +1,1342 @@
+== pod/eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0-mhw4m
+2026-10-22T10:07:41.863264992Z # nccl-tests version 2.17.8 nccl-headers=22902 nccl-library=22902
+2026-10-22T10:07:41.863323943Z # Collective test starting: all_reduce_perf_mpi
+2026-10-22T10:07:41.863326643Z # nThread 1 nGpus 2 minBytes 8 maxBytes 17179869184 step: 2(factor) warmup iters: 1 iters: 100 agg iters: 1 validation: 1 graph: 0
+2026-10-22T10:07:41.863329153Z #
+2026-10-22T10:07:41.863330763Z # Using devices
+2026-10-22T10:07:42.033641263Z #  Rank  0 Group  0 Pid      1 on eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0 device  0 [0000:05:00] NVIDIA H200
+2026-10-22T10:07:42.033660293Z #  Rank  1 Group  0 Pid      1 on eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0 device  1 [0000:06:00] NVIDIA H200
+2026-10-22T10:07:42.034186742Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:1 [0] NCCL INFO ENV/Plugin: Could not find: libnccl-env.so
+2026-10-22T10:07:42.268816214Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:1 [0] NCCL INFO cudaDriverVersion 13000
+2026-10-22T10:07:42.269085658Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:1 [0] NCCL INFO NCCL version 2.29.2+cuda13.1
+2026-10-22T10:07:42.269087788Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:1 [0] NCCL INFO NCCL git version stable 07fa371c7
+2026-10-22T10:07:42.544794244Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO NET/Plugin: Loaded net plugin NCCL RDMA Plugin v11 (v11)
+2026-10-22T10:07:42.544816194Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO NET/Plugin: Loaded collnet plugin SHARP (v11)
+2026-10-22T10:07:42.544820555Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Successfully loaded external network plugin /opt/hpcx/nccl_rdma_sharp_plugin/lib/libnccl-net.so
+2026-10-22T10:07:42.544822305Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Plugin Path : /opt/hpcx/nccl_rdma_sharp_plugin/lib/libnccl-net.so
+2026-10-22T10:07:42.544824125Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO P2P plugin v11 IBext_v11
+2026-10-22T10:07:42.544971358Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO NET/IB : No device found.
+2026-10-22T10:07:42.544973388Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO NET/IB : Using [RO]; OOB eth0:10.244.1.18<0>
+2026-10-22T10:07:42.544974998Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Failed to initialize NET plugin IBext_v11
+2026-10-22T10:07:42.545370565Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO NET/IB : No device found.
+2026-10-22T10:07:42.545390345Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO NET/IB : Using [RO]; OOB eth0:10.244.1.18<0>
+2026-10-22T10:07:42.545392305Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Failed to initialize NET plugin IB
+2026-10-22T10:07:42.545463766Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO NET/Socket : Using [0]eth0:10.244.1.18<0>
+2026-10-22T10:07:42.545466176Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Initialized NET plugin Socket
+2026-10-22T10:07:42.545475636Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Assigned NET plugin Socket to comm
+2026-10-22T10:07:42.545477946Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Using network Socket
+2026-10-22T10:07:42.545514387Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Initialized NET plugin Socket
+2026-10-22T10:07:42.545535697Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Assigned NET plugin Socket to comm
+2026-10-22T10:07:42.545537917Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Using network Socket
+2026-10-22T10:07:42.557990805Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO [Rank 0] ncclCommInitRankConfig comm 0x583249d1c810 rank 0 nranks 2 cudaDev 0 nvmlDev 0 busId 5000 commId 0x463a04136c01ee00 - Init START
+2026-10-22T10:07:42.558009985Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO [Rank 1] ncclCommInitRankConfig comm 0x583249e255a0 rank 1 nranks 2 cudaDev 1 nvmlDev 1 busId 6000 commId 0x463a04136c01ee00 - Init START
+2026-10-22T10:07:42.558917110Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO RAS client listening socket at ::1<28028>
+2026-10-22T10:07:42.559267366Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO MNNVL busId 0x5000 fabric UUID 0.0 cliqueId 0x0 state 3 healthMask 0x0
+2026-10-22T10:07:42.559477219Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO MNNVL busId 0x6000 fabric UUID 0.0 cliqueId 0x0 state 3 healthMask 0x0
+2026-10-22T10:07:42.561011285Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Topology detection : could not read /sys/devices/system/node/node-1/cpumap, ignoring
+2026-10-22T10:07:42.561014305Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Topology detection : could not read /sys/devices/system/node/node-1/cpumap, ignoring
+2026-10-22T10:07:42.566404434Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Could not find real path of /sys/class/pci_bus/fffffff/../../fffffff:ff:f
+2026-10-22T10:07:42.566408184Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO TOPO/NET : Importing network plugins to topology
+2026-10-22T10:07:42.566415645Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO ncclTopoPopulateNics : Filled eth0 in topo with pciPath=(null) keep=1 coll=(null)
+2026-10-22T10:07:42.570984971Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Could not find real path of /sys/class/pci_bus/fffffff/../../fffffff:ff:f
+2026-10-22T10:07:42.570988891Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO TOPO/NET : Importing network plugins to topology
+2026-10-22T10:07:42.570990411Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO ncclTopoPopulateNics : Filled eth0 in topo with pciPath=(null) keep=1 coll=(null)
+2026-10-22T10:07:42.575725950Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO === System : maxBw 370.8 totalBw 370.8 ===
+2026-10-22T10:07:42.575729780Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO CPU/0-ffffffffffffff (1/2/-1)
+2026-10-22T10:07:42.575731580Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO + PCI[5000.0] - NIC/0-0
+2026-10-22T10:07:42.575733080Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO                 + NET[1.2] - NET/0-0 (0/0/0/1.250000)
+2026-10-22T10:07:42.575734640Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO + PCI[24.0] - GPU/0-5000 (0)
+2026-10-22T10:07:42.575736551Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO               + NVL[370.8] - NVS/0-0
+2026-10-22T10:07:42.575738121Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO + PCI[24.0] - GPU/0-6000 (1)
+2026-10-22T10:07:42.575739911Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO               + NVL[370.8] - NVS/0-0
+2026-10-22T10:07:42.575741371Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO ==========================================
+2026-10-22T10:07:42.575743641Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO GPU/0-5000 :GPU/0-5000 (0/5000.0/LOC) GPU/0-6000 (2/370.8/NVL) NVS/0-0 (1/370.8/NVL) CPU/0-ffffffffffffff (1/24.0/PHB) NET/0-0 (3/1.2/PHB) 
+2026-10-22T10:07:42.575757821Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO GPU/0-6000 :GPU/0-5000 (2/370.8/NVL) GPU/0-6000 (0/5000.0/LOC) NVS/0-0 (1/370.8/NVL) CPU/0-ffffffffffffff (1/24.0/PHB) NET/0-0 (3/1.2/PHB) 
+2026-10-22T10:07:42.575761391Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO NET/0-0 :GPU/0-5000 (3/1.2/PHB) GPU/0-6000 (3/1.2/PHB) CPU/0-ffffffffffffff (2/1.2/PHB) NET/0-0 (0/5000.0/LOC) 
+2026-10-22T10:07:42.575768681Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO ncclTopoGetCpuAffinity: Affinity for GPU 0 is empty, ignoring. (GPU affinity =  ; CPU affinity = 0-87).
+2026-10-22T10:07:42.575770251Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO NVLS multicast support is available on dev 0 (NVLS_NCHANNELS 16)
+2026-10-22T10:07:42.575803381Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO === System : maxBw 370.8 totalBw 370.8 ===
+2026-10-22T10:07:42.575809692Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO CPU/0-ffffffffffffff (1/2/-1)
+2026-10-22T10:07:42.575811832Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO + PCI[5000.0] - NIC/0-0
+2026-10-22T10:07:42.575813522Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO                 + NET[1.2] - NET/0-0 (0/0/0/1.250000)
+2026-10-22T10:07:42.575815052Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO + PCI[24.0] - GPU/0-5000 (0)
+2026-10-22T10:07:42.575816572Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO               + NVL[370.8] - NVS/0-0
+2026-10-22T10:07:42.575818832Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO + PCI[24.0] - GPU/0-6000 (1)
+2026-10-22T10:07:42.575820352Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO               + NVL[370.8] - NVS/0-0
+2026-10-22T10:07:42.575821822Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO ==========================================
+2026-10-22T10:07:42.575823702Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO GPU/0-5000 :GPU/0-5000 (0/5000.0/LOC) GPU/0-6000 (2/370.8/NVL) NVS/0-0 (1/370.8/NVL) CPU/0-ffffffffffffff (1/24.0/PHB) NET/0-0 (3/1.2/PHB) 
+2026-10-22T10:07:42.575825192Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO GPU/0-6000 :GPU/0-5000 (2/370.8/NVL) GPU/0-6000 (0/5000.0/LOC) NVS/0-0 (1/370.8/NVL) CPU/0-ffffffffffffff (1/24.0/PHB) NET/0-0 (3/1.2/PHB) 
+2026-10-22T10:07:42.575830312Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO NET/0-0 :GPU/0-5000 (3/1.2/PHB) GPU/0-6000 (3/1.2/PHB) CPU/0-ffffffffffffff (2/1.2/PHB) NET/0-0 (0/5000.0/LOC) 
+2026-10-22T10:07:42.575832012Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO ncclTopoGetCpuAffinity: Affinity for GPU 1 is empty, ignoring. (GPU affinity =  ; CPU affinity = 0-87).
+2026-10-22T10:07:42.575833792Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO NVLS multicast support is available on dev 1 (NVLS_NCHANNELS 16)
+2026-10-22T10:07:42.577410468Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Pattern 4, crossNic 0, nChannels 12, bw 30.000000/30.000000, type NVL/PIX, sameChannels 1
+2026-10-22T10:07:42.577415918Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO  0 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:07:42.577417558Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO  1 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:07:42.577419498Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO  2 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:07:42.577420928Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO  3 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:07:42.577430258Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO  4 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:07:42.577431798Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO  5 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:07:42.577435208Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO  6 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:07:42.577437098Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO  7 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:07:42.577438508Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO  8 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:07:42.577440028Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO  9 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:07:42.577441578Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO 10 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:07:42.577443078Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO 11 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:07:42.577449869Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Pattern 1, crossNic 0, nChannels 12, bw 60.000000/60.000000, type NVL/PIX, sameChannels 0
+2026-10-22T10:07:42.577451369Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO  0 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:07:42.577452879Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO  1 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:07:42.577454409Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO  2 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:07:42.577455819Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO  3 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:07:42.577457239Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO  4 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:07:42.577458639Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO  5 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:07:42.577460039Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO  6 : GPU/0-6000 GPU/0-5000
+2026-10-22T10:07:42.577461449Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO  7 : GPU/0-6000 GPU/0-5000
+2026-10-22T10:07:42.577463049Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO  8 : GPU/0-6000 GPU/0-5000
+2026-10-22T10:07:42.577464549Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO  9 : GPU/0-6000 GPU/0-5000
+2026-10-22T10:07:42.577466159Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO 10 : GPU/0-6000 GPU/0-5000
+2026-10-22T10:07:42.577467719Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO 11 : GPU/0-6000 GPU/0-5000
+2026-10-22T10:07:42.577475359Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Pattern 5, crossNic 0, nChannels 2, bw 60.000000/60.000000, type NVL/PIX, sameChannels 0
+2026-10-22T10:07:42.577476939Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Pattern 4, crossNic 0, nChannels 12, bw 30.000000/30.000000, type NVL/PIX, sameChannels 1
+2026-10-22T10:07:42.577478389Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO  0 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:07:42.577480069Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO  1 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:07:42.577481479Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO  2 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:07:42.577482879Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO  3 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:07:42.577484259Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO  4 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:07:42.577488349Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO  5 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:07:42.577493629Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO  6 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:07:42.577495219Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO  7 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:07:42.577497080Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO  0 : GPU/0-5000
+2026-10-22T10:07:42.577500260Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO  1 : GPU/0-6000
+2026-10-22T10:07:42.577502120Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO  8 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:07:42.577503580Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO  9 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:07:42.577505800Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO 10 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:07:42.577507500Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO 11 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:07:42.577522471Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Pattern 1, crossNic 0, nChannels 12, bw 60.000000/60.000000, type NVL/PIX, sameChannels 0
+2026-10-22T10:07:42.577524201Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO  0 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:07:42.577525651Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO  1 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:07:42.577527201Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO  2 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:07:42.577528611Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO  3 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:07:42.577530041Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO  4 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:07:42.577531431Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO  5 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:07:42.577532891Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO  6 : GPU/0-6000 GPU/0-5000
+2026-10-22T10:07:42.577534291Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO  7 : GPU/0-6000 GPU/0-5000
+2026-10-22T10:07:42.577535781Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO  8 : GPU/0-6000 GPU/0-5000
+2026-10-22T10:07:42.577537181Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO  9 : GPU/0-6000 GPU/0-5000
+2026-10-22T10:07:42.577538591Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO 10 : GPU/0-6000 GPU/0-5000
+2026-10-22T10:07:42.577539981Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO 11 : GPU/0-6000 GPU/0-5000
+2026-10-22T10:07:42.577571711Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Pattern 5, crossNic 0, nChannels 2, bw 60.000000/60.000000, type NVL/PIX, sameChannels 0
+2026-10-22T10:07:42.577573471Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO  0 : GPU/0-5000
+2026-10-22T10:07:42.577574971Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO  1 : GPU/0-6000
+2026-10-22T10:07:42.577648982Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO comm 0x583249d1c810 rank 0 nRanks 2 nNodes 1 localRanks 2 localRank 0 MNNVL 0
+2026-10-22T10:07:42.577653022Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Tree 0 : -1 -> 0 -> 1/-1/-1
+2026-10-22T10:07:42.577654713Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO comm 0x583249e255a0 rank 1 nRanks 2 nNodes 1 localRanks 2 localRank 1 MNNVL 0
+2026-10-22T10:07:42.577661143Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Tree 12 : -1 -> 0 -> 1/-1/-1
+2026-10-22T10:07:42.577662783Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Tree 1 : -1 -> 0 -> 1/-1/-1
+2026-10-22T10:07:42.577664443Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Tree 13 : -1 -> 0 -> 1/-1/-1
+2026-10-22T10:07:42.577666063Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Tree 2 : -1 -> 0 -> 1/-1/-1
+2026-10-22T10:07:42.577667603Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Tree 14 : -1 -> 0 -> 1/-1/-1
+2026-10-22T10:07:42.577669253Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Tree 3 : -1 -> 0 -> 1/-1/-1
+2026-10-22T10:07:42.577670843Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Tree 15 : -1 -> 0 -> 1/-1/-1
+2026-10-22T10:07:42.577678883Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Tree 4 : -1 -> 0 -> 1/-1/-1
+2026-10-22T10:07:42.577680443Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Tree 16 : -1 -> 0 -> 1/-1/-1
+2026-10-22T10:07:42.577682093Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Tree 5 : -1 -> 0 -> 1/-1/-1
+2026-10-22T10:07:42.577683843Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Tree 17 : -1 -> 0 -> 1/-1/-1
+2026-10-22T10:07:42.577685313Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Tree 6 : 1 -> 0 -> -1/-1/-1
+2026-10-22T10:07:42.577686793Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Tree 18 : 1 -> 0 -> -1/-1/-1
+2026-10-22T10:07:42.577688363Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Tree 7 : 1 -> 0 -> -1/-1/-1
+2026-10-22T10:07:42.577689943Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Tree 19 : 1 -> 0 -> -1/-1/-1
+2026-10-22T10:07:42.577691503Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Tree 8 : 1 -> 0 -> -1/-1/-1
+2026-10-22T10:07:42.577693083Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Tree 20 : 1 -> 0 -> -1/-1/-1
+2026-10-22T10:07:42.577694823Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Tree 9 : 1 -> 0 -> -1/-1/-1
+2026-10-22T10:07:42.577696353Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Tree 21 : 1 -> 0 -> -1/-1/-1
+2026-10-22T10:07:42.577701683Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Tree 10 : 1 -> 0 -> -1/-1/-1
+2026-10-22T10:07:42.577703283Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Tree 22 : 1 -> 0 -> -1/-1/-1
+2026-10-22T10:07:42.577704783Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Tree 0 : 0 -> 1 -> -1/-1/-1
+2026-10-22T10:07:42.577706283Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Tree 12 : 0 -> 1 -> -1/-1/-1
+2026-10-22T10:07:42.577707773Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Tree 1 : 0 -> 1 -> -1/-1/-1
+2026-10-22T10:07:42.577709273Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Tree 13 : 0 -> 1 -> -1/-1/-1
+2026-10-22T10:07:42.577710773Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Tree 2 : 0 -> 1 -> -1/-1/-1
+2026-10-22T10:07:42.577714233Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Tree 14 : 0 -> 1 -> -1/-1/-1
+2026-10-22T10:07:42.577715763Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Tree 3 : 0 -> 1 -> -1/-1/-1
+2026-10-22T10:07:42.577717283Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Tree 15 : 0 -> 1 -> -1/-1/-1
+2026-10-22T10:07:42.577721413Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Tree 4 : 0 -> 1 -> -1/-1/-1
+2026-10-22T10:07:42.577723004Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Tree 16 : 0 -> 1 -> -1/-1/-1
+2026-10-22T10:07:42.577724484Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Tree 5 : 0 -> 1 -> -1/-1/-1
+2026-10-22T10:07:42.577725984Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Tree 17 : 0 -> 1 -> -1/-1/-1
+2026-10-22T10:07:42.577727584Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Tree 6 : -1 -> 1 -> 0/-1/-1
+2026-10-22T10:07:42.577729074Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Tree 18 : -1 -> 1 -> 0/-1/-1
+2026-10-22T10:07:42.577732974Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Tree 7 : -1 -> 1 -> 0/-1/-1
+2026-10-22T10:07:42.577734534Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Tree 19 : -1 -> 1 -> 0/-1/-1
+2026-10-22T10:07:42.577736074Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Tree 8 : -1 -> 1 -> 0/-1/-1
+2026-10-22T10:07:42.577737564Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Tree 11 : 1 -> 0 -> -1/-1/-1
+2026-10-22T10:07:42.577739064Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Tree 23 : 1 -> 0 -> -1/-1/-1
+2026-10-22T10:07:42.577740534Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Tree 20 : -1 -> 1 -> 0/-1/-1
+2026-10-22T10:07:42.577741994Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Tree 9 : -1 -> 1 -> 0/-1/-1
+2026-10-22T10:07:42.577747034Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Tree 21 : -1 -> 1 -> 0/-1/-1
+2026-10-22T10:07:42.577748694Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Tree 10 : -1 -> 1 -> 0/-1/-1
+2026-10-22T10:07:42.577750234Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Tree 22 : -1 -> 1 -> 0/-1/-1
+2026-10-22T10:07:42.577751744Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Tree 11 : -1 -> 1 -> 0/-1/-1
+2026-10-22T10:07:42.577753294Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Tree 23 : -1 -> 1 -> 0/-1/-1
+2026-10-22T10:07:42.577756974Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Channel 00/24 : 0 1
+2026-10-22T10:07:42.577758604Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Channel 01/24 : 0 1
+2026-10-22T10:07:42.577760184Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Channel 02/24 : 0 1
+2026-10-22T10:07:42.577761664Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Channel 03/24 : 0 1
+2026-10-22T10:07:42.577763164Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Ring 00 : 0 -> 1 -> 0
+2026-10-22T10:07:42.577764634Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Ring 01 : 0 -> 1 -> 0
+2026-10-22T10:07:42.577766164Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Ring 02 : 0 -> 1 -> 0
+2026-10-22T10:07:42.577767644Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Ring 03 : 0 -> 1 -> 0
+2026-10-22T10:07:42.577769224Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Ring 04 : 0 -> 1 -> 0
+2026-10-22T10:07:42.577770704Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Ring 05 : 0 -> 1 -> 0
+2026-10-22T10:07:42.577772204Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Ring 06 : 0 -> 1 -> 0
+2026-10-22T10:07:42.577778354Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Ring 07 : 0 -> 1 -> 0
+2026-10-22T10:07:42.577782924Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Ring 08 : 0 -> 1 -> 0
+2026-10-22T10:07:42.577784454Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Channel 04/24 : 0 1
+2026-10-22T10:07:42.577785944Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Channel 05/24 : 0 1
+2026-10-22T10:07:42.577787464Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Channel 06/24 : 0 1
+2026-10-22T10:07:42.577792065Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Ring 09 : 0 -> 1 -> 0
+2026-10-22T10:07:42.577793645Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Ring 10 : 0 -> 1 -> 0
+2026-10-22T10:07:42.577795145Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Ring 11 : 0 -> 1 -> 0
+2026-10-22T10:07:42.577796665Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Ring 12 : 0 -> 1 -> 0
+2026-10-22T10:07:42.577798165Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Ring 13 : 0 -> 1 -> 0
+2026-10-22T10:07:42.577799655Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Ring 14 : 0 -> 1 -> 0
+2026-10-22T10:07:42.577801165Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Ring 15 : 0 -> 1 -> 0
+2026-10-22T10:07:42.577802635Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Ring 16 : 0 -> 1 -> 0
+2026-10-22T10:07:42.577804105Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Ring 17 : 0 -> 1 -> 0
+2026-10-22T10:07:42.577805585Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Ring 18 : 0 -> 1 -> 0
+2026-10-22T10:07:42.577810085Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Ring 19 : 0 -> 1 -> 0
+2026-10-22T10:07:42.577811675Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Ring 20 : 0 -> 1 -> 0
+2026-10-22T10:07:42.577813275Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Channel 07/24 : 0 1
+2026-10-22T10:07:42.577814805Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Channel 08/24 : 0 1
+2026-10-22T10:07:42.577817515Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Channel 09/24 : 0 1
+2026-10-22T10:07:42.577822145Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Channel 10/24 : 0 1
+2026-10-22T10:07:42.577825595Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Channel 11/24 : 0 1
+2026-10-22T10:07:42.577827235Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Channel 12/24 : 0 1
+2026-10-22T10:07:42.577828785Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Channel 13/24 : 0 1
+2026-10-22T10:07:42.577830255Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Channel 14/24 : 0 1
+2026-10-22T10:07:42.577831705Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Channel 15/24 : 0 1
+2026-10-22T10:07:42.577833165Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Channel 16/24 : 0 1
+2026-10-22T10:07:42.577834595Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Channel 17/24 : 0 1
+2026-10-22T10:07:42.577841195Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Channel 18/24 : 0 1
+2026-10-22T10:07:42.577842735Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Channel 19/24 : 0 1
+2026-10-22T10:07:42.577844185Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Ring 21 : 0 -> 1 -> 0
+2026-10-22T10:07:42.577849675Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Ring 22 : 0 -> 1 -> 0
+2026-10-22T10:07:42.577851285Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Ring 23 : 0 -> 1 -> 0
+2026-10-22T10:07:42.577854245Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Trees [0] -1/-1/-1->1->0 [1] -1/-1/-1->1->0 [2] -1/-1/-1->1->0 [3] -1/-1/-1->1->0 [4] -1/-1/-1->1->0 [5] -1/-1/-1->1->0 [6] 0/-1/-1->1->-1 [7] 0/-1/-1->1->-1 [8] 0/-1/-1->1->-1 [9] 0/-1/-1->1->-1 [10] 0/-1/-1->1->-1 [11] 0/-1/-1->1->-1 [12] -1/-1/-1->1->0 [13] -1/-1/-1->1->0 [14] -1/-1/-1->1->0 [15] -1/-1/-1->1->0 [16] -1/-1/-1->1->0 [17] -1/-1/-1->1->0 [18] 0/-1/-1->1->-1 [19] 0/-1/-1->1->-1 [20] 0/-1/-1->1->-1 [21] 0/-1/-1->1->-1 [22] 0/-1/-1->1->-1 [23] 0/-1/-1->1->-1
+2026-10-22T10:07:42.577861196Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO P2P Chunksize set to 524288
+2026-10-22T10:07:42.577864096Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Channel 20/24 : 0 1
+2026-10-22T10:07:42.577865796Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Channel 21/24 : 0 1
+2026-10-22T10:07:42.577867306Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Channel 22/24 : 0 1
+2026-10-22T10:07:42.577868966Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Channel 23/24 : 0 1
+2026-10-22T10:07:42.577874126Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Ring 00 : 1 -> 0 -> 1
+2026-10-22T10:07:42.577875906Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Ring 01 : 1 -> 0 -> 1
+2026-10-22T10:07:42.577877426Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Ring 02 : 1 -> 0 -> 1
+2026-10-22T10:07:42.577879096Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Ring 03 : 1 -> 0 -> 1
+2026-10-22T10:07:42.577880626Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Ring 04 : 1 -> 0 -> 1
+2026-10-22T10:07:42.577882166Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Ring 05 : 1 -> 0 -> 1
+2026-10-22T10:07:42.577883726Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Ring 06 : 1 -> 0 -> 1
+2026-10-22T10:07:42.577885226Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Ring 07 : 1 -> 0 -> 1
+2026-10-22T10:07:42.577886736Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Ring 08 : 1 -> 0 -> 1
+2026-10-22T10:07:42.577888646Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Ring 09 : 1 -> 0 -> 1
+2026-10-22T10:07:42.577890126Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Ring 10 : 1 -> 0 -> 1
+2026-10-22T10:07:42.577891666Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Ring 11 : 1 -> 0 -> 1
+2026-10-22T10:07:42.577893166Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Ring 12 : 1 -> 0 -> 1
+2026-10-22T10:07:42.577894706Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Ring 13 : 1 -> 0 -> 1
+2026-10-22T10:07:42.577898666Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Ring 14 : 1 -> 0 -> 1
+2026-10-22T10:07:42.577900226Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Ring 15 : 1 -> 0 -> 1
+2026-10-22T10:07:42.577901746Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Ring 16 : 1 -> 0 -> 1
+2026-10-22T10:07:42.577903256Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Ring 17 : 1 -> 0 -> 1
+2026-10-22T10:07:42.577904776Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Ring 18 : 1 -> 0 -> 1
+2026-10-22T10:07:42.577909496Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Ring 19 : 1 -> 0 -> 1
+2026-10-22T10:07:42.577911046Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Ring 20 : 1 -> 0 -> 1
+2026-10-22T10:07:42.577912536Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Ring 21 : 1 -> 0 -> 1
+2026-10-22T10:07:42.577914046Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Ring 22 : 1 -> 0 -> 1
+2026-10-22T10:07:42.577917196Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Ring 23 : 1 -> 0 -> 1
+2026-10-22T10:07:42.577920216Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Trees [0] 1/-1/-1->0->-1 [1] 1/-1/-1->0->-1 [2] 1/-1/-1->0->-1 [3] 1/-1/-1->0->-1 [4] 1/-1/-1->0->-1 [5] 1/-1/-1->0->-1 [6] -1/-1/-1->0->1 [7] -1/-1/-1->0->1 [8] -1/-1/-1->0->1 [9] -1/-1/-1->0->1 [10] -1/-1/-1->0->1 [11] -1/-1/-1->0->1 [12] 1/-1/-1->0->-1 [13] 1/-1/-1->0->-1 [14] 1/-1/-1->0->-1 [15] 1/-1/-1->0->-1 [16] 1/-1/-1->0->-1 [17] 1/-1/-1->0->-1 [18] -1/-1/-1->0->1 [19] -1/-1/-1->0->1 [20] -1/-1/-1->0->1 [21] -1/-1/-1->0->1 [22] -1/-1/-1->0->1 [23] -1/-1/-1->0->1
+2026-10-22T10:07:42.577922136Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO P2P Chunksize set to 524288
+2026-10-22T10:07:42.581097400Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO PROFILER/Plugin: Could not find: libnccl-profiler.so
+2026-10-22T10:07:42.581107910Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Check P2P Type isAllDirectP2p 1 directMode 1 isAllCudaP2p 1
+2026-10-22T10:07:42.581254232Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:78 [0] NCCL INFO [Proxy Service] Device 0 CPU core 13
+2026-10-22T10:07:42.581256862Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO ncclP2pSchedule: group size used is 2
+2026-10-22T10:07:42.581362235Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:79 [0] NCCL INFO [Proxy Service UDS] Device 0 CPU core 14
+2026-10-22T10:07:42.581681099Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Check P2P Type isAllDirectP2p 1 directMode 1 isAllCudaP2p 1
+2026-10-22T10:07:42.581805451Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:80 [0] NCCL INFO [Proxy Service] Device 1 CPU core 15
+2026-10-22T10:07:42.581842073Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:81 [0] NCCL INFO [Proxy Service UDS] Device 1 CPU core 16
+2026-10-22T10:07:42.581844053Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO ncclP2pSchedule: group size used is 2
+2026-10-22T10:07:42.695785652Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO TUNER/Plugin: Could not find: libnccl-tuner.so
+2026-10-22T10:07:42.695806152Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO threadThresholds 8/8/64 | 16/8/64 | 512 | 512
+2026-10-22T10:07:42.695808372Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO 24 coll channels, 24 collnet channels, 16 nvls channels, 32 p2p channels, 32 p2p channels per peer
+2026-10-22T10:07:42.704898744Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO CC Off, workFifoBytes 1048576
+2026-10-22T10:07:42.704906504Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO threadThresholds 8/8/64 | 16/8/64 | 512 | 512
+2026-10-22T10:07:42.704908924Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO 24 coll channels, 24 collnet channels, 16 nvls channels, 32 p2p channels, 32 p2p channels per peer
+2026-10-22T10:07:42.705390982Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO ncclCommInitRankConfig comm 0x583249d1c810 rank 0 nranks 2 cudaDev 0 nvmlDev 0 busId 5000 commId 0x463a04136c01ee00 - Init COMPLETE
+2026-10-22T10:07:42.705411872Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:75 [0] NCCL INFO Init timings - ncclCommInitRankConfig: rank 0 nranks 2 total 0.43 (kernels 0.27, alloc 0.02, bootstrap 0.00, allgathers 0.00, topo 0.02, graphs 0.00, connections 0.12, rest 0.00)
+2026-10-22T10:07:42.705413592Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO ncclCommInitRankConfig comm 0x583249e255a0 rank 1 nranks 2 cudaDev 1 nvmlDev 1 busId 6000 commId 0x463a04136c01ee00 - Init COMPLETE
+2026-10-22T10:07:42.705415272Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:76 [1] NCCL INFO Init timings - ncclCommInitRankConfig: rank 1 nranks 2 total 0.43 (kernels 0.27, alloc 0.02, bootstrap 0.00, allgathers 0.00, topo 0.02, graphs 0.00, connections 0.12, rest 0.00)
+2026-10-22T10:07:42.781409339Z #
+2026-10-22T10:07:42.781425729Z #                                                              out-of-place                       in-place          
+2026-10-22T10:07:42.781427749Z #       size         count      type   redop    root     time   algbw   busbw  #wrong     time   algbw   busbw  #wrong 
+2026-10-22T10:07:42.781429529Z #        (B)    (elements)                               (us)  (GB/s)  (GB/s)             (us)  (GB/s)  (GB/s)         
+2026-10-22T10:07:42.781463350Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:1 [1] NCCL INFO Symmetric VA size=140GB
+2026-10-22T10:07:42.781471990Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:1 [0] NCCL INFO Symmetric VA size=140GB
+2026-10-22T10:07:42.817807006Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:83 [0] NCCL INFO Channel 00/0 : 0[0] -> 1[1] via P2P/direct pointer
+2026-10-22T10:07:42.818307424Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:82 [1] NCCL INFO Channel 00/0 : 1[1] -> 0[0] via P2P/direct pointer
+2026-10-22T10:07:42.818829433Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:83 [0] NCCL INFO Channel 01/0 : 0[0] -> 1[1] via P2P/direct pointer
+2026-10-22T10:07:42.819367092Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:82 [1] NCCL INFO Channel 01/0 : 1[1] -> 0[0] via P2P/direct pointer
+2026-10-22T10:07:42.819886590Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:83 [0] NCCL INFO Channel 02/0 : 0[0] -> 1[1] via P2P/direct pointer
+2026-10-22T10:07:42.820447990Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:82 [1] NCCL INFO Channel 02/0 : 1[1] -> 0[0] via P2P/direct pointer
+2026-10-22T10:07:42.820944229Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:83 [0] NCCL INFO Channel 03/0 : 0[0] -> 1[1] via P2P/direct pointer
+2026-10-22T10:07:42.821484588Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:82 [1] NCCL INFO Channel 03/0 : 1[1] -> 0[0] via P2P/direct pointer
+2026-10-22T10:07:42.822020876Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:83 [0] NCCL INFO Channel 04/0 : 0[0] -> 1[1] via P2P/direct pointer
+2026-10-22T10:07:42.822543695Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:82 [1] NCCL INFO Channel 04/0 : 1[1] -> 0[0] via P2P/direct pointer
+2026-10-22T10:07:42.823066434Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:83 [0] NCCL INFO Channel 05/0 : 0[0] -> 1[1] via P2P/direct pointer
+2026-10-22T10:07:42.823603982Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:82 [1] NCCL INFO Channel 05/0 : 1[1] -> 0[0] via P2P/direct pointer
+2026-10-22T10:07:42.824132321Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:83 [0] NCCL INFO Channel 06/0 : 0[0] -> 1[1] via P2P/direct pointer
+2026-10-22T10:07:42.824661530Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:82 [1] NCCL INFO Channel 06/0 : 1[1] -> 0[0] via P2P/direct pointer
+2026-10-22T10:07:42.825196599Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:83 [0] NCCL INFO Channel 07/0 : 0[0] -> 1[1] via P2P/direct pointer
+2026-10-22T10:07:42.825732288Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:82 [1] NCCL INFO Channel 07/0 : 1[1] -> 0[0] via P2P/direct pointer
+2026-10-22T10:07:42.826250647Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:83 [0] NCCL INFO Channel 08/0 : 0[0] -> 1[1] via P2P/direct pointer
+2026-10-22T10:07:42.826786216Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:82 [1] NCCL INFO Channel 08/0 : 1[1] -> 0[0] via P2P/direct pointer
+2026-10-22T10:07:42.827313625Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:83 [0] NCCL INFO Channel 09/0 : 0[0] -> 1[1] via P2P/direct pointer
+2026-10-22T10:07:42.827845693Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:82 [1] NCCL INFO Channel 09/0 : 1[1] -> 0[0] via P2P/direct pointer
+2026-10-22T10:07:42.828375482Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:83 [0] NCCL INFO Channel 10/0 : 0[0] -> 1[1] via P2P/direct pointer
+2026-10-22T10:07:42.828901821Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:82 [1] NCCL INFO Channel 10/0 : 1[1] -> 0[0] via P2P/direct pointer
+2026-10-22T10:07:42.829436630Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:83 [0] NCCL INFO Channel 11/0 : 0[0] -> 1[1] via P2P/direct pointer
+2026-10-22T10:07:42.829967808Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:82 [1] NCCL INFO Channel 11/0 : 1[1] -> 0[0] via P2P/direct pointer
+2026-10-22T10:07:42.830503428Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:83 [0] NCCL INFO Channel 12/0 : 0[0] -> 1[1] via P2P/direct pointer
+2026-10-22T10:07:42.831028897Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:82 [1] NCCL INFO Channel 12/0 : 1[1] -> 0[0] via P2P/direct pointer
+2026-10-22T10:07:42.831556845Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:83 [0] NCCL INFO Channel 13/0 : 0[0] -> 1[1] via P2P/direct pointer
+2026-10-22T10:07:42.832090374Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:82 [1] NCCL INFO Channel 13/0 : 1[1] -> 0[0] via P2P/direct pointer
+2026-10-22T10:07:42.832625453Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:83 [0] NCCL INFO Channel 14/0 : 0[0] -> 1[1] via P2P/direct pointer
+2026-10-22T10:07:42.833161752Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:82 [1] NCCL INFO Channel 14/0 : 1[1] -> 0[0] via P2P/direct pointer
+2026-10-22T10:07:42.833685670Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:83 [0] NCCL INFO Channel 15/0 : 0[0] -> 1[1] via P2P/direct pointer
+2026-10-22T10:07:42.834210179Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:82 [1] NCCL INFO Channel 15/0 : 1[1] -> 0[0] via P2P/direct pointer
+2026-10-22T10:07:42.834737548Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:83 [0] NCCL INFO Channel 16/0 : 0[0] -> 1[1] via P2P/direct pointer
+2026-10-22T10:07:42.842651320Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:82 [1] NCCL INFO Channel 16/0 : 1[1] -> 0[0] via P2P/direct pointer
+2026-10-22T10:07:42.842686261Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:83 [0] NCCL INFO Channel 17/0 : 0[0] -> 1[1] via P2P/direct pointer
+2026-10-22T10:07:42.843687027Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:82 [1] NCCL INFO Channel 17/0 : 1[1] -> 0[0] via P2P/direct pointer
+2026-10-22T10:07:42.843749758Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:83 [0] NCCL INFO Channel 18/0 : 0[0] -> 1[1] via P2P/direct pointer
+2026-10-22T10:07:42.844740265Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:82 [1] NCCL INFO Channel 18/0 : 1[1] -> 0[0] via P2P/direct pointer
+2026-10-22T10:07:42.844788656Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:83 [0] NCCL INFO Channel 19/0 : 0[0] -> 1[1] via P2P/direct pointer
+2026-10-22T10:07:42.845801172Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:82 [1] NCCL INFO Channel 19/0 : 1[1] -> 0[0] via P2P/direct pointer
+2026-10-22T10:07:42.845862764Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:83 [0] NCCL INFO Channel 20/0 : 0[0] -> 1[1] via P2P/direct pointer
+2026-10-22T10:07:42.846866161Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:82 [1] NCCL INFO Channel 20/0 : 1[1] -> 0[0] via P2P/direct pointer
+2026-10-22T10:07:42.846926682Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:83 [0] NCCL INFO Channel 21/0 : 0[0] -> 1[1] via P2P/direct pointer
+2026-10-22T10:07:42.847946429Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:82 [1] NCCL INFO Channel 21/0 : 1[1] -> 0[0] via P2P/direct pointer
+2026-10-22T10:07:42.847974159Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:83 [0] NCCL INFO Channel 22/0 : 0[0] -> 1[1] via P2P/direct pointer
+2026-10-22T10:07:42.848986636Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:82 [1] NCCL INFO Channel 22/0 : 1[1] -> 0[0] via P2P/direct pointer
+2026-10-22T10:07:42.849048667Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:83 [0] NCCL INFO Channel 23/0 : 0[0] -> 1[1] via P2P/direct pointer
+2026-10-22T10:07:42.850047603Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:82 [1] NCCL INFO Channel 23/0 : 1[1] -> 0[0] via P2P/direct pointer
+2026-10-22T10:07:42.878915584Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:83 [0] NCCL INFO Connected all rings, use ring PXN 0 GDR 1
+2026-10-22T10:07:42.878926784Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:82 [1] NCCL INFO Connected all rings, use ring PXN 0 GDR 1
+2026-10-22T10:07:43.006642734Z            8             2     float     sum      -1     9.27    0.00    0.00       0     9.24    0.00    0.00       0
+2026-10-22T10:07:43.010970426Z           16             4     float     sum      -1     9.38    0.00    0.00       0     9.38    0.00    0.00       0
+2026-10-22T10:07:43.015332970Z           32             8     float     sum      -1     9.35    0.00    0.00       0     9.29    0.00    0.00       0
+2026-10-22T10:07:43.019694032Z           64            16     float     sum      -1     9.33    0.01    0.01       0     9.34    0.01    0.01       0
+2026-10-22T10:07:43.024050295Z          128            32     float     sum      -1     9.43    0.01    0.01       0     9.30    0.01    0.01       0
+2026-10-22T10:07:43.028295786Z          256            64     float     sum      -1     9.11    0.03    0.03       0     9.06    0.03    0.03       0
+2026-10-22T10:07:43.032519665Z          512           128     float     sum      -1     9.17    0.06    0.06       0     8.98    0.06    0.06       0
+2026-10-22T10:07:43.036732666Z         1024           256     float     sum      -1     9.25    0.11    0.11       0     9.10    0.11    0.11       0
+2026-10-22T10:07:43.041006257Z         2048           512     float     sum      -1     9.46    0.22    0.22       0     9.39    0.22    0.22       0
+2026-10-22T10:07:43.045302669Z         4096          1024     float     sum      -1     9.38    0.44    0.44       0     9.38    0.44    0.44       0
+2026-10-22T10:07:43.049669671Z         8192          2048     float     sum      -1     9.67    0.85    0.85       0     9.64    0.85    0.85       0
+2026-10-22T10:07:43.056279312Z        16384          4096     float     sum      -1    10.03    1.63    1.63       0    10.23    1.60    1.60       0
+2026-10-22T10:07:43.067246945Z        32768          8192     float     sum      -1    10.42    3.15    3.15       0    10.29    3.18    3.18       0
+2026-10-22T10:07:43.086920253Z        65536         16384     float     sum      -1    10.78    6.08    6.08       0    10.82    6.06    6.06       0
+2026-10-22T10:07:43.123918180Z       131072         32768     float     sum      -1    11.20   11.70   11.70       0    11.32   11.58   11.58       0
+2026-10-22T10:07:43.195423992Z       262144         65536     float     sum      -1    11.67   22.47   22.47       0    11.51   22.78   22.78       0
+2026-10-22T10:07:43.266894193Z       524288        131072     float     sum      -1    11.48   45.65   45.65       0    11.38   46.05   46.05       0
+2026-10-22T10:07:43.339264909Z      1048576        262144     float     sum      -1    15.05   69.69   69.69       0    14.93   70.24   70.24       0
+2026-10-22T10:07:43.414512074Z      2097152        524288     float     sum      -1    28.66   73.17   73.17       0    28.51   73.55   73.55       0
+2026-10-22T10:07:43.491048630Z      4194304       1048576     float     sum      -1    33.95  123.54  123.54       0    33.62  124.74  124.74       0
+2026-10-22T10:07:43.571038964Z      8388608       2097152     float     sum      -1    48.36  173.46  173.46       0    47.31  177.30  177.30       0
+2026-10-22T10:07:43.657959853Z     16777216       4194304     float     sum      -1    77.31  217.00  217.00       0    75.09  223.43  223.43       0
+2026-10-22T10:07:43.759477776Z     33554432       8388608     float     sum      -1   136.68  245.49  245.49       0   135.91  246.89  246.89       0
+2026-10-22T10:07:43.888141891Z     67108864      16777216     float     sum      -1   247.73  270.89  270.89       0   247.37  271.29  271.29       0
+2026-10-22T10:07:44.070813496Z    134217728      33554432     float     sum      -1   467.67  286.99  286.99       0   467.24  287.26  287.26       0
+2026-10-22T10:07:44.358235908Z    268435456      67108864     float     sum      -1   892.78  300.67  300.67       0   893.09  300.57  300.57       0
+2026-10-22T10:07:44.848028553Z    536870912     134217728     float     sum      -1  1708.25  314.28  314.28       0  1708.14  314.30  314.30       0
+2026-10-22T10:07:45.722138276Z   1073741824     268435456     float     sum      -1  3247.23  330.66  330.66       0  3230.69  332.36  332.36       0
+2026-10-22T10:07:47.366506871Z   2147483648     536870912     float     sum      -1  6299.99  340.87  340.87       0  6321.71  339.70  339.70       0
+2026-10-22T10:07:50.529269649Z   4294967296    1073741824     float     sum      -1  12336.3  348.16  348.16       0  12367.2  347.29  347.29       0
+2026-10-22T10:07:56.750438888Z   8589934592    2147483648     float     sum      -1  24615.3  348.97  348.97       0  24468.2  351.06  351.06       0
+2026-10-22T10:08:09.064293162Z  17179869184    4294967296     float     sum      -1  48793.4  352.09  352.09       0  48747.2  352.43  352.43       0
+2026-10-22T10:08:09.068834457Z            8             2     float     sum      -1     9.66    0.00    0.00       0     9.40    0.00    0.00       0
+2026-10-22T10:08:09.073081358Z           16             4     float     sum      -1     9.37    0.00    0.00       0     9.38    0.00    0.00       0
+2026-10-22T10:08:09.077461581Z           32             8     float     sum      -1     9.40    0.00    0.00       0     9.42    0.00    0.00       0
+2026-10-22T10:08:09.081720032Z           64            16     float     sum      -1     9.38    0.01    0.01       0     9.32    0.01    0.01       0
+2026-10-22T10:08:09.085970643Z          128            32     float     sum      -1     9.34    0.01    0.01       0     9.32    0.01    0.01       0
+2026-10-22T10:08:09.090224454Z          256            64     float     sum      -1     9.32    0.03    0.03       0     9.32    0.03    0.03       0
+2026-10-22T10:08:09.094544756Z          512           128     float     sum      -1     9.55    0.05    0.05       0     9.24    0.06    0.06       0
+2026-10-22T10:08:09.098932329Z         1024           256     float     sum      -1     9.40    0.11    0.11       0     9.43    0.11    0.11       0
+2026-10-22T10:08:09.103254721Z         2048           512     float     sum      -1     9.60    0.21    0.21       0     9.78    0.21    0.21       0
+2026-10-22T10:08:09.107575053Z         4096          1024     float     sum      -1     9.62    0.43    0.43       0     9.45    0.43    0.43       0
+2026-10-22T10:08:09.112142930Z         8192          2048     float     sum      -1    11.27    0.73    0.73       0     9.79    0.84    0.84       0
+2026-10-22T10:08:09.118772740Z        16384          4096     float     sum      -1    10.18    1.61    1.61       0    10.24    1.60    1.60       0
+2026-10-22T10:08:09.129797853Z        32768          8192     float     sum      -1    10.58    3.10    3.10       0    10.57    3.10    3.10       0
+2026-10-22T10:08:09.149506552Z        65536         16384     float     sum      -1    10.92    6.00    6.00       0    10.97    5.97    5.97       0
+2026-10-22T10:08:09.186497869Z       131072         32768     float     sum      -1    11.39   11.51   11.51       0    11.34   11.56   11.56       0
+2026-10-22T10:08:09.258066623Z       262144         65536     float     sum      -1    11.75   22.32   22.32       0    11.87   22.09   22.09       0
+2026-10-22T10:08:09.329676546Z       524288        131072     float     sum      -1    11.78   44.52   44.52       0    11.78   44.49   44.49       0
+2026-10-22T10:08:09.401994931Z      1048576        262144     float     sum      -1    15.12   69.33   69.33       0    14.91   70.33   70.33       0
+2026-10-22T10:08:09.477617053Z      2097152        524288     float     sum      -1    28.62   73.27   73.27       0    28.43   73.77   73.77       0
+2026-10-22T10:08:09.554204299Z      4194304       1048576     float     sum      -1    33.95  123.54  123.54       0    33.71  124.41  124.41       0
+2026-10-22T10:08:09.634145452Z      8388608       2097152     float     sum      -1    48.28  173.76  173.76       0    47.23  177.61  177.61       0
+2026-10-22T10:08:09.721018251Z     16777216       4194304     float     sum      -1    77.38  216.83  216.83       0    75.02  223.64  223.64       0
+2026-10-22T10:08:09.822538663Z     33554432       8388608     float     sum      -1   136.99  244.94  244.94       0   135.63  247.40  247.40       0
+2026-10-22T10:08:09.951316010Z     67108864      16777216     float     sum      -1   247.49  271.16  271.16       0   247.60  271.04  271.04       0
+2026-10-22T10:08:10.133852293Z    134217728      33554432     float     sum      -1   468.15  286.70  286.70       0   466.29  287.84  287.84       0
+2026-10-22T10:08:10.421192013Z    268435456      67108864     float     sum      -1   892.75  300.68  300.68       0   892.73  300.69  300.69       0
+2026-10-22T10:08:10.909863600Z    536870912     134217728     float     sum      -1  1698.72  316.04  316.04       0  1707.17  314.48  314.48       0
+2026-10-22T10:08:11.789179370Z   1073741824     268435456     float     sum      -1  3267.46  328.62  328.62       0  3265.49  328.81  328.81       0
+2026-10-22T10:08:13.434380609Z   2147483648     536870912     float     sum      -1  6311.94  340.23  340.23       0  6314.49  340.09  340.09       0
+2026-10-22T10:08:16.596565578Z   4294967296    1073741824     float     sum      -1  12344.5  347.93  347.93       0  12344.9  347.91  347.91       0
+2026-10-22T10:08:22.815322866Z   8589934592    2147483648     float     sum      -1  24581.6  349.45  349.45       0  24470.3  351.03  351.03       0
+2026-10-22T10:08:35.148783817Z  17179869184    4294967296     float     sum      -1  48757.5  352.35  352.35       0  48999.4  350.61  350.61       0
+2026-10-22T10:08:35.153500305Z            8             2     float     sum      -1    10.73    0.00    0.00       0     9.48    0.00    0.00       0
+2026-10-22T10:08:35.157765447Z           16             4     float     sum      -1     9.45    0.00    0.00       0     9.31    0.00    0.00       0
+2026-10-22T10:08:35.162128779Z           32             8     float     sum      -1     9.40    0.00    0.00       0     9.35    0.00    0.00       0
+2026-10-22T10:08:35.166490732Z           64            16     float     sum      -1     9.42    0.01    0.01       0     9.29    0.01    0.01       0
+2026-10-22T10:08:35.170847674Z          128            32     float     sum      -1     9.34    0.01    0.01       0     9.37    0.01    0.01       0
+2026-10-22T10:08:35.175201157Z          256            64     float     sum      -1     9.36    0.03    0.03       0     9.33    0.03    0.03       0
+2026-10-22T10:08:35.179636722Z          512           128     float     sum      -1     9.53    0.05    0.05       0     9.33    0.05    0.05       0
+2026-10-22T10:08:35.184118126Z         1024           256     float     sum      -1     9.46    0.11    0.11       0     9.35    0.11    0.11       0
+2026-10-22T10:08:35.188530359Z         2048           512     float     sum      -1     9.59    0.21    0.21       0     9.59    0.21    0.21       0
+2026-10-22T10:08:35.192949283Z         4096          1024     float     sum      -1     9.57    0.43    0.43       0     9.61    0.43    0.43       0
+2026-10-22T10:08:35.197458179Z         8192          2048     float     sum      -1     9.82    0.83    0.83       0     9.76    0.84    0.84       0
+2026-10-22T10:08:35.204264082Z        16384          4096     float     sum      -1    10.26    1.60    1.60       0    10.15    1.61    1.61       0
+2026-10-22T10:08:35.215298076Z        32768          8192     float     sum      -1    10.57    3.10    3.10       0    10.62    3.09    3.09       0
+2026-10-22T10:08:35.235007874Z        65536         16384     float     sum      -1    11.09    5.91    5.91       0    10.93    6.00    6.00       0
+2026-10-22T10:08:35.273576477Z       131072         32768     float     sum      -1    11.55   11.35   11.35       0    11.49   11.40   11.40       0
+2026-10-22T10:08:35.345877103Z       262144         65536     float     sum      -1    11.75   22.30   22.30       0    13.31   19.69   19.69       0
+2026-10-22T10:08:35.418940131Z       524288        131072     float     sum      -1    11.71   44.79   44.79       0    11.66   44.97   44.97       0
+2026-10-22T10:08:35.492790212Z      1048576        262144     float     sum      -1    15.11   69.41   69.41       0    14.93   70.21   70.21       0
+2026-10-22T10:08:35.568026567Z      2097152        524288     float     sum      -1    28.71   73.06   73.06       0    28.47   73.66   73.66       0
+2026-10-22T10:08:35.644569032Z      4194304       1048576     float     sum      -1    33.92  123.64  123.64       0    33.79  124.14  124.14       0
+2026-10-22T10:08:35.724510406Z      8388608       2097152     float     sum      -1    48.32  173.60  173.60       0    47.18  177.79  177.79       0
+2026-10-22T10:08:35.811453385Z     16777216       4194304     float     sum      -1    77.34  216.93  216.93       0    75.07  223.49  223.49       0
+2026-10-22T10:08:35.912899296Z     33554432       8388608     float     sum      -1   137.28  244.42  244.42       0   135.58  247.48  247.48       0
+2026-10-22T10:08:36.041639852Z     67108864      16777216     float     sum      -1   247.69  270.94  270.94       0   247.34  271.32  271.32       0
+2026-10-22T10:08:36.224119694Z    134217728      33554432     float     sum      -1   466.94  287.44  287.44       0   466.69  287.59  287.59       0
+2026-10-22T10:08:36.511599037Z    268435456      67108864     float     sum      -1   893.43  300.46  300.46       0   892.42  300.79  300.79       0
+2026-10-22T10:08:37.000363826Z    536870912     134217728     float     sum      -1  1702.81  315.29  315.29       0  1703.17  315.22  315.22       0
+2026-10-22T10:08:37.876388381Z   1073741824     268435456     float     sum      -1  3246.77  330.71  330.71       0  3248.62  330.52  330.52       0
+2026-10-22T10:08:39.522036997Z   2147483648     536870912     float     sum      -1  6311.32  340.26  340.26       0  6319.84  339.80  339.80       0
+2026-10-22T10:08:42.684076994Z   4294967296    1073741824     float     sum      -1  12380.6  346.91  346.91       0  12309.2  348.92  348.92       0
+2026-10-22T10:08:48.907918906Z   8589934592    2147483648     float     sum      -1  24513.3  350.42  350.42       0  24572.6  349.57  349.57       0
+2026-10-22T10:09:01.243841159Z  17179869184    4294967296     float     sum      -1  48819.8  351.90  351.90       0  48953.2  350.94  350.94       0
+2026-10-22T10:09:01.248475495Z            8             2     float     sum      -1     9.56    0.00    0.00       0     9.42    0.00    0.00       0
+2026-10-22T10:09:01.252838789Z           16             4     float     sum      -1     9.41    0.00    0.00       0     9.44    0.00    0.00       0
+2026-10-22T10:09:01.257313343Z           32             8     float     sum      -1     9.43    0.00    0.00       0     9.32    0.00    0.00       0
+2026-10-22T10:09:01.261685296Z           64            16     float     sum      -1     9.42    0.01    0.01       0     9.38    0.01    0.01       0
+2026-10-22T10:09:01.266059429Z          128            32     float     sum      -1     9.48    0.01    0.01       0     9.36    0.01    0.01       0
+2026-10-22T10:09:01.270437352Z          256            64     float     sum      -1     9.41    0.03    0.03       0     9.44    0.03    0.03       0
+2026-10-22T10:09:01.274873475Z          512           128     float     sum      -1     9.56    0.05    0.05       0     9.37    0.05    0.05       0
+2026-10-22T10:09:01.279360841Z         1024           256     float     sum      -1     9.50    0.11    0.11       0     9.29    0.11    0.11       0
+2026-10-22T10:09:01.283789104Z         2048           512     float     sum      -1     9.66    0.21    0.21       0     9.65    0.21    0.21       0
+2026-10-22T10:09:01.288206758Z         4096          1024     float     sum      -1     9.59    0.43    0.43       0     9.59    0.43    0.43       0
+2026-10-22T10:09:01.292696423Z         8192          2048     float     sum      -1     9.85    0.83    0.83       0     9.77    0.84    0.84       0
+2026-10-22T10:09:01.299362004Z        16384          4096     float     sum      -1    10.22    1.60    1.60       0    10.24    1.60    1.60       0
+2026-10-22T10:09:01.310772924Z        32768          8192     float     sum      -1    10.56    3.10    3.10       0    10.52    3.11    3.11       0
+2026-10-22T10:09:01.331315987Z        65536         16384     float     sum      -1    11.04    5.94    5.94       0    11.09    5.91    5.91       0
+2026-10-22T10:09:01.369899660Z       131072         32768     float     sum      -1    11.49   11.40   11.40       0    11.43   11.47   11.47       0
+2026-10-22T10:09:01.443253863Z       262144         65536     float     sum      -1    11.77   22.27   22.27       0    11.77   22.27   22.27       0
+2026-10-22T10:09:01.515564359Z       524288        131072     float     sum      -1    11.82   44.35   44.35       0    11.67   44.94   44.94       0
+2026-10-22T10:09:01.587891224Z      1048576        262144     float     sum      -1    15.13   69.30   69.30       0    14.97   70.05   70.05       0
+2026-10-22T10:09:01.663099148Z      2097152        524288     float     sum      -1    28.62   73.28   73.28       0    28.44   73.74   73.74       0
+2026-10-22T10:09:01.739658355Z      4194304       1048576     float     sum      -1    33.99  123.39  123.39       0    33.74  124.33  124.33       0
+2026-10-22T10:09:01.819606807Z      8388608       2097152     float     sum      -1    48.16  174.18  174.18       0    47.25  177.55  177.55       0
+2026-10-22T10:09:01.906551287Z     16777216       4194304     float     sum      -1    77.43  216.68  216.68       0    74.91  223.98  223.98       0
+2026-10-22T10:09:02.008120910Z     33554432       8388608     float     sum      -1   137.56  243.93  243.93       0   135.63  247.40  247.40       0
+2026-10-22T10:09:02.136824716Z     67108864      16777216     float     sum      -1   247.81  270.80  270.80       0   247.29  271.37  271.37       0
+2026-10-22T10:09:02.319383259Z    134217728      33554432     float     sum      -1   467.55  287.06  287.06       0   466.88  287.48  287.48       0
+2026-10-22T10:09:02.606718000Z    268435456      67108864     float     sum      -1   890.66  301.39  301.39       0   893.59  300.40  300.40       0
+2026-10-22T10:09:03.096302303Z    536870912     134217728     float     sum      -1  1704.97  314.89  314.89       0  1710.05  313.95  313.95       0
+2026-10-22T10:09:03.972454929Z   1073741824     268435456     float     sum      -1  3249.90  330.39  330.39       0  3247.52  330.63  330.63       0
+2026-10-22T10:09:05.616989466Z   2147483648     536870912     float     sum      -1  6325.20  339.51  339.51       0  6289.22  341.45  341.45       0
+2026-10-22T10:09:08.784489414Z   4294967296    1073741824     float     sum      -1  12369.8  347.21  347.21       0  12365.4  347.34  347.34       0
+2026-10-22T10:09:14.994362834Z   8589934592    2147483648     float     sum      -1  24499.8  350.61  350.61       0  24464.8  351.11  351.11       0
+2026-10-22T10:09:27.327138156Z  17179869184    4294967296     float     sum      -1  48749.3  352.41  352.41       0  49029.5  350.40  350.40       0
+2026-10-22T10:09:27.331730960Z            8             2     float     sum      -1     9.70    0.00    0.00       0     9.45    0.00    0.00       0
+2026-10-22T10:09:27.335993879Z           16             4     float     sum      -1     9.42    0.00    0.00       0     9.43    0.00    0.00       0
+2026-10-22T10:09:27.340373190Z           32             8     float     sum      -1     9.43    0.00    0.00       0     9.28    0.00    0.00       0
+2026-10-22T10:09:27.344644909Z           64            16     float     sum      -1     9.32    0.01    0.01       0     9.35    0.01    0.01       0
+2026-10-22T10:09:27.348916518Z          128            32     float     sum      -1     9.41    0.01    0.01       0     9.37    0.01    0.01       0
+2026-10-22T10:09:27.353176427Z          256            64     float     sum      -1     9.36    0.03    0.03       0     9.31    0.03    0.03       0
+2026-10-22T10:09:27.357514307Z          512           128     float     sum      -1     9.53    0.05    0.05       0     9.28    0.06    0.06       0
+2026-10-22T10:09:27.361957648Z         1024           256     float     sum      -1     9.42    0.11    0.11       0     9.31    0.11    0.11       0
+2026-10-22T10:09:27.366346609Z         2048           512     float     sum      -1     9.56    0.21    0.21       0     9.56    0.21    0.21       0
+2026-10-22T10:09:27.370748411Z         4096          1024     float     sum      -1     9.53    0.43    0.43       0     9.54    0.43    0.43       0
+2026-10-22T10:09:27.375261413Z         8192          2048     float     sum      -1     9.81    0.83    0.83       0    10.03    0.82    0.82       0
+2026-10-22T10:09:27.382109134Z        16384          4096     float     sum      -1    10.27    1.60    1.60       0    10.17    1.61    1.61       0
+2026-10-22T10:09:27.393500928Z        32768          8192     float     sum      -1    10.59    3.10    3.10       0    10.59    3.10    3.10       0
+2026-10-22T10:09:27.413981749Z        65536         16384     float     sum      -1    10.98    5.97    5.97       0    10.96    5.98    5.98       0
+2026-10-22T10:09:27.452542441Z       131072         32768     float     sum      -1    11.38   11.52   11.52       0    11.51   11.39   11.39       0
+2026-10-22T10:09:27.524633005Z       262144         65536     float     sum      -1    11.76   22.30   22.30       0    11.78   22.26   22.26       0
+2026-10-22T10:09:27.596231781Z       524288        131072     float     sum      -1    11.72   44.75   44.75       0    11.77   44.53   44.53       0
+2026-10-22T10:09:27.668578260Z      1048576        262144     float     sum      -1    15.10   69.45   69.45       0    14.96   70.07   70.07       0
+2026-10-22T10:09:27.743783944Z      2097152        524288     float     sum      -1    28.62   73.27   73.27       0    28.44   73.75   73.75       0
+2026-10-22T10:09:27.820415111Z      4194304       1048576     float     sum      -1    33.97  123.48  123.48       0    33.67  124.59  124.59       0
+2026-10-22T10:09:27.900319772Z      8388608       2097152     float     sum      -1    48.15  174.23  174.23       0    47.24  177.57  177.57       0
+2026-10-22T10:09:27.987255626Z     16777216       4194304     float     sum      -1    77.36  216.89  216.89       0    74.82  224.23  224.23       0
+2026-10-22T10:09:28.088698823Z     33554432       8388608     float     sum      -1   136.69  245.48  245.48       0   135.21  248.17  248.17       0
+2026-10-22T10:09:28.217342291Z     67108864      16777216     float     sum      -1   247.87  270.74  270.74       0   247.08  271.60  271.60       0
+2026-10-22T10:09:28.399917198Z    134217728      33554432     float     sum      -1   466.93  287.45  287.45       0   467.13  287.32  287.32       0
+2026-10-22T10:09:28.687479392Z    268435456      67108864     float     sum      -1   893.48  300.44  300.44       0   893.60  300.40  300.40       0
+2026-10-22T10:09:29.175839488Z    536870912     134217728     float     sum      -1  1697.76  316.22  316.22       0  1704.23  315.02  315.02       0
+2026-10-22T10:09:30.051331485Z   1073741824     268435456     float     sum      -1  3264.90  328.87  328.87       0  3228.71  332.56  332.56       0
+2026-10-22T10:09:31.695027017Z   2147483648     536870912     float     sum      -1  6334.49  339.01  339.01       0  6281.06  341.90  341.90       0
+2026-10-22T10:09:34.856837132Z   4294967296    1073741824     float     sum      -1  12343.1  347.97  347.97       0  12337.3  348.13  348.13       0
+2026-10-22T10:09:41.092402722Z   8589934592    2147483648     float     sum      -1  24610.1  349.04  349.04       0  24586.3  349.38  349.38       0
+2026-10-22T10:09:53.422321089Z  17179869184    4294967296     float     sum      -1  48883.2  351.45  351.45       0  48853.7  351.66  351.66       0
+2026-10-22T10:09:53.426949704Z            8             2     float     sum      -1     9.57    0.00    0.00       0     9.44    0.00    0.00       0
+2026-10-22T10:09:53.431317945Z           16             4     float     sum      -1     9.39    0.00    0.00       0     9.45    0.00    0.00       0
+2026-10-22T10:09:53.435788257Z           32             8     float     sum      -1     9.32    0.00    0.00       0     9.38    0.00    0.00       0
+2026-10-22T10:09:53.440154718Z           64            16     float     sum      -1     9.39    0.01    0.01       0     9.41    0.01    0.01       0
+2026-10-22T10:09:53.444515798Z          128            32     float     sum      -1     9.32    0.01    0.01       0     9.42    0.01    0.01       0
+2026-10-22T10:09:53.448872999Z          256            64     float     sum      -1     9.39    0.03    0.03       0     9.35    0.03    0.03       0
+2026-10-22T10:09:53.453298910Z          512           128     float     sum      -1     9.58    0.05    0.05       0     9.35    0.05    0.05       0
+2026-10-22T10:09:53.457778122Z         1024           256     float     sum      -1     9.34    0.11    0.11       0     9.38    0.11    0.11       0
+2026-10-22T10:09:53.462190323Z         2048           512     float     sum      -1     9.55    0.21    0.21       0     9.56    0.21    0.21       0
+2026-10-22T10:09:53.466609505Z         4096          1024     float     sum      -1     9.49    0.43    0.43       0     9.54    0.43    0.43       0
+2026-10-22T10:09:53.471109267Z         8192          2048     float     sum      -1     9.90    0.83    0.83       0     9.74    0.84    0.84       0
+2026-10-22T10:09:53.477761805Z        16384          4096     float     sum      -1    10.22    1.60    1.60       0    10.27    1.60    1.60       0
+2026-10-22T10:09:53.488773493Z        32768          8192     float     sum      -1    10.57    3.10    3.10       0    10.56    3.10    3.10       0
+2026-10-22T10:09:53.508477671Z        65536         16384     float     sum      -1    11.00    5.96    5.96       0    10.96    5.98    5.98       0
+2026-10-22T10:09:53.545521199Z       131072         32768     float     sum      -1    11.40   11.50   11.50       0    11.44   11.46   11.46       0
+2026-10-22T10:09:53.618569568Z       262144         65536     float     sum      -1    11.83   22.16   22.16       0    11.82   22.18   22.18       0
+2026-10-22T10:09:53.691005648Z       524288        131072     float     sum      -1    11.64   45.02   45.02       0    11.77   44.55   44.55       0
+2026-10-22T10:09:53.763304466Z      1048576        262144     float     sum      -1    15.05   69.68   69.68       0    15.00   69.90   69.90       0
+2026-10-22T10:09:53.838526250Z      2097152        524288     float     sum      -1    28.65   73.19   73.19       0    28.46   73.68   73.68       0
+2026-10-22T10:09:53.915061006Z      4194304       1048576     float     sum      -1    33.93  123.63  123.63       0    33.68  124.52  124.52       0
+2026-10-22T10:09:53.997128462Z      8388608       2097152     float     sum      -1    48.16  174.19  174.19       0    47.38  177.06  177.06       0
+2026-10-22T10:09:54.084082545Z     16777216       4194304     float     sum      -1    77.18  217.39  217.39       0    75.08  223.46  223.46       0
+2026-10-22T10:09:54.185538183Z     33554432       8388608     float     sum      -1   136.54  245.75  245.75       0   135.83  247.03  247.03       0
+2026-10-22T10:09:54.315547623Z     67108864      16777216     float     sum      -1   247.32  271.34  271.34       0   247.68  270.95  270.95       0
+2026-10-22T10:09:54.498067660Z    134217728      33554432     float     sum      -1   467.10  287.34  287.34       0   466.79  287.54  287.54       0
+2026-10-22T10:09:54.785589933Z    268435456      67108864     float     sum      -1   894.30  300.16  300.16       0   893.19  300.53  300.53       0
+2026-10-22T10:09:55.273455740Z    536870912     134217728     float     sum      -1  1699.64  315.87  315.87       0  1698.42  316.10  316.10       0
+2026-10-22T10:09:56.151022841Z   1073741824     268435456     float     sum      -1  3250.08  330.37  330.37       0  3261.84  329.18  329.18       0
+2026-10-22T10:09:57.797140722Z   2147483648     536870912     float     sum      -1  6322.32  339.67  339.67       0  6315.55  340.03  340.03       0
+2026-10-22T10:10:00.959804021Z   4294967296    1073741824     float     sum      -1  12331.2  348.30  348.30       0  12353.9  347.66  347.66       0
+2026-10-22T10:10:07.189716310Z   8589934592    2147483648     float     sum      -1  24579.6  349.47  349.47       0  24584.3  349.41  349.41       0
+2026-10-22T10:10:19.542198402Z  17179869184    4294967296     float     sum      -1  48965.4  350.86  350.86       0  48965.6  350.86  350.86       0
+2026-10-22T10:10:19.546765925Z            8             2     float     sum      -1     9.58    0.00    0.00       0     9.43    0.00    0.00       0
+2026-10-22T10:10:19.551076905Z           16             4     float     sum      -1     9.58    0.00    0.00       0     9.41    0.00    0.00       0
+2026-10-22T10:10:19.555498596Z           32             8     float     sum      -1     9.42    0.00    0.00       0     9.47    0.00    0.00       0
+2026-10-22T10:10:19.559943619Z           64            16     float     sum      -1     9.61    0.01    0.01       0    10.63    0.01    0.01       0
+2026-10-22T10:10:19.564249868Z          128            32     float     sum      -1     9.53    0.01    0.01       0     9.43    0.01    0.01       0
+2026-10-22T10:10:19.568559507Z          256            64     float     sum      -1     9.50    0.03    0.03       0     9.29    0.03    0.03       0
+2026-10-22T10:10:19.572911928Z          512           128     float     sum      -1     9.62    0.05    0.05       0     9.39    0.05    0.05       0
+2026-10-22T10:10:19.577333919Z         1024           256     float     sum      -1     9.57    0.11    0.11       0     9.31    0.11    0.11       0
+2026-10-22T10:10:19.581703210Z         2048           512     float     sum      -1     9.82    0.21    0.21       0     9.62    0.21    0.21       0
+2026-10-22T10:10:19.586092820Z         4096          1024     float     sum      -1     9.68    0.42    0.42       0     9.55    0.43    0.43       0
+2026-10-22T10:10:19.590625643Z         8192          2048     float     sum      -1     9.93    0.82    0.82       0     9.72    0.84    0.84       0
+2026-10-22T10:10:19.597485875Z        16384          4096     float     sum      -1    10.35    1.58    1.58       0    10.28    1.59    1.59       0
+2026-10-22T10:10:19.608980700Z        32768          8192     float     sum      -1    10.72    3.06    3.06       0    10.59    3.09    3.09       0
+2026-10-22T10:10:19.629540033Z        65536         16384     float     sum      -1    11.14    5.89    5.89       0    11.07    5.92    5.92       0
+2026-10-22T10:10:19.667202090Z       131072         32768     float     sum      -1    11.50   11.39   11.39       0    11.39   11.50   11.50       0
+2026-10-22T10:10:19.738806056Z       262144         65536     float     sum      -1    11.99   21.86   21.86       0    11.86   22.11   22.11       0
+2026-10-22T10:10:19.813484773Z       524288        131072     float     sum      -1    11.87   44.16   44.16       0    11.83   44.30   44.30       0
+2026-10-22T10:10:19.885829710Z      1048576        262144     float     sum      -1    15.17   69.12   69.12       0    14.95   70.15   70.15       0
+2026-10-22T10:10:19.961091216Z      2097152        524288     float     sum      -1    28.61   73.29   73.29       0    28.54   73.48   73.48       0
+2026-10-22T10:10:20.037679953Z      4194304       1048576     float     sum      -1    33.93  123.60  123.60       0    33.66  124.61  124.61       0
+2026-10-22T10:10:20.117668574Z      8388608       2097152     float     sum      -1    48.26  173.82  173.82       0    47.28  177.41  177.41       0
+2026-10-22T10:10:20.204630178Z     16777216       4194304     float     sum      -1    77.34  216.93  216.93       0    74.92  223.93  223.93       0
+2026-10-22T10:10:20.306678056Z     33554432       8388608     float     sum      -1   136.70  245.47  245.47       0   136.15  246.46  246.46       0
+2026-10-22T10:10:20.435303703Z     67108864      16777216     float     sum      -1   247.21  271.46  271.46       0   247.02  271.67  271.67       0
+2026-10-22T10:10:20.619343845Z    134217728      33554432     float     sum      -1   466.35  287.81  287.81       0   467.05  287.37  287.37       0
+2026-10-22T10:10:20.906804207Z    268435456      67108864     float     sum      -1   892.52  300.76  300.76       0   893.66  300.38  300.38       0
+2026-10-22T10:10:21.394379800Z    536870912     134217728     float     sum      -1  1702.02  315.43  315.43       0  1690.85  317.51  317.51       0
+2026-10-22T10:10:22.269640303Z   1073741824     268435456     float     sum      -1  3244.72  330.92  330.92       0  3247.65  330.62  330.62       0
+2026-10-22T10:10:23.917947320Z   2147483648     536870912     float     sum      -1  6326.10  339.46  339.46       0  6323.97  339.58  339.58       0
+2026-10-22T10:10:27.085024870Z   4294967296    1073741824     float     sum      -1  12400.2  346.36  346.36       0  12339.4  348.07  348.07       0
+2026-10-22T10:10:33.296220338Z   8589934592    2147483648     float     sum      -1  24476.2  350.95  350.95       0  24493.0  350.71  350.71       0
+2026-10-22T10:10:45.601735893Z  17179869184    4294967296     float     sum      -1  48705.8  352.73  352.73       0  48796.6  352.07  352.07       0
+2026-10-22T10:10:45.606330983Z            8             2     float     sum      -1     9.58    0.00    0.00       0     9.44    0.00    0.00       0
+2026-10-22T10:10:45.610707150Z           16             4     float     sum      -1     9.56    0.00    0.00       0     9.35    0.00    0.00       0
+2026-10-22T10:10:45.615181647Z           32             8     float     sum      -1     9.43    0.00    0.00       0     9.41    0.00    0.00       0
+2026-10-22T10:10:45.619538723Z           64            16     float     sum      -1     9.31    0.01    0.01       0     9.30    0.01    0.01       0
+2026-10-22T10:10:45.623904239Z          128            32     float     sum      -1     9.40    0.01    0.01       0     9.40    0.01    0.01       0
+2026-10-22T10:10:45.628262185Z          256            64     float     sum      -1     9.35    0.03    0.03       0     9.39    0.03    0.03       0
+2026-10-22T10:10:45.632705234Z          512           128     float     sum      -1     9.54    0.05    0.05       0     9.45    0.05    0.05       0
+2026-10-22T10:10:45.637171971Z         1024           256     float     sum      -1     9.46    0.11    0.11       0     9.35    0.11    0.11       0
+2026-10-22T10:10:45.641586078Z         2048           512     float     sum      -1     9.51    0.22    0.22       0     9.45    0.22    0.22       0
+2026-10-22T10:10:45.646006955Z         4096          1024     float     sum      -1     9.64    0.43    0.43       0     9.62    0.43    0.43       0
+2026-10-22T10:10:45.650490803Z         8192          2048     float     sum      -1     9.83    0.83    0.83       0     9.85    0.83    0.83       0
+2026-10-22T10:10:45.657131083Z        16384          4096     float     sum      -1    10.24    1.60    1.60       0    10.17    1.61    1.61       0
+2026-10-22T10:10:45.668161111Z        32768          8192     float     sum      -1    10.66    3.07    3.07       0    10.67    3.07    3.07       0
+2026-10-22T10:10:45.687899801Z        65536         16384     float     sum      -1    11.11    5.90    5.90       0    11.04    5.94    5.94       0
+2026-10-22T10:10:45.724925202Z       131072         32768     float     sum      -1    11.40   11.49   11.49       0    11.43   11.47   11.47       0
+2026-10-22T10:10:45.796448587Z       262144         65536     float     sum      -1    11.85   22.12   22.12       0    11.81   22.19   22.19       0
+2026-10-22T10:10:45.868058843Z       524288        131072     float     sum      -1    11.73   44.69   44.69       0    11.77   44.53   44.53       0
+2026-10-22T10:10:45.940390861Z      1048576        262144     float     sum      -1    15.09   69.47   69.47       0    14.90   70.36   70.36       0
+2026-10-22T10:10:46.015597881Z      2097152        524288     float     sum      -1    28.56   73.43   73.43       0    28.48   73.63   73.63       0
+2026-10-22T10:10:46.094202093Z      4194304       1048576     float     sum      -1    33.93  123.62  123.62       0    33.68  124.54  124.54       0
+2026-10-22T10:10:46.174127985Z      8388608       2097152     float     sum      -1    48.14  174.24  174.24       0    47.20  177.71  177.71       0
+2026-10-22T10:10:46.261071585Z     16777216       4194304     float     sum      -1    77.19  217.36  217.36       0    75.12  223.35  223.35       0
+2026-10-22T10:10:46.362564034Z     33554432       8388608     float     sum      -1   136.53  245.77  245.77       0   135.94  246.82  246.82       0
+2026-10-22T10:10:46.491869836Z     67108864      16777216     float     sum      -1   247.33  271.33  271.33       0   248.25  270.32  270.32       0
+2026-10-22T10:10:46.674422355Z    134217728      33554432     float     sum      -1   467.37  287.18  287.18       0   466.59  287.66  287.66       0
+2026-10-22T10:10:46.961725443Z    268435456      67108864     float     sum      -1   892.52  300.76  300.76       0   893.56  300.41  300.41       0
+2026-10-22T10:10:47.450309475Z    536870912     134217728     float     sum      -1  1697.24  316.32  316.32       0  1707.06  314.50  314.50       0
+2026-10-22T10:10:48.329457180Z   1073741824     268435456     float     sum      -1  3266.03  328.76  328.76       0  3264.47  328.92  328.92       0
+2026-10-22T10:10:49.973139124Z   2147483648     536870912     float     sum      -1  6288.63  341.49  341.49       0  6303.16  340.70  340.70       0
+2026-10-22T10:10:53.135451503Z   4294967296    1073741824     float     sum      -1  12341.1  348.02  348.02       0  12350.1  347.77  347.77       0
+2026-10-22T10:10:59.346873936Z   8589934592    2147483648     float     sum      -1  24472.9  351.00  351.00       0  24493.8  350.70  350.70       0
+2026-10-22T10:11:11.695213001Z  17179869184    4294967296     float     sum      -1  48927.2  351.13  351.13       0  48992.4  350.66  350.66       0
+2026-10-22T10:11:11.699829781Z            8             2     float     sum      -1     9.66    0.00    0.00       0     9.35    0.00    0.00       0
+2026-10-22T10:11:11.704183387Z           16             4     float     sum      -1     9.34    0.00    0.00       0     9.33    0.00    0.00       0
+2026-10-22T10:11:11.708647374Z           32             8     float     sum      -1     9.39    0.00    0.00       0     9.37    0.00    0.00       0
+2026-10-22T10:11:11.713004540Z           64            16     float     sum      -1     9.34    0.01    0.01       0     9.40    0.01    0.01       0
+2026-10-22T10:11:11.717368997Z          128            32     float     sum      -1     9.38    0.01    0.01       0     9.25    0.01    0.01       0
+2026-10-22T10:11:11.721719853Z          256            64     float     sum      -1     9.24    0.03    0.03       0     9.36    0.03    0.03       0
+2026-10-22T10:11:11.726141020Z          512           128     float     sum      -1     9.52    0.05    0.05       0     9.40    0.05    0.05       0
+2026-10-22T10:11:11.730624318Z         1024           256     float     sum      -1     9.50    0.11    0.11       0     9.28    0.11    0.11       0
+2026-10-22T10:11:11.735025755Z         2048           512     float     sum      -1     9.60    0.21    0.21       0     9.58    0.21    0.21       0
+2026-10-22T10:11:11.739487253Z         4096          1024     float     sum      -1     9.58    0.43    0.43       0     9.81    0.42    0.42       0
+2026-10-22T10:11:11.743868489Z         8192          2048     float     sum      -1     9.84    0.83    0.83       0     9.75    0.84    0.84       0
+2026-10-22T10:11:11.750531271Z        16384          4096     float     sum      -1    10.27    1.60    1.60       0    10.16    1.61    1.61       0
+2026-10-22T10:11:11.761561438Z        32768          8192     float     sum      -1    10.59    3.10    3.10       0    10.60    3.09    3.09       0
+2026-10-22T10:11:11.781275827Z        65536         16384     float     sum      -1    10.99    5.97    5.97       0    11.06    5.92    5.92       0
+2026-10-22T10:11:11.818311468Z       131072         32768     float     sum      -1    11.51   11.38   11.38       0    11.36   11.54   11.54       0
+2026-10-22T10:11:11.889850324Z       262144         65536     float     sum      -1    11.89   22.04   22.04       0    11.81   22.20   22.20       0
+2026-10-22T10:11:11.961446260Z       524288        131072     float     sum      -1    11.71   44.76   44.76       0    11.81   44.40   44.40       0
+2026-10-22T10:11:12.035337731Z      1048576        262144     float     sum      -1    15.14   69.25   69.25       0    14.96   70.08   70.08       0
+2026-10-22T10:11:12.112110175Z      2097152        524288     float     sum      -1    28.63   73.25   73.25       0    28.51   73.56   73.56       0
+2026-10-22T10:11:12.188701207Z      4194304       1048576     float     sum      -1    33.96  123.50  123.50       0    33.63  124.70  124.70       0
+2026-10-22T10:11:12.268607069Z      8388608       2097152     float     sum      -1    48.12  174.31  174.31       0    47.42  176.90  176.90       0
+2026-10-22T10:11:12.355642659Z     16777216       4194304     float     sum      -1    77.37  216.84  216.84       0    75.02  223.65  223.65       0
+2026-10-22T10:11:12.457247181Z     33554432       8388608     float     sum      -1   137.38  244.25  244.25       0   136.49  245.83  245.83       0
+2026-10-22T10:11:12.587109480Z     67108864      16777216     float     sum      -1   247.71  270.91  270.91       0   247.21  271.46  271.46       0
+2026-10-22T10:11:12.770441731Z    134217728      33554432     float     sum      -1   467.36  287.18  287.18       0   466.67  287.61  287.61       0
+2026-10-22T10:11:13.058271848Z    268435456      67108864     float     sum      -1   892.57  300.74  300.74       0   894.09  300.23  300.23       0
+2026-10-22T10:11:13.547790293Z    536870912     134217728     float     sum      -1  1708.47  314.24  314.24       0  1703.88  315.09  315.09       0
+2026-10-22T10:11:14.423686930Z   1073741824     268435456     float     sum      -1  3245.36  330.85  330.85       0  3248.44  330.54  330.54       0
+2026-10-22T10:11:16.065890091Z   2147483648     536870912     float     sum      -1  6297.41  341.01  341.01       0  6289.59  341.43  341.43       0
+2026-10-22T10:11:19.227055255Z   4294967296    1073741824     float     sum      -1  12316.0  348.73  348.73       0  12364.4  347.36  347.36       0
+2026-10-22T10:11:25.456004971Z   8589934592    2147483648     float     sum      -1  24561.6  349.73  349.73       0  24581.2  349.45  349.45       0
+2026-10-22T10:11:37.788431546Z  17179869184    4294967296     float     sum      -1  48788.4  352.13  352.13       0  48889.8  351.40  351.40       0
+2026-10-22T10:11:37.793068012Z            8             2     float     sum      -1     9.53    0.00    0.00       0     9.41    0.00    0.00       0
+2026-10-22T10:11:37.797433964Z           16             4     float     sum      -1     9.38    0.00    0.00       0     9.45    0.00    0.00       0
+2026-10-22T10:11:37.801910346Z           32             8     float     sum      -1     9.42    0.00    0.00       0     9.41    0.00    0.00       0
+2026-10-22T10:11:37.806262088Z           64            16     float     sum      -1     9.34    0.01    0.01       0     9.32    0.01    0.01       0
+2026-10-22T10:11:37.810606348Z          128            32     float     sum      -1     9.33    0.01    0.01       0     9.30    0.01    0.01       0
+2026-10-22T10:11:37.814963340Z          256            64     float     sum      -1     9.35    0.03    0.03       0     9.31    0.03    0.03       0
+2026-10-22T10:11:37.819402572Z          512           128     float     sum      -1     9.55    0.05    0.05       0     9.38    0.05    0.05       0
+2026-10-22T10:11:37.823881966Z         1024           256     float     sum      -1     9.46    0.11    0.11       0     9.35    0.11    0.11       0
+2026-10-22T10:11:37.828459880Z         2048           512     float     sum      -1    11.30    0.18    0.18       0     9.59    0.21    0.21       0
+2026-10-22T10:11:37.832785041Z         4096          1024     float     sum      -1     9.56    0.43    0.43       0     9.60    0.43    0.43       0
+2026-10-22T10:11:37.837171032Z         8192          2048     float     sum      -1     9.86    0.83    0.83       0     9.79    0.84    0.84       0
+2026-10-22T10:11:37.843815151Z        16384          4096     float     sum      -1    10.28    1.59    1.59       0    10.29    1.59    1.59       0
+2026-10-22T10:11:37.854842701Z        32768          8192     float     sum      -1    10.68    3.07    3.07       0    10.64    3.08    3.08       0
+2026-10-22T10:11:37.874561043Z        65536         16384     float     sum      -1    11.03    5.94    5.94       0    11.03    5.94    5.94       0
+2026-10-22T10:11:37.911592838Z       131072         32768     float     sum      -1    11.40   11.50   11.50       0    11.51   11.39   11.39       0
+2026-10-22T10:11:37.983166629Z       262144         65536     float     sum      -1    11.80   22.22   22.22       0    11.77   22.27   22.27       0
+2026-10-22T10:11:38.056264683Z       524288        131072     float     sum      -1    11.70   44.81   44.81       0    11.73   44.70   44.70       0
+2026-10-22T10:11:38.129537230Z      1048576        262144     float     sum      -1    15.16   69.18   69.18       0    14.95   70.13   70.13       0
+2026-10-22T10:11:38.204758259Z      2097152        524288     float     sum      -1    28.61   73.29   73.29       0    28.43   73.75   73.75       0
+2026-10-22T10:11:38.281324671Z      4194304       1048576     float     sum      -1    34.01  123.34  123.34       0    33.70  124.45  124.45       0
+2026-10-22T10:11:38.361326398Z      8388608       2097152     float     sum      -1    48.24  173.91  173.91       0    47.17  177.83  177.83       0
+2026-10-22T10:11:38.448241838Z     16777216       4194304     float     sum      -1    77.53  216.39  216.39       0    74.94  223.88  223.88       0
+2026-10-22T10:11:38.551162930Z     33554432       8388608     float     sum      -1   136.46  245.89  245.89       0   135.82  247.05  247.05       0
+2026-10-22T10:11:38.680825749Z     67108864      16777216     float     sum      -1   247.85  270.76  270.76       0   247.35  271.31  271.31       0
+2026-10-22T10:11:38.863337411Z    134217728      33554432     float     sum      -1   467.34  287.20  287.20       0   466.65  287.62  287.62       0
+2026-10-22T10:11:39.150625326Z    268435456      67108864     float     sum      -1   892.79  300.67  300.67       0   892.19  300.87  300.87       0
+2026-10-22T10:11:39.638702302Z    536870912     134217728     float     sum      -1  1701.52  315.52  315.52       0  1696.29  316.50  316.50       0
+2026-10-22T10:11:40.514851229Z   1073741824     268435456     float     sum      -1  3251.46  330.23  330.23       0  3249.33  330.45  330.45       0
+2026-10-22T10:11:42.160006743Z   2147483648     536870912     float     sum      -1  6300.25  340.86  340.86       0  6326.43  339.45  339.45       0
+2026-10-22T10:11:45.322670435Z   4294967296    1073741824     float     sum      -1  12346.7  347.86  347.86       0  12351.0  347.74  347.74       0
+2026-10-22T10:11:51.538167624Z   8589934592    2147483648     float     sum      -1  24486.3  350.81  350.81       0  24522.0  350.29  350.29       0
+2026-10-22T10:12:03.872620534Z  17179869184    4294967296     float     sum      -1  48855.9  351.64  351.64       0  48924.2  351.15  351.15       0
+2026-10-22T10:12:03.887551378Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:1 [0] NCCL INFO comm 0x583249d1c810 rank 0 nranks 2 cudaDev 0 busId 5000 - Destroy COMPLETE
+2026-10-22T10:12:04.406857064Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:1 [1] NCCL INFO comm 0x583249e255a0 rank 1 nranks 2 cudaDev 1 busId 6000 - Destroy COMPLETE
+2026-10-22T10:12:04.460301206Z # Out of bounds values : 0 OK
+2026-10-22T10:12:04.460319557Z # Avg bus bandwidth    : 121.705 
+2026-10-22T10:12:04.460322277Z #
+2026-10-22T10:12:04.460325117Z # Collective test concluded: all_reduce_perf_mpi
+2026-10-22T10:12:04.460327627Z #
+2026-10-22T10:12:04.508257190Z 
+2026-10-22T10:12:04.622659269Z eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0:1:1 [1] NCCL INFO ENV/Plugin: Closing env plugin ncclEnvDefault
+== pod/eu1-fin-h200-communicatio-c154b-job-workload-launcher-0-0-2p7s6
+2026-10-22T10:03:42.390322880Z + cp /tmp/mpi-ssh-raw/authorized_keys /tmp/mpi-ssh-raw/id_rsa /tmp/mpi-ssh-raw/id_rsa.pub /root/.ssh/
+2026-10-22T10:03:42.392014187Z + chmod 600 /root/.ssh/id_rsa
+2026-10-22T10:03:42.393188315Z + chmod 644 /root/.ssh/id_rsa.pub /root/.ssh/authorized_keys
+2026-10-22T10:03:42.870985647Z Warning: Permanently added 'eu1-fin-h200-communicatio-c154b-job-workload-node-0-0.eu1-fin-h200-communicatio-c154b-job-workload' (ED25519) to the list of known hosts.
+2026-10-22T10:03:43.941814662Z # nccl-tests version 2.17.8 nccl-headers=22902 nccl-library=22902
+2026-10-22T10:03:43.941836843Z # Collective test starting: all_reduce_perf_mpi
+2026-10-22T10:03:43.941839353Z # nThread 1 nGpus 1 minBytes 8 maxBytes 17179869184 step: 2(factor) warmup iters: 1 iters: 100 agg iters: 1 validation: 1 graph: 0
+2026-10-22T10:03:43.941841463Z #
+2026-10-22T10:03:43.941842943Z # Using devices
+2026-10-22T10:03:43.941844613Z #  Rank  0 Group  0 Pid    583 on eu1-fin-h200-communicatio-c154b-job-workload-node-0-0 device  0 [0000:05:00] NVIDIA H200
+2026-10-22T10:03:43.941846143Z #  Rank  1 Group  0 Pid    584 on eu1-fin-h200-communicatio-c154b-job-workload-node-0-0 device  1 [0000:06:00] NVIDIA H200
+2026-10-22T10:03:43.941964354Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO ENV/Plugin: Could not find: libnccl-env.so
+2026-10-22T10:03:44.130602336Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO cudaDriverVersion 13010
+2026-10-22T10:03:44.130623996Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO NCCL version 2.29.2+cuda13.1
+2026-10-22T10:03:44.130625746Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO NCCL git version stable 07fa371c7
+2026-10-22T10:03:44.133533392Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO ENV/Plugin: Could not find: libnccl-env.so
+2026-10-22T10:03:44.133537942Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO cudaDriverVersion 13010
+2026-10-22T10:03:44.133540022Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO NCCL version 2.29.2+cuda13.1
+2026-10-22T10:03:44.133541702Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO NCCL git version stable 07fa371c7
+2026-10-22T10:03:44.349588687Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO NET/Plugin: Loaded net plugin NCCL RDMA Plugin v11 (v11)
+2026-10-22T10:03:44.349606057Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO NET/Plugin: Loaded collnet plugin SHARP (v11)
+2026-10-22T10:03:44.349608597Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Successfully loaded external network plugin /opt/hpcx/nccl_rdma_sharp_plugin/lib/libnccl-net.so
+2026-10-22T10:03:44.349610257Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Plugin Path : /opt/hpcx/nccl_rdma_sharp_plugin/lib/libnccl-net.so
+2026-10-22T10:03:44.349612268Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO P2P plugin v11 IBext_v11
+2026-10-22T10:03:44.349805071Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO NET/IB : No device found.
+2026-10-22T10:03:44.349818841Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO NET/IB : Using [RO]; OOB eth0:10.244.1.16<0>
+2026-10-22T10:03:44.349820651Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Failed to initialize NET plugin IBext_v11
+2026-10-22T10:03:44.349822701Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO NET/Plugin: Loaded net plugin NCCL RDMA Plugin v11 (v11)
+2026-10-22T10:03:44.349824451Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO NET/Plugin: Loaded collnet plugin SHARP (v11)
+2026-10-22T10:03:44.349826221Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Successfully loaded external network plugin /opt/hpcx/nccl_rdma_sharp_plugin/lib/libnccl-net.so
+2026-10-22T10:03:44.349827821Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Plugin Path : /opt/hpcx/nccl_rdma_sharp_plugin/lib/libnccl-net.so
+2026-10-22T10:03:44.349845452Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO P2P plugin v11 IBext_v11
+2026-10-22T10:03:44.350074185Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO NET/IB : No device found.
+2026-10-22T10:03:44.350077865Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO NET/IB : Using [RO]; OOB eth0:10.244.1.16<0>
+2026-10-22T10:03:44.350079525Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Failed to initialize NET plugin IBext_v11
+2026-10-22T10:03:44.350426771Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO NET/IB : No device found.
+2026-10-22T10:03:44.350431361Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO NET/IB : Using [RO]; OOB eth0:10.244.1.16<0>
+2026-10-22T10:03:44.350433021Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Failed to initialize NET plugin IB
+2026-10-22T10:03:44.350639415Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO NET/Socket : Using [0]eth0:10.244.1.16<0>
+2026-10-22T10:03:44.350641215Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Initialized NET plugin Socket
+2026-10-22T10:03:44.350731046Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Assigned NET plugin Socket to comm
+2026-10-22T10:03:44.350733466Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Using network Socket
+2026-10-22T10:03:44.350858878Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO NET/IB : No device found.
+2026-10-22T10:03:44.350863388Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO NET/IB : Using [RO]; OOB eth0:10.244.1.16<0>
+2026-10-22T10:03:44.350865178Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Failed to initialize NET plugin IB
+2026-10-22T10:03:44.350867098Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO NET/Socket : Using [0]eth0:10.244.1.16<0>
+2026-10-22T10:03:44.350868648Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Initialized NET plugin Socket
+2026-10-22T10:03:44.350870538Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Assigned NET plugin Socket to comm
+2026-10-22T10:03:44.350872578Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Using network Socket
+2026-10-22T10:03:44.366759049Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO [Rank 0] ncclCommInitRankConfig comm 0x577a7075f0c0 rank 0 nranks 2 cudaDev 0 nvmlDev 0 busId 5000 commId 0x7599fa74b3342de8 - Init START
+2026-10-22T10:03:44.369204057Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO [Rank 1] ncclCommInitRankConfig comm 0x64f3d7bb4b30 rank 1 nranks 2 cudaDev 1 nvmlDev 1 busId 6000 commId 0x7599fa74b3342de8 - Init START
+2026-10-22T10:03:44.369868708Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO RAS client listening socket at ::1<28028>
+2026-10-22T10:03:44.370223353Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO MNNVL busId 0x6000 fabric UUID 0.0 cliqueId 0x0 state 3 healthMask 0x0
+2026-10-22T10:03:44.370319426Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO RAS client listening socket at ::1<28028>
+2026-10-22T10:03:44.370321776Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO MNNVL busId 0x5000 fabric UUID 0.0 cliqueId 0x0 state 3 healthMask 0x0
+2026-10-22T10:03:44.371926481Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Topology detection : could not read /sys/devices/system/node/node-1/cpumap, ignoring
+2026-10-22T10:03:44.372529810Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Topology detection : could not read /sys/devices/system/node/node-1/cpumap, ignoring
+2026-10-22T10:03:44.379596512Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Could not find real path of /sys/class/pci_bus/fffffff/../../fffffff:ff:f
+2026-10-22T10:03:44.379602392Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO TOPO/NET : Importing network plugins to topology
+2026-10-22T10:03:44.379606532Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO ncclTopoPopulateNics : Filled eth0 in topo with pciPath=(null) keep=1 coll=(null)
+2026-10-22T10:03:44.379722184Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Could not find real path of /sys/class/pci_bus/fffffff/../../fffffff:ff:f
+2026-10-22T10:03:44.379745684Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO TOPO/NET : Importing network plugins to topology
+2026-10-22T10:03:44.379796855Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO ncclTopoPopulateNics : Filled eth0 in topo with pciPath=(null) keep=1 coll=(null)
+2026-10-22T10:03:44.386530771Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO === System : maxBw 370.8 totalBw 370.8 ===
+2026-10-22T10:03:44.386537001Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO CPU/0-ffffffffffffff (1/2/-1)
+2026-10-22T10:03:44.386539061Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO === System : maxBw 370.8 totalBw 370.8 ===
+2026-10-22T10:03:44.386540661Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO CPU/0-ffffffffffffff (1/2/-1)
+2026-10-22T10:03:44.386542181Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO + PCI[5000.0] - NIC/0-0
+2026-10-22T10:03:44.386543931Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO                 + NET[1.2] - NET/0-0 (0/0/0/1.250000)
+2026-10-22T10:03:44.386545441Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO + PCI[24.0] - GPU/0-5000 (0)
+2026-10-22T10:03:44.386546941Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO               + NVL[370.8] - NVS/0-0
+2026-10-22T10:03:44.386548641Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO + PCI[24.0] - GPU/0-6000 (1)
+2026-10-22T10:03:44.386552401Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO               + NVL[370.8] - NVS/0-0
+2026-10-22T10:03:44.386554311Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO ==========================================
+2026-10-22T10:03:44.386556071Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO GPU/0-5000 :GPU/0-5000 (0/5000.0/LOC) GPU/0-6000 (2/370.8/NVL) NVS/0-0 (1/370.8/NVL) CPU/0-ffffffffffffff (1/24.0/PHB) NET/0-0 (3/1.2/PHB) 
+2026-10-22T10:03:44.386557621Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO GPU/0-6000 :GPU/0-5000 (2/370.8/NVL) GPU/0-6000 (0/5000.0/LOC) NVS/0-0 (1/370.8/NVL) CPU/0-ffffffffffffff (1/24.0/PHB) NET/0-0 (3/1.2/PHB) 
+2026-10-22T10:03:44.386559501Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO NET/0-0 :GPU/0-5000 (3/1.2/PHB) GPU/0-6000 (3/1.2/PHB) CPU/0-ffffffffffffff (2/1.2/PHB) NET/0-0 (0/5000.0/LOC) 
+2026-10-22T10:03:44.386560991Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO ncclTopoGetCpuAffinity: Affinity for GPU 1 is empty, ignoring. (GPU affinity =  ; CPU affinity = 0-87).
+2026-10-22T10:03:44.386562641Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO NVLS multicast support is available on dev 1 (NVLS_NCHANNELS 16)
+2026-10-22T10:03:44.386573252Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO + PCI[5000.0] - NIC/0-0
+2026-10-22T10:03:44.386574962Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO                 + NET[1.2] - NET/0-0 (0/0/0/1.250000)
+2026-10-22T10:03:44.386576513Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO + PCI[24.0] - GPU/0-5000 (0)
+2026-10-22T10:03:44.386578153Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO               + NVL[370.8] - NVS/0-0
+2026-10-22T10:03:44.386579673Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO + PCI[24.0] - GPU/0-6000 (1)
+2026-10-22T10:03:44.386581173Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO               + NVL[370.8] - NVS/0-0
+2026-10-22T10:03:44.386582843Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO ==========================================
+2026-10-22T10:03:44.386584503Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO GPU/0-5000 :GPU/0-5000 (0/5000.0/LOC) GPU/0-6000 (2/370.8/NVL) NVS/0-0 (1/370.8/NVL) CPU/0-ffffffffffffff (1/24.0/PHB) NET/0-0 (3/1.2/PHB) 
+2026-10-22T10:03:44.386586093Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO GPU/0-6000 :GPU/0-5000 (2/370.8/NVL) GPU/0-6000 (0/5000.0/LOC) NVS/0-0 (1/370.8/NVL) CPU/0-ffffffffffffff (1/24.0/PHB) NET/0-0 (3/1.2/PHB) 
+2026-10-22T10:03:44.386587663Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO NET/0-0 :GPU/0-5000 (3/1.2/PHB) GPU/0-6000 (3/1.2/PHB) CPU/0-ffffffffffffff (2/1.2/PHB) NET/0-0 (0/5000.0/LOC) 
+2026-10-22T10:03:44.386589193Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO ncclTopoGetCpuAffinity: Affinity for GPU 0 is empty, ignoring. (GPU affinity =  ; CPU affinity = 0-87).
+2026-10-22T10:03:44.386591033Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO NVLS multicast support is available on dev 0 (NVLS_NCHANNELS 16)
+2026-10-22T10:03:44.386640564Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Pattern 4, crossNic 0, nChannels 12, bw 30.000000/30.000000, type NVL/PIX, sameChannels 1
+2026-10-22T10:03:44.386642784Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO  0 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:03:44.386644324Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO  1 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:03:44.386645894Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO  2 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:03:44.386647414Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO  3 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:03:44.386648914Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO  4 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:03:44.386650454Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO  5 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:03:44.386651974Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO  6 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:03:44.386653954Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO  7 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:03:44.386716905Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO  8 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:03:44.386718775Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO  9 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:03:44.386720265Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO 10 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:03:44.386738915Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO 11 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:03:44.386741105Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Pattern 1, crossNic 0, nChannels 12, bw 60.000000/60.000000, type NVL/PIX, sameChannels 0
+2026-10-22T10:03:44.386775945Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Pattern 4, crossNic 0, nChannels 12, bw 30.000000/30.000000, type NVL/PIX, sameChannels 1
+2026-10-22T10:03:44.386777605Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO  0 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:03:44.386779125Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO  1 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:03:44.386780875Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO  2 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:03:44.386782375Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO  3 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:03:44.386784176Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO  4 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:03:44.386785686Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO  5 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:03:44.386787186Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO  6 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:03:44.386788686Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO  7 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:03:44.386790226Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO  8 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:03:44.386839866Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO  0 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:03:44.386847996Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO  1 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:03:44.386849866Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO  2 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:03:44.386851476Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO  3 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:03:44.386852926Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO  4 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:03:44.386854496Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO  5 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:03:44.386855967Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO  6 : GPU/0-6000 GPU/0-5000
+2026-10-22T10:03:44.386857417Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO  7 : GPU/0-6000 GPU/0-5000
+2026-10-22T10:03:44.386859007Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO  8 : GPU/0-6000 GPU/0-5000
+2026-10-22T10:03:44.386872117Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO  9 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:03:44.386874017Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO 10 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:03:44.386875827Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO 11 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:03:44.386877797Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Pattern 1, crossNic 0, nChannels 12, bw 60.000000/60.000000, type NVL/PIX, sameChannels 0
+2026-10-22T10:03:44.386879317Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO  0 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:03:44.386880957Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO  1 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:03:44.386912307Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO  9 : GPU/0-6000 GPU/0-5000
+2026-10-22T10:03:44.386924237Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO 10 : GPU/0-6000 GPU/0-5000
+2026-10-22T10:03:44.386926037Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO 11 : GPU/0-6000 GPU/0-5000
+2026-10-22T10:03:44.386928207Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Pattern 5, crossNic 0, nChannels 2, bw 60.000000/60.000000, type NVL/PIX, sameChannels 0
+2026-10-22T10:03:44.386930198Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO  0 : GPU/0-5000
+2026-10-22T10:03:44.386931928Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO  1 : GPU/0-6000
+2026-10-22T10:03:44.386937108Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO  2 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:03:44.386938708Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO  3 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:03:44.386940258Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO  4 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:03:44.386941828Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO  5 : GPU/0-5000 GPU/0-6000
+2026-10-22T10:03:44.386943358Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO  6 : GPU/0-6000 GPU/0-5000
+2026-10-22T10:03:44.386944928Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO  7 : GPU/0-6000 GPU/0-5000
+2026-10-22T10:03:44.386946338Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO  8 : GPU/0-6000 GPU/0-5000
+2026-10-22T10:03:44.386947738Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO  9 : GPU/0-6000 GPU/0-5000
+2026-10-22T10:03:44.386949208Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO 10 : GPU/0-6000 GPU/0-5000
+2026-10-22T10:03:44.386950608Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO 11 : GPU/0-6000 GPU/0-5000
+2026-10-22T10:03:44.387022769Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Pattern 5, crossNic 0, nChannels 2, bw 60.000000/60.000000, type NVL/PIX, sameChannels 0
+2026-10-22T10:03:44.387025449Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO  0 : GPU/0-5000
+2026-10-22T10:03:44.387027059Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO  1 : GPU/0-6000
+2026-10-22T10:03:44.387370335Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO comm 0x577a7075f0c0 rank 0 nRanks 2 nNodes 1 localRanks 2 localRank 0 MNNVL 0
+2026-10-22T10:03:44.387382165Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Tree 0 : -1 -> 0 -> 1/-1/-1
+2026-10-22T10:03:44.387383775Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Tree 12 : -1 -> 0 -> 1/-1/-1
+2026-10-22T10:03:44.387385325Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Tree 1 : -1 -> 0 -> 1/-1/-1
+2026-10-22T10:03:44.387386995Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Tree 13 : -1 -> 0 -> 1/-1/-1
+2026-10-22T10:03:44.387388495Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Tree 2 : -1 -> 0 -> 1/-1/-1
+2026-10-22T10:03:44.387390055Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Tree 14 : -1 -> 0 -> 1/-1/-1
+2026-10-22T10:03:44.387559748Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO comm 0x64f3d7bb4b30 rank 1 nRanks 2 nNodes 1 localRanks 2 localRank 1 MNNVL 0
+2026-10-22T10:03:44.387563658Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Tree 0 : 0 -> 1 -> -1/-1/-1
+2026-10-22T10:03:44.387569208Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Tree 12 : 0 -> 1 -> -1/-1/-1
+2026-10-22T10:03:44.387570928Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Tree 1 : 0 -> 1 -> -1/-1/-1
+2026-10-22T10:03:44.387572508Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Tree 13 : 0 -> 1 -> -1/-1/-1
+2026-10-22T10:03:44.387574118Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Tree 2 : 0 -> 1 -> -1/-1/-1
+2026-10-22T10:03:44.387575588Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Tree 14 : 0 -> 1 -> -1/-1/-1
+2026-10-22T10:03:44.387577098Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Tree 3 : 0 -> 1 -> -1/-1/-1
+2026-10-22T10:03:44.387586039Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Tree 3 : -1 -> 0 -> 1/-1/-1
+2026-10-22T10:03:44.387589489Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Tree 15 : -1 -> 0 -> 1/-1/-1
+2026-10-22T10:03:44.387591129Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Tree 4 : -1 -> 0 -> 1/-1/-1
+2026-10-22T10:03:44.387592709Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Tree 16 : -1 -> 0 -> 1/-1/-1
+2026-10-22T10:03:44.387594219Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Tree 5 : -1 -> 0 -> 1/-1/-1
+2026-10-22T10:03:44.387595819Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Tree 17 : -1 -> 0 -> 1/-1/-1
+2026-10-22T10:03:44.387597319Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Tree 6 : 1 -> 0 -> -1/-1/-1
+2026-10-22T10:03:44.387598819Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Tree 18 : 1 -> 0 -> -1/-1/-1
+2026-10-22T10:03:44.387600359Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Tree 7 : 1 -> 0 -> -1/-1/-1
+2026-10-22T10:03:44.387601739Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Tree 19 : 1 -> 0 -> -1/-1/-1
+2026-10-22T10:03:44.387603119Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Tree 8 : 1 -> 0 -> -1/-1/-1
+2026-10-22T10:03:44.387621849Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Tree 15 : 0 -> 1 -> -1/-1/-1
+2026-10-22T10:03:44.387624389Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Tree 4 : 0 -> 1 -> -1/-1/-1
+2026-10-22T10:03:44.387626069Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Tree 16 : 0 -> 1 -> -1/-1/-1
+2026-10-22T10:03:44.387627789Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Tree 5 : 0 -> 1 -> -1/-1/-1
+2026-10-22T10:03:44.387629449Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Tree 17 : 0 -> 1 -> -1/-1/-1
+2026-10-22T10:03:44.387631089Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Tree 6 : -1 -> 1 -> 0/-1/-1
+2026-10-22T10:03:44.387632759Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Tree 18 : -1 -> 1 -> 0/-1/-1
+2026-10-22T10:03:44.387634419Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Tree 7 : -1 -> 1 -> 0/-1/-1
+2026-10-22T10:03:44.387659590Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Tree 20 : 1 -> 0 -> -1/-1/-1
+2026-10-22T10:03:44.387661450Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Tree 9 : 1 -> 0 -> -1/-1/-1
+2026-10-22T10:03:44.387662990Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Tree 21 : 1 -> 0 -> -1/-1/-1
+2026-10-22T10:03:44.387667270Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Tree 10 : 1 -> 0 -> -1/-1/-1
+2026-10-22T10:03:44.387668840Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Tree 22 : 1 -> 0 -> -1/-1/-1
+2026-10-22T10:03:44.387677610Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Tree 11 : 1 -> 0 -> -1/-1/-1
+2026-10-22T10:03:44.387679220Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Tree 23 : 1 -> 0 -> -1/-1/-1
+2026-10-22T10:03:44.387680960Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Channel 00/24 : 0 1
+2026-10-22T10:03:44.387682590Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Channel 01/24 : 0 1
+2026-10-22T10:03:44.387684230Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Channel 02/24 : 0 1
+2026-10-22T10:03:44.387685850Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Channel 03/24 : 0 1
+2026-10-22T10:03:44.387687390Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Channel 04/24 : 0 1
+2026-10-22T10:03:44.387689100Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Channel 05/24 : 0 1
+2026-10-22T10:03:44.387690720Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Channel 06/24 : 0 1
+2026-10-22T10:03:44.387692230Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Channel 07/24 : 0 1
+2026-10-22T10:03:44.387693720Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Channel 08/24 : 0 1
+2026-10-22T10:03:44.387695210Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Channel 09/24 : 0 1
+2026-10-22T10:03:44.387696720Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Channel 10/24 : 0 1
+2026-10-22T10:03:44.387698260Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Channel 11/24 : 0 1
+2026-10-22T10:03:44.387699770Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Channel 12/24 : 0 1
+2026-10-22T10:03:44.387701260Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Channel 13/24 : 0 1
+2026-10-22T10:03:44.387702790Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Channel 14/24 : 0 1
+2026-10-22T10:03:44.387704310Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Channel 15/24 : 0 1
+2026-10-22T10:03:44.387705800Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Channel 16/24 : 0 1
+2026-10-22T10:03:44.387713850Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Tree 19 : -1 -> 1 -> 0/-1/-1
+2026-10-22T10:03:44.387715470Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Tree 8 : -1 -> 1 -> 0/-1/-1
+2026-10-22T10:03:44.387717640Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Tree 20 : -1 -> 1 -> 0/-1/-1
+2026-10-22T10:03:44.387719320Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Tree 9 : -1 -> 1 -> 0/-1/-1
+2026-10-22T10:03:44.387720860Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Tree 21 : -1 -> 1 -> 0/-1/-1
+2026-10-22T10:03:44.387722380Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Tree 10 : -1 -> 1 -> 0/-1/-1
+2026-10-22T10:03:44.387723870Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Tree 22 : -1 -> 1 -> 0/-1/-1
+2026-10-22T10:03:44.387726220Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Tree 11 : -1 -> 1 -> 0/-1/-1
+2026-10-22T10:03:44.387727860Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Tree 23 : -1 -> 1 -> 0/-1/-1
+2026-10-22T10:03:44.387731811Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Ring 00 : 0 -> 1 -> 0
+2026-10-22T10:03:44.387733401Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Ring 01 : 0 -> 1 -> 0
+2026-10-22T10:03:44.387734921Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Ring 02 : 0 -> 1 -> 0
+2026-10-22T10:03:44.387736421Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Ring 03 : 0 -> 1 -> 0
+2026-10-22T10:03:44.387738071Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Ring 04 : 0 -> 1 -> 0
+2026-10-22T10:03:44.387739691Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Ring 05 : 0 -> 1 -> 0
+2026-10-22T10:03:44.387741181Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Ring 06 : 0 -> 1 -> 0
+2026-10-22T10:03:44.387742671Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Ring 07 : 0 -> 1 -> 0
+2026-10-22T10:03:44.387744171Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Ring 08 : 0 -> 1 -> 0
+2026-10-22T10:03:44.387745641Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Ring 09 : 0 -> 1 -> 0
+2026-10-22T10:03:44.387747221Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Ring 10 : 0 -> 1 -> 0
+2026-10-22T10:03:44.387748801Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Ring 11 : 0 -> 1 -> 0
+2026-10-22T10:03:44.387750341Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Ring 12 : 0 -> 1 -> 0
+2026-10-22T10:03:44.387751821Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Ring 13 : 0 -> 1 -> 0
+2026-10-22T10:03:44.387753301Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Ring 14 : 0 -> 1 -> 0
+2026-10-22T10:03:44.387754781Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Ring 15 : 0 -> 1 -> 0
+2026-10-22T10:03:44.387756281Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Ring 16 : 0 -> 1 -> 0
+2026-10-22T10:03:44.387757791Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Ring 17 : 0 -> 1 -> 0
+2026-10-22T10:03:44.387759291Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Ring 18 : 0 -> 1 -> 0
+2026-10-22T10:03:44.387760761Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Ring 19 : 0 -> 1 -> 0
+2026-10-22T10:03:44.387762251Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Ring 20 : 0 -> 1 -> 0
+2026-10-22T10:03:44.387763721Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Ring 21 : 0 -> 1 -> 0
+2026-10-22T10:03:44.387765191Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Ring 22 : 0 -> 1 -> 0
+2026-10-22T10:03:44.387766741Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Ring 23 : 0 -> 1 -> 0
+2026-10-22T10:03:44.387768931Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Trees [0] -1/-1/-1->1->0 [1] -1/-1/-1->1->0 [2] -1/-1/-1->1->0 [3] -1/-1/-1->1->0 [4] -1/-1/-1->1->0 [5] -1/-1/-1->1->0 [6] 0/-1/-1->1->-1 [7] 0/-1/-1->1->-1 [8] 0/-1/-1->1->-1 [9] 0/-1/-1->1->-1 [10] 0/-1/-1->1->-1 [11] 0/-1/-1->1->-1 [12] -1/-1/-1->1->0 [13] -1/-1/-1->1->0 [14] -1/-1/-1->1->0 [15] -1/-1/-1->1->0 [16] -1/-1/-1->1->0 [17] -1/-1/-1->1->0 [18] 0/-1/-1->1->-1 [19] 0/-1/-1->1->-1 [20] 0/-1/-1->1->-1 [21] 0/-1/-1->1->-1 [22] 0/-1/-1->1->-1 [23] 0/-1/-1->1->-1
+2026-10-22T10:03:44.387771511Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO P2P Chunksize set to 524288
+2026-10-22T10:03:44.387783651Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Channel 17/24 : 0 1
+2026-10-22T10:03:44.387785261Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Channel 18/24 : 0 1
+2026-10-22T10:03:44.387786851Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Channel 19/24 : 0 1
+2026-10-22T10:03:44.387788371Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Channel 20/24 : 0 1
+2026-10-22T10:03:44.387789871Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Channel 21/24 : 0 1
+2026-10-22T10:03:44.387791381Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Channel 22/24 : 0 1
+2026-10-22T10:03:44.387793321Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Channel 23/24 : 0 1
+2026-10-22T10:03:44.387795031Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Ring 00 : 1 -> 0 -> 1
+2026-10-22T10:03:44.387796511Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Ring 01 : 1 -> 0 -> 1
+2026-10-22T10:03:44.387798111Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Ring 02 : 1 -> 0 -> 1
+2026-10-22T10:03:44.387800201Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Ring 03 : 1 -> 0 -> 1
+2026-10-22T10:03:44.387801821Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Ring 04 : 1 -> 0 -> 1
+2026-10-22T10:03:44.387803451Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Ring 05 : 1 -> 0 -> 1
+2026-10-22T10:03:44.387805042Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Ring 06 : 1 -> 0 -> 1
+2026-10-22T10:03:44.387806542Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Ring 07 : 1 -> 0 -> 1
+2026-10-22T10:03:44.387808092Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Ring 08 : 1 -> 0 -> 1
+2026-10-22T10:03:44.387809562Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Ring 09 : 1 -> 0 -> 1
+2026-10-22T10:03:44.387811052Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Ring 10 : 1 -> 0 -> 1
+2026-10-22T10:03:44.387812552Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Ring 11 : 1 -> 0 -> 1
+2026-10-22T10:03:44.387814032Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Ring 12 : 1 -> 0 -> 1
+2026-10-22T10:03:44.387815502Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Ring 13 : 1 -> 0 -> 1
+2026-10-22T10:03:44.387816992Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Ring 14 : 1 -> 0 -> 1
+2026-10-22T10:03:44.387818502Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Ring 15 : 1 -> 0 -> 1
+2026-10-22T10:03:44.387820002Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Ring 16 : 1 -> 0 -> 1
+2026-10-22T10:03:44.387821502Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Ring 17 : 1 -> 0 -> 1
+2026-10-22T10:03:44.387822992Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Ring 18 : 1 -> 0 -> 1
+2026-10-22T10:03:44.387824482Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Ring 19 : 1 -> 0 -> 1
+2026-10-22T10:03:44.387825992Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Ring 20 : 1 -> 0 -> 1
+2026-10-22T10:03:44.387827482Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Ring 21 : 1 -> 0 -> 1
+2026-10-22T10:03:44.387829062Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Ring 22 : 1 -> 0 -> 1
+2026-10-22T10:03:44.387833352Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Ring 23 : 1 -> 0 -> 1
+2026-10-22T10:03:44.387834982Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Trees [0] 1/-1/-1->0->-1 [1] 1/-1/-1->0->-1 [2] 1/-1/-1->0->-1 [3] 1/-1/-1->0->-1 [4] 1/-1/-1->0->-1 [5] 1/-1/-1->0->-1 [6] -1/-1/-1->0->1 [7] -1/-1/-1->0->1 [8] -1/-1/-1->0->1 [9] -1/-1/-1->0->1 [10] -1/-1/-1->0->1 [11] -1/-1/-1->0->1 [12] 1/-1/-1->0->-1 [13] 1/-1/-1->0->-1 [14] 1/-1/-1->0->-1 [15] 1/-1/-1->0->-1 [16] 1/-1/-1->0->-1 [17] 1/-1/-1->0->-1 [18] -1/-1/-1->0->1 [19] -1/-1/-1->0->1 [20] -1/-1/-1->0->1 [21] -1/-1/-1->0->1 [22] -1/-1/-1->0->1 [23] -1/-1/-1->0->1
+2026-10-22T10:03:44.387836622Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO P2P Chunksize set to 524288
+2026-10-22T10:03:44.390550375Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO PROFILER/Plugin: Could not find: libnccl-profiler.so
+2026-10-22T10:03:44.390579336Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO PROFILER/Plugin: Could not find: libnccl-profiler.so
+2026-10-22T10:03:44.390581636Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Check P2P Type isAllDirectP2p 1 directMode 0 isAllCudaP2p 1
+2026-10-22T10:03:44.390608926Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Check P2P Type isAllDirectP2p 1 directMode 0 isAllCudaP2p 1
+2026-10-22T10:03:44.390662837Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO ncclP2pSchedule: group size used is 2
+2026-10-22T10:03:44.390788379Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:602 [0] NCCL INFO [Proxy Service] Device 1 CPU core 1
+2026-10-22T10:03:44.390811279Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:603 [0] NCCL INFO [Proxy Service] Device 0 CPU core 43
+2026-10-22T10:03:44.390812909Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO ncclP2pSchedule: group size used is 2
+2026-10-22T10:03:44.390858249Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:604 [0] NCCL INFO [Proxy Service UDS] Device 1 CPU core 3
+2026-10-22T10:03:44.391027733Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:605 [0] NCCL INFO [Proxy Service UDS] Device 0 CPU core 45
+2026-10-22T10:03:44.515071653Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO TUNER/Plugin: Could not find: libnccl-tuner.so
+2026-10-22T10:03:44.515089773Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO TUNER/Plugin: Could not find: libnccl-tuner.so
+2026-10-22T10:03:44.515091703Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO threadThresholds 8/8/64 | 16/8/64 | 512 | 512
+2026-10-22T10:03:44.515093773Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO 24 coll channels, 24 collnet channels, 16 nvls channels, 32 p2p channels, 32 p2p channels per peer
+2026-10-22T10:03:44.515105443Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO threadThresholds 8/8/64 | 16/8/64 | 512 | 512
+2026-10-22T10:03:44.515107223Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO 24 coll channels, 24 collnet channels, 16 nvls channels, 32 p2p channels, 32 p2p channels per peer
+2026-10-22T10:03:44.515422029Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO ncclCommInitRankConfig comm 0x64f3d7bb4b30 rank 1 nranks 2 cudaDev 1 nvmlDev 1 busId 6000 commId 0x7599fa74b3342de8 - Init COMPLETE
+2026-10-22T10:03:44.515426299Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Init timings - ncclCommInitRankConfig: rank 1 nranks 2 total 0.38 (kernels 0.22, alloc 0.02, bootstrap 0.00, allgathers 0.00, topo 0.01, graphs 0.00, connections 0.12, rest 0.00)
+2026-10-22T10:03:44.515458839Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO CC Off, workFifoBytes 1048576
+2026-10-22T10:03:44.515461189Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO ncclCommInitRankConfig comm 0x577a7075f0c0 rank 0 nranks 2 cudaDev 0 nvmlDev 0 busId 5000 commId 0x7599fa74b3342de8 - Init COMPLETE
+2026-10-22T10:03:44.515463459Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Init timings - ncclCommInitRankConfig: rank 0 nranks 2 total 0.38 (kernels 0.22, alloc 0.02, bootstrap 0.00, allgathers 0.00, topo 0.01, graphs 0.00, connections 0.12, rest 0.00)
+2026-10-22T10:03:44.596005273Z #
+2026-10-22T10:03:44.596027313Z #                                                              out-of-place                       in-place          
+2026-10-22T10:03:44.596029613Z #       size         count      type   redop    root     time   algbw   busbw  #wrong     time   algbw   busbw  #wrong 
+2026-10-22T10:03:44.596031313Z #        (B)    (elements)                               (us)  (GB/s)  (GB/s)             (us)  (GB/s)  (GB/s)         
+2026-10-22T10:03:44.596033193Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Symmetric VA size=140GB
+2026-10-22T10:03:44.597139830Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Symmetric VA size=140GB
+2026-10-22T10:03:44.627546120Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Channel 00/0 : 1[1] -> 0[0] via P2P/CUMEM
+2026-10-22T10:03:44.627668953Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Channel 00/0 : 0[0] -> 1[1] via P2P/CUMEM
+2026-10-22T10:03:44.627954997Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Channel 01/0 : 1[1] -> 0[0] via P2P/CUMEM
+2026-10-22T10:03:44.629040155Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Channel 02/0 : 1[1] -> 0[0] via P2P/CUMEM
+2026-10-22T10:03:44.629475111Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Channel 01/0 : 0[0] -> 1[1] via P2P/CUMEM
+2026-10-22T10:03:44.629780216Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Channel 02/0 : 0[0] -> 1[1] via P2P/CUMEM
+2026-10-22T10:03:44.630071271Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Channel 03/0 : 1[1] -> 0[0] via P2P/CUMEM
+2026-10-22T10:03:44.630841953Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Channel 03/0 : 0[0] -> 1[1] via P2P/CUMEM
+2026-10-22T10:03:44.631134108Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Channel 04/0 : 1[1] -> 0[0] via P2P/CUMEM
+2026-10-22T10:03:44.631906140Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Channel 04/0 : 0[0] -> 1[1] via P2P/CUMEM
+2026-10-22T10:03:44.632191924Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Channel 05/0 : 1[1] -> 0[0] via P2P/CUMEM
+2026-10-22T10:03:44.632955577Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Channel 05/0 : 0[0] -> 1[1] via P2P/CUMEM
+2026-10-22T10:03:44.633259941Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Channel 06/0 : 1[1] -> 0[0] via P2P/CUMEM
+2026-10-22T10:03:44.634023483Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Channel 06/0 : 0[0] -> 1[1] via P2P/CUMEM
+2026-10-22T10:03:44.634328819Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Channel 07/0 : 1[1] -> 0[0] via P2P/CUMEM
+2026-10-22T10:03:44.635086610Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Channel 07/0 : 0[0] -> 1[1] via P2P/CUMEM
+2026-10-22T10:03:44.635376455Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Channel 08/0 : 1[1] -> 0[0] via P2P/CUMEM
+2026-10-22T10:03:44.636136226Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Channel 08/0 : 0[0] -> 1[1] via P2P/CUMEM
+2026-10-22T10:03:44.636449482Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Channel 09/0 : 1[1] -> 0[0] via P2P/CUMEM
+2026-10-22T10:03:44.637193514Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Channel 09/0 : 0[0] -> 1[1] via P2P/CUMEM
+2026-10-22T10:03:44.637503528Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Channel 10/0 : 1[1] -> 0[0] via P2P/CUMEM
+2026-10-22T10:03:44.638258340Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Channel 10/0 : 0[0] -> 1[1] via P2P/CUMEM
+2026-10-22T10:03:44.638567445Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Channel 11/0 : 1[1] -> 0[0] via P2P/CUMEM
+2026-10-22T10:03:44.639316847Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Channel 11/0 : 0[0] -> 1[1] via P2P/CUMEM
+2026-10-22T10:03:44.639621622Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Channel 12/0 : 1[1] -> 0[0] via P2P/CUMEM
+2026-10-22T10:03:44.640374283Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Channel 12/0 : 0[0] -> 1[1] via P2P/CUMEM
+2026-10-22T10:03:44.640690229Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Channel 13/0 : 1[1] -> 0[0] via P2P/CUMEM
+2026-10-22T10:03:44.641457240Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Channel 13/0 : 0[0] -> 1[1] via P2P/CUMEM
+2026-10-22T10:03:44.641748335Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Channel 14/0 : 1[1] -> 0[0] via P2P/CUMEM
+2026-10-22T10:03:44.642505698Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Channel 14/0 : 0[0] -> 1[1] via P2P/CUMEM
+2026-10-22T10:03:44.642809102Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Channel 15/0 : 1[1] -> 0[0] via P2P/CUMEM
+2026-10-22T10:03:44.643562684Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Channel 15/0 : 0[0] -> 1[1] via P2P/CUMEM
+2026-10-22T10:03:44.643875139Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Channel 16/0 : 1[1] -> 0[0] via P2P/CUMEM
+2026-10-22T10:03:44.644627871Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Channel 16/0 : 0[0] -> 1[1] via P2P/CUMEM
+2026-10-22T10:03:44.644927676Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Channel 17/0 : 1[1] -> 0[0] via P2P/CUMEM
+2026-10-22T10:03:44.645693947Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Channel 17/0 : 0[0] -> 1[1] via P2P/CUMEM
+2026-10-22T10:03:44.646003123Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Channel 18/0 : 1[1] -> 0[0] via P2P/CUMEM
+2026-10-22T10:03:44.646769254Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Channel 18/0 : 0[0] -> 1[1] via P2P/CUMEM
+2026-10-22T10:03:44.647049389Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Channel 19/0 : 1[1] -> 0[0] via P2P/CUMEM
+2026-10-22T10:03:44.647817902Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Channel 19/0 : 0[0] -> 1[1] via P2P/CUMEM
+2026-10-22T10:03:44.648113586Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Channel 20/0 : 1[1] -> 0[0] via P2P/CUMEM
+2026-10-22T10:03:44.651750364Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Channel 20/0 : 0[0] -> 1[1] via P2P/CUMEM
+2026-10-22T10:03:44.651940776Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Channel 21/0 : 0[0] -> 1[1] via P2P/CUMEM
+2026-10-22T10:03:44.652169230Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Channel 22/0 : 0[0] -> 1[1] via P2P/CUMEM
+2026-10-22T10:03:44.652313622Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Channel 21/0 : 1[1] -> 0[0] via P2P/CUMEM
+2026-10-22T10:03:44.652345823Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Channel 23/0 : 0[0] -> 1[1] via P2P/CUMEM
+2026-10-22T10:03:44.653380539Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Channel 22/0 : 1[1] -> 0[0] via P2P/CUMEM
+2026-10-22T10:03:44.654455727Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Channel 23/0 : 1[1] -> 0[0] via P2P/CUMEM
+2026-10-22T10:03:44.788468405Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO Connected all rings, use ring PXN 0 GDR 1
+2026-10-22T10:03:44.788485655Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO Connected all rings, use ring PXN 0 GDR 1
+2026-10-22T10:03:44.907288762Z            8             2     float     sum      -1     6.12    0.00    0.00       0     6.23    0.00    0.00       0
+2026-10-22T10:03:44.909500078Z           16             4     float     sum      -1     5.92    0.00    0.00       0     6.23    0.00    0.00       0
+2026-10-22T10:03:44.911976996Z           32             8     float     sum      -1     6.36    0.01    0.01       0     6.15    0.01    0.01       0
+2026-10-22T10:03:44.914444875Z           64            16     float     sum      -1     6.38    0.01    0.01       0     6.23    0.01    0.01       0
+2026-10-22T10:03:44.916939685Z          128            32     float     sum      -1     6.58    0.02    0.02       0     6.27    0.02    0.02       0
+2026-10-22T10:03:44.919432384Z          256            64     float     sum      -1     6.48    0.04    0.04       0     6.31    0.04    0.04       0
+2026-10-22T10:03:44.921980585Z          512           128     float     sum      -1     6.62    0.08    0.08       0     6.67    0.08    0.08       0
+2026-10-22T10:03:44.924499414Z         1024           256     float     sum      -1     6.53    0.16    0.16       0     6.45    0.16    0.16       0
+2026-10-22T10:03:44.927017714Z         2048           512     float     sum      -1     6.62    0.31    0.31       0     6.48    0.32    0.32       0
+2026-10-22T10:03:44.929592225Z         4096          1024     float     sum      -1     6.74    0.61    0.61       0     6.67    0.61    0.61       0
+2026-10-22T10:03:44.932243407Z         8192          2048     float     sum      -1     7.16    1.14    1.14       0     7.06    1.16    1.16       0
+2026-10-22T10:03:44.936001736Z        16384          4096     float     sum      -1     7.31    2.24    2.24       0     7.27    2.25    2.25       0
+2026-10-22T10:03:44.941877199Z        32768          8192     float     sum      -1     7.45    4.40    4.40       0     7.31    4.48    4.48       0
+2026-10-22T10:03:44.951991309Z        65536         16384     float     sum      -1     7.58    8.65    8.65       0     7.41    8.84    8.84       0
+2026-10-22T10:03:44.970549322Z       131072         32768     float     sum      -1     7.82   16.76   16.76       0     7.70   17.03   17.03       0
+2026-10-22T10:03:45.006054523Z       262144         65536     float     sum      -1     9.11   28.79   28.79       0     9.06   28.93   28.93       0
+2026-10-22T10:03:45.042010352Z       524288        131072     float     sum      -1    11.03   47.54   47.54       0    10.90   48.10   48.10       0
+2026-10-22T10:03:45.078877775Z      1048576        262144     float     sum      -1    15.48   67.76   67.76       0    15.29   68.59   68.59       0
+2026-10-22T10:03:45.118549671Z      2097152        524288     float     sum      -1    28.53   73.51   73.51       0    28.39   73.87   73.87       0
+2026-10-22T10:03:45.159314056Z      4194304       1048576     float     sum      -1    34.34  122.16  122.16       0    33.93  123.63  123.63       0
+2026-10-22T10:03:45.203376142Z      8388608       2097152     float     sum      -1    48.71  172.21  172.21       0    47.65  176.06  176.06       0
+2026-10-22T10:03:45.253905841Z     16777216       4194304     float     sum      -1    77.94  215.27  215.27       0    75.93  220.96  220.96       0
+2026-10-22T10:03:45.317975794Z     33554432       8388608     float     sum      -1   137.84  243.42  243.42       0   137.09  244.75  244.75       0
+2026-10-22T10:03:45.407060771Z     67108864      16777216     float     sum      -1   248.54  270.01  270.01       0   248.22  270.36  270.36       0
+2026-10-22T10:03:45.545201425Z    134217728      33554432     float     sum      -1   467.73  286.96  286.96       0   466.62  287.64  287.64       0
+2026-10-22T10:03:45.779153892Z    268435456      67108864     float     sum      -1   893.77  300.34  300.34       0   893.45  300.45  300.45       0
+2026-10-22T10:03:46.195609835Z    536870912     134217728     float     sum      -1  1700.87  315.64  315.64       0  1697.71  316.23  316.23       0
+2026-10-22T10:03:46.965739117Z   1073741824     268435456     float     sum      -1  3263.43  329.02  329.02       0  3248.23  330.56  330.56       0
+2026-10-22T10:03:48.433667309Z   2147483648     536870912     float     sum      -1  6326.82  339.43  339.43       0  6317.20  339.94  339.94       0
+2026-10-22T10:03:51.277728171Z   4294967296    1073741824     float     sum      -1  12376.9  347.02  347.02       0  12363.0  347.40  347.40       0
+2026-10-22T10:03:56.894746942Z   8589934592    2147483648     float     sum      -1  24559.3  349.76  349.76       0  24555.1  349.82  349.82       0
+2026-10-22T10:04:08.022135966Z  17179869184    4294967296     float     sum      -1  48759.0  352.34  352.34       0  48758.4  352.35  352.35       0
+2026-10-22T10:04:08.024902293Z            8             2     float     sum      -1     9.57    0.00    0.00       0     6.22    0.00    0.00       0
+2026-10-22T10:04:08.027361963Z           16             4     float     sum      -1     6.25    0.00    0.00       0     6.24    0.00    0.00       0
+2026-10-22T10:04:08.030017598Z           32             8     float     sum      -1     7.51    0.00    0.00       0     6.20    0.01    0.01       0
+2026-10-22T10:04:08.032488339Z           64            16     float     sum      -1     6.39    0.01    0.01       0     6.29    0.01    0.01       0
+2026-10-22T10:04:08.034963389Z          128            32     float     sum      -1     6.48    0.02    0.02       0     6.29    0.02    0.02       0
+2026-10-22T10:04:08.037523513Z          256            64     float     sum      -1     7.15    0.04    0.04       0     6.33    0.04    0.04       0
+2026-10-22T10:04:08.040399993Z          512           128     float     sum      -1     9.80    0.05    0.05       0     6.39    0.08    0.08       0
+2026-10-22T10:04:08.043120439Z         1024           256     float     sum      -1     7.71    0.13    0.13       0     6.43    0.16    0.16       0
+2026-10-22T10:04:08.045631990Z         2048           512     float     sum      -1     6.65    0.31    0.31       0     6.44    0.32    0.32       0
+2026-10-22T10:04:08.048181983Z         4096          1024     float     sum      -1     6.81    0.60    0.60       0     6.67    0.61    0.61       0
+2026-10-22T10:04:08.050857398Z         8192          2048     float     sum      -1     7.23    1.13    1.13       0     7.08    1.16    1.16       0
+2026-10-22T10:04:08.054590570Z        16384          4096     float     sum      -1     7.44    2.20    2.20       0     7.24    2.26    2.26       0
+2026-10-22T10:04:08.060441233Z        32768          8192     float     sum      -1     7.49    4.37    4.37       0     7.29    4.49    4.49       0
+2026-10-22T10:04:08.070492869Z        65536         16384     float     sum      -1     7.58    8.65    8.65       0     7.45    8.80    8.80       0
+2026-10-22T10:04:08.088971192Z       131072         32768     float     sum      -1     7.98   16.43   16.43       0     7.71   17.00   17.00       0
+2026-10-22T10:04:08.124480241Z       262144         65536     float     sum      -1     9.09   28.83   28.83       0     9.05   28.97   28.97       0
+2026-10-22T10:04:08.160239276Z       524288        131072     float     sum      -1    11.03   47.52   47.52       0    10.90   48.09   48.09       0
+2026-10-22T10:04:08.196973026Z      1048576        262144     float     sum      -1    15.48   67.73   67.73       0    15.27   68.69   68.69       0
+2026-10-22T10:04:08.236419932Z      2097152        524288     float     sum      -1    28.58   73.38   73.38       0    28.37   73.92   73.92       0
+2026-10-22T10:04:08.277206750Z      4194304       1048576     float     sum      -1    34.36  122.08  122.08       0    34.06  123.15  123.15       0
+2026-10-22T10:04:08.321291210Z      8388608       2097152     float     sum      -1    48.69  172.29  172.29       0    47.72  175.78  175.78       0
+2026-10-22T10:04:08.371450197Z     16777216       4194304     float     sum      -1    78.16  214.64  214.64       0    75.73  221.55  221.55       0
+2026-10-22T10:04:08.435596488Z     33554432       8388608     float     sum      -1   137.45  244.13  244.13       0   136.92  245.06  245.06       0
+2026-10-22T10:04:08.524043183Z     67108864      16777216     float     sum      -1   248.45  270.11  270.11       0   247.21  271.47  271.47       0
+2026-10-22T10:04:08.662660357Z    134217728      33554432     float     sum      -1   467.40  287.16  287.16       0   468.01  286.78  286.78       0
+2026-10-22T10:04:08.896322728Z    268435456      67108864     float     sum      -1   894.15  300.21  300.21       0   893.89  300.30  300.30       0
+2026-10-22T10:04:09.314599879Z    536870912     134217728     float     sum      -1  1707.25  314.46  314.46       0  1709.04  314.14  314.14       0
+2026-10-22T10:04:10.084681882Z   1073741824     268435456     float     sum      -1  3252.42  330.14  330.14       0  3263.22  329.04  329.04       0
+2026-10-22T10:04:11.552753804Z   2147483648     536870912     float     sum      -1  6328.81  339.32  339.32       0  6315.06  340.06  340.06       0
+2026-10-22T10:04:14.396168549Z   4294967296    1073741824     float     sum      -1  12367.5  347.28  347.28       0  12369.5  347.22  347.22       0
+2026-10-22T10:04:19.995853763Z   8589934592    2147483648     float     sum      -1  24478.7  350.91  350.91       0  24463.6  351.13  351.13       0
+2026-10-22T10:04:31.146378938Z  17179869184    4294967296     float     sum      -1  48768.1  352.28  352.28       0  48980.6  350.75  350.75       0
+2026-10-22T10:04:31.149191197Z            8             2     float     sum      -1     9.61    0.00    0.00       0     6.15    0.00    0.00       0
+2026-10-22T10:04:31.151652177Z           16             4     float     sum      -1     6.28    0.00    0.00       0     6.26    0.00    0.00       0
+2026-10-22T10:04:31.154328513Z           32             8     float     sum      -1     7.49    0.00    0.00       0     6.28    0.01    0.01       0
+2026-10-22T10:04:31.156826344Z           64            16     float     sum      -1     6.33    0.01    0.01       0     6.29    0.01    0.01       0
+2026-10-22T10:04:31.159326405Z          128            32     float     sum      -1     6.54    0.02    0.02       0     6.33    0.02    0.02       0
+2026-10-22T10:04:31.161806025Z          256            64     float     sum      -1     6.49    0.04    0.04       0     6.32    0.04    0.04       0
+2026-10-22T10:04:31.164665735Z          512           128     float     sum      -1     9.80    0.05    0.05       0     6.35    0.08    0.08       0
+2026-10-22T10:04:31.167393602Z         1024           256     float     sum      -1     7.71    0.13    0.13       0     6.41    0.16    0.16       0
+2026-10-22T10:04:31.169913744Z         2048           512     float     sum      -1     6.57    0.31    0.31       0     6.53    0.31    0.31       0
+2026-10-22T10:04:31.172468887Z         4096          1024     float     sum      -1     6.77    0.60    0.60       0     6.70    0.61    0.61       0
+2026-10-22T10:04:31.175131152Z         8192          2048     float     sum      -1     7.23    1.13    1.13       0     7.06    1.16    1.16       0
+2026-10-22T10:04:31.178875834Z        16384          4096     float     sum      -1     7.43    2.21    2.21       0     7.23    2.27    2.27       0
+2026-10-22T10:04:31.184738417Z        32768          8192     float     sum      -1     7.46    4.39    4.39       0     7.38    4.44    4.44       0
+2026-10-22T10:04:31.194796513Z        65536         16384     float     sum      -1     7.62    8.60    8.60       0     7.42    8.83    8.83       0
+2026-10-22T10:04:31.213308167Z       131072         32768     float     sum      -1     7.89   16.61   16.61       0     7.78   16.86   16.86       0
+2026-10-22T10:04:31.248855507Z       262144         65536     float     sum      -1     9.07   28.92   28.92       0     9.05   28.97   28.97       0
+2026-10-22T10:04:31.284780857Z       524288        131072     float     sum      -1    11.06   47.42   47.42       0    10.89   48.15   48.15       0
+2026-10-22T10:04:31.321610978Z      1048576        262144     float     sum      -1    15.46   67.81   67.81       0    15.25   68.75   68.75       0
+2026-10-22T10:04:31.361276269Z      2097152        524288     float     sum      -1    28.55   73.45   73.45       0    28.39   73.88   73.88       0
+2026-10-22T10:04:31.402140010Z      4194304       1048576     float     sum      -1    34.38  122.00  122.00       0    33.94  123.58  123.58       0
+2026-10-22T10:04:31.446214779Z      8388608       2097152     float     sum      -1    48.73  172.15  172.15       0    47.60  176.25  176.25       0
+2026-10-22T10:04:31.496674854Z     16777216       4194304     float     sum      -1    77.94  215.26  215.26       0    75.78  221.40  221.40       0
+2026-10-22T10:04:31.560586299Z     33554432       8388608     float     sum      -1   137.25  244.48  244.48       0   136.29  246.19  246.19       0
+2026-10-22T10:04:31.649387963Z     67108864      16777216     float     sum      -1   247.61  271.02  271.02       0   247.84  270.78  270.78       0
+2026-10-22T10:04:31.788696383Z    134217728      33554432     float     sum      -1   467.74  286.95  286.95       0   468.36  286.57  286.57       0
+2026-10-22T10:04:32.021848312Z    268435456      67108864     float     sum      -1   893.93  300.29  300.29       0   893.39  300.47  300.47       0
+2026-10-22T10:04:32.439664011Z    536870912     134217728     float     sum      -1  1703.32  315.19  315.19       0  1709.15  314.12  314.12       0
+2026-10-22T10:04:33.208643327Z   1073741824     268435456     float     sum      -1  3256.39  329.73  329.73       0  3236.44  331.77  331.77       0
+2026-10-22T10:04:34.676724000Z   2147483648     536870912     float     sum      -1  6325.71  339.48  339.48       0  6324.15  339.57  339.57       0
+2026-10-22T10:04:37.515746627Z   4294967296    1073741824     float     sum      -1  12342.3  347.99  347.99       0  12339.6  348.06  348.06       0
+2026-10-22T10:04:43.126632886Z   8589934592    2147483648     float     sum      -1  24577.2  349.51  349.51       0  24476.6  350.94  350.94       0
+2026-10-22T10:04:54.276228834Z  17179869184    4294967296     float     sum      -1  48979.4  350.76  350.76       0  48755.5  352.37  352.37       0
+2026-10-22T10:04:54.279078761Z            8             2     float     sum      -1     9.58    0.00    0.00       0     6.23    0.00    0.00       0
+2026-10-22T10:04:54.281508701Z           16             4     float     sum      -1     6.32    0.00    0.00       0     6.22    0.00    0.00       0
+2026-10-22T10:04:54.284220685Z           32             8     float     sum      -1     7.54    0.00    0.00       0     6.23    0.01    0.01       0
+2026-10-22T10:04:54.286734867Z           64            16     float     sum      -1     6.37    0.01    0.01       0     6.57    0.01    0.01       0
+2026-10-22T10:04:54.289211858Z          128            32     float     sum      -1     6.46    0.02    0.02       0     6.29    0.02    0.02       0
+2026-10-22T10:04:54.291684658Z          256            64     float     sum      -1     6.41    0.04    0.04       0     6.35    0.04    0.04       0
+2026-10-22T10:04:54.294563026Z          512           128     float     sum      -1     9.79    0.05    0.05       0     6.37    0.08    0.08       0
+2026-10-22T10:04:54.297314411Z         1024           256     float     sum      -1     7.80    0.13    0.13       0     6.40    0.16    0.16       0
+2026-10-22T10:04:54.299843803Z         2048           512     float     sum      -1     6.68    0.31    0.31       0     6.51    0.31    0.31       0
+2026-10-22T10:04:54.302405344Z         4096          1024     float     sum      -1     6.74    0.61    0.61       0     6.66    0.62    0.62       0
+2026-10-22T10:04:54.305091259Z         8192          2048     float     sum      -1     7.23    1.13    1.13       0     7.08    1.16    1.16       0
+2026-10-22T10:04:54.308845361Z        16384          4096     float     sum      -1     7.45    2.20    2.20       0     7.26    2.26    2.26       0
+2026-10-22T10:04:54.314701757Z        32768          8192     float     sum      -1     7.44    4.40    4.40       0     7.32    4.48    4.48       0
+2026-10-22T10:04:54.324780713Z        65536         16384     float     sum      -1     7.53    8.71    8.71       0     7.41    8.85    8.85       0
+2026-10-22T10:04:54.343309709Z       131072         32768     float     sum      -1     7.83   16.75   16.75       0     7.68   17.07   17.07       0
+2026-10-22T10:04:54.378802932Z       262144         65536     float     sum      -1     9.02   29.07   29.07       0     9.07   28.91   28.91       0
+2026-10-22T10:04:54.414708914Z       524288        131072     float     sum      -1    11.09   47.27   47.27       0    10.90   48.09   48.09       0
+2026-10-22T10:04:54.451487400Z      1048576        262144     float     sum      -1    15.45   67.87   67.87       0    15.26   68.73   68.73       0
+2026-10-22T10:04:54.491118842Z      2097152        524288     float     sum      -1    28.63   73.26   73.26       0    28.46   73.68   73.68       0
+2026-10-22T10:04:54.532769508Z      4194304       1048576     float     sum      -1    34.26  122.41  122.41       0    33.97  123.47  123.47       0
+2026-10-22T10:04:54.576776623Z      8388608       2097152     float     sum      -1    48.74  172.10  172.10       0    47.69  175.91  175.91       0
+2026-10-22T10:04:54.627606090Z     16777216       4194304     float     sum      -1    78.05  214.95  214.95       0    75.90  221.04  221.04       0
+2026-10-22T10:04:54.691224317Z     33554432       8388608     float     sum      -1   137.25  244.49  244.49       0   136.67  245.52  245.52       0
+2026-10-22T10:04:54.780666401Z     67108864      16777216     float     sum      -1   248.08  270.51  270.51       0   248.89  269.64  269.64       0
+2026-10-22T10:04:54.918665762Z    134217728      33554432     float     sum      -1   467.39  287.16  287.16       0   467.17  287.30  287.30       0
+2026-10-22T10:04:55.152692647Z    268435456      67108864     float     sum      -1   893.56  300.41  300.41       0   893.84  300.32  300.32       0
+2026-10-22T10:04:55.571703796Z    536870912     134217728     float     sum      -1  1707.09  314.49  314.49       0  1703.33  315.19  315.19       0
+2026-10-22T10:04:56.341668285Z   1073741824     268435456     float     sum      -1  3261.66  329.20  329.20       0  3250.30  330.35  330.35       0
+2026-10-22T10:04:57.809294172Z   2147483648     536870912     float     sum      -1  6323.16  339.62  339.62       0  6328.69  339.33  339.33       0
+2026-10-22T10:05:00.655754514Z   4294967296    1073741824     float     sum      -1  12381.0  346.90  346.90       0  12375.1  347.07  347.07       0
+2026-10-22T10:05:06.276655492Z   8589934592    2147483648     float     sum      -1  24580.9  349.46  349.46       0  24568.2  349.64  349.64       0
+2026-10-22T10:05:17.443197408Z  17179869184    4294967296     float     sum      -1  48964.6  350.86  350.86       0  48949.5  350.97  350.97       0
+2026-10-22T10:05:17.446048856Z            8             2     float     sum      -1     9.58    0.00    0.00       0     6.28    0.00    0.00       0
+2026-10-22T10:05:17.448555028Z           16             4     float     sum      -1     6.97    0.00    0.00       0     6.18    0.00    0.00       0
+2026-10-22T10:05:17.451255603Z           32             8     float     sum      -1     7.50    0.00    0.00       0     6.18    0.01    0.01       0
+2026-10-22T10:05:17.453750364Z           64            16     float     sum      -1     6.40    0.01    0.01       0     6.27    0.01    0.01       0
+2026-10-22T10:05:17.456222245Z          128            32     float     sum      -1     6.46    0.02    0.02       0     6.26    0.02    0.02       0
+2026-10-22T10:05:17.458702037Z          256            64     float     sum      -1     6.46    0.04    0.04       0     6.40    0.04    0.04       0
+2026-10-22T10:05:17.461563034Z          512           128     float     sum      -1     9.79    0.05    0.05       0     6.32    0.08    0.08       0
+2026-10-22T10:05:17.464314340Z         1024           256     float     sum      -1     7.74    0.13    0.13       0     6.37    0.16    0.16       0
+2026-10-22T10:05:17.466828432Z         2048           512     float     sum      -1     6.62    0.31    0.31       0     6.51    0.31    0.31       0
+2026-10-22T10:05:17.469369784Z         4096          1024     float     sum      -1     6.87    0.60    0.60       0     6.64    0.62    0.62       0
+2026-10-22T10:05:17.472038379Z         8192          2048     float     sum      -1     7.20    1.14    1.14       0     7.08    1.16    1.16       0
+2026-10-22T10:05:17.475778202Z        16384          4096     float     sum      -1     7.38    2.22    2.22       0     7.26    2.26    2.26       0
+2026-10-22T10:05:17.481641969Z        32768          8192     float     sum      -1     7.50    4.37    4.37       0     7.29    4.50    4.50       0
+2026-10-22T10:05:17.491724167Z        65536         16384     float     sum      -1     7.60    8.62    8.62       0     7.42    8.84    8.84       0
+2026-10-22T10:05:17.510212175Z       131072         32768     float     sum      -1     7.88   16.63   16.63       0     7.71   16.99   16.99       0
+2026-10-22T10:05:17.545807879Z       262144         65536     float     sum      -1     9.13   28.71   28.71       0     9.05   28.97   28.97       0
+2026-10-22T10:05:17.581733638Z       524288        131072     float     sum      -1    11.09   47.30   47.30       0    10.88   48.17   48.17       0
+2026-10-22T10:05:17.618555352Z      1048576        262144     float     sum      -1    15.43   67.97   67.97       0    15.26   68.72   68.72       0
+2026-10-22T10:05:17.658230624Z      2097152        524288     float     sum      -1    28.60   73.32   73.32       0    28.44   73.74   73.74       0
+2026-10-22T10:05:17.699068584Z      4194304       1048576     float     sum      -1    34.31  122.24  122.24       0    34.09  123.04  123.04       0
+2026-10-22T10:05:17.743826200Z      8388608       2097152     float     sum      -1    48.70  172.26  172.26       0    47.76  175.63  175.63       0
+2026-10-22T10:05:17.794427233Z     16777216       4194304     float     sum      -1    77.84  215.52  215.52       0    75.68  221.68  221.68       0
+2026-10-22T10:05:17.858384091Z     33554432       8388608     float     sum      -1   137.01  244.90  244.90       0   136.79  245.30  245.30       0
+2026-10-22T10:05:17.947398524Z     67108864      16777216     float     sum      -1   249.33  269.16  269.16       0   248.25  270.32  270.32       0
+2026-10-22T10:05:18.086650706Z    134217728      33554432     float     sum      -1   469.30  286.00  286.00       0   467.18  287.29  287.29       0
+2026-10-22T10:05:18.320693968Z    268435456      67108864     float     sum      -1   893.90  300.30  300.30       0   893.54  300.42  300.42       0
+2026-10-22T10:05:18.736979168Z    536870912     134217728     float     sum      -1  1706.93  314.52  314.52       0  1698.86  316.02  316.02       0
+2026-10-22T10:05:19.506720951Z   1073741824     268435456     float     sum      -1  3262.81  329.08  329.08       0  3239.12  331.49  331.49       0
+2026-10-22T10:05:20.970710599Z   2147483648     536870912     float     sum      -1  6314.25  340.10  340.10       0  6296.58  341.06  341.06       0
+2026-10-22T10:05:23.809189391Z   4294967296    1073741824     float     sum      -1  12351.1  347.74  347.74       0  12330.4  348.32  348.32       0
+2026-10-22T10:05:29.412703701Z   8589934592    2147483648     float     sum      -1  24496.2  350.66  350.66       0  24477.1  350.94  350.94       0
+2026-10-22T10:05:40.581086838Z  17179869184    4294967296     float     sum      -1  48963.6  350.87  350.87       0  48967.7  350.84  350.84       0
+2026-10-22T10:05:40.583936216Z            8             2     float     sum      -1     9.59    0.00    0.00       0     6.22    0.00    0.00       0
+2026-10-22T10:05:40.586387806Z           16             4     float     sum      -1     6.26    0.00    0.00       0     6.27    0.00    0.00       0
+2026-10-22T10:05:40.589069042Z           32             8     float     sum      -1     7.50    0.00    0.00       0     6.25    0.01    0.01       0
+2026-10-22T10:05:40.591532973Z           64            16     float     sum      -1     6.34    0.01    0.01       0     6.22    0.01    0.01       0
+2026-10-22T10:05:40.594030314Z          128            32     float     sum      -1     6.46    0.02    0.02       0     6.30    0.02    0.02       0
+2026-10-22T10:05:40.596515025Z          256            64     float     sum      -1     6.43    0.04    0.04       0     6.34    0.04    0.04       0
+2026-10-22T10:05:40.599433225Z          512           128     float     sum      -1     9.81    0.05    0.05       0     6.42    0.08    0.08       0
+2026-10-22T10:05:40.602152979Z         1024           256     float     sum      -1     7.71    0.13    0.13       0     6.45    0.16    0.16       0
+2026-10-22T10:05:40.604748193Z         2048           512     float     sum      -1     6.86    0.30    0.30       0     6.50    0.32    0.32       0
+2026-10-22T10:05:40.607321936Z         4096          1024     float     sum      -1     6.81    0.60    0.60       0     6.63    0.62    0.62       0
+2026-10-22T10:05:40.609981481Z         8192          2048     float     sum      -1     7.23    1.13    1.13       0     7.07    1.16    1.16       0
+2026-10-22T10:05:40.613736782Z        16384          4096     float     sum      -1     7.39    2.22    2.22       0     7.27    2.25    2.25       0
+2026-10-22T10:05:40.619667692Z        32768          8192     float     sum      -1     7.50    4.37    4.37       0     7.31    4.48    4.48       0
+2026-10-22T10:05:40.629746010Z        65536         16384     float     sum      -1     7.62    8.60    8.60       0     7.42    8.84    8.84       0
+2026-10-22T10:05:40.648263638Z       131072         32768     float     sum      -1     7.90   16.59   16.59       0     7.68   17.07   17.07       0
+2026-10-22T10:05:40.684095016Z       262144         65536     float     sum      -1     9.12   28.74   28.74       0     9.07   28.92   28.92       0
+2026-10-22T10:05:40.720573874Z       524288        131072     float     sum      -1    11.06   47.39   47.39       0    10.92   48.01   48.01       0
+2026-10-22T10:05:40.757682092Z      1048576        262144     float     sum      -1    15.46   67.81   67.81       0    15.27   68.68   68.68       0
+2026-10-22T10:05:40.797270263Z      2097152        524288     float     sum      -1    28.63   73.26   73.26       0    28.47   73.66   73.66       0
+2026-10-22T10:05:40.838160085Z      4194304       1048576     float     sum      -1    34.32  122.22  122.22       0    34.14  122.87  122.87       0
+2026-10-22T10:05:40.882175499Z      8388608       2097152     float     sum      -1    48.49  173.00  173.00       0    47.87  175.22  175.22       0
+2026-10-22T10:05:40.932674330Z     16777216       4194304     float     sum      -1    78.02  215.03  215.03       0    75.86  221.17  221.17       0
+2026-10-22T10:05:40.996659237Z     33554432       8388608     float     sum      -1   137.84  243.43  243.43       0   136.67  245.51  245.51       0
+2026-10-22T10:05:41.085633980Z     67108864      16777216     float     sum      -1   248.70  269.84  269.84       0   248.15  270.43  270.43       0
+2026-10-22T10:05:41.223876785Z    134217728      33554432     float     sum      -1   468.28  286.62  286.62       0   467.49  287.10  287.10       0
+2026-10-22T10:05:41.458002348Z    268435456      67108864     float     sum      -1   892.50  300.77  300.77       0   893.98  300.27  300.27       0
+2026-10-22T10:05:41.873794680Z    536870912     134217728     float     sum      -1  1695.51  316.64  316.64       0  1697.58  316.26  316.26       0
+2026-10-22T10:05:42.643931130Z   1073741824     268435456     float     sum      -1  3249.48  330.44  330.44       0  3261.93  329.17  329.17       0
+2026-10-22T10:05:44.113693614Z   2147483648     536870912     float     sum      -1  6330.37  339.24  339.24       0  6330.68  339.22  339.22       0
+2026-10-22T10:05:46.957710118Z   4294967296    1073741824     float     sum      -1  12393.8  346.54  346.54       0  12338.4  348.10  348.10       0
+2026-10-22T10:05:52.576754548Z   8589934592    2147483648     float     sum      -1  24557.0  349.80  349.80       0  24569.1  349.62  349.62       0
+2026-10-22T10:06:03.700099053Z  17179869184    4294967296     float     sum      -1  48733.6  352.53  352.53       0  48740.7  352.47  352.47       0
+2026-10-22T10:06:03.702839389Z            8             2     float     sum      -1     9.60    0.00    0.00       0     6.23    0.00    0.00       0
+2026-10-22T10:06:03.705263089Z           16             4     float     sum      -1     6.27    0.00    0.00       0     6.23    0.00    0.00       0
+2026-10-22T10:06:03.707929544Z           32             8     float     sum      -1     7.52    0.00    0.00       0     6.24    0.01    0.01       0
+2026-10-22T10:06:03.710396985Z           64            16     float     sum      -1     6.37    0.01    0.01       0     6.30    0.01    0.01       0
+2026-10-22T10:06:03.712844036Z          128            32     float     sum      -1     6.42    0.02    0.02       0     6.31    0.02    0.02       0
+2026-10-22T10:06:03.715295207Z          256            64     float     sum      -1     6.49    0.04    0.04       0     6.29    0.04    0.04       0
+2026-10-22T10:06:03.718175625Z          512           128     float     sum      -1     9.80    0.05    0.05       0     6.40    0.08    0.08       0
+2026-10-22T10:06:03.720829649Z         1024           256     float     sum      -1     7.20    0.14    0.14       0     6.40    0.16    0.16       0
+2026-10-22T10:06:03.723329301Z         2048           512     float     sum      -1     6.66    0.31    0.31       0     6.46    0.32    0.32       0
+2026-10-22T10:06:03.725880643Z         4096          1024     float     sum      -1     6.78    0.60    0.60       0     6.66    0.61    0.61       0
+2026-10-22T10:06:03.728495247Z         8192          2048     float     sum      -1     7.26    1.13    1.13       0     7.07    1.16    1.16       0
+2026-10-22T10:06:03.732269550Z        16384          4096     float     sum      -1     7.40    2.22    2.22       0     7.23    2.27    2.27       0
+2026-10-22T10:06:03.738115487Z        32768          8192     float     sum      -1     7.48    4.38    4.38       0     7.30    4.49    4.49       0
+2026-10-22T10:06:03.748148005Z        65536         16384     float     sum      -1     7.59    8.64    8.64       0     7.38    8.88    8.88       0
+2026-10-22T10:06:03.766587652Z       131072         32768     float     sum      -1     7.89   16.61   16.61       0     7.70   17.01   17.01       0
+2026-10-22T10:06:03.802050143Z       262144         65536     float     sum      -1     9.05   28.96   28.96       0     9.09   28.83   28.83       0
+2026-10-22T10:06:03.837842419Z       524288        131072     float     sum      -1    11.00   47.66   47.66       0    10.91   48.07   48.07       0
+2026-10-22T10:06:03.874587162Z      1048576        262144     float     sum      -1    15.46   67.82   67.82       0    15.26   68.72   68.72       0
+2026-10-22T10:06:03.914055540Z      2097152        524288     float     sum      -1    28.60   73.33   73.33       0    28.49   73.62   73.62       0
+2026-10-22T10:06:03.954869521Z      4194304       1048576     float     sum      -1    34.35  122.11  122.11       0    34.00  123.36  123.36       0
+2026-10-22T10:06:03.998777883Z      8388608       2097152     float     sum      -1    48.49  173.00  173.00       0    47.77  175.60  175.60       0
+2026-10-22T10:06:04.049180674Z     16777216       4194304     float     sum      -1    78.08  214.88  214.88       0    75.47  222.30  222.30       0
+2026-10-22T10:06:04.113007968Z     33554432       8388608     float     sum      -1   137.65  243.77  243.77       0   136.49  245.84  245.84       0
+2026-10-22T10:06:04.202665052Z     67108864      16777216     float     sum      -1   248.64  269.90  269.90       0   248.24  270.34  270.34       0
+2026-10-22T10:06:04.340172885Z    134217728      33554432     float     sum      -1   467.81  286.91  286.91       0   468.52  286.47  286.47       0
+2026-10-22T10:06:04.574696614Z    268435456      67108864     float     sum      -1   892.67  300.71  300.71       0   894.43  300.12  300.12       0
+2026-10-22T10:06:04.992710433Z    536870912     134217728     float     sum      -1  1707.88  314.35  314.35       0  1707.27  314.46  314.46       0
+2026-10-22T10:06:05.763266780Z   1073741824     268435456     float     sum      -1  3262.35  329.13  329.13       0  3261.07  329.26  329.26       0
+2026-10-22T10:06:07.223837181Z   2147483648     536870912     float     sum      -1  6289.03  341.47  341.47       0  6289.86  341.42  341.42       0
+2026-10-22T10:06:10.066636665Z   4294967296    1073741824     float     sum      -1  12376.9  347.02  347.02       0  12342.6  347.98  347.98       0
+2026-10-22T10:06:15.677724173Z   8589934592    2147483648     float     sum      -1  24496.0  350.67  350.67       0  24557.7  349.79  349.79       0
+2026-10-22T10:06:26.834705249Z  17179869184    4294967296     float     sum      -1  48988.7  350.69  350.69       0  48794.2  352.09  352.09       0
+2026-10-22T10:06:26.837543747Z            8             2     float     sum      -1     9.61    0.00    0.00       0     6.20    0.00    0.00       0
+2026-10-22T10:06:26.840010748Z           16             4     float     sum      -1     6.29    0.00    0.00       0     6.27    0.00    0.00       0
+2026-10-22T10:06:26.842685013Z           32             8     float     sum      -1     7.50    0.00    0.00       0     6.31    0.01    0.01       0
+2026-10-22T10:06:26.845163854Z           64            16     float     sum      -1     6.38    0.01    0.01       0     6.28    0.01    0.01       0
+2026-10-22T10:06:26.847642675Z          128            32     float     sum      -1     6.46    0.02    0.02       0     6.26    0.02    0.02       0
+2026-10-22T10:06:26.850932440Z          256            64     float     sum      -1    10.48    0.02    0.02       0     6.35    0.04    0.04       0
+2026-10-22T10:06:26.853809508Z          512           128     float     sum      -1     9.80    0.05    0.05       0     6.47    0.08    0.08       0
+2026-10-22T10:06:26.856533404Z         1024           256     float     sum      -1     7.71    0.13    0.13       0     6.43    0.16    0.16       0
+2026-10-22T10:06:26.859053366Z         2048           512     float     sum      -1     6.71    0.31    0.31       0     6.51    0.31    0.31       0
+2026-10-22T10:06:26.861627248Z         4096          1024     float     sum      -1     6.79    0.60    0.60       0     6.66    0.61    0.61       0
+2026-10-22T10:06:26.864276053Z         8192          2048     float     sum      -1     7.26    1.13    1.13       0     7.07    1.16    1.16       0
+2026-10-22T10:06:26.868015585Z        16384          4096     float     sum      -1     7.41    2.21    2.21       0     7.25    2.26    2.26       0
+2026-10-22T10:06:26.873867893Z        32768          8192     float     sum      -1     7.48    4.38    4.38       0     7.30    4.49    4.49       0
+2026-10-22T10:06:26.883941601Z        65536         16384     float     sum      -1     7.63    8.59    8.59       0     7.42    8.83    8.83       0
+2026-10-22T10:06:26.902487189Z       131072         32768     float     sum      -1     7.91   16.56   16.56       0     7.81   16.79   16.79       0
+2026-10-22T10:06:26.938022692Z       262144         65536     float     sum      -1     9.08   28.86   28.86       0     9.10   28.79   28.79       0
+2026-10-22T10:06:26.973929830Z       524288        131072     float     sum      -1    11.04   47.49   47.49       0    10.92   48.00   48.00       0
+2026-10-22T10:06:27.010777035Z      1048576        262144     float     sum      -1    15.45   67.87   67.87       0    15.31   68.50   68.50       0
+2026-10-22T10:06:27.050447157Z      2097152        524288     float     sum      -1    28.57   73.42   73.42       0    28.46   73.70   73.70       0
+2026-10-22T10:06:27.091373869Z      4194304       1048576     float     sum      -1    34.28  122.34  122.34       0    34.00  123.34  123.34       0
+2026-10-22T10:06:27.135545475Z      8388608       2097152     float     sum      -1    48.77  172.01  172.01       0    47.75  175.67  175.67       0
+2026-10-22T10:06:27.185723041Z     16777216       4194304     float     sum      -1    78.25  214.42  214.42       0    75.71  221.58  221.58       0
+2026-10-22T10:06:27.250610413Z     33554432       8388608     float     sum      -1   137.47  244.09  244.09       0   136.61  245.63  245.63       0
+2026-10-22T10:06:27.338565570Z     67108864      16777216     float     sum      -1   248.94  269.58  269.58       0   247.91  270.69  270.69       0
+2026-10-22T10:06:27.476771104Z    134217728      33554432     float     sum      -1   467.57  287.05  287.05       0   467.10  287.34  287.34       0
+2026-10-22T10:06:27.711343764Z    268435456      67108864     float     sum      -1   893.63  300.39  300.39       0   893.47  300.44  300.44       0
+2026-10-22T10:06:28.128703423Z    536870912     134217728     float     sum      -1  1698.86  316.02  316.02       0  1707.93  314.34  314.34       0
+2026-10-22T10:06:28.900738424Z   1073741824     268435456     float     sum      -1  3265.80  328.78  328.78       0  3260.52  329.32  329.32       0
+2026-10-22T10:06:30.366686213Z   2147483648     536870912     float     sum      -1  6317.13  339.95  339.95       0  6315.53  340.03  340.03       0
+2026-10-22T10:06:33.204005327Z   4294967296    1073741824     float     sum      -1  12330.3  348.33  348.33       0  12324.2  348.50  348.50       0
+2026-10-22T10:06:38.810714981Z   8589934592    2147483648     float     sum      -1  24440.8  351.46  351.46       0  24556.4  349.80  349.80       0
+2026-10-22T10:06:49.981722062Z  17179869184    4294967296     float     sum      -1  48954.5  350.94  350.94       0  49001.5  350.60  350.60       0
+2026-10-22T10:06:49.984537459Z            8             2     float     sum      -1     9.57    0.00    0.00       0     6.22    0.00    0.00       0
+2026-10-22T10:06:49.987004030Z           16             4     float     sum      -1     6.26    0.00    0.00       0     6.27    0.00    0.00       0
+2026-10-22T10:06:49.989722015Z           32             8     float     sum      -1     7.48    0.00    0.00       0     6.34    0.01    0.01       0
+2026-10-22T10:06:49.992249638Z           64            16     float     sum      -1     6.39    0.01    0.01       0     6.39    0.01    0.01       0
+2026-10-22T10:06:49.994770389Z          128            32     float     sum      -1     6.48    0.02    0.02       0     6.33    0.02    0.02       0
+2026-10-22T10:06:49.997262461Z          256            64     float     sum      -1     6.51    0.04    0.04       0     6.31    0.04    0.04       0
+2026-10-22T10:06:50.000202530Z          512           128     float     sum      -1     9.81    0.05    0.05       0     6.38    0.08    0.08       0
+2026-10-22T10:06:50.002941736Z         1024           256     float     sum      -1     7.72    0.13    0.13       0     6.44    0.16    0.16       0
+2026-10-22T10:06:50.005486268Z         2048           512     float     sum      -1     6.63    0.31    0.31       0     6.49    0.32    0.32       0
+2026-10-22T10:06:50.008113582Z         4096          1024     float     sum      -1     6.83    0.60    0.60       0     6.70    0.61    0.61       0
+2026-10-22T10:06:50.010802386Z         8192          2048     float     sum      -1     7.22    1.13    1.13       0     7.12    1.15    1.15       0
+2026-10-22T10:06:50.014602340Z        16384          4096     float     sum      -1     7.40    2.21    2.21       0     7.27    2.25    2.25       0
+2026-10-22T10:06:50.020576310Z        32768          8192     float     sum      -1     7.50    4.37    4.37       0     7.30    4.49    4.49       0
+2026-10-22T10:06:50.030890731Z        65536         16384     float     sum      -1     7.61    8.62    8.62       0     7.41    8.84    8.84       0
+2026-10-22T10:06:50.049504552Z       131072         32768     float     sum      -1     7.91   16.58   16.58       0     7.77   16.87   16.87       0
+2026-10-22T10:06:50.085060195Z       262144         65536     float     sum      -1     9.18   28.56   28.56       0     9.03   29.03   29.03       0
+2026-10-22T10:06:50.121410311Z       524288        131072     float     sum      -1    11.10   47.23   47.23       0    10.94   47.93   47.93       0
+2026-10-22T10:06:50.158129682Z      1048576        262144     float     sum      -1    15.55   67.44   67.44       0    15.26   68.69   68.69       0
+2026-10-22T10:06:50.197888476Z      2097152        524288     float     sum      -1    28.62   73.28   73.28       0    28.44   73.73   73.73       0
+2026-10-22T10:06:50.238791267Z      4194304       1048576     float     sum      -1    34.44  121.78  121.78       0    34.08  123.07  123.07       0
+2026-10-22T10:06:50.282654108Z      8388608       2097152     float     sum      -1    48.68  172.33  172.33       0    47.62  176.14  176.14       0
+2026-10-22T10:06:50.333592888Z     16777216       4194304     float     sum      -1    77.91  215.33  215.33       0    75.86  221.15  221.15       0
+2026-10-22T10:06:50.397027016Z     33554432       8388608     float     sum      -1   137.47  244.09  244.09       0   136.40  245.99  245.99       0
+2026-10-22T10:06:50.485957698Z     67108864      16777216     float     sum      -1   248.18  270.40  270.40       0   248.62  269.93  269.93       0
+2026-10-22T10:06:50.624373405Z    134217728      33554432     float     sum      -1   468.69  286.37  286.37       0   468.22  286.65  286.65       0
+2026-10-22T10:06:50.858663321Z    268435456      67108864     float     sum      -1   893.26  300.51  300.51       0   892.89  300.64  300.64       0
+2026-10-22T10:06:51.274457583Z    536870912     134217728     float     sum      -1  1701.99  315.44  315.44       0  1693.73  316.98  316.98       0
+2026-10-22T10:06:52.046724849Z   1073741824     268435456     float     sum      -1  3269.41  328.42  328.42       0  3263.51  329.01  329.01       0
+2026-10-22T10:06:53.511951757Z   2147483648     536870912     float     sum      -1  6311.29  340.26  340.26       0  6315.32  340.04  340.04       0
+2026-10-22T10:06:56.350721365Z   4294967296    1073741824     float     sum      -1  12342.5  347.98  347.98       0  12327.2  348.41  348.41       0
+2026-10-22T10:07:01.954070683Z   8589934592    2147483648     float     sum      -1  24507.9  350.50  350.50       0  24472.3  351.01  351.01       0
+2026-10-22T10:07:13.122212766Z  17179869184    4294967296     float     sum      -1  48991.3  350.67  350.67       0  48935.8  351.07  351.07       0
+2026-10-22T10:07:13.125023512Z            8             2     float     sum      -1     9.66    0.00    0.00       0     6.27    0.00    0.00       0
+2026-10-22T10:07:13.127468832Z           16             4     float     sum      -1     6.27    0.00    0.00       0     6.23    0.00    0.00       0
+2026-10-22T10:07:13.130160407Z           32             8     float     sum      -1     7.52    0.00    0.00       0     6.29    0.01    0.01       0
+2026-10-22T10:07:13.132610618Z           64            16     float     sum      -1     6.34    0.01    0.01       0     6.24    0.01    0.01       0
+2026-10-22T10:07:13.135100340Z          128            32     float     sum      -1     6.50    0.02    0.02       0     6.34    0.02    0.02       0
+2026-10-22T10:07:13.137586342Z          256            64     float     sum      -1     6.47    0.04    0.04       0     6.32    0.04    0.04       0
+2026-10-22T10:07:13.140461040Z          512           128     float     sum      -1     9.82    0.05    0.05       0     6.51    0.08    0.08       0
+2026-10-22T10:07:13.143218505Z         1024           256     float     sum      -1     7.73    0.13    0.13       0     6.57    0.16    0.16       0
+2026-10-22T10:07:13.145779768Z         2048           512     float     sum      -1     6.74    0.30    0.30       0     6.50    0.32    0.32       0
+2026-10-22T10:07:13.148381961Z         4096          1024     float     sum      -1     6.83    0.60    0.60       0     6.70    0.61    0.61       0
+2026-10-22T10:07:13.151067756Z         8192          2048     float     sum      -1     7.23    1.13    1.13       0     7.08    1.16    1.16       0
+2026-10-22T10:07:13.154893240Z        16384          4096     float     sum      -1     7.38    2.22    2.22       0     7.27    2.25    2.25       0
+2026-10-22T10:07:13.160845469Z        32768          8192     float     sum      -1     7.52    4.36    4.36       0     7.31    4.48    4.48       0
+2026-10-22T10:07:13.171183622Z        65536         16384     float     sum      -1     7.63    8.59    8.59       0     7.43    8.82    8.82       0
+2026-10-22T10:07:13.190062086Z       131072         32768     float     sum      -1     7.84   16.73   16.73       0     7.73   16.95   16.95       0
+2026-10-22T10:07:13.225540768Z       262144         65536     float     sum      -1     9.11   28.79   28.79       0     9.08   28.86   28.86       0
+2026-10-22T10:07:13.261680840Z       524288        131072     float     sum      -1    11.04   47.49   47.49       0    10.90   48.10   48.10       0
+2026-10-22T10:07:13.298335121Z      1048576        262144     float     sum      -1    15.41   68.03   68.03       0    15.26   68.72   68.72       0
+2026-10-22T10:07:13.337982222Z      2097152        524288     float     sum      -1    28.64   73.22   73.22       0    28.42   73.80   73.80       0
+2026-10-22T10:07:13.378878304Z      4194304       1048576     float     sum      -1    34.26  122.42  122.42       0    33.91  123.69  123.69       0
+2026-10-22T10:07:13.423046810Z      8388608       2097152     float     sum      -1    48.63  172.51  172.51       0    47.80  175.51  175.51       0
+2026-10-22T10:07:13.473148556Z     16777216       4194304     float     sum      -1    77.70  215.91  215.91       0    75.46  222.32  222.32       0
+2026-10-22T10:07:13.537622601Z     33554432       8388608     float     sum      -1   137.79  243.52  243.52       0   136.08  246.57  246.57       0
+2026-10-22T10:07:13.625932083Z     67108864      16777216     float     sum      -1   247.96  270.64  270.64       0   248.63  269.91  269.91       0
+2026-10-22T10:07:13.764227839Z    134217728      33554432     float     sum      -1   468.25  286.63  286.63       0   467.55  287.07  287.07       0
+2026-10-22T10:07:13.999668933Z    268435456      67108864     float     sum      -1   892.57  300.74  300.74       0   893.63  300.39  300.39       0
+2026-10-22T10:07:14.415575018Z    536870912     134217728     float     sum      -1  1701.04  315.61  315.61       0  1700.62  315.69  315.69       0
+2026-10-22T10:07:15.186782965Z   1073741824     268435456     float     sum      -1  3265.69  328.80  328.80       0  3259.51  329.42  329.42       0
+2026-10-22T10:07:16.652630924Z   2147483648     536870912     float     sum      -1  6303.29  340.69  340.69       0  6320.94  339.74  339.74       0
+2026-10-22T10:07:19.497998151Z   4294967296    1073741824     float     sum      -1  12367.5  347.28  347.28       0  12375.7  347.05  347.05       0
+2026-10-22T10:07:25.111122092Z   8589934592    2147483648     float     sum      -1  24594.9  349.26  349.26       0  24476.6  350.94  350.94       0
+2026-10-22T10:07:36.255695663Z  17179869184    4294967296     float     sum      -1  48730.6  352.55  352.55       0  48947.8  350.98  350.98       0
+2026-10-22T10:07:36.547712862Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO comm 0x64f3d7bb4b30 rank 1 nranks 2 cudaDev 1 busId 6000 - Destroy COMPLETE
+2026-10-22T10:07:36.617033678Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO comm 0x577a7075f0c0 rank 0 nranks 2 cudaDev 0 busId 5000 - Destroy COMPLETE
+2026-10-22T10:07:36.644548576Z # Out of bounds values : 0 OK
+2026-10-22T10:07:36.644559426Z # Avg bus bandwidth    : 122.024 
+2026-10-22T10:07:36.644561136Z #
+2026-10-22T10:07:36.644562866Z # Collective test concluded: all_reduce_perf_mpi
+2026-10-22T10:07:36.644564376Z #
+2026-10-22T10:07:36.702344729Z 
+2026-10-22T10:07:36.890753841Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:583:583 [0] NCCL INFO ENV/Plugin: Closing env plugin ncclEnvDefault
+2026-10-22T10:07:36.890770741Z eu1-fin-h200-communicatio-c154b-job-workload-node-0-0:584:584 [1] NCCL INFO ENV/Plugin: Closing env plugin ncclEnvDefault

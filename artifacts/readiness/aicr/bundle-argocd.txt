@@ -1,0 +1,117 @@
+# aicr bundle --deployer argocd of recipe-k0s-h200-training.yaml, 2026-10-21T08:05:42Z
+# The bundle itself: bundle-argocd.tar.gz, AICR's output untouched (checksums.txt verified).
+# Reference only: nothing here is synced to a cluster.
+  001-cert-manager/application.yaml
+  001-cert-manager/values.yaml
+  002-nfd/application.yaml
+  002-nfd/values.yaml
+  003-nodewright-operator/application.yaml
+  003-nodewright-operator/values.yaml
+  004-prometheus-operator-crds/application.yaml
+  004-prometheus-operator-crds/values.yaml
+  005-kube-prometheus-stack/application.yaml
+  005-kube-prometheus-stack/values.yaml
+  006-gpu-operator/application.yaml
+  006-gpu-operator/values.yaml
+  007-k8s-ephemeral-storage-metrics/application.yaml
+  007-k8s-ephemeral-storage-metrics/values.yaml
+  008-kai-scheduler/application.yaml
+  008-kai-scheduler/values.yaml
+  009-nvidia-dra-driver-gpu/application.yaml
+  009-nvidia-dra-driver-gpu/values.yaml
+  010-nvsentinel/application.yaml
+  010-nvsentinel/values.yaml
+  011-prometheus-adapter/application.yaml
+  011-prometheus-adapter/values.yaml
+  app-of-apps.yaml
+  bundle-info.yaml
+  checksums.txt
+  README.md
+  recipe.yaml
+  UPGRADING.md
+
+# bundle-info.yaml
+apiVersion: aicr.run/v1
+build:
+  deployer: argocd
+  recipe:
+    digest: sha256:304c71ddd19d4e0059d30e3e057a25dc3823c53813439f13235be7733079934e
+    path: recipe.yaml
+    version: 1.1.0
+  settings:
+    appName: nvidia-stack
+    attested: false
+    checksums: true
+    nodeScheduling:
+      accelerated:
+        tolerations:
+          - operator: Exists
+      system:
+        tolerations:
+          - operator: Exists
+    readinessHooks: false
+    repoURL: https://github.com/yassineteimi/ncp-partner-onboarding
+    serial: false
+    targetRevision: main
+    vendorCharts: false
+kind: BundleInfo
+layout:
+  entrypoint: app-of-apps.yaml
+  releases:
+    - component: cert-manager
+      manifest: 001-cert-manager/application.yaml
+      name: cert-manager
+      namespace: cert-manager
+      path: 001-cert-manager
+    - component: nfd
+      manifest: 002-nfd/application.yaml
+      name: nfd
+      namespace: node-feature-discovery
+      path: 002-nfd
+    - component: nodewright-operator
+      manifest: 003-nodewright-operator/application.yaml
+      name: nodewright-operator
+      namespace: nodewright
+      path: 003-nodewright-operator
+    - component: prometheus-operator-crds
+      manifest: 004-prometheus-operator-crds/application.yaml
+      name: prometheus-operator-crds
+      namespace: monitoring
+      path: 004-prometheus-operator-crds
+    - component: kube-prometheus-stack
+      manifest: 005-kube-prometheus-stack/application.yaml
+      name: kube-prometheus-stack
+      namespace: monitoring
+      path: 005-kube-prometheus-stack
+    - component: gpu-operator
+      manifest: 006-gpu-operator/application.yaml
+      name: gpu-operator
+      namespace: gpu-operator
+      path: 006-gpu-operator
+    - component: k8s-ephemeral-storage-metrics
+      manifest: 007-k8s-ephemeral-storage-metrics/application.yaml
+      name: k8s-ephemeral-storage-metrics
+      namespace: monitoring
+      path: 007-k8s-ephemeral-storage-metrics
+    - component: kai-scheduler
+      manifest: 008-kai-scheduler/application.yaml
+      name: kai-scheduler
+      namespace: kai-scheduler
+      path: 008-kai-scheduler
+    - component: nvidia-dra-driver-gpu
+      manifest: 009-nvidia-dra-driver-gpu/application.yaml
+      name: nvidia-dra-driver-gpu
+      namespace: nvidia-dra-driver
+      path: 009-nvidia-dra-driver-gpu
+    - component: nvsentinel
+      manifest: 010-nvsentinel/application.yaml
+      name: nvsentinel
+      namespace: nvsentinel
+      path: 010-nvsentinel
+    - component: prometheus-adapter
+      manifest: 011-prometheus-adapter/application.yaml
+      name: prometheus-adapter
+      namespace: monitoring
+      path: 011-prometheus-adapter
+metadata:
+  version: 1.1.0

@@ -1,0 +1,6 @@
+staged=2026-10-21T17:23:23Z node=eu1-par-gpu-01 taint=eu1.io/staging=pending:NoSchedule
+certify_started=2026-10-21T17:23:29Z node=eu1-par-gpu-01 name=eu1-par-172328 image=catalog
+certify_ended=2026-10-21T17:25:27Z name=eu1-par-172328 exit=0
+diag_started=2026-10-21T17:25:33Z node=eu1-par-gpu-01 level=2 via=workloadrun
+diag_ended=2026-10-21T17:25:44Z diag_result=PASS
+promoted=2026-10-21T17:25:54Z node=eu1-par-gpu-01

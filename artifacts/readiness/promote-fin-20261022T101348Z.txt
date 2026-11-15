@@ -1,0 +1,13 @@
+# promote.py at 2026-10-22T10:13:48Z, inputs docs/artifacts/readiness/nvcre-fin-20261022T100307Z.json and docs/artifacts/readiness/diag-fin-20261022T101241Z.log
+taints before:
+eu1.io/staging=pending:NoSchedule
+PASS certification result is 'PASSED'
+PASS eu1-fin-gpu-01 not excluded
+PASS communication/nccl-all-reduce Succeeded, max busBW 351.45 GB/s
+PASS communication/nccl-loopback-nvswitch Succeeded, max busBW 351.87 GB/s
+PASS dcgmi diag passed
+PASS NCCL channels over NVLink: 104 lines
+PASS NCCL channels over the network: 0 lines
+PROMOTE eu1-fin-gpu-01
+node/eu1-fin-gpu-01 untainted
+taints after:

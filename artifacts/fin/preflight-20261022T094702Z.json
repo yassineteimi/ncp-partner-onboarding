@@ -1,0 +1,49 @@
+{
+  "checked_at": "2026-10-22T09:47:06Z",
+  "verdict": "go",
+  "reason": "",
+  "cp_only": true,
+  "gpu": {
+    "type": "2H200.141S.88V",
+    "location": "FIN-02",
+    "spot": false,
+    "price_per_hour": "11.66",
+    "orderable_on_demand_in": "FIN-02",
+    "orderable_on_spot_in": "FIN-02",
+    "fallback_2RTXPRO6000_on_demand_in": "FIN-02 FIN-03"
+  },
+  "control_plane": {
+    "type": "CPU.16V.64G",
+    "price_per_hour": "0.1920"
+  },
+  "disks": {
+    "nvme_gb": 100,
+    "price_per_hour": "0.0273972602739726"
+  },
+  "budget": {
+    "hours": 2,
+    "cost": 0.4387945205479452,
+    "required_balance": 0.6581917808219178,
+    "balance": {
+      "amount": 49.95816,
+      "currency": "usd"
+    }
+  },
+  "images": {
+    "gpu": {
+      "type": "26.04.cuda13.4",
+      "id": "d42bf255-0547-4aeb-94ac-c5c0138e6bba",
+      "name": "Ubuntu 26.04 + CUDA 13.4 Open",
+      "driver": "580.178.04 (from docs/artifacts/fin/image-inventory-20261020T075300Z-rehearsal.txt)"
+    },
+    "control_plane": {
+      "type": "26.04.base",
+      "id": "6c93c8b3-4f48-4252-82b3-f199fb9b701b"
+    }
+  },
+  "leftovers": {
+    "instances": [],
+    "volumes": [],
+    "trash": []
+  }
+}

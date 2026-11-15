@@ -1,0 +1,11 @@
+[cli] CLI flag overriding config value: flag=fail-on-error config=true override=false
+[cli] validating against the live cluster -- validator Jobs will be deployed to the active kube-context
+[cli] loading recipe: uri=./docs/artifacts/readiness/aicr/recipe-k0s-h200-training.yaml
+[cli] loading snapshot: uri=./docs/artifacts/readiness/aicr/snapshot-fin-20261022T101356Z.yaml
+[cli] running validation: phases=[deployment]
+[cli] running validation phases: runID=20261022-121408-e98fee231cccba55 phases=[deployment]
+[cli] readiness pre-flight: constraints=3
+[cli] readiness constraint passed: name=K8s.server.version expected=>= 1.34 actual=v1.36.5
+[cli] readiness constraint passed: name=OS.release.ID expected=ubuntu actual=ubuntu
+[cli] command failed: error=[INVALID_REQUEST] readiness check failed: OS.release.VERSION_ID expected 24.04, got 26.04 exitCode=2
+aicr validate exit=2 (2 = readiness pre-flight failed)

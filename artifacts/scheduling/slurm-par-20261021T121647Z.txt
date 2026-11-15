@@ -1,0 +1,94 @@
+# slurm on par, 20261021T121647Z, laptop clock, UTC. git 000962a
+
+## 1. The cluster, from Kubernetes   [12:16:47Z]
+NAME                                    READY   STATUS      RESTARTS   AGE   IP             NODE             NOMINATED NODE   READINESS GATES
+slurm-controller-0                      2/2     Running     0          27m   10.244.1.71    eu1-par-cpu-01   <none>           <none>
+slurm-keys-bootstrap-nrl9v              0/1     Completed   0          39m   10.244.0.116   eu1-par-cp-01    <none>           <none>
+slurm-login-hpc-695c7d78bb-xwhp7        1/1     Running     0          39m   10.244.1.67    eu1-par-cpu-01   <none>           <none>
+slurm-operator-cd499cbf-tcpxg           1/1     Running     0          35s   10.244.1.75    eu1-par-cpu-01   <none>           <none>
+slurm-operator-webhook-b884494f-9h9m7   1/1     Running     0          35s   10.244.1.74    eu1-par-cpu-01   <none>           <none>
+slurm-restapi-f4c9455c9-6vmpw           1/1     Running     0          39m   10.244.1.66    eu1-par-cpu-01   <none>           <none>
+slurm-worker-cpu-0                      2/2     Running     0          27m   10.244.1.72    eu1-par-cpu-01   <none>           <none>
+slurm-worker-cpu-1                      2/2     Running     0          27m   10.244.1.73    eu1-par-cpu-01   <none>           <none>
+NAME                                AGE
+controller.slinky.slurm.net/slurm   39m
+
+NAME                                        DESIRED   REPLICAS   UPDATED   READY   AGE
+nodeset.slinky.slurm.net/slurm-worker-cpu   2         2          2         2       38m
+
+NAME                                        REPLICAS   AGE
+loginset.slinky.slurm.net/slurm-login-hpc   1          39m
+
+NAME                             AGE
+restapi.slinky.slurm.net/slurm   39m
+Slurm nodes: cpu-0 (slurm-worker-cpu-0), cpu-1 (slurm-worker-cpu-1); login: pod/slurm-login-hpc-695c7d78bb-xwhp7
+
+## 1. The cluster, from Slurm   [12:16:49Z]
+PARTITION AVAIL  TIMELIMIT  NODES  STATE NODELIST
+cpu*         up   infinite      2   idle cpu-[0-1]
+
+Wed Oct 21 12:16:49 2026
+NODELIST   NODES PARTITION       STATE CPUS    S:C:T MEMORY TMP_DISK WEIGHT AVAIL_FE REASON              
+cpu-0          1      cpu*        idle 8       1:8:1  32089        0      1      cpu none                
+cpu-1          1      cpu*        idle 8       1:8:1  32089        0      1      cpu none                
+
+PartitionName=cpu
+   AllowGroups=ALL AllowAccounts=ALL AllowQos=ALL
+   AllocNodes=ALL Default=YES QoS=N/A
+   DefaultTime=NONE DisableRootJobs=NO Exclusive=NO GraceTime=0 Hidden=NO
+   MaxNodes=UNLIMITED MaxTime=UNLIMITED MinNodes=0 LLN=NO MaxCPUsPerNode=UNLIMITED MaxCPUsPerSocket=UNLIMITED
+   NodeSets=cpu
+   Nodes=cpu-[0-1]
+   PriorityJobFactor=1 PriorityTier=1 RootOnly=NO ReqResv=NO OverSubscribe=NO
+   OverTimeLimit=NONE PreemptMode=OFF
+   State=UP TotalCPUs=16 TotalNodes=2 SelectTypeParameters=NONE
+   JobDefaults=(null)
+   DefMemPerNode=UNLIMITED MaxMemPerNode=UNLIMITED
+   TRES=cpu=4,mem=64178M,node=2,billing=4
+
+
+## 2. srun across both nodes, then sbatch   [12:16:49Z]
+0: cpu-1
+1: cpu-0
+submitted job 5
+after 7s: job 5 completed
+JobId=5 JobName=eu1-hello
+   JobState=COMPLETED Reason=None Dependency=(null)
+   Requeue=1 Restarts=0 BatchFlag=1 Reboot=0 ExitCode=0:0
+   RunTime=00:00:05 TimeLimit=365-00:00:00 TimeMin=N/A
+   ReqNodeList=(null) ExcNodeList=(null)
+   NodeList=cpu-1
+
+## 3. Prolog health check: SIMULATED fault on cpu-0   [12:16:57Z]
+marker /var/run/eu1-simulated-fault created in slurm-worker-cpu-0 at 12:16:58Z
+submitted job 6 to cpu-0
+after 1s: cpu-0 drained by the prolog
+REASON               USER      TIMESTAMP           NODELIST
+Prolog error         slurm     2026-10-21T12:16:59 cpu-0
+
+JobId=6 JobName=eu1-on-faulty
+   JobState=PENDING Reason=launch_failed_requeued_held Dependency=(null)
+### fix: remove the marker, resume the node, release the held job
+after 160s: job 6 completed after the fix
+NODELIST   NODES PARTITION STATE 
+cpu-0          1      cpu* idle  
+JobId=6 JobName=eu1-on-faulty
+   JobState=COMPLETED Reason=None Dependency=(null)
+   Requeue=1 Restarts=1 BatchFlag=2 Reboot=0 ExitCode=0:0
+   ReqNodeList=cpu-0 ExcNodeList=(null)
+   NodeList=cpu-0
+
+## 4. Kubernetes to Slurm: nodeset.slinky.slurm.net/pod-cordon=true on slurm-worker-cpu-1   [12:19:42Z]
+pod/slurm-worker-cpu-1 annotated
+after 6s: cpu-1 drained by the operator
+REASON               USER      TIMESTAMP           NODELIST
+slurm-operator: Pod  slurm     2026-10-21T12:19:43 cpu-1
+SlurmNodeStateDrain=True message="slurm-operator: Pod (slurm/slurm-worker-cpu-1) was cordoned" since 2026-10-21T12:19:45Z
+pod/slurm-worker-cpu-1 annotated
+after 6s: cpu-1 back to idle
+NODELIST   NODES PARTITION STATE 
+cpu-0          1      cpu* idle  
+cpu-1          1      cpu* idle  
+
+## Result   [12:19:57Z]
+jobs ran from the login pod; prolog and Kubernetes drains both seen from Slurm and Kubernetes

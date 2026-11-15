@@ -1,0 +1,63 @@
+# mig-whole-gpu on fin, 20261022T102435Z, laptop clock, UTC. git 1932605
+# Why team-a/whole-a (nvidia.com/gpu: 1) stayed Pending next to h200-split in mig-fin-20261022T101643Z.txt.
+
+## Node eu1-fin-gpu-01: labels and allocatable
+mig.config=h200-split state=success gpu.count=2 gpu.product=NVIDIA-H200
+"nvidia.com/gpu":"1"
+"nvidia.com/mig-3g.71gb":"2"
+
+## Pods holding GPUs on eu1-fin-gpu-01
+readiness-runs/eu1-fin-diag-101242-job-workload-node-0-0-8sz48 Succeeded {"nvidia.com/gpu":"2"}
+readiness-runs/eu1-fin-h200-communicatio-a82b3-job-workload-node-0-0-mhw4m Succeeded {"nvidia.com/gpu":"2"}
+
+## Submit whole-a alone   [10:24:36Z]
+pod/whole-a created
+phase after wait: Pending   [10:26:12Z]
+NAME      READY   STATUS    RESTARTS   AGE   IP       NODE     NOMINATED NODE   READINESS GATES
+whole-a   0/1     Pending   0          95s   <none>   <none>   <none>           <none>
+
+## PodGroup conditions
+podgroup.scheduling.run.ai/pg-whole-a-388d847f-caba-4ba1-99a2-7d15c518d67a
+{"resourcesStatus":{"requested":{"nvidia.com/gpu":"1"}},"schedulingConditions":[{"lastTransitionTime":"2026-10-22T10:24:38Z","message":"PodSchedulingErrors: Resources were not found for pod team-a/whole-a due to: no nodes with enough resources were found: 1 node(s) didn't have enough resources: GPUs. \n1 non MIG jobs cant run on a node with MigStrategy='mixed'..","nodePool":"default","reason":"Unschedulable","reasons":[{"message":"Resources were not found for pod team-a/whole-a due to: no nodes with enough resources were found: 1 node(s) didn't have enough resources: GPUs. \n1 non MIG jobs cant run on a node with MigStrategy='mixed'.","reason":"PodSchedulingErrors"}],"status":"True","transitionID":"1","type":"UnschedulableOnNodePool"}]}
+
+## Events for whole-a and its PodGroup
+TIME                   TYPE      REASON              OBJECT                                                     SOURCE                 MESSAGE
+2026-10-22T10:18:10Z   Warning   PodGrouperWarning   whole-a                                                    pod-grouper            Pod "whole-a" not found
+2026-10-22T10:23:12Z   Normal    Unschedulable       pg-whole-a-8fe55b3c-0f94-4587-9ae4-e9794e24bc4b            kai-scheduler          PodSchedulingErrors: Resources were not found for pod team-a/whole-a due to: no nodes with enough resources were found: 1 node(s) didn't have enough resources: GPUs. 
+2026-10-22T10:23:12Z   Warning   Unschedulable       whole-a                                                    kai-scheduler          no nodes with enough resources were found: 1 node(s) didn't have enough resources: GPUs. 
+2026-10-22T10:24:37Z   Warning   PodGrouperWarning   whole-a                                                    pod-grouper            Pod "whole-a" not found
+2026-10-22T10:25:02Z   Normal    Unschedulable       pg-whole-a-388d847f-caba-4ba1-99a2-7d15c518d67a            kai-scheduler          PodSchedulingErrors: Resources were not found for pod team-a/whole-a due to: no nodes with enough resources were found: 1 node(s) didn't have enough resources: GPUs. 
+2026-10-22T10:25:02Z   Warning   Unschedulable       whole-a                                                    kai-scheduler          no nodes with enough resources were found: 1 node(s) didn't have enough resources: GPUs. 
+
+## KAI scheduler log lines about whole-a (last 400 lines)
+2026-10-22T10:26:11.629Z	[34mINFO[0m	reclaim/reclaim.go:122	[[36m24stB0[0m] [[34mreclaim[0m] Attempting to reclaim for job: <team-a/pg-whole-a-388d847f-caba-4ba1-99a2-7d15c518d67a> of queue <Team A>, resources: <[0 0 1 1 0 0 0 0]>
+2026-10-22T10:26:11.629Z	[34mINFO[0m	reclaim/reclaim.go:109	[[36m24stB0[0m] [[34mreclaim[0m] Didn't find a reclaim strategy for job <team-a/pg-whole-a-388d847f-caba-4ba1-99a2-7d15c518d67a>
+2026-10-22T10:26:11.630Z	[34mINFO[0m	preempt/preempt.go:119	[[36m24stB0[0m] [[31mpreempt[0m] Attempting to preempt for job: <team-a/pg-whole-a-388d847f-caba-4ba1-99a2-7d15c518d67a>, priority: <50>, queue: <team-a>, resources: <[0 0 1 1 0 0 0 0]>
+2026-10-22T10:26:11.630Z	[34mINFO[0m	preempt/preempt.go:107	[[36m24stB0[0m] [[31mpreempt[0m] Didn't find a preemption strategy for job <team-a/pg-whole-a-388d847f-caba-4ba1-99a2-7d15c518d67a>
+2026-10-22T10:26:12.633Z	[34mINFO[0m	allocate/allocate.go:85	[[34mzpPKn0[0m] [[32mallocate[0m] Attempting to allocate job: <team-a/pg-whole-a-388d847f-caba-4ba1-99a2-7d15c518d67a> of queue <Team A>, resources: <[0 0 1 1 0 0 0 0]>
+2026-10-22T10:26:12.633Z	[34mINFO[0m	allocate/allocate.go:90	[[34mzpPKn0[0m] [[32mallocate[0m] Could not allocate resources for job: <team-a/pg-whole-a-388d847f-caba-4ba1-99a2-7d15c518d67a> of queue <team-a>
+2026-10-22T10:26:12.634Z	[34mINFO[0m	consolidation/consolidation.go:101	[[34mzpPKn0[0m] [[37mconsolidation[0m] Attempting to consolidate running jobs in order to make room for job: <team-a/pg-whole-a-388d847f-caba-4ba1-99a2-7d15c518d67a>, resources: <[0 0 1 1 0 0 0 0]>
+2026-10-22T10:26:12.634Z	[34mINFO[0m	consolidation/consolidation.go:137	[[34mzpPKn0[0m] [[37mconsolidation[0m] Didn't find a consolidation strategy for job: <team-a/pg-whole-a-388d847f-caba-4ba1-99a2-7d15c518d67a>
+2026-10-22T10:26:12.634Z	[34mINFO[0m	reclaim/reclaim.go:122	[[34mzpPKn0[0m] [[34mreclaim[0m] Attempting to reclaim for job: <team-a/pg-whole-a-388d847f-caba-4ba1-99a2-7d15c518d67a> of queue <Team A>, resources: <[0 0 1 1 0 0 0 0]>
+2026-10-22T10:26:12.635Z	[34mINFO[0m	reclaim/reclaim.go:109	[[34mzpPKn0[0m] [[34mreclaim[0m] Didn't find a reclaim strategy for job <team-a/pg-whole-a-388d847f-caba-4ba1-99a2-7d15c518d67a>
+2026-10-22T10:26:12.635Z	[34mINFO[0m	preempt/preempt.go:119	[[34mzpPKn0[0m] [[31mpreempt[0m] Attempting to preempt for job: <team-a/pg-whole-a-388d847f-caba-4ba1-99a2-7d15c518d67a>, priority: <50>, queue: <team-a>, resources: <[0 0 1 1 0 0 0 0]>
+2026-10-22T10:26:12.635Z	[34mINFO[0m	preempt/preempt.go:107	[[34mzpPKn0[0m] [[31mpreempt[0m] Didn't find a preemption strategy for job <team-a/pg-whole-a-388d847f-caba-4ba1-99a2-7d15c518d67a>
+2026-10-22T10:26:13.639Z	[34mINFO[0m	allocate/allocate.go:85	[[33mD09pAJ[0m] [[32mallocate[0m] Attempting to allocate job: <team-a/pg-whole-a-388d847f-caba-4ba1-99a2-7d15c518d67a> of queue <Team A>, resources: <[0 0 1 1 0 0 0 0]>
+2026-10-22T10:26:13.640Z	[34mINFO[0m	allocate/allocate.go:90	[[33mD09pAJ[0m] [[32mallocate[0m] Could not allocate resources for job: <team-a/pg-whole-a-388d847f-caba-4ba1-99a2-7d15c518d67a> of queue <team-a>
+2026-10-22T10:26:13.640Z	[34mINFO[0m	consolidation/consolidation.go:101	[[33mD09pAJ[0m] [[37mconsolidation[0m] Attempting to consolidate running jobs in order to make room for job: <team-a/pg-whole-a-388d847f-caba-4ba1-99a2-7d15c518d67a>, resources: <[0 0 1 1 0 0 0 0]>
+2026-10-22T10:26:13.640Z	[34mINFO[0m	consolidation/consolidation.go:137	[[33mD09pAJ[0m] [[37mconsolidation[0m] Didn't find a consolidation strategy for job: <team-a/pg-whole-a-388d847f-caba-4ba1-99a2-7d15c518d67a>
+2026-10-22T10:26:13.640Z	[34mINFO[0m	reclaim/reclaim.go:122	[[33mD09pAJ[0m] [[34mreclaim[0m] Attempting to reclaim for job: <team-a/pg-whole-a-388d847f-caba-4ba1-99a2-7d15c518d67a> of queue <Team A>, resources: <[0 0 1 1 0 0 0 0]>
+2026-10-22T10:26:13.641Z	[34mINFO[0m	reclaim/reclaim.go:109	[[33mD09pAJ[0m] [[34mreclaim[0m] Didn't find a reclaim strategy for job <team-a/pg-whole-a-388d847f-caba-4ba1-99a2-7d15c518d67a>
+2026-10-22T10:26:13.641Z	[34mINFO[0m	preempt/preempt.go:119	[[33mD09pAJ[0m] [[31mpreempt[0m] Attempting to preempt for job: <team-a/pg-whole-a-388d847f-caba-4ba1-99a2-7d15c518d67a>, priority: <50>, queue: <team-a>, resources: <[0 0 1 1 0 0 0 0]>
+2026-10-22T10:26:13.641Z	[34mINFO[0m	preempt/preempt.go:107	[[33mD09pAJ[0m] [[31mpreempt[0m] Didn't find a preemption strategy for job <team-a/pg-whole-a-388d847f-caba-4ba1-99a2-7d15c518d67a>
+
+## Queues
+QUEUE                  GPU_QUOTA   ALLOCATED   REQUESTED
+default-parent-queue   0           <none>      <none>
+default-queue          0           <none>      <none>
+eu1                    2           <none>      map[nvidia.com/gpu:1]
+team-a                 1           <none>      map[nvidia.com/gpu:1]
+team-b                 1           <none>      <none>
+
+## Cleanup   [10:26:15Z]
+pod "whole-a" deleted

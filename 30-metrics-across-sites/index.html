@@ -1,0 +1,1548 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Part 2 of my GPU fleet work. Nordhaven, a fictional European GPU cloud partner, goes from hardware handover to its first production workloads on NVIDIA's open stack, across a Paris site and a Finland site on two providers, driven by one Git repository.">
+      
+      
+        <meta name="author" content="Yassine TEIMI">
+      
+      
+        <link rel="canonical" href="https://yassineteimi.github.io/ncp-partner-onboarding/30-metrics-across-sites/">
+      
+      
+        <link rel="prev" href="../21-hpc-slinky/">
+      
+      
+        <link rel="next" href="../30-vm-tenants/">
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.49">
+    
+    
+      
+        <title>Observability with Thanos - Nordhaven: a GPU cloud partner from handover to first workloads</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.6f8fc17f.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../stylesheets/terminal.css">
+    
+      <link rel="stylesheet" href="../stylesheets/diagram-zoom.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="teal" data-md-color-accent="lime">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#observability-with-thanos-one-view-of-every-gpu-across-sites" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Nordhaven: a GPU cloud partner from handover to first workloads" class="md-header__button md-logo" aria-label="Nordhaven: a GPU cloud partner from handover to first workloads" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Nordhaven: a GPU cloud partner from handover to first workloads
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Observability with Thanos
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="teal" data-md-color-accent="lime"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="purple"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 6H7c-3.31 0-6 2.69-6 6s2.69 6 6 6h10c3.31 0 6-2.69 6-6s-2.69-6-6-6m0 10H7c-2.21 0-4-1.79-4-4s1.79-4 4-4h10c2.21 0 4 1.79 4 4s-1.79 4-4 4M7 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/yassineteimi/ncp-partner-onboarding" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    yassineteimi/ncp-partner-onboarding
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../ownership-map/" class="md-tabs__link">
+        
+  
+    
+  
+  AI Factory
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+    
+  
+  PoC Overview
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../architecture/" class="md-tabs__link">
+        
+  
+    
+  
+  Architecture
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../10-day1/" class="md-tabs__link">
+        
+  
+    
+  
+  Day 1
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../10-day2-nvsentinel/" class="md-tabs__link">
+          
+  
+  Day 2
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../simulated/" class="md-tabs__link">
+        
+  
+    
+  
+  What is simulated
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../adr/" class="md-tabs__link">
+          
+  
+  Decisions
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../findings/" class="md-tabs__link">
+        
+  
+    
+  
+  Findings
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Nordhaven: a GPU cloud partner from handover to first workloads" class="md-nav__button md-logo" aria-label="Nordhaven: a GPU cloud partner from handover to first workloads" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Nordhaven: a GPU cloud partner from handover to first workloads
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/yassineteimi/ncp-partner-onboarding" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    yassineteimi/ncp-partner-onboarding
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ownership-map/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AI Factory
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    PoC Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Architecture
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../10-day1/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Day 1
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Day 2
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Day 2
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../10-day2-nvsentinel/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    NVSentinel
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../20-tenancy/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Tenancy: KAI and MIG
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../21-hpc-slinky/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    HPC: Slurm with Slinky
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Observability with Thanos
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Observability with Thanos
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#the-problem" class="md-nav__link">
+    <span class="md-ellipsis">
+      The problem
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-i-built" class="md-nav__link">
+    <span class="md-ellipsis">
+      What I built
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-happened" class="md-nav__link">
+    <span class="md-ellipsis">
+      What happened
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#lessons" class="md-nav__link">
+    <span class="md-ellipsis">
+      Lessons
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#in-one-sentence" class="md-nav__link">
+    <span class="md-ellipsis">
+      In one sentence
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      Setup
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#paris-hub-21-october" class="md-nav__link">
+    <span class="md-ellipsis">
+      Paris hub, 21 October
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#finland-over-the-internet-without-a-gpu-21-october" class="md-nav__link">
+    <span class="md-ellipsis">
+      Finland over the internet without a GPU, 21 October
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#finland-h200s-22-october-utc" class="md-nav__link">
+    <span class="md-ellipsis">
+      Finland H200s, 22 October (UTC)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#after-one-h200-was-split-by-mig" class="md-nav__link">
+    <span class="md-ellipsis">
+      After one H200 was split by MIG
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#after-the-finland-site-was-deleted-102757-utc" class="md-nav__link">
+    <span class="md-ellipsis">
+      After the Finland site was deleted (10:27:57 UTC)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#known-gaps-not-fixed-yet" class="md-nav__link">
+    <span class="md-ellipsis">
+      Known gaps, not fixed yet
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#series-per-gpu-for-capacity" class="md-nav__link">
+    <span class="md-ellipsis">
+      Series per GPU, for capacity
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#limits" class="md-nav__link">
+    <span class="md-ellipsis">
+      Limits
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../30-vm-tenants/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    VM tenants
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../40-inference-dynamo/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Inference with Dynamo (WIP)
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../simulated/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    What is simulated
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Decisions
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            Decisions
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    All decisions
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0001-two-sites-two-providers/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    0001: Two sites, two providers
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0002-driver-ownership/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    0002: Driver ownership
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0003-known-good-stack/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    0003: Known-good stack
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0004-readiness-gate/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    0004: Readiness gate
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0005-fault-remediation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    0005: Fault remediation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0006-batch-scheduling/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    0006: Batch scheduling
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0007-hpc-tenants-slurm/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    0007: HPC tenants
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0008-gpu-sharing/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    0008: GPU sharing
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0009-metrics-across-sites/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    0009: Metrics across sites
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0010-vm-tenants/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    0010: VM tenants
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../findings/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Findings
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="observability-with-thanos-one-view-of-every-gpu-across-sites">Observability with Thanos: one view of every GPU, across sites</h1>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">In short</label><label for="__tabbed_1_2">Run evidence</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<h3 id="the-problem">The problem</h3>
+<p>Operators need one place to see every GPU of both sites. The Finland site only exists
+while its H200s are rented, so its metrics must stay readable <strong>after the site is
+deleted</strong>.</p>
+<h3 id="what-i-built">What I built</h3>
+<pre class="mermaid"><code>flowchart LR
+  subgraph fin["Finland (only while rented)"]
+    fprom["Prometheus"]
+  end
+  subgraph par["Paris (permanent)"]
+    pprom["Prometheus + sidecar"]
+    recv["Thanos Receive"]
+    q["Thanos Query"]
+    bucket[("Object storage&lt;br/&gt;Garage bucket")]
+    graf["Grafana"]
+  end
+  fprom -- "pushes over the internet,&lt;br/&gt;mutual TLS" --&gt; recv
+  pprom --&gt; bucket
+  recv --&gt; bucket
+  q --&gt; pprom
+  q --&gt; recv
+  q --&gt; bucket
+  graf --&gt; q</code></pre>
+<ul>
+<li><strong>Finland pushes, Paris never reaches in.</strong> Paris can't query a site that no longer
+  exists, so Finland sends its metrics as they're produced (<em>remote write</em>).</li>
+<li><strong>The certificate names the sender.</strong> Finland can only write as tenant <code>fin</code>.</li>
+<li><strong>Paris keeps working on its own.</strong> Its Prometheus and alerts don't depend on the
+  worker that runs Thanos (<a href="../adr/0009-metrics-across-sites/">ADR 0009</a> compares
+  Mimir and VictoriaMetrics).</li>
+</ul>
+<h3 id="what-happened">What happened</h3>
+<table>
+<thead>
+<tr>
+<th>Moment</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Finland site starts (22 October)</td>
+<td>Its series appeared in Paris <strong>4 s</strong> after its Prometheus was ready</td>
+</tr>
+<tr>
+<td>Two H200s running</td>
+<td>40 DCGM series per GPU, the same as the L4; 0 failed samples</td>
+</tr>
+<tr>
+<td>One H200 split by MIG</td>
+<td>Each slice got its own series, attributed to the tenant pod using it</td>
+</tr>
+<tr>
+<td>Finland site deleted</td>
+<td>Paris still served it: <strong>4,676,183 samples sent over the run, 0 lost</strong></td>
+</tr>
+</tbody>
+</table>
+<h3 id="lessons">Lessons</h3>
+<ul>
+<li><strong>Asking about a deleted site needs a look back.</strong> A "now" query sees nothing 5
+  minutes after the last sample; queries and dashboards have to cover the run's time.</li>
+<li><strong>MIG breaks naive GPU counting</strong> (not fixed yet): utilisation isn't reported per
+  slice, so the dashboard showed 1 H200 instead of 2, and 13 instead of 2 after deletion.</li>
+<li><strong>Capacity:</strong> 40 to 51 series per GPU means 400,000 to 510,000 series for 10,000 GPUs,
+  before pod churn: arithmetic from three GPUs, not a load test.</li>
+</ul>
+<h3 id="in-one-sentence">In one sentence</h3>
+<p>The Finland site pushed every GPU metric to Paris over mutual TLS and its history
+outlived the site itself, with no sample lost; the run also showed how MIG trips up GPU
+counting.</p>
+</div>
+<div class="tabbed-block">
+<pre class="mermaid"><code>flowchart LR
+  subgraph fin["Finland (exists only while its GPUs are rented)"]
+    fprom["Prometheus&lt;br/&gt;site=fin"]
+  end
+  subgraph par["Paris (permanent)"]
+    pprom["Prometheus + Thanos sidecar&lt;br/&gt;site=par, control plane"]
+    recv["Thanos Receive&lt;br/&gt;CPU worker, NodePort 30291"]
+    q["Thanos Query"]
+    sg["Store gateway"]
+    comp["Compactor&lt;br/&gt;downsampling"]
+    bucket[("Garage bucket thanos")]
+    graf["Grafana&lt;br/&gt;cross-site dashboard"]
+  end
+  fprom -- "remote write, mutual TLS&lt;br/&gt;client CN = tenant" --&gt; recv
+  pprom -- "2 h blocks" --&gt; bucket
+  recv -- "2 h blocks" --&gt; bucket
+  comp &lt;--&gt; bucket
+  sg --&gt; bucket
+  q --&gt; pprom
+  q --&gt; recv
+  q --&gt; sg
+  graf --&gt; q</code></pre>
+<h3 id="setup">Setup</h3>
+<ul>
+<li>Port 30291 on the Paris CPU worker open only to the Finland node addresses; from my
+  laptop it doesn't answer. The CA is generated in the cluster and never in Git.</li>
+<li><code>fin-sim</code>, a SIMULATED second Prometheus in Paris posing as Finland, ran the whole
+  write path before any H200 was rented.</li>
+</ul>
+<h3 id="paris-hub-21-october">Paris hub, 21 October</h3>
+<table>
+<thead>
+<tr>
+<th>Check</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Stores in Query</td>
+<td>Receive (<code>fin-sim</code>, <code>default-tenant</code>), the Paris sidecar, the store gateway</td>
+</tr>
+<tr>
+<td>Deduplication, two replicas</td>
+<td>2 + 2 <code>up</code> series without, 2 with</td>
+</tr>
+<tr>
+<td>Paris sidecar uploads</td>
+<td>14 blocks every 2 h since 20 October, 0 failures</td>
+</tr>
+<tr>
+<td>Downsampling (SIMULATED backfill, <code>site="sim-backfill"</code>)</td>
+<td>61 blocks compacted, two <strong>5-minute</strong> blocks written (<a href="../artifacts/platform/thanos-bucket-20261021T114314Z.txt">bucket</a>)</td>
+</tr>
+<tr>
+<td>Last block on shutdown</td>
+<td>Receive flushed and uploaded a 12 s <code>fin-sim</code> block when the worker powered off (<code>cmd/thanos/receive.go</code>, v0.42.4)</td>
+</tr>
+</tbody>
+</table>
+<p><a href="../artifacts/platform/thanos-hub-20261021T114455Z.txt">Hub capture</a>.</p>
+<h3 id="finland-over-the-internet-without-a-gpu-21-october">Finland over the internet without a GPU, 21 October</h3>
+<p>A CPU-only Finland control plane (the first order failed on the provider's side; the
+retry ran 15:33 to 15:40 UTC): first <code>site="fin"</code> series in Paris at 15:39:11, 45,032
+samples, 0 failed, still served 16 minutes after deletion
+(<a href="../artifacts/platform/thanos-fin-20261021T153930Z.txt">during</a>,
+<a href="../artifacts/platform/thanos-after-20261021T155641Z.txt">after</a>).</p>
+<h3 id="finland-h200s-22-october-utc">Finland H200s, 22 October (UTC)</h3>
+<div class="terminal highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>$<span class="w"> </span>make<span class="w"> </span>thanos-capture<span class="w"> </span><span class="nv">MODE</span><span class="o">=</span>fin
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="c1"># capture-thanos.sh fin, 20261022T095211Z, laptop clock, UTC. git 17ecc08</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>...
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1">## Sites and tenants seen (now)</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="c1"># count by (site, tenant_id) (up)   (dedup=true)</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="o">{</span><span class="nv">site</span><span class="o">=</span><span class="s2">"fin"</span>,<span class="w"> </span><span class="nv">tenant_id</span><span class="o">=</span><span class="s2">"fin"</span><span class="o">}</span><span class="w"> </span><span class="m">11</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="o">{</span><span class="nv">site</span><span class="o">=</span><span class="s2">"fin-sim"</span>,<span class="w"> </span><span class="nv">tenant_id</span><span class="o">=</span><span class="s2">"fin-sim"</span><span class="o">}</span><span class="w"> </span><span class="m">2</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="o">{</span><span class="nv">site</span><span class="o">=</span><span class="s2">"par"</span><span class="o">}</span><span class="w"> </span><span class="m">27</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>...
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="o">{</span><span class="nv">__name__</span><span class="o">=</span><span class="s2">"prometheus_remote_storage_samples_failed_total"</span><span class="o">}</span><span class="w"> </span><span class="m">0</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="o">{</span><span class="nv">__name__</span><span class="o">=</span><span class="s2">"prometheus_remote_storage_samples_retried_total"</span><span class="o">}</span><span class="w"> </span><span class="m">0</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="o">{</span><span class="nv">__name__</span><span class="o">=</span><span class="s2">"prometheus_remote_storage_samples_total"</span><span class="o">}</span><span class="w"> </span><span class="m">43637</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>...
+</code></pre></div>
+<p><a href="../artifacts/platform/thanos-fin-20261022T095211Z.txt">Full capture</a>. Prometheus Ready at
+09:51:26, first series in Paris at 09:51:30. DCGM series arrived at 09:58:10, after
+dcgm-exporter waited about 3 minutes for the DCGM host engine
+(<a href="../findings/">finding</a>). With both H200s whole: 40 series each, Finland head 52,662
+series, 733,067 samples sent, 0 failed
+(<a href="../artifacts/platform/thanos-fin-20261022T095840Z.txt">capture</a>).</p>
+<p><img alt="The cross-site dashboard over 20 hours: the Paris L4 on 21 October and the two Finland H200s on 22 October" src="../artifacts/par/screenshots/w2-6b-grafana-l4-and-h200-20261022T101338Z.jpg" /></p>
+<p><em>Over 20 hours: the Paris L4's training run (left) and the two H200s (right). The L4
+row has no hostname: my rule grouped by <code>Hostname</code> at the time, a label dcgm-exporter
+doesn't set; corrected after.</em></p>
+<p><img alt="Thanos Query's Stores page: Receive with tenants default-tenant, fin and fin-sim, the Paris sidecar, and the store gateway" src="../artifacts/par/screenshots/w2-6b-thanos-stores-20261022T101350Z.jpg" /></p>
+<p><em>Query's Stores page: Receive holds tenant <code>fin</code> next to <code>fin-sim</code>.</em></p>
+<h3 id="after-one-h200-was-split-by-mig">After one H200 was split by MIG</h3>
+<div class="terminal highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>$<span class="w"> </span>make<span class="w"> </span>thanos-capture<span class="w"> </span><span class="nv">MODE</span><span class="o">=</span>fin
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="c1"># capture-thanos.sh fin, 20261022T102230Z, laptop clock, UTC. git 17ecc08</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>...
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1">## GPUs per site and model (now)</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="c1"># count by (site, modelName) (DCGM_FI_DEV_GPU_UTIL)   (dedup=true)</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="o">{</span><span class="nv">modelName</span><span class="o">=</span><span class="s2">"NVIDIA H200"</span>,<span class="w"> </span><span class="nv">site</span><span class="o">=</span><span class="s2">"fin"</span><span class="o">}</span><span class="w"> </span><span class="m">1</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>...
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="c1">## DCGM series per GPU (recording rule)</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="c1"># max by (site, modelName, hostname, gpu) (max_over_time(gpu:dcgm_series:count[3h]))   (dedup=true)</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="o">{</span><span class="nv">gpu</span><span class="o">=</span><span class="s2">"0"</span>,<span class="w"> </span><span class="nv">hostname</span><span class="o">=</span><span class="s2">"eu1-fin-gpu-01"</span>,<span class="w"> </span><span class="nv">modelName</span><span class="o">=</span><span class="s2">"NVIDIA H200"</span>,<span class="w"> </span><span class="nv">site</span><span class="o">=</span><span class="s2">"fin"</span><span class="o">}</span><span class="w"> </span><span class="m">51</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="o">{</span><span class="nv">gpu</span><span class="o">=</span><span class="s2">"1"</span>,<span class="w"> </span><span class="nv">hostname</span><span class="o">=</span><span class="s2">"eu1-fin-gpu-01"</span>,<span class="w"> </span><span class="nv">modelName</span><span class="o">=</span><span class="s2">"NVIDIA H200"</span>,<span class="w"> </span><span class="nv">site</span><span class="o">=</span><span class="s2">"fin"</span><span class="o">}</span><span class="w"> </span><span class="m">41</span>
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>...
+</code></pre></div>
+<p><a href="../artifacts/platform/thanos-fin-20261022T102230Z.txt">Full capture</a>,
+<a href="../artifacts/platform/thanos-fin-mig-labels-20261022T102301Z.txt">labels on Finland's Prometheus</a>.
+GPU0's 51 = 11 device series + 20 per MIG slice, each labelled <code>GPU_I_ID</code> and
+<code>GPU_I_PROFILE="MIG 3g.71gb"</code> and attributed to its tenant pod.</p>
+<p><img alt="The dashboard filtered on Finland after the MIG split: 51 and 41 DCGM series per GPU" src="../artifacts/par/screenshots/w2-6b-grafana-fin-after-mig-20261022T102345Z.jpg" /></p>
+<p><em>Finland, six minutes after the MIG split: GPU0's 51 series show as one row.</em></p>
+<h3 id="after-the-finland-site-was-deleted-102757-utc">After the Finland site was deleted (10:27:57 UTC)</h3>
+<div class="terminal highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>$<span class="w"> </span>make<span class="w"> </span>thanos-capture<span class="w"> </span><span class="nv">MODE</span><span class="o">=</span>after
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="c1"># capture-thanos.sh after, 20261022T102814Z, laptop clock, UTC. git 17ecc08</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>...
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c1">## Sites and tenants seen (last value within 3 h)</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="c1"># count by (site, tenant_id) (last_over_time(up[3h]))   (dedup=true)</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="o">{</span><span class="nv">site</span><span class="o">=</span><span class="s2">"fin"</span>,<span class="w"> </span><span class="nv">tenant_id</span><span class="o">=</span><span class="s2">"fin"</span><span class="o">}</span><span class="w"> </span><span class="m">19</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="o">{</span><span class="nv">site</span><span class="o">=</span><span class="s2">"fin-sim"</span>,<span class="w"> </span><span class="nv">tenant_id</span><span class="o">=</span><span class="s2">"fin-sim"</span><span class="o">}</span><span class="w"> </span><span class="m">2</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="o">{</span><span class="nv">site</span><span class="o">=</span><span class="s2">"par"</span><span class="o">}</span><span class="w"> </span><span class="m">28</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>...
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="c1">## GPUs per site and model (last value within 3 h)</span>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="c1"># count by (site, modelName) (last_over_time(DCGM_FI_DEV_GPU_UTIL[3h]))   (dedup=true)</span>
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="o">{</span><span class="nv">modelName</span><span class="o">=</span><span class="s2">"NVIDIA H200"</span>,<span class="w"> </span><span class="nv">site</span><span class="o">=</span><span class="s2">"fin"</span><span class="o">}</span><span class="w"> </span><span class="m">13</span>
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>...
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="o">{</span><span class="nv">__name__</span><span class="o">=</span><span class="s2">"prometheus_remote_storage_samples_failed_total"</span><span class="o">}</span><span class="w"> </span><span class="m">0</span>
+<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="o">{</span><span class="nv">__name__</span><span class="o">=</span><span class="s2">"prometheus_remote_storage_samples_retried_total"</span><span class="o">}</span><span class="w"> </span><span class="m">0</span>
+<a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="o">{</span><span class="nv">__name__</span><span class="o">=</span><span class="s2">"prometheus_remote_storage_samples_total"</span><span class="o">}</span><span class="w"> </span><span class="m">4676183</span>
+</code></pre></div>
+<p><a href="../artifacts/platform/thanos-after-20261022T102814Z.txt">Full capture</a>. Last Finland sample
+at 10:27:31, 26 s before deletion.</p>
+<p><img alt="The cross-site dashboard after the Finland site was deleted: the H200s still there next to the Paris L4" src="../artifacts/par/screenshots/w2-6c-grafana-after-fin-down-20261022T102828Z.jpg" /></p>
+<p><em>After deletion: the H200 series are still there, read from Receive in Paris.</em></p>
+<h3 id="known-gaps-not-fixed-yet">Known gaps, not fixed yet</h3>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>"1 H200" after MIG</td>
+<td><code>DCGM_FI_DEV_GPU_UTIL</code> isn't reported for MIG slices</td>
+<td>Count GPUs by <code>gpu</code> and <code>hostname</code> from a field every GPU reports</td>
+</tr>
+<tr>
+<td>GPU0 shows one 51, not two slices</td>
+<td>The rule groups by the parent GPU's UUID</td>
+<td>Group by <code>GPU_I_ID</code> too</td>
+</tr>
+<tr>
+<td>"13 H200s" after deletion</td>
+<td><code>last_over_time</code> counts every series seen in 3 h; pods add new series</td>
+<td>Same as the first fix</td>
+</tr>
+<tr>
+<td>Empty "now" query after deletion</td>
+<td>Instant queries look back only 5 minutes</td>
+<td>Already fixed: <code>MODE=after</code> uses <code>last_over_time(...[3h])</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="series-per-gpu-for-capacity">Series per GPU, for capacity</h3>
+<table>
+<thead>
+<tr>
+<th>GPU</th>
+<th>DCGM series</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>L4 idle / under training</td>
+<td>40 / 41 (<code>power_cap</code> clock event appeared)</td>
+</tr>
+<tr>
+<td>H200 whole</td>
+<td>40, then 41 under load</td>
+</tr>
+<tr>
+<td>H200 split into two MIG slices</td>
+<td>51</td>
+</tr>
+</tbody>
+</table>
+<p>Counts move with clock-event reasons and with pod labels on busy GPUs, so plan on the
+maximum over a busy period (<code>max_over_time(gpu:dcgm_series:count[...])</code>). DCGM was 91 of
+Finland's 66,491 series; the rest came from the API server and kubelets
+(<a href="../artifacts/platform/thanos-par-20261021T170231Z.txt">L4 capture</a>).</p>
+<h3 id="limits">Limits</h3>
+<ul>
+<li>One Receive, no hashring or replication: a single point of failure on the write path.</li>
+<li>Cardinality at 1,000 or 10,000 GPUs is extrapolated, not load-tested.</li>
+<li>Downsampling shown on SIMULATED blocks only; the Finland site's last block in the
+  bucket isn't listed yet.</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      &copy; 2026 <a href="https://github.com/yassineteimi" target="_blank" rel="noopener">Yassine TEIMI</a>
+
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/yassineteimi" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 512"><!--! Font Awesome Free 6.7.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M186.1 328.7c0 20.9-10.9 55.1-36.7 55.1s-36.7-34.2-36.7-55.1 10.9-55.1 36.7-55.1 36.7 34.2 36.7 55.1M480 278.2c0 31.9-3.2 65.7-17.5 95-37.9 76.6-142.1 74.8-216.7 74.8-75.8 0-186.2 2.7-225.6-74.8-14.6-29-20.2-63.1-20.2-95 0-41.9 13.9-81.5 41.5-113.6-5.2-15.8-7.7-32.4-7.7-48.8 0-21.5 4.9-32.3 14.6-51.8 45.3 0 74.3 9 108.8 36 29-6.9 58.8-10 88.7-10 27 0 54.2 2.9 80.4 9.2 34-26.7 63-35.2 107.8-35.2 9.8 19.5 14.6 30.3 14.6 51.8 0 16.4-2.6 32.7-7.7 48.2 27.5 32.4 39 72.3 39 114.2m-64.3 50.5c0-43.9-26.7-82.6-73.5-82.6-18.9 0-37 3.4-56 6-14.9 2.3-29.8 3.2-45.1 3.2-15.2 0-30.1-.9-45.1-3.2-18.7-2.6-37-6-56-6-46.8 0-73.5 38.7-73.5 82.6 0 87.8 80.4 101.3 150.4 101.3h48.2c70.3 0 150.6-13.4 150.6-101.3m-82.6-55.1c-25.8 0-36.7 34.2-36.7 55.1s10.9 55.1 36.7 55.1 36.7-34.2 36.7-55.1-10.9-55.1-36.7-55.1"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://linkedin.com/in/yassine-teimi" target="_blank" rel="noopener" title="linkedin.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3M135.4 416H69V202.2h66.5V416zm-33.2-243c-21.3 0-38.5-17.3-38.5-38.5S80.9 96 102.2 96c21.2 0 38.5 17.3 38.5 38.5 0 21.3-17.2 38.5-38.5 38.5m282.1 243h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.tabs", "navigation.sections", "toc.integrate", "navigation.top", "search.suggest", "search.highlight", "content.tabs.link", "content.code.annotation", "content.code.copy"], "search": "../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.88dd0f4e.min.js"></script>
+      
+        <script src="../javascripts/diagram-zoom.js"></script>
+      
+        <script src="../javascripts/tab-anchors.js"></script>
+      
+    
+  </body>
+</html>

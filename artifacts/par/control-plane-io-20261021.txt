@@ -1,0 +1,76 @@
+# par control plane disk starvation by Grafana, 21 October 2026 (UTC, laptop clock)
+# Captured 2026-10-21T12:15:07Z by cos. Node eu1-par-cp-01, PLAY2-MICRO, 4 vCPU, 8 GB, disk sda 74.5G model sbs (network block storage).
+
+## Measured at 12:02-12:08 UTC, before the fix
+CPU busy 0.93 (5m avg), iowait 0.63, steal 0.003 (node-exporter)
+/proc/pressure/io: some avg10=85.47 avg60=87.64 avg300=77.73; full avg10=65.96 avg60=70.03 avg300=57.29
+Per-process disk I/O over 10 s: grafana server 179.3 MB/s, argocd-repo-server 0.6 MB/s, etcd 0.2 MB/s
+grafana /proc/<pid>/io: rchar 580237572, read_bytes 89462829056 (disk reads are page faults, not the process's own reads); VmRSS 188048 kB; pod limit 384Mi
+kube-apiserver /livez 500 at 12:08:22; connections refused at 12:07:43
+
+## etcd 'apply request took too long', per 10 minutes (from its log)
+   1 08:1x
+   2 08:2x
+   3 08:4x
+   7 08:5x
+  13 09:0x
+   3 09:1x
+   2 09:4x
+   5 09:5x
+   8 10:0x
+   6 10:1x
+   8 10:2x
+  29 10:3x
+  25 10:4x
+  75 10:5x
+ 653 11:0x
+  13 11:1x
+   4 11:2x
+  13 11:3x
+ 686 11:4x
+1346 11:5x
+1276 12:0x
+  11 12:1x
+
+## Fix: Grafana limit 384Mi to 1Gi (commit 89feaf8), applied by kubectl patch at 12:09:28 because ArgoCD could not reach the API, then synced by ArgoCD
+/proc/pressure/io at 12:10:47: some avg10=9.92 avg60=25.77 avg300=63.04
+/proc/pressure/io at 12:14:41: some avg10=0.97 avg60=1.00 avg300=28.47
+
+## Grafana ReplicaSets today: checksum/secret changes on every render (the chart's random admin password)
+NAME                                       CREATED                SECRET_CHECKSUM
+kube-prometheus-stack-grafana-58b56b85fd   2026-10-21T10:52:11Z   0ee444c24d9349c46f535ef5d22ccae8b51d770a2997
+kube-prometheus-stack-grafana-cb86ffb97    2026-10-21T10:55:27Z   7bb1dfcb085a1317e8925d1e1ac6a00e5bef7eeaffcd
+kube-prometheus-stack-grafana-766c4b767f   2026-10-21T10:56:10Z   a0258732745201de51fb805998ca5c8dd1efbfed8dcc
+kube-prometheus-stack-grafana-777ccdfdb5   2026-10-21T10:59:36Z   017ec7d70ac68983b2a300df10f67bb16cbc446ce80f
+kube-prometheus-stack-grafana-559cb55985   2026-10-21T11:01:40Z   6834feccf20f716c01c79add996876200f425c80665a
+kube-prometheus-stack-grafana-74454fb4d7   2026-10-21T11:39:44Z   a48e7c45fb719332d790c44192a11945de314c90c497
+kube-prometheus-stack-grafana-c8f989dc5    2026-10-21T11:41:50Z   d939515c29aacf912db7c3db7adcbd498393633f4a94
+kube-prometheus-stack-grafana-97c698b95    2026-10-21T11:47:50Z   7d41055b2880f9f2d844a21313a852fa20f5045718f1
+kube-prometheus-stack-grafana-9dd54f6c6    2026-10-21T11:55:25Z   d347fc8587c4286ac858966523c06f4eefd6348d52df
+kube-prometheus-stack-grafana-76cd99b678   2026-10-21T12:09:42Z   d347fc8587c4286ac858966523c06f4eefd6348d52df
+kube-prometheus-stack-grafana-64cf878978   2026-10-21T12:10:36Z   238c8a068576e09186c591a2d6653598786dab0b60d4
+
+## Containers whose last exit was in the 30 min around the outage
+argocd/argocd-repo-server-6fff84cc6f-kxc52 repo-server restarts=1 last exit 2026-10-21T11:56:42Z Completed
+cert-manager/cert-manager-74789bff6-tmqxr cert-manager-controller restarts=2 last exit 2026-10-21T12:07:20Z Error
+cert-manager/cert-manager-cainjector-7bcd8d8d78-dl7gh cert-manager-cainjector restarts=3 last exit 2026-10-21T12:07:43Z Error
+gpu-operator/gpu-operator-8469d9bdd-xpjsg gpu-operator restarts=10 last exit 2026-10-21T12:08:51Z Error
+kube-system/kube-apiserver-eu1-par-cp-01 kube-apiserver restarts=2 last exit 2026-10-21T12:08:50Z Error
+kube-system/kube-controller-manager-eu1-par-cp-01 kube-controller-manager restarts=9 last exit 2026-10-21T12:06:09Z Error
+kube-system/kube-scheduler-eu1-par-cp-01 kube-scheduler restarts=9 last exit 2026-10-21T12:06:13Z Error
+kubeflow-system/jobset-controller-5999749d98-ws522 controller restarts=9 last exit 2026-10-21T12:06:07Z Error
+kubeflow-system/kubeflow-trainer-controller-manager-6b54cc4fc7-hlhcl manager restarts=10 last exit 2026-10-21T12:09:13Z Error
+kubevirt/virt-controller-8459dd74c-blfsd virt-controller restarts=8 last exit 2026-10-21T12:06:08Z Error
+kubevirt/virt-operator-d4c8786bd-d5r2x virt-operator restarts=9 last exit 2026-10-21T12:09:13Z Error
+kubevirt/virt-template-controller-65b79745d8-6hpcf manager restarts=8 last exit 2026-10-21T12:06:08Z Error
+monitoring/kube-prometheus-stack-kube-state-metrics-84f8496f5c-qbp26 kube-state-metrics restarts=8 last exit 2026-10-21T12:06:53Z Error
+node-feature-discovery/node-feature-discovery-worker-dk7jc worker restarts=5 last exit 2026-10-21T12:08:51Z Error
+node-feature-discovery/node-feature-discovery-worker-tcj5b worker restarts=4 last exit 2026-10-21T12:08:51Z Error
+nvcre/nvcre-manager-d6c6cc8c7-cfl2r manager restarts=9 last exit 2026-10-21T12:09:13Z Error
+nvsentinel/fault-remediation-7d45c77bc6-h4fgj fault-remediation restarts=8 last exit 2026-10-21T12:06:07Z Error
+nvsentinel/nvsentinel-psmdb-operator-565bd99d6f-rhmr9 psmdb-operator restarts=9 last exit 2026-10-21T12:08:51Z Error
+slurm/slurm-operator-64c459b89b-sk2d5 slurm-operator restarts=7 last exit 2026-10-21T12:09:13Z Error
+slurm/slurm-operator-webhook-84f4d88b88-2trhf webhook restarts=6 last exit 2026-10-21T12:06:12Z Error
+
+## VM tenant-vm/web-01 after the outage
+tenant-vm   web-01   104m   Running   10.244.1.18   eu1-par-cpu-01   True

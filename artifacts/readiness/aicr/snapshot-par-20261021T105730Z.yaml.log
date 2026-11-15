@@ -1,0 +1,19 @@
+[cli] snapshot agent run: runID=20261021-125731-82073d430cf732f0
+[cli] deploying agent: namespace=aicr-validation
+I1021 12:57:32.857641   17231 request.go:754] "Waited before sending request" delay="1.15544975s" reason="client-side throttling, not priority and fairness" verb="POST" URL="https://51.159.138.62:6443/apis/authorization.k8s.io/v1/selfsubjectaccessreviews"
+[cli] agent deployed successfully
+[cli] waiting for Job completion: job=aicr-20261021-125731-82073d430cf732f0 timeout=5m0s
+[cli] pod current phase: name=aicr-20261021-125731-82073d430cf732f0-89m8v status=Pending waitingReason=ContainerCreating
+[cli] pod current phase: name=aicr-20261021-125731-82073d430cf732f0-89m8v status=Running
+[agent] collecting OS configuration
+[agent] collecting GPU information
+E1021 10:57:34.612094   51601 kernel.go:135] "failed to read kconfig" err="failed to read kernel config from [ /proc/config.gz /usr/src/linux-6.8.0-142-generic/.config /usr/src/linux-rt-6.8.0-142-generic/.config /usr/src/linux/.config /usr/lib/modules/6.8.0-142-generic/config /usr/lib/ostree-boot/config-6.8.0-142-generic /usr/lib/kernel/config-6.8.0-142-generic /usr/src/linux-headers-6.8.0-142-generic/.config /lib/modules/6.8.0-142-generic/build/.config /usr/src/linux-rt-headers-6.8.0-142-generic/.config /boot/config-6.8.0-142-generic]"
+[agent] collecting Kubernetes cluster information
+E1021 10:57:34.612615   51601 kernel.go:150] "failed to get builtin kernel modules" err="failed to read file /lib/modules/6.8.0-142-generic/modules.builtin: open /lib/modules/6.8.0-142-generic/modules.builtin: no such file or directory"
+[agent] collecting node topology information
+[agent] collecting SystemD service configurations
+[agent] node topology collection complete: nodes=2 taints=0 labels=498
+[agent] configmap operation: namespace=aicr-validation name=aicr-agent-snapshot-20261021-125731-82073d430cf732f0 auth_method=bearer-token format=yaml
+[agent] applying ConfigMap: namespace=aicr-validation name=aicr-agent-snapshot-20261021-125731-82073d430cf732f0 format=yaml
+[cli] job completed successfully
+[cli] snapshot saved to file: path=./docs/artifacts/readiness/aicr/snapshot-par-20261021T105730Z.yaml format=yaml

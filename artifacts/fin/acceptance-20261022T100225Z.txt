@@ -1,0 +1,72 @@
+# fin GPU acceptance, 20261022T100225Z, laptop clock, UTC. Node eu1-fin-gpu-01, driver reported by the provider image at boot: 580.178.04
+
+== allocatable
+{"cpu":"88","ephemeral-storage":"186364668825","hugepages-1Gi":"0","hugepages-2Mi":"0","memory":"350471908Ki","nvidia.com/gpu":"2","pods":"110"}
+
+== GPU labels
+"feature.node.kubernetes.io/pci-10de.present": "true"
+"nvidia.com/cuda.driver-version.full": "580.178.04"
+"nvidia.com/cuda.runtime-version.full": "13.0"
+"nvidia.com/gpu.count": "2"
+"nvidia.com/gpu.deploy.client": "true"
+"nvidia.com/gpu.deploy.container-toolkit": "true"
+"nvidia.com/gpu.deploy.dcgm-exporter": "true"
+"nvidia.com/gpu.deploy.dcgm": "true"
+"nvidia.com/gpu.deploy.device-plugin": "true"
+"nvidia.com/gpu.deploy.driver": "true"
+"nvidia.com/gpu.deploy.gpu-feature-discovery": "true"
+"nvidia.com/gpu.deploy.mig-manager": "true"
+"nvidia.com/gpu.deploy.node-status-exporter": "true"
+"nvidia.com/gpu.deploy.nvsm": "true"
+"nvidia.com/gpu.deploy.operator-validator": "true"
+"nvidia.com/gpu.memory": "143771"
+"nvidia.com/gpu.product": "NVIDIA-H200"
+
+== GPU Operator pods on eu1-fin-gpu-01: image references and the digests the node pulled
+gpu-feature-discovery-4995w gpu-feature-discovery nvcr.io/nvidia/k8s-device-plugin:v0.20.1 pulled=nvcr.io/nvidia/k8s-device-plugin@sha256:27c1b2553a690ca3d29889dcd61df97525d46f58272c0be8dc63c2b18f120075
+nvidia-container-toolkit-daemonset-srdw6 nvidia-container-toolkit-ctr nvcr.io/nvidia/k8s/container-toolkit:v1.20.1 pulled=nvcr.io/nvidia/k8s/container-toolkit@sha256:00a422252dd875b112f5974321c2feebbdf11c338f8ad131e5ce18e5b3a3bfac
+nvidia-cuda-validator-phszs nvidia-cuda-validator nvcr.io/nvidia/gpu-operator:v26.7.2 pulled=nvcr.io/nvidia/gpu-operator@sha256:02933b43d286d1321cd0dadd460b9ae8f5e5c0ee99a087e2d10254febc94ba45
+nvidia-dcgm-exporter-ww6xl nvidia-dcgm-exporter nvcr.io/nvidia/k8s/dcgm-exporter:4.6.1-4.8.4-distroless pulled=nvcr.io/nvidia/k8s/dcgm-exporter@sha256:148b0c025e5f2850256816fa33754fbf4733b7a086697a95613fc0ba3db5b003
+nvidia-dcgm-kjrcd nvidia-dcgm-ctr nvcr.io/nvidia/cloud-native/dcgm:4.6.1-1-ubuntu24.04 pulled=nvcr.io/nvidia/cloud-native/dcgm@sha256:48464e50aa76671f5b204264cb4999739591112bf74330a727523f5655c6d7f2
+nvidia-device-plugin-daemonset-8kpvd nvidia-device-plugin nvcr.io/nvidia/k8s-device-plugin:v0.20.1 pulled=nvcr.io/nvidia/k8s-device-plugin@sha256:27c1b2553a690ca3d29889dcd61df97525d46f58272c0be8dc63c2b18f120075
+nvidia-mig-manager-wxxb2 nvidia-mig-manager nvcr.io/nvidia/cloud-native/k8s-mig-manager:v0.15.1 pulled=nvcr.io/nvidia/cloud-native/k8s-mig-manager@sha256:c1674fa2f46012dc425539f7fcac6445dce13bc81a05e4f91e311c7b8c27bcaf
+nvidia-operator-validator-5qgjn nvidia-operator-validator nvcr.io/nvidia/gpu-operator:v26.7.2 pulled=nvcr.io/nvidia/gpu-operator@sha256:02933b43d286d1321cd0dadd460b9ae8f5e5c0ee99a087e2d10254febc94ba45
+
+== cuda-vectoradd
+[Vector addition of 50000 elements]
+Copy input data from the host memory to the CUDA device
+CUDA kernel launch with 196 blocks of 256 threads
+Copy output data from the CUDA device to the host memory
+Test PASSED
+Done
+
+== nvidia-smi
+Thu Oct 22 10:02:39 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 580.178.04             Driver Version: 580.178.04     CUDA Version: 13.0     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H200                    On  |   00000000:05:00.0 Off |                  Off |
+| N/A   30C    P0             76W /  700W |       0MiB / 143771MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+
+== verdict
+PASS  node advertises nvidia.com/gpu: 2
+PASS  node carries pci-10de.present=true
+INFO  DCGM exporter image on the node: nvcr.io/nvidia/k8s/dcgm-exporter:4.6.1-4.8.4-distroless
+PASS  cuda-vectoradd printed Test PASSED
+PASS  nvidia-smi sees the H200
+PASS  driver in use is 580.178.04, the version reported by the provider image at boot
+[36m==>[0m acceptance PASSED. Evidence: docs/artifacts/fin/acceptance-20261022T100225Z.txt

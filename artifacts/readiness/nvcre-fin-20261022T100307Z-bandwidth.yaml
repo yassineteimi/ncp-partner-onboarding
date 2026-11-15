@@ -1,0 +1,361 @@
+apiVersion: v1
+items:
+- apiVersion: nvcre.nvidia.com/v1alpha1
+  kind: BandwidthMeasurement
+  metadata:
+    annotations:
+      nvcre.nvidia.com/job-uid: 0f86337d-d8ab-4955-a498-5ddb1bfb2152
+    creationTimestamp: "2026-10-22T10:07:40Z"
+    finalizers:
+    - nvcre.nvidia.com/bandwidthmeasurement-finalizer
+    generation: 1
+    labels:
+      app.kubernetes.io/managed-by: nvcre
+      nvcre.nvidia.com/job: eu1-fin-h200-communicatio-a82b3-job
+      nvcre.nvidia.com/workflow: eu1-fin-h200-communicatio-a82b3
+    name: eu1-fin-h200-communicatio-a82b3-job-bandwidth
+    namespace: readiness-runs
+    ownerReferences:
+    - apiVersion: nvcre.nvidia.com/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Workflow
+      name: eu1-fin-h200-communicatio-a82b3
+      uid: fbeeb4e4-0bc4-4bc8-b309-c67b66724ddc
+    resourceVersion: "7573"
+    uid: e779241c-83f9-40af-ac20-3e927cb1eeef
+  spec:
+    jobRef:
+      apiGroup: nvcre.nvidia.com
+      kind: Job
+      name: eu1-fin-h200-communicatio-a82b3-job
+    logProfileRef: nccl-loopback
+    sampleInterval: 30s
+    testType: loopback_all_reduce
+  status:
+    completionTime: "2026-10-22T10:12:07Z"
+    conditions:
+    - lastTransitionTime: "2026-10-22T10:12:07Z"
+      message: Job succeeded
+      observedGeneration: 1
+      reason: JobSucceeded
+      status: "False"
+      type: Measuring
+    - lastTransitionTime: "2026-10-22T10:12:07Z"
+      message: Job succeeded
+      observedGeneration: 1
+      reason: JobSucceeded
+      status: "True"
+      type: Complete
+    results:
+    - algBW: "0.00"
+      busBW: "0.00"
+      samples: 10
+      sizeBytes: 8
+    - algBW: "0.00"
+      busBW: "0.00"
+      samples: 10
+      sizeBytes: 16
+    - algBW: "0.00"
+      busBW: "0.00"
+      samples: 10
+      sizeBytes: 32
+    - algBW: "0.01"
+      busBW: "0.01"
+      samples: 10
+      sizeBytes: 64
+    - algBW: "0.01"
+      busBW: "0.01"
+      samples: 10
+      sizeBytes: 128
+    - algBW: "0.03"
+      busBW: "0.03"
+      samples: 10
+      sizeBytes: 256
+    - algBW: "0.05"
+      busBW: "0.05"
+      samples: 10
+      sizeBytes: 512
+    - algBW: "0.11"
+      busBW: "0.11"
+      samples: 10
+      sizeBytes: 1024
+    - algBW: "0.21"
+      busBW: "0.21"
+      samples: 10
+      sizeBytes: 2048
+    - algBW: "0.43"
+      busBW: "0.43"
+      samples: 10
+      sizeBytes: 4096
+    - algBW: "0.82"
+      busBW: "0.82"
+      samples: 10
+      sizeBytes: 8192
+    - algBW: "1.60"
+      busBW: "1.60"
+      samples: 10
+      sizeBytes: 16384
+    - algBW: "3.09"
+      busBW: "3.09"
+      samples: 10
+      sizeBytes: 32768
+    - algBW: "5.96"
+      busBW: "5.96"
+      samples: 10
+      sizeBytes: 65536
+    - algBW: "11.47"
+      busBW: "11.47"
+      samples: 10
+      sizeBytes: 131072
+    - algBW: "22.21"
+      busBW: "22.21"
+      samples: 10
+      sizeBytes: 262144
+    - algBW: "44.75"
+      busBW: "44.75"
+      samples: 10
+      sizeBytes: 524288
+    - algBW: "69.39"
+      busBW: "69.39"
+      samples: 10
+      sizeBytes: 1048576
+    - algBW: "73.25"
+      busBW: "73.25"
+      samples: 10
+      sizeBytes: 2097152
+    - algBW: "123.53"
+      busBW: "123.53"
+      samples: 10
+      sizeBytes: 4194304
+    - algBW: "173.97"
+      busBW: "173.97"
+      samples: 10
+      sizeBytes: 8388608
+    - algBW: "216.92"
+      busBW: "216.92"
+      samples: 10
+      sizeBytes: 16777216
+    - algBW: "245.14"
+      busBW: "245.14"
+      samples: 10
+      sizeBytes: 33554432
+    - algBW: "271.03"
+      busBW: "271.03"
+      samples: 10
+      sizeBytes: 67108864
+    - algBW: "287.23"
+      busBW: "287.23"
+      samples: 10
+      sizeBytes: 134217728
+    - algBW: "300.67"
+      busBW: "300.67"
+      samples: 10
+      sizeBytes: 268435456
+    - algBW: "315.41"
+      busBW: "315.41"
+      samples: 10
+      sizeBytes: 536870912
+    - algBW: "330.04"
+      busBW: "330.04"
+      samples: 10
+      sizeBytes: 1073741824
+    - algBW: "340.24"
+      busBW: "340.24"
+      samples: 10
+      sizeBytes: 2147483648
+    - algBW: "347.75"
+      busBW: "347.75"
+      samples: 10
+      sizeBytes: 4294967296
+    - algBW: "350.04"
+      busBW: "350.04"
+      samples: 10
+      sizeBytes: 8589934592
+    - algBW: "351.87"
+      busBW: "351.87"
+      samples: 10
+      sizeBytes: 17179869184
+    startTime: "2026-10-22T10:07:55Z"
+- apiVersion: nvcre.nvidia.com/v1alpha1
+  kind: BandwidthMeasurement
+  metadata:
+    annotations:
+      nvcre.nvidia.com/job-uid: f917918c-b1b1-4e85-8d03-fc1cf17038ab
+    creationTimestamp: "2026-10-22T10:03:09Z"
+    finalizers:
+    - nvcre.nvidia.com/bandwidthmeasurement-finalizer
+    generation: 1
+    labels:
+      app.kubernetes.io/managed-by: nvcre
+      nvcre.nvidia.com/job: eu1-fin-h200-communicatio-c154b-job
+      nvcre.nvidia.com/workflow: eu1-fin-h200-communicatio-c154b
+    name: eu1-fin-h200-communicatio-c154b-job-bandwidth
+    namespace: readiness-runs
+    ownerReferences:
+    - apiVersion: nvcre.nvidia.com/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Workflow
+      name: eu1-fin-h200-communicatio-c154b
+      uid: 32d39208-92ac-4b8f-a570-26bc5413028b
+    resourceVersion: "6512"
+    uid: 227c27fe-2a7e-4450-b027-2a19bda81e3a
+  spec:
+    jobRef:
+      apiGroup: nvcre.nvidia.com
+      kind: Job
+      name: eu1-fin-h200-communicatio-c154b-job
+    logProfileRef: nccl-bandwidth
+    sampleInterval: 30s
+    testType: all_reduce
+  status:
+    completionTime: "2026-10-22T10:07:40Z"
+    conditions:
+    - lastTransitionTime: "2026-10-22T10:07:40Z"
+      message: Job succeeded
+      observedGeneration: 1
+      reason: JobSucceeded
+      status: "False"
+      type: Measuring
+    - lastTransitionTime: "2026-10-22T10:07:40Z"
+      message: Job succeeded
+      observedGeneration: 1
+      reason: JobSucceeded
+      status: "True"
+      type: Complete
+    results:
+    - algBW: "0.00"
+      busBW: "0.00"
+      samples: 10
+      sizeBytes: 8
+    - algBW: "0.00"
+      busBW: "0.00"
+      samples: 10
+      sizeBytes: 16
+    - algBW: "0.00"
+      busBW: "0.00"
+      samples: 10
+      sizeBytes: 32
+    - algBW: "0.01"
+      busBW: "0.01"
+      samples: 10
+      sizeBytes: 64
+    - algBW: "0.02"
+      busBW: "0.02"
+      samples: 10
+      sizeBytes: 128
+    - algBW: "0.04"
+      busBW: "0.04"
+      samples: 10
+      sizeBytes: 256
+    - algBW: "0.05"
+      busBW: "0.05"
+      samples: 10
+      sizeBytes: 512
+    - algBW: "0.13"
+      busBW: "0.13"
+      samples: 10
+      sizeBytes: 1024
+    - algBW: "0.31"
+      busBW: "0.31"
+      samples: 10
+      sizeBytes: 2048
+    - algBW: "0.60"
+      busBW: "0.60"
+      samples: 10
+      sizeBytes: 4096
+    - algBW: "1.13"
+      busBW: "1.13"
+      samples: 10
+      sizeBytes: 8192
+    - algBW: "2.22"
+      busBW: "2.22"
+      samples: 10
+      sizeBytes: 16384
+    - algBW: "4.38"
+      busBW: "4.38"
+      samples: 10
+      sizeBytes: 32768
+    - algBW: "8.63"
+      busBW: "8.63"
+      samples: 10
+      sizeBytes: 65536
+    - algBW: "16.62"
+      busBW: "16.62"
+      samples: 10
+      sizeBytes: 131072
+    - algBW: "28.82"
+      busBW: "28.82"
+      samples: 10
+      sizeBytes: 262144
+    - algBW: "47.43"
+      busBW: "47.43"
+      samples: 10
+      sizeBytes: 524288
+    - algBW: "67.81"
+      busBW: "67.81"
+      samples: 10
+      sizeBytes: 1048576
+    - algBW: "73.34"
+      busBW: "73.34"
+      samples: 10
+      sizeBytes: 2097152
+    - algBW: "122.18"
+      busBW: "122.18"
+      samples: 10
+      sizeBytes: 4194304
+    - algBW: "172.39"
+      busBW: "172.39"
+      samples: 10
+      sizeBytes: 8388608
+    - algBW: "215.12"
+      busBW: "215.12"
+      samples: 10
+      sizeBytes: 16777216
+    - algBW: "244.03"
+      busBW: "244.03"
+      samples: 10
+      sizeBytes: 33554432
+    - algBW: "270.12"
+      busBW: "270.12"
+      samples: 10
+      sizeBytes: 67108864
+    - algBW: "286.78"
+      busBW: "286.78"
+      samples: 10
+      sizeBytes: 134217728
+    - algBW: "300.47"
+      busBW: "300.47"
+      samples: 10
+      sizeBytes: 268435456
+    - algBW: "315.24"
+      busBW: "315.24"
+      samples: 10
+      sizeBytes: 536870912
+    - algBW: "329.27"
+      busBW: "329.27"
+      samples: 10
+      sizeBytes: 1073741824
+    - algBW: "339.96"
+      busBW: "339.96"
+      samples: 10
+      sizeBytes: 2147483648
+    - algBW: "347.41"
+      busBW: "347.41"
+      samples: 10
+      sizeBytes: 4294967296
+    - algBW: "350.20"
+      busBW: "350.20"
+      samples: 10
+      sizeBytes: 8589934592
+    - algBW: "351.45"
+      busBW: "351.45"
+      samples: 10
+      sizeBytes: 17179869184
+    startTime: "2026-10-22T10:03:54Z"
+    transport:
+    - Socket
+kind: List
+metadata:
+  resourceVersion: ""
