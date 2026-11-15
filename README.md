@@ -10,6 +10,11 @@
   <a href="https://yassineteimi.github.io/ncp-partner-onboarding/"><b>Read the documentation</b></a>
 </p>
 
+<p align="center">
+  <a href="https://yassineteimi.github.io/ncp-partner-onboarding/#watch"><img src="docs/assets/video/poster.jpg" alt="Watch the two-minute video" width="720"/></a><br/>
+  <sub>▶ Watch the two-minute video: the data centre, what I built on it, and what ran</sub>
+</p>
+
 ---
 
 A new NVIDIA Cloud Partner gets its hardware long before it gets its first tenant, and

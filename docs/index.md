@@ -8,6 +8,15 @@ who still ships VMs. This project takes both pools from bare nodes to those tena
 NVIDIA's open stack, from one Git repository, and records why each piece won over its
 alternatives.
 
+<video id="watch" controls playsinline preload="metadata" poster="assets/video/poster.jpg" style="width: 100%; border-radius: 8px;">
+  <source src="assets/video/nordhaven.mp4" type="video/mp4">
+  <track kind="captions" src="assets/video/nordhaven.vtt" srclang="en" label="English">
+</video>
+
+The project in two minutes, narrated. The data-centre footage is AI-generated
+illustration; every number on screen comes from a committed run, and the inference
+layer is shown as designed, not run.
+
 It's Part 2 of my GPU fleet work. [Part 1](https://github.com/yassineteimi/nvidia-gpu-fleet-poc)
 built Day 2 operations by hand on one L4; here NVIDIA's tools take over, and where Part 1
 did the same job, I compare the two on the same GPU model. The [AI Factory](ownership-map.md)

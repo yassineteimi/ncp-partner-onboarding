@@ -16,6 +16,11 @@ hardware: one L4 in Paris on 21 October and a 2× H200 node in Finland on 22 Oct
 | A second Prometheus on Paris posing as the Finland site, with `site="fin-sim"` and `simulated="true"` on every series | Thanos on Paris, before the Finland site existed | It runs the whole Finland-to-Paris metrics path, mutual TLS included, without renting anything | 6 | 21 Oct ([hub capture](artifacts/platform/thanos-hub-20261021T114455Z.txt)) |
 | Synthetic blocks backfilled into the Thanos bucket, labelled `site="sim-backfill"` and `simulated="true"` | Thanos compactor, downsampling | Downsampling needs blocks spanning days, far more than a GPU run produces | 6 | 21 Oct ([bucket](artifacts/platform/thanos-bucket-20261021T114314Z.txt)) |
 
+The [two-minute video](index.md#watch) adds one more kind: its data-centre footage (the
+racks, the light trails, the zooms, the beam from Finland to Paris) is AI-generated
+illustration, not footage of the hardware used here. Its numbers, tags and stack come
+from the runs above, and it shows the Dynamo inference layer as designed, not run.
+
 The VM tenant of use case 7 isn't on this list: Paris's CPU worker exposes `/dev/kvm`
 (AMD SVM, [node facts](artifacts/par/cpu-worker-facts.txt)), so KubeVirt runs it on KVM
 with no software emulation.
